@@ -32,7 +32,7 @@ Unlike traditional e-commerce platforms, this project uses Sanity to manage all 
 ## Getting started
 
 ```bash
-git clone https://github.com/lomiafrica/events
+git clone https://github.com/kamayakoi/kamayakoi.com
 ```
 
 ```bash

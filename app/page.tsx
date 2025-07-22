@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Header from "@/components/landing/header";
 import BackgroundVideo from "@/components/landing/BackgroundVideo";
 import Footer from "@/components/landing/footer";
-import OurCodeSection from "@/components/landing/kamayakoi-code";
 import {
   getHomepageVideoUrls,
   getHomepagePromoEvent,
@@ -27,7 +26,6 @@ export default async function Home() {
           <Header />
         </div>
       </div>
-      <OurCodeSection />
       <Footer />
 
       {/* Floating Promo - Renders if promoEventData is found and has a flyer and slug */}

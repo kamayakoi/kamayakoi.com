@@ -84,6 +84,10 @@ BEGIN
 END;
 $$;
 
+-- 4. Drop existing functions before creating new versions with different signatures
+DROP FUNCTION IF EXISTS public.verify_ticket(TEXT);
+DROP FUNCTION IF EXISTS public.mark_ticket_used(TEXT, TEXT);
+
 -- 4. Unified Ticket Verification Function
 CREATE OR REPLACE FUNCTION public.verify_ticket(
     p_ticket_identifier TEXT

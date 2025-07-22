@@ -8,7 +8,7 @@ export default defineConfig({
   title: 'kamayakoi',
 
   // Using the same values as defined in sanity.cli.ts
-  projectId: '11qckjsr',
+  projectId: 'qziej56d',
   dataset: 'production',
 
   plugins: [structureTool(), visionTool()],

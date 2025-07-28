@@ -19,7 +19,6 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
   const [mutedStates, setMutedStates] = useState<boolean[]>([]);
   const [showVideo, setShowVideo] = useState<boolean[]>([]);
-  const [isMobile, setIsMobile] = useState(false);
 
   const {
     activeVideoIndex,
@@ -36,7 +35,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
 
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
-  // Memoize displayEvents to prevent unnecessary re-renders and fix ESLint warning
+  // Memoize displayEvents to prevent unnecessary re-renders
   const displayEvents = useMemo(() => {
     return events?.slice(0, 5) || [];
   }, [events]);
@@ -49,16 +48,6 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
     setMutedStates(initialMutedStates);
     setShowVideo(initialShowVideo);
   }, [displayEvents]);
-
-  // Check for mobile on mount and resize
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   // Load saved video states and auto-play first video
   useEffect(() => {
@@ -281,7 +270,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
   return (
     <>
 
-      <div ref={containerRef} className="parallax-container relative z-10">
+      <div ref={containerRef} className="relative z-10 min-h-[500vh] md:min-h-[400vh]">
         {displayEvents.map((event, index) => {
           const hasVideo = !!event.promoVideoUrl;
           const hasImage = !!event.featuredImage;
@@ -291,12 +280,12 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
           return (
             <section
               key={event._id}
-              className="img-container"
+              className="h-screen snap-start flex justify-center items-center relative"
               ref={(el) => {
                 sectionRefs.current[index] = el;
               }}
             >
-              <div className="media-wrapper">
+              <div className="w-[500px] h-[600px] md:w-[350px] md:h-[467px] lg:w-[500px] lg:h-[600px] m-5 bg-gray-100 overflow-hidden relative rounded-lg shadow-2xl">
                 {hasVideo && currentShowVideo ? (
                   <div className="relative w-full h-full overflow-hidden rounded">
                     <video
@@ -359,8 +348,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                     <Image
                       src={event.featuredImage || "/placeholder.webp"}
                       alt={event.title}
-                      width={isMobile ? 350 : 500}
-                      height={isMobile ? 467 : 600}
+                      fill
                       className="absolute inset-0 w-full h-full object-cover cursor-pointer transition-transform duration-300 hover:scale-105"
                       onClick={() => handleImageClick(event.slug, index)}
                       quality={85}
@@ -388,8 +376,21 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                 )}
 
                 <motion.h2
-                  style={{ y: transforms[index] }}
-                  className="event-number"
+                  className="fixed top-4/4 right-4 md:right-96 transform -translate-y-1/2 text-white font-black pointer-events-none z-30"
+                  style={{
+                    y: transforms[index],
+                    fontSize: '60px',
+                    fontFamily: '"Inter", "Helvetica Neue", Arial, sans-serif',
+                    letterSpacing: '-6px',
+                    lineHeight: '0.8',
+                    color: '#ff6b6b',
+                    textShadow: `
+                      0 0 20px rgba(255, 107, 107, 0.8),
+                      0 0 40px rgba(255, 107, 107, 0.6),
+                      4px 4px 20px rgba(0, 0, 0, 0.9)
+                    `,
+                    filter: 'drop-shadow(0 0 10px rgba(255, 107, 107, 0.7))'
+                  }}
                 >
                   {getDisplayNumber(event, index)}
                 </motion.h2>
@@ -398,101 +399,15 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
           );
         })}
 
-        <motion.div className="progress" style={{ width: progressWidth }} />
+        <motion.div
+          className="fixed left-0 bottom-12 h-1 bg-red-500 z-[1000] origin-left"
+          style={{ width: progressWidth }}
+        />
       </div>
 
-      <style jsx>{`
-        :global(html) {
+      <style jsx global>{`
+        html {
           scroll-snap-type: y mandatory;
-        }
-
-        .parallax-container {
-          min-height: 500vh;
-        }
-
-        .img-container {
-          height: 100vh;
-          scroll-snap-align: start;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          position: relative;
-        }
-
-        .media-wrapper {
-          width: ${isMobile ? "350px" : "500px"};
-          height: ${isMobile ? "467px" : "600px"};
-          margin: 20px;
-          background: #f5f5f5;
-          overflow: hidden;
-          position: relative;
-          border-radius: 8px;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .event-media {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          cursor: pointer;
-          transition: transform 0.3s ease;
-        }
-
-        .event-media.image {
-          border-radius: 8px;
-        }
-
-        .event-media:hover {
-          transform: scale(1.02);
-        }
-
-        .event-number {
-          color: #ffffff;
-          margin: 0;
-          font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
-          font-size: ${isMobile ? "120px" : "180px"};
-          font-weight: 900;
-          letter-spacing: -8px;
-          line-height: 0.8;
-          position: absolute;
-          display: inline-block;
-          top: 50%;
-          right: -${isMobile ? "60px" : "90px"};
-          transform: translateY(-50%);
-          text-shadow: 
-            0 0 30px rgba(255, 255, 255, 0.8),
-            0 0 60px rgba(255, 255, 255, 0.6),
-            0 0 90px rgba(255, 255, 255, 0.4),
-            4px 4px 20px rgba(0, 0, 0, 0.9);
-          z-index: 30;
-          pointer-events: none;
-          filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.7));
-          background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        .progress {
-          position: fixed;
-          left: 0;
-          bottom: 50px;
-          height: 5px;
-          background: var(--accent, #ff6b6b);
-          z-index: 1000;
-          transform-origin: left;
-        }
-
-        @media (max-width: 768px) {
-          .parallax-container {
-            min-height: 400vh;
-          }
-
-          .event-number {
-            font-size: 100px;
-            right: -50px;
-            letter-spacing: -6px;
-          }
         }
       `}</style>
     </>

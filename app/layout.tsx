@@ -71,6 +71,20 @@ export const metadata: Metadata = {
   // manifest: "/site.webmanifest",
 };
 
+// Safe AudioPlayer wrapper component
+function SafeAudioPlayer() {
+  try {
+    return (
+      <div className="hidden md:block fixed top-4 left-4 z-[70]">
+        <AudioPlayer />
+      </div>
+    );
+  } catch (error) {
+    console.log("🎵 SafeAudioPlayer - Failed to render AudioPlayer:", error);
+    return null;
+  }
+}
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -94,9 +108,7 @@ export default async function RootLayout({
             <MusicWrapper tracks={musicTracks}>
               <MediaProvider>
                 {/* Global Desktop Audio Player - positioned in top-left */}
-                <div className="hidden md:block fixed top-4 left-4 z-[70]">
-                  <AudioPlayer />
-                </div>
+                <SafeAudioPlayer />
 
                 <main className="flex-grow">{children}</main>
               </MediaProvider>

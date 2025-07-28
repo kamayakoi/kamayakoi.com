@@ -170,6 +170,11 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
       audioRef.current.currentTime = 0;
       setIsPlaying(false);
       setCurrentTime(0);
+
+      // Force state update to ensure UI reflects stopped state
+      setTimeout(() => {
+        setIsPlaying(false);
+      }, 0);
     }
   }, []);
 
@@ -180,7 +185,14 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
       hasUserInteracted
     });
 
-    if (isPlaying) {
+    // Use the actual audio element state for more reliable toggling
+    if (audioRef.current) {
+      if (audioRef.current.paused || audioRef.current.ended) {
+        play();
+      } else {
+        pause();
+      }
+    } else if (isPlaying) {
       pause();
     } else {
       play();

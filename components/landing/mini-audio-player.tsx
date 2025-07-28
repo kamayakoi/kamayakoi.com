@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/actions/utils";
 import Image from "next/image";
@@ -10,10 +10,11 @@ import { useMusic } from "@/lib/contexts/MusicContext";
 
 interface MiniAudioPlayerProps {
   className?: string;
+  showStopButton?: boolean;
 }
 
-const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
-  const { tracks, currentTrack, isPlaying, togglePlay, nextTrack, prevTrack } =
+const MiniAudioPlayer = ({ className, showStopButton = false }: MiniAudioPlayerProps) => {
+  const { tracks, currentTrack, isPlaying, togglePlay, nextTrack, prevTrack, stop } =
     useMusic();
 
   const handleTogglePlay = (e: React.MouseEvent) => {
@@ -21,6 +22,13 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
     e.stopPropagation();
     console.log("🎵 Mini audio player button clicked - current state:", isPlaying);
     togglePlay();
+  };
+
+  const handleStop = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("🎵 Mini audio player stop clicked");
+    stop();
   };
 
   if (!tracks || tracks.length === 0 || !currentTrack) return null;
@@ -37,7 +45,7 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
     >
       {/* Cover Image */}
       {currentTrack.coverImageUrl && (
-        <div className="w-8 h-8 rounded-full overflow-hidden bg-white/20 flex-shrink-0">
+        <div className="w-8 h-8 rounded-sm overflow-hidden bg-white/20 flex-shrink-0">
           <Image
             src={currentTrack.coverImageUrl}
             alt={currentTrack.title}
@@ -55,7 +63,7 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
             variant="ghost"
             size="icon"
             onClick={prevTrack}
-            className="text-white hover:bg-white/20 h-6 w-6 rounded-full p-0"
+            className="text-white hover:bg-white/20 h-6 w-6 rounded-sm p-0"
           >
             <SkipBack className="h-3 w-3" />
           </Button>
@@ -65,7 +73,7 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
           onClick={handleTogglePlay}
           variant="ghost"
           size="icon"
-          className="text-white hover:bg-white/20 h-6 w-6 rounded-full p-0"
+          className="text-white hover:bg-white/20 h-6 w-6 rounded-sm p-0"
         >
           {isPlaying ? (
             <Pause className="h-3 w-3" />
@@ -79,9 +87,22 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
             variant="ghost"
             size="icon"
             onClick={nextTrack}
-            className="text-white hover:bg-white/20 h-6 w-6 rounded-full p-0"
+            className="text-white hover:bg-white/20 h-6 w-6 rounded-sm p-0"
           >
             <SkipForward className="h-3 w-3" />
+          </Button>
+        )}
+
+        {/* Stop button - only show if requested */}
+        {showStopButton && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleStop}
+            className="text-white hover:bg-white/20 h-6 w-6 rounded-sm p-0"
+            aria-label="Stop music"
+          >
+            <X className="h-3 w-3" />
           </Button>
         )}
       </div>

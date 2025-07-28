@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, SkipBack, SkipForward, X, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -55,10 +55,13 @@ interface AudioPlayerProps {
   className?: string;
 }
 
-const AudioPlayer = ({ className }: AudioPlayerProps) => {
+// Internal component that uses the music context
+const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false); // Always start collapsed
+  const [isClient, setIsClient] = useState(false);
 
+  // Must call hooks unconditionally at top level
   const {
     tracks,
     currentTrack,
@@ -71,6 +74,16 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
     seekTo,
     stop
   } = useMusic();
+
+  // Only render on client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Don't render during SSR
+  if (!isClient) {
+    return <div className="hidden" />;
+  }
 
   console.log("🎵 AudioPlayer - tracks:", tracks);
   console.log("🎵 AudioPlayer - currentTrack:", currentTrack);
@@ -86,6 +99,7 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
   };
 
   const handleClose = () => {
+    console.log("🎵 AudioPlayer - Stop button clicked");
     stop(); // Use stop to permanently stop the music
     setIsVisible(false);
   };
@@ -97,7 +111,7 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
   const handleTogglePlay = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("🎵 Audio player button clicked - current state:", isPlaying);
+    console.log("🎵 Audio player toggle button clicked - current state:", isPlaying);
     togglePlay();
   };
 
@@ -181,7 +195,7 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
           <button
             onClick={handleClose}
             className="bg-[#2a2a2a] rounded-sm w-4 h-4 flex items-center justify-center shadow-md hover:bg-[#3a3a3a] transition-colors border border-gray-700"
-            aria-label="Close"
+            aria-label="Close and stop music"
           >
             <X className="h-2.5 w-2.5 text-gray-300" />
           </button>
@@ -302,6 +316,16 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
       </motion.div>
     </AnimatePresence>
   );
+};
+
+// Wrapper component with error boundary
+const AudioPlayer = ({ className }: AudioPlayerProps) => {
+  try {
+    return <AudioPlayerInternal className={className} />;
+  } catch (error) {
+    console.log("🎵 AudioPlayer - Error caught:", error);
+    return <div className="hidden" />;
+  }
 };
 
 export default AudioPlayer;

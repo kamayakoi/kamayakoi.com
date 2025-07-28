@@ -6,6 +6,8 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
 import { TranslationProvider } from "@/lib/contexts/TranslationContext";
 import MusicWrapper from "@/components/landing/music-wrapper";
+import AudioPlayer from "@/components/landing/audio-player";
+import { getHomepageMusicTracks } from "@/lib/sanity/queries";
 
 // Bold geometric fonts matching the image style
 const bebasNeue = Bebas_Neue({
@@ -68,11 +70,14 @@ export const metadata: Metadata = {
   // manifest: "/site.webmanifest",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch music tracks for global audio player
+  const musicTracks = await getHomepageMusicTracks();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -85,7 +90,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TranslationProvider>
-            <MusicWrapper tracks={[]}>
+            <MusicWrapper tracks={musicTracks}>
+              {/* Global Desktop Audio Player - positioned in top-left */}
+              <div className="hidden md:block fixed top-4 left-4 z-40">
+                <AudioPlayer className="w-[200px] h-auto" />
+              </div>
+
               <main className="flex-grow">{children}</main>
             </MusicWrapper>
           </TranslationProvider>

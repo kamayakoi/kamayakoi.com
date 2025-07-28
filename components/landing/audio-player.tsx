@@ -94,7 +94,7 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
     <AnimatePresence>
       <motion.div
         className={cn(
-          "relative flex flex-col mx-auto rounded-sm overflow-hidden bg-[#11111198] shadow-[0_0_20px_rgba(0,0,0,0.2)] backdrop-blur-sm p-3 w-[280px] h-auto",
+          "relative flex flex-col mx-auto rounded-sm overflow-hidden bg-[#11111198] shadow-[0_0_20px_rgba(0,0,0,0.2)] backdrop-blur-sm p-2 w-[200px] h-auto",
           className,
         )}
         initial={{ opacity: 0, filter: "blur(10px)" }}
@@ -116,12 +116,12 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
         >
           {/* Cover Image */}
           {currentTrack.coverImageUrl && (
-            <motion.div className="bg-white/20 overflow-hidden rounded-sm h-[180px] w-full relative">
+            <motion.div className="bg-white/20 overflow-hidden rounded-sm h-[120px] w-full relative">
               <Image
                 src={currentTrack.coverImageUrl}
                 alt={currentTrack.title}
-                width={180}
-                height={180}
+                width={120}
+                height={120}
                 className="!object-cover w-full my-0 p-0 !mt-0 border-none !h-full"
               />
             </motion.div>

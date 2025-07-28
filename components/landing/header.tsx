@@ -56,11 +56,13 @@ export default function Header() {
   return (
     <header className={`${styles.header} ${isScrolled ? styles.scrolled : ""}`}>
       <div className={styles.headerContent}>
-        {/* Mini Music Player for mobile, empty space for desktop */}
-        <div className="flex items-center" style={{ width: "120px" }}>
-          <div className="md:hidden">
-            <MiniAudioPlayer />
-          </div>
+        {/* Mini Music Player for mobile - positioned on the left */}
+        <div className="flex items-center justify-start md:hidden" style={{ width: "140px" }}>
+          <MiniAudioPlayer className="rounded-sm" />
+        </div>
+
+        {/* Empty space for desktop */}
+        <div className="hidden md:flex items-center" style={{ width: "120px" }}>
         </div>
 
         <nav className="hidden md:flex items-center gap-6">

@@ -21,7 +21,7 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
   return (
     <motion.div
       className={cn(
-        "flex items-center gap-2 bg-black/20 backdrop-blur-sm rounded-full px-2 py-1",
+        "flex items-center gap-2 bg-black/20 backdrop-blur-sm rounded-sm px-2 py-1",
         className,
       )}
       initial={{ opacity: 0, x: -20 }}

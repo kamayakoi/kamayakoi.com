@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
 import { TranslationProvider } from "@/lib/contexts/TranslationContext";
+import { MediaProvider } from "@/lib/contexts/MediaContext";
 import MusicWrapper from "@/components/landing/music-wrapper";
 import AudioPlayer from "@/components/landing/audio-player";
 import { getHomepageMusicTracks } from "@/lib/sanity/queries";
@@ -90,14 +91,16 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <TranslationProvider>
-            <MusicWrapper tracks={musicTracks}>
-              {/* Global Desktop Audio Player - positioned in top-left */}
-              <div className="hidden md:block fixed top-4 left-4 z-[70]">
-                <AudioPlayer />
-              </div>
+            <MediaProvider>
+              <MusicWrapper tracks={musicTracks}>
+                {/* Global Desktop Audio Player - positioned in top-left */}
+                <div className="hidden md:block fixed top-4 left-4 z-[70]">
+                  <AudioPlayer />
+                </div>
 
-              <main className="flex-grow">{children}</main>
-            </MusicWrapper>
+                <main className="flex-grow">{children}</main>
+              </MusicWrapper>
+            </MediaProvider>
           </TranslationProvider>
         </ThemeProvider>
         <Analytics />

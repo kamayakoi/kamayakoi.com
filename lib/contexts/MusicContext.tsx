@@ -169,18 +169,55 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
     }
   };
 
-  // Reset playing state when track changes
+  // Track change logic - preserve state during navigation
   useEffect(() => {
-    setIsPlaying(false);
-    setCurrentTime(0);
-    setDuration(0);
-    if (audioRef.current) {
+    // Only reset if we're actually changing to a different track
+    // This prevents resetting when navigating between pages
+    if (audioRef.current && audioRef.current.src !== currentTrack?.audioUrl) {
+      setCurrentTime(0);
+      setDuration(0);
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
       // Load the new track
       audioRef.current.load();
+
+      // Auto-play if we were already playing or if it's the first track
+      setIsPlaying(prevIsPlaying => {
+        const shouldPlay = prevIsPlaying || currentTrackIndex === 0;
+
+        if (shouldPlay) {
+          const playNewTrack = () => {
+            if (audioRef.current) {
+              audioRef.current.play().then(() => {
+                setIsPlaying(true);
+              }).catch(err => {
+                console.error("Auto-play prevented:", err);
+                setIsPlaying(false);
+              });
+            }
+          };
+
+          // Small delay to ensure the track is loaded
+          setTimeout(playNewTrack, 100);
+          return true;
+        } else {
+          return false;
+        }
+      });
+    } else {
+      // Same track - preserve playing state during navigation
+      if (audioRef.current && audioRef.current.paused) {
+        setIsPlaying(prevIsPlaying => {
+          if (prevIsPlaying) {
+            audioRef.current!.play().catch(err => {
+              console.error("Resume play prevented:", err);
+            });
+          }
+          return prevIsPlaying;
+        });
+      }
     }
-  }, [currentTrackIndex]);
+  }, [currentTrackIndex, currentTrack?.audioUrl]); // Removed isPlaying from dependencies
 
   // Initialize audio volume
   useEffect(() => {
@@ -206,6 +243,25 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
+
+  // Auto-start music when tracks are first loaded
+  useEffect(() => {
+    if (tracks.length > 0 && currentTrack) {
+      const timer = setTimeout(() => {
+        setIsPlaying(prevIsPlaying => {
+          if (!prevIsPlaying) {
+            play().catch(err => {
+              console.log("Initial auto-play prevented:", err);
+            });
+            return true;
+          }
+          return prevIsPlaying;
+        });
+      }, 1000); // Delay to ensure user interaction has occurred
+
+      return () => clearTimeout(timer);
+    }
+  }, [tracks.length, currentTrack, play]); // Removed isPlaying from dependencies
 
   const value: MusicContextType = {
     tracks,

@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, SkipBack, SkipForward, X, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/actions/utils";
 import Image from "next/image";
 import { useMusic } from "@/lib/contexts/MusicContext";
-import { usePathname } from "next/navigation";
 
 const formatTime = (seconds: number = 0) => {
   const minutes = Math.floor(seconds / 60);
@@ -57,11 +56,9 @@ interface AudioPlayerProps {
 }
 
 const AudioPlayer = ({ className }: AudioPlayerProps) => {
-  const pathname = usePathname();
-  const isEventsPage = pathname === '/events';
-
   const [isVisible, setIsVisible] = useState(true);
-  const [isExpanded, setIsExpanded] = useState(!isEventsPage); // Collapsed by default on events page
+  const [isExpanded, setIsExpanded] = useState(true); // Always start expanded to encourage interaction
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
   const {
     tracks,
@@ -74,11 +71,38 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
     prevTrack,
     seekTo,
     pause,
+    play,
   } = useMusic();
 
   console.log("🎵 AudioPlayer - tracks:", tracks);
   console.log("🎵 AudioPlayer - currentTrack:", currentTrack);
   console.log("🎵 AudioPlayer - tracks length:", tracks?.length);
+
+  // Auto-start music on first interaction
+  useEffect(() => {
+    const handleFirstInteraction = async () => {
+      if (!hasUserInteracted && tracks.length > 0 && currentTrack && !isPlaying) {
+        setHasUserInteracted(true);
+        try {
+          await play();
+        } catch (err: unknown) {
+          console.log("Auto-play after interaction prevented:", err);
+        }
+      }
+    };
+
+    // Listen for any user interaction
+    const events = ['click', 'touchstart', 'keydown'];
+    events.forEach(event => {
+      document.addEventListener(event, handleFirstInteraction, { once: true });
+    });
+
+    return () => {
+      events.forEach(event => {
+        document.removeEventListener(event, handleFirstInteraction);
+      });
+    };
+  }, [tracks.length, currentTrack, isPlaying, hasUserInteracted, play]);
 
   const handleSeek = (value: number) => {
     if (duration && duration > 0) {

@@ -14,15 +14,19 @@ export default function MusicWrapper({ children }: MusicWrapperProps) {
   useEffect(() => {
     const fetchMusicTracks = async () => {
       try {
+        console.log("🎵 Fetching music tracks from Sanity...");
         const tracks = await getHomepageMusicTracks();
+        console.log("🎵 Music tracks fetched:", tracks);
         setMusicTracks(tracks);
       } catch (error) {
-        console.error("Failed to fetch music tracks:", error);
+        console.error("❌ Failed to fetch music tracks:", error);
       }
     };
 
     fetchMusicTracks();
   }, []);
+
+  console.log("🎵 Current music tracks state:", musicTracks);
 
   // Render children wrapped in MusicProvider
   return <MusicProvider tracks={musicTracks}>{children}</MusicProvider>;

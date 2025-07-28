@@ -48,27 +48,27 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
   const transform1 = useTransform(
     scrollYProgress,
     [0, 0.2],
-    isMobile ? [-200, 200] : [-400, 400],
+    [-400, 400],
   );
   const transform2 = useTransform(
     scrollYProgress,
     [0.2, 0.4],
-    isMobile ? [-200, 200] : [-400, 400],
+    [-400, 400],
   );
   const transform3 = useTransform(
     scrollYProgress,
     [0.4, 0.6],
-    isMobile ? [-200, 200] : [-400, 400],
+    [-400, 400],
   );
   const transform4 = useTransform(
     scrollYProgress,
     [0.6, 0.8],
-    isMobile ? [-200, 200] : [-400, 400],
+    [-400, 400],
   );
   const transform5 = useTransform(
     scrollYProgress,
     [0.8, 1],
-    isMobile ? [-200, 200] : [-400, 400],
+    [-400, 400],
   );
 
   const transforms = [
@@ -147,7 +147,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                       e.stopPropagation();
                       toggleVideoSound(index);
                     }}
-                    className="absolute bottom-4 right-4 z-20 p-2 bg-black/20 hover:bg-black/40 rounded-sm text-white focus:outline-none transition-colors duration-200"
+                    className="absolute bottom-4 right-4 z-30 p-2 bg-black/20 hover:bg-black/40 rounded-sm text-white focus:outline-none transition-colors duration-200"
                     aria-label={
                       mutedStates[index] ? "Unmute video" : "Mute video"
                     }
@@ -163,8 +163,8 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                 <Image
                   src={event.featuredImage || "/placeholder.webp"}
                   alt={event.title}
-                  width={isMobile ? 250 : 300}
-                  height={isMobile ? 333 : 400}
+                  width={isMobile ? 350 : 500}
+                  height={isMobile ? 467 : 600}
                   className="event-media image"
                   onClick={() => handleImageClick(event.slug)}
                   style={{ cursor: "pointer" }}
@@ -208,13 +208,13 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
         }
 
         .media-wrapper {
-          width: ${isMobile ? "250px" : "300px"};
-          height: ${isMobile ? "333px" : "400px"};
+          width: ${isMobile ? "350px" : "500px"};
+          height: ${isMobile ? "467px" : "600px"};
           margin: 20px;
           background: #f5f5f5;
           overflow: hidden;
           position: relative;
-          border-radius: ${isMobile ? "12px" : "16px"};
+          border-radius: 4px;
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
@@ -227,11 +227,11 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
         }
 
         .event-media.image {
-          border-radius: ${isMobile ? "12px" : "16px"};
+          border-radius: 4px;
         }
 
         .event-media.video {
-          border-radius: ${isMobile ? "12px" : "16px"};
+          border-radius: 4px;
         }
 
         .event-media:hover {
@@ -239,28 +239,29 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
         }
 
         .event-number {
-          color: var(--accent, #ff6b6b);
+          color: #87CEEB;
           margin: 0;
           font-family: "Azeret Mono", monospace;
-          font-size: ${isMobile ? "36px" : "50px"};
+          font-size: ${isMobile ? "80px" : "120px"};
           font-weight: 700;
           letter-spacing: -3px;
           line-height: 1.2;
           position: absolute;
           display: inline-block;
-          top: calc(50% - ${isMobile ? "18px" : "25px"});
-          left: calc(50% + ${isMobile ? "100px" : "120px"});
-          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-          z-index: 10;
+          top: calc(50% - ${isMobile ? "40px" : "60px"});
+          left: calc(50% + ${isMobile ? "200px" : "300px"});
+          text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+          z-index: 20;
         }
 
         .progress {
           position: fixed;
           left: 0;
-          top: 0;
+          bottom: 50px;
           height: 5px;
           background: var(--accent, #ff6b6b);
           z-index: 1000;
+          transform-origin: left;
         }
 
         @media (max-width: 768px) {
@@ -269,7 +270,9 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
           }
 
           .event-number {
-            left: calc(50% + 80px);
+            font-size: 70px;
+            top: calc(50% - 35px);
+            left: calc(50% + 150px);
           }
         }
       `}</style>

@@ -23,7 +23,7 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
                   alt="image"
                   width={500}
                   height={500}
-                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md "
+                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-sm "
                 />
               </figure>
               <figure className=" w-full">
@@ -32,7 +32,7 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
                   alt="image"
                   width={500}
                   height={500}
-                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md "
+                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-sm "
                 />
               </figure>
               <figure className=" w-full">
@@ -41,7 +41,7 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
                   alt="image"
                   width={500}
                   height={500}
-                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md "
+                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-sm "
                 />
               </figure>
               <figure className="w-full">
@@ -50,7 +50,7 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
                   alt="image"
                   width={500}
                   height={500}
-                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md "
+                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-sm "
                 />
               </figure>
               <figure className="w-full">
@@ -59,7 +59,7 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
                   alt="image"
                   width={500}
                   height={500}
-                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md "
+                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-sm "
                 />
               </figure>
             </div>
@@ -70,7 +70,7 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
                   alt="image"
                   width={500}
                   height={500}
-                  className="transition-all duration-300 h-full w-full  align-bottom object-cover rounded-md "
+                  className="transition-all duration-300 h-full w-full  align-bottom object-cover rounded-sm "
                 />
               </figure>
               <figure className="w-full h-full ">
@@ -79,7 +79,7 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
                   alt="image"
                   width={500}
                   height={500}
-                  className="transition-all duration-300 h-full w-full align-bottom object-cover rounded-md "
+                  className="transition-all duration-300 h-full w-full align-bottom object-cover rounded-sm "
                 />
               </figure>
               <figure className="w-full h-full ">
@@ -88,7 +88,7 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
                   alt="image"
                   width={500}
                   height={500}
-                  className="transition-all duration-300 h-full w-full  align-bottom object-cover rounded-md "
+                  className="transition-all duration-300 h-full w-full  align-bottom object-cover rounded-sm "
                 />
               </figure>
             </div>
@@ -99,7 +99,7 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
                   alt="image"
                   width={500}
                   height={500}
-                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md "
+                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-sm "
                 />
               </figure>
               <figure className="w-full">
@@ -108,7 +108,7 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
                   alt="image"
                   width={500}
                   height={500}
-                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md "
+                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-sm "
                 />
               </figure>
               <figure className="w-full">
@@ -117,7 +117,7 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
                   alt="image"
                   width={500}
                   height={500}
-                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md "
+                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-sm "
                 />
               </figure>
               <figure className="w-full">
@@ -126,7 +126,7 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
                   alt="image"
                   width={500}
                   height={500}
-                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md "
+                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-sm "
                 />
               </figure>
               <figure className="w-full">
@@ -135,7 +135,7 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
                   alt="image"
                   width={500}
                   height={500}
-                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md "
+                  className="transition-all duration-300 w-full h-96  align-bottom object-cover rounded-sm "
                 />
               </figure>
             </div>

@@ -154,12 +154,12 @@ export default function GalleryClientComponent() {
                       className={`
                                         relative 
                                         mb-5 block w-full cursor-zoom-in
-                                        after:content after:pointer-events-none after:absolute after:inset-0 after:rounded-md after:shadow-highlight
+                                        after:content after:pointer-events-none after:absolute after:inset-0 after:rounded-sm after:shadow-highlight
                                     `}
                     >
                       <Image
                         alt="Gallery photo - Highlight"
-                        className="transform rounded-md brightness-90 transition will-change-auto group-hover:brightness-110"
+                        className="transform rounded-sm brightness-90 transition will-change-auto group-hover:brightness-110"
                         style={{ transform: "translate3d(0, 0, 0)" }}
                         src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_scale,w_720,f_auto,q_auto/${public_id}.${format}`}
                         width={!isNaN(numericWidth) ? numericWidth : 720}
@@ -210,12 +210,12 @@ export default function GalleryClientComponent() {
                       className={`
                                         relative 
                                         mb-5 block w-full cursor-zoom-in
-                                        after:content after:pointer-events-none after:absolute after:inset-0 after:rounded-md after:shadow-highlight
+                                        after:content after:pointer-events-none after:absolute after:inset-0 after:rounded-sm after:shadow-highlight
                                     `}
                     >
                       <Image
                         alt="Gallery photo"
-                        className="transform rounded-md brightness-90 transition will-change-auto group-hover:brightness-110"
+                        className="transform rounded-sm brightness-90 transition will-change-auto group-hover:brightness-110"
                         style={{ transform: "translate3d(0, 0, 0)" }}
                         src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_scale,w_720,f_auto,q_auto/${public_id}.${format}`}
                         width={!isNaN(numericWidth) ? numericWidth : 720}
@@ -292,7 +292,7 @@ export default function GalleryClientComponent() {
                 >
                   <Image
                     alt={`Zoomed gallery photo ${zoomedImage.id}`}
-                    className="object-contain w-full h-full rounded-md" // Transform class removed
+                    className="object-contain w-full h-full rounded-sm" // Transform class removed
                     style={{ transform: "translate3d(0, 0, 0)" }} // Keep for potential GPU layer promotion
                     src={imageSrc}
                     width={baseWidth}

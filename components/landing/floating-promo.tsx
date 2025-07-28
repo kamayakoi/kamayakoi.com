@@ -17,8 +17,8 @@ interface FloatingPromoProps {
 
 export default function FloatingPromo({
   imageUrl = "/placeholder.svg?height=180&width=320",
-  onClose = () => {},
-  onButtonClick = () => {},
+  onClose = () => { },
+  onButtonClick = () => { },
   href,
   title = "Promotional event flyer",
   buttonText = "Get your ticket",
@@ -62,7 +62,7 @@ export default function FloatingPromo({
         </button>
       </div>
 
-      <div className="bg-[#1a1a1a] rounded-lg shadow-2xl overflow-hidden border border-gray-800 relative">
+      <div className="bg-[#1a1a1a] rounded-sm shadow-2xl overflow-hidden border border-gray-800 relative">
         {/* Traffic light buttons */}
         <div className="flex items-center px-2 py-1.5 bg-[#252525]">
           <div className="flex space-x-1.5">

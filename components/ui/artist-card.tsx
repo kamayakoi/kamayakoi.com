@@ -92,8 +92,8 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
         `}
       </style>
 
-      <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-zinc-900 rounded-3xl shadow-lg dark:shadow-2xl dark:shadow-black/80 overflow-hidden hover-scale">
+      <div className="w-full max-w-lg">
+        <div className="bg-white dark:bg-zinc-900 rounded-sm shadow-lg dark:shadow-2xl dark:shadow-black/80 overflow-hidden hover-scale">
           <div className="relative overflow-hidden image-container">
             <Image
               src={artist.imageUrl || "/placeholder.webp"}
@@ -125,8 +125,8 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
             )}
           </div>
 
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3 flex-1">
+          <div className="p-4">
+            <div className="flex items-center gap-3 mb-4">
               <div className="w-8 h-8 rounded-full overflow-hidden hover-scale-sm ring-2 ring-gray-200 dark:ring-zinc-700 flex-shrink-0">
                 <Image
                   src={artist.imageUrl || "/placeholder.webp"}
@@ -158,13 +158,45 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
                     {socialPlatform}
                   </div>
                 )}
-                {artist.bio && (
+                {artist.bio && !artist.description && (
                   <div className="text-xs text-gray-500 dark:text-zinc-500 mt-1 line-clamp-2">
                     {artist.bio}
                   </div>
                 )}
               </div>
             </div>
+
+            {/* Full Description */}
+            {artist.description && (
+              <div className="mb-4">
+                <div className="text-sm text-gray-700 dark:text-zinc-300 leading-relaxed">
+                  {artist.description.split('\n').map((paragraph, index) => (
+                    <p key={index} className={index > 0 ? 'mt-3' : ''}>
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Video */}
+            {artist.videoUrl && (
+              <div className="mb-4">
+                <video
+                  src={artist.videoUrl}
+                  controls
+                  className="w-full rounded-sm shadow-sm"
+                  preload="metadata"
+                >
+                  Your browser does not support the video tag.
+                </video>
+                {artist.videoCaption && (
+                  <p className="text-xs text-gray-500 dark:text-zinc-500 mt-2 italic">
+                    {artist.videoCaption}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -74,7 +74,7 @@ async function BlogPostContent({
       )}
 
       {post.mainImage && (
-        <div className="relative aspect-video mb-8 rounded-md overflow-hidden">
+        <div className="relative aspect-video mb-8 rounded-sm overflow-hidden">
           <Image
             src={post.mainImage.url}
             alt={post.mainImage.alt || post.title}
@@ -87,7 +87,7 @@ async function BlogPostContent({
 
       <Separator className="my-8" />
 
-      <div className="bg-muted p-6 rounded-md">
+      <div className="bg-muted p-6 rounded-sm">
         <div className="prose prose-lg max-w-none">
           <PortableText value={post.body} />
         </div>

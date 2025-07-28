@@ -64,6 +64,10 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
     seekTo,
   } = useMusic();
 
+  console.log("🎵 AudioPlayer - tracks:", tracks);
+  console.log("🎵 AudioPlayer - currentTrack:", currentTrack);
+  console.log("🎵 AudioPlayer - tracks length:", tracks?.length);
+
   const handleSeek = (value: number) => {
     if (duration) {
       const time = (value / 100) * duration;
@@ -75,13 +79,22 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-  if (!tracks || tracks.length === 0 || !currentTrack) return null;
+  if (!tracks || tracks.length === 0 || !currentTrack) {
+    console.log("🎵 AudioPlayer - Not rendering because:", {
+      hasNoTracks: !tracks,
+      tracksLength: tracks?.length,
+      hasNoCurrentTrack: !currentTrack
+    });
+    return null;
+  }
+
+  console.log("🎵 AudioPlayer - Rendering with track:", currentTrack.title);
 
   return (
     <AnimatePresence>
       <motion.div
         className={cn(
-          "relative flex flex-col mx-auto rounded-3xl overflow-hidden bg-[#11111198] shadow-[0_0_20px_rgba(0,0,0,0.2)] backdrop-blur-sm p-3 w-[280px] h-auto",
+          "relative flex flex-col mx-auto rounded-sm overflow-hidden bg-[#11111198] shadow-[0_0_20px_rgba(0,0,0,0.2)] backdrop-blur-sm p-3 w-[280px] h-auto",
           className,
         )}
         initial={{ opacity: 0, filter: "blur(10px)" }}
@@ -103,7 +116,7 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
         >
           {/* Cover Image */}
           {currentTrack.coverImageUrl && (
-            <motion.div className="bg-white/20 overflow-hidden rounded-[16px] h-[180px] w-full relative">
+            <motion.div className="bg-white/20 overflow-hidden rounded-sm h-[180px] w-full relative">
               <Image
                 src={currentTrack.coverImageUrl}
                 alt={currentTrack.title}
@@ -144,7 +157,7 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
 
             {/* Controls */}
             <motion.div className="flex items-center justify-center w-full">
-              <div className="flex items-center gap-2 w-fit bg-[#11111198] rounded-[16px] p-2">
+              <div className="flex items-center gap-2 w-fit bg-[#11111198] rounded-sm p-2">
                 {tracks.length > 1 && (
                   <motion.div
                     whileHover={{ scale: 1.1 }}

@@ -74,6 +74,30 @@ export default defineType({
       description: 'Username without @ symbol (e.g., johndoe)',
       placeholder: 'johndoe',
     }),
+    defineField({
+      name: 'description',
+      title: 'Full Description',
+      type: 'text',
+      description: 'Longer description/biography of the artist for detailed display',
+      rows: 8,
+    }),
+    defineField({
+      name: 'video',
+      title: 'Artist Video',
+      type: 'file',
+      description: 'Optional video showcasing the artist (supports MP4, WebM, etc.)',
+      options: {
+        accept: 'video/*',
+      },
+      fields: [
+        {
+          name: 'caption',
+          title: 'Video Caption',
+          type: 'string',
+          description: 'Optional caption for the video',
+        },
+      ],
+    }),
     // Add any other relevant fields for artists here
   ],
   preview: {

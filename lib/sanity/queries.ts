@@ -81,9 +81,14 @@ export async function getEventBySlug(slug: string, locale: string) {
         _id,
         name,
         bio,
+        description,
         "image": image.asset->url,
+        "videoUrl": video.asset->url,
+        "videoCaption": video.caption,
         socialLink,
-        isResident
+        socialHandle,
+        isResident,
+        role
       },
       gallery[]{
         _key,
@@ -365,7 +370,10 @@ export interface ArtistData {
   name: string;
   slug: string;
   bio?: string;
+  description?: string;
   imageUrl?: string;
+  videoUrl?: string;
+  videoCaption?: string;
   socialLink?: string;
   socialHandle?: string;
   isResident: boolean;
@@ -379,7 +387,10 @@ export const getAllArtists = async (): Promise<ArtistData[]> => {
     name,
     "slug": slug.current,
     bio,
+    description,
     "imageUrl": image.asset->url,
+    "videoUrl": video.asset->url,
+    "videoCaption": video.caption,
     socialLink,
     socialHandle,
     isResident,
@@ -406,7 +417,10 @@ export const getArtistBySlug = async (
     name,
     "slug": slug.current,
     bio,
+    description,
     "imageUrl": image.asset->url,
+    "videoUrl": video.asset->url,
+    "videoCaption": video.caption,
     socialLink,
     socialHandle,
     isResident,

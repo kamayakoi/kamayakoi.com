@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import Header from "@/components/landing/header";
-import Footer from "@/components/landing/footer";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
 
@@ -85,7 +84,6 @@ export function PaymentSuccessClient({
           </Card>
         </div>
       </div>
-      <Footer />
     </>
   );
 }

@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Volume2, VolumeX, ImageIcon, Play } from "lucide-react";
 import { type EventParallaxData } from "@/lib/sanity/queries";
-import HorizonBackground from "./horizon-background";
 import { useMedia } from "@/lib/contexts/MediaContext";
 
 interface ParallaxGalleryProps {
@@ -49,7 +48,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
 
     setMutedStates(initialMutedStates);
     setShowVideo(initialShowVideo);
-  }, [displayEvents.length]);
+  }, [displayEvents]);
 
   // Check for mobile on mount and resize
   useEffect(() => {
@@ -83,18 +82,24 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
         }
       });
 
-      // Auto-play first video
+      // Try to auto-play first video (will fail gracefully if no user interaction)
       if (displayEvents.length > 0 && videoRefs.current[0] && displayEvents[0]?.promoVideoUrl) {
         const firstVideo = videoRefs.current[0];
         setActiveVideo(0);
         setVideoPlaying(true);
         firstVideo.currentTime = getVideoState(displayEvents[0].slug)?.currentTime || 0;
-        firstVideo.play().catch(() => {
+        firstVideo.play().catch((error) => {
+          console.log("🎥 Video autoplay prevented:", error.message || 'Autoplay blocked');
+          // Fallback: mute the video and try again
           firstVideo.muted = true;
           setMutedStates(prev => {
             const newStates = [...prev];
             newStates[0] = true;
             return newStates;
+          });
+          firstVideo.play().catch(() => {
+            console.log("🎥 Video autoplay failed even when muted - user interaction required");
+            setVideoPlaying(false);
           });
         });
       }
@@ -275,18 +280,12 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
 
   return (
     <>
-      <HorizonBackground
-        staticPosition={true}
-        opacity={0.8}
-        className="fixed inset-0 z-0"
-      />
 
       <div ref={containerRef} className="parallax-container relative z-10">
         {displayEvents.map((event, index) => {
           const hasVideo = !!event.promoVideoUrl;
           const hasImage = !!event.featuredImage;
           const hasBoth = hasVideo && hasImage;
-          const isActiveVideo = activeVideoIndex === index;
           const currentShowVideo = showVideo[index];
 
           return (
@@ -353,13 +352,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                       )}
                     </div>
 
-                    {/* Playing indicator */}
-                    {isActiveVideo && (
-                      <div className="absolute top-4 left-4 z-40 flex items-center space-x-2">
-                        <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                        <span className="text-white text-sm font-medium bg-black/50 px-2 py-1 rounded backdrop-blur-sm">LIVE</span>
-                      </div>
-                    )}
+
                   </div>
                 ) : (
                   <div className="relative w-full h-full overflow-hidden rounded">

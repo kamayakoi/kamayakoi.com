@@ -113,8 +113,8 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
               </h2>
             </div>
 
-            {/* Role badge */}
-            {badge && (
+            {/* Role badge - but not for residents since they have bottom badge */}
+            {badge && !artist.isResident && (
               <div className="absolute top-6 right-6">
                 <span
                   className={`px-3 py-1 text-xs font-bold text-white rounded-full ${badge.color} badge-pulse`}
@@ -123,22 +123,26 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
                 </span>
               </div>
             )}
+
+            {/* Resident badge at bottom right */}
+            {artist.isResident && (
+              <div className="absolute bottom-3 right-3">
+                <div className="inline-flex items-center px-1.5 py-0.5 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-sm flex-shrink-0">
+                  <span className="relative flex h-2 w-2 mr-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  </span>
+                  Resident
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="p-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 rounded-full overflow-hidden hover-scale-sm ring-2 ring-gray-200 dark:ring-zinc-700 flex-shrink-0">
-                <Image
-                  src={artist.imageUrl || "/placeholder.webp"}
-                  width={32}
-                  height={32}
-                  alt={`${artist.name} avatar`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
               <div className="hover-translate flex-1 min-w-0">
                 {(artist.socialHandle || artist.socialLink) && (
-                  <div className="text-sm text-gray-700 dark:text-zinc-200 truncate">
+                  <div className="text-xl font-medium text-gray-700 dark:text-zinc-200 truncate">
                     {artist.socialLink ? (
                       <Link
                         href={artist.socialLink}
@@ -146,38 +150,20 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
                         rel="noopener noreferrer"
                         className="hover:text-blue-500 transition-colors"
                       >
-                        @{artist.socialHandle || "social"}
+                        <span className="font-bold">@</span>{artist.socialHandle || "social"}
                       </Link>
                     ) : (
-                      <span>@{artist.socialHandle}</span>
+                      <span><span className="font-bold">@</span>{artist.socialHandle}</span>
                     )}
                   </div>
                 )}
                 {socialPlatform && (
-                  <div className="text-xs text-gray-500 dark:text-zinc-500">
+                  <div className="text-sm text-gray-500 dark:text-zinc-500 mt-1">
                     {socialPlatform}
-                  </div>
-                )}
-                {artist.bio && !artist.description && (
-                  <div className="text-xs text-gray-500 dark:text-zinc-500 mt-1 line-clamp-2">
-                    {artist.bio}
                   </div>
                 )}
               </div>
             </div>
-
-            {/* Full Description */}
-            {artist.description && (
-              <div className="mb-4">
-                <div className="text-sm text-gray-700 dark:text-zinc-300 leading-relaxed">
-                  {artist.description.split('\n').map((paragraph, index) => (
-                    <p key={index} className={index > 0 ? 'mt-3' : ''}>
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Video */}
             {artist.videoUrl && (

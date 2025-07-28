@@ -4,6 +4,7 @@ import { getAllArtists, type ArtistData } from "@/lib/sanity/queries";
 import Header from "@/components/landing/header";
 import { ArtistCard } from "@/components/ui/artist-card";
 import LoadingComponent from "@/components/ui/loader";
+import MinimalFooter from "@/components/landing/minimal-footer";
 
 export const metadata: Metadata = {
   title: "Artists",
@@ -28,6 +29,7 @@ async function ArtistsContent() {
           </div>
         </div>
       </main>
+      <MinimalFooter />
     </div>
   );
 }

@@ -1,18 +1,16 @@
 import { Suspense } from "react";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CalendarDays, Clock, MapPin, Users, Check } from "lucide-react";
 import Header from "@/components/landing/header";
 import { Separator } from "@/components/ui/separator";
 import { getEventBySlug } from "@/lib/sanity/queries";
 import { EventShareButton } from "@/components/event/event-share-button";
-import { YangoButton } from "@/components/event/YangoButton";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { t } from "@/lib/i18n/translations";
 import CheckoutButton from "@/components/event/CheckoutButton";
-import ArtistCard from "@/components/event/ArtistCard";
 import LoadingComponent from "@/components/ui/loader";
-
+import { EventMediaDisplay } from "@/components/event/event-media-display";
+import MinimalFooter from "@/components/landing/minimal-footer";
 // Define specific type for TicketType
 interface TicketTypeData {
   _key: string;
@@ -61,20 +59,14 @@ type EventData = {
     yangoUrl?: string; // Added Yango URL
   };
   flyer?: { url: string };
+  promoVideoUrl?: string;
   description?: string;
   venueDetails?: string;
   hostedBy?: string;
   ticketsAvailable?: boolean; // Master switch
   ticketTypes?: TicketTypeData[];
   bundles?: BundleData[];
-  lineup?: {
-    _id: string;
-    name: string;
-    bio?: string;
-    image?: string;
-    socialLink?: string;
-    isResident?: boolean; // Added isResident
-  }[];
+
   gallery?: { _key: string; url: string; caption?: string }[];
 };
 
@@ -218,7 +210,6 @@ async function EventPageContent({
   let mapEmbedSrc = null;
   if (event.location && (event.location.venueName || event.location.address)) {
     const queryParts = [];
-    // Only add non-empty, meaningful location data
     if (
       event.location.venueName &&
       event.location.venueName.trim().length > 2
@@ -229,10 +220,9 @@ async function EventPageContent({
       queryParts.push(event.location.address.trim());
     }
 
-    const Sanequery = queryParts.join(", ");
-    // Only create map embed if we have meaningful location data (more than just a few characters)
-    if (Sanequery && Sanequery.length > 2) {
-      const encodedQuery = encodeURIComponent(Sanequery);
+    const saneQuery = queryParts.join(", ");
+    if (saneQuery && saneQuery.length > 2) {
+      const encodedQuery = encodeURIComponent(saneQuery);
       mapEmbedSrc = `https://www.google.com/maps?q=${encodedQuery}&output=embed`;
     }
   }
@@ -262,151 +252,180 @@ async function EventPageContent({
   return (
     <>
       <Header />
-      <div className="container mx-auto py-22 px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-6 gap-8 lg:gap-12 items-start">
-          {/* Event Flyer - Assign 2 columns */}
-          <div className="lg:col-span-2 relative aspect-[2/3] rounded-sm overflow-hidden shadow-lg bg-muted">
-            <Image
-              src={event.flyer?.url || "/placeholder.webp"}
-              alt={event.title}
-              priority
-              fill
-              className="object-center"
-            />
-          </div>
+      <div className="relative">
+        {/* Hero Background Section */}
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-primary/5"></div>
 
-          {/* Event Details - Assign 3 columns */}
-          <div className="lg:col-span-4">
-            {/* Title and Subtitle */}
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3">
-              {event.title}
-            </h1>
-            {event.subtitle && (
-              <p className="text-xl md:text-2xl text-slate-300 mt-1 mb-6">
-                {event.subtitle}
-              </p>
-            )}
-
-            {/* Date, Time, Location, Hosted By */}
-            <div className="flex flex-col gap-4 mb-8">
-              <div className="flex items-center gap-3">
-                <CalendarDays className="h-6 w-6 text-primary flex-shrink-0" />
-                <span className="text-lg text-gray-200">{formattedDate}</span>
+        <div className="relative container mx-auto py-24 px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
+            {/* Event Flyer/Video - Enhanced with better shadows and effects */}
+            <div className="lg:col-span-2 relative">
+              <div className="relative aspect-[2/3] rounded-lg overflow-hidden shadow-2xl bg-gradient-to-br from-muted to-muted/50 border border-border/20">
+                <EventMediaDisplay
+                  flyerUrl={event.flyer?.url}
+                  promoVideoUrl={event.promoVideoUrl}
+                  eventTitle={event.title}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
               </div>
-              <div className="flex items-center gap-3">
-                <Clock className="h-6 w-6 text-primary flex-shrink-0" />
-                <span className="text-lg text-gray-200">{formattedTime}</span>
-              </div>
-              {event.location?.venueName && (
-                <div className="flex items-center gap-3">
-                  <MapPin className="h-6 w-6 text-primary flex-shrink-0" />
-                  <div className="flex items-center gap-2 flex-wrap text-base">
-                    {event.location.googleMapsUrl ? (
-                      <a
-                        href={event.location.googleMapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:underline"
-                      >
-                        <span className="font-semibold text-gray-100">
-                          {event.location.venueName}
-                        </span>
-                        {event.location.address && (
-                          <span className="text-sm text-slate-400 block">
-                            {" "}
-                            ({event.location.address})
-                          </span>
-                        )}
-                      </a>
-                    ) : (
-                      <span>
-                        <span className="font-semibold text-gray-100">
-                          {event.location.venueName}
-                        </span>
-                        {event.location.address && (
-                          <span className="text-sm text-slate-400 block">
-                            {" "}
-                            ({event.location.address})
-                          </span>
-                        )}
-                      </span>
-                    )}
-                    {event.location.yangoUrl && (
-                      <>
-                        <span className="text-muted-foreground">|</span>
-                        <YangoButton href={event.location.yangoUrl} />
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
-              {event.hostedBy && (
-                <div className="flex items-center gap-3">
-                  <Users className="h-6 w-6 text-primary flex-shrink-0" />
-                  <span className="text-lg text-gray-200">
-                    {t(currentLanguage, "eventSlugPage.hostedBy", {
-                      name: event.hostedBy,
-                    })}
-                  </span>
-                </div>
-              )}
             </div>
 
-            <Separator className="my-6" />
+            {/* Event Details - Enhanced typography and spacing */}
+            <div className="lg:col-span-3 space-y-8">
+              {/* Title Section with better typography */}
+              <div className="space-y-4">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent leading-tight">
+                  {event.title}
+                </h1>
+                {event.subtitle && (
+                  <p className="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed max-w-2xl">
+                    {event.subtitle}
+                  </p>
+                )}
+              </div>
 
-            {/* Tickets/Bundles Section - Always Link Checkout Mode Logic */}
-            <div className="py-4">
-              {!globallyTicketsOnSale ? (
-                <div className="bg-secondary text-secondary-foreground p-4 rounded-sm mb-6">
-                  <p className="font-medium">
-                    {t(
-                      currentLanguage,
-                      "eventSlugPage.tickets.salesClosedGlobal",
-                    )}
-                  </p>
+              {/* Event Meta Information - Redesigned with cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-border/20 hover:bg-card/70 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <CalendarDays className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground font-medium">Date</p>
+                      <p className="text-foreground font-semibold">{formattedDate}</p>
+                    </div>
+                  </div>
                 </div>
-              ) : !hasAnyDefinedItems ? (
-                <div className="bg-secondary text-secondary-foreground p-4 rounded-sm">
-                  <p className="font-medium">
-                    {t(currentLanguage, "eventSlugPage.tickets.noItemsListed")}
-                  </p>
+
+                <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-border/20 hover:bg-card/70 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Clock className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground font-medium">Time</p>
+                      <p className="text-foreground font-semibold">{formattedTime}</p>
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <>
-                  <h2 className="text-2xl font-bold text-gray-100 mb-4 tracking-tight">
-                    {t(currentLanguage, "eventSlugPage.tickets.title")}
-                  </h2>
-                  <div className="space-y-6 mt-6">
-                    {/* List Ticket Types */}
-                    {hasDefinedTickets && (
-                      <div className="space-y-3">
-                        {event.ticketTypes?.map((ticket) => {
-                          console.log(
-                            "Event page - ticket.productId:",
-                            ticket.productId,
-                            "for ticket:",
-                            ticket.name,
-                          );
-                          return (
-                            <Card
-                              key={ticket._key}
-                              className="border-slate-700 bg-background shadow-lg rounded-sm overflow-hidden flex flex-col"
+
+                {event.location?.venueName && (
+                  <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-border/20 hover:bg-card/70 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <MapPin className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-muted-foreground font-medium">Location</p>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {event.location.googleMapsUrl ? (
+                            <a
+                              href={event.location.googleMapsUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:underline"
                             >
-                              <div className="size-full bg-repeat p-1 bg-[length:20px_20px]">
-                                <div className="size-full bg-gradient-to-br from-background/95 via-background/85 to-background/70 rounded-sm pt-1 pb-1 px-3 flex flex-col flex-grow">
-                                  <CardContent className="p-0 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 flex-grow w-full">
-                                    <div className="flex-grow">
-                                      <div className="flex flex-wrap items-baseline mb-3">
-                                        <h4 className="text-gray-100 font-bold text-lg uppercase leading-tight">
+                              <span className="font-semibold text-foreground hover:text-primary transition-colors">
+                                {event.location.venueName}
+                              </span>
+                              {event.location.address && (
+                                <span className="text-sm text-muted-foreground">
+                                  , {event.location.address}
+                                </span>
+                              )}
+                            </a>
+                          ) : (
+                            <div>
+                              <span className="font-semibold text-foreground">
+                                {event.location.venueName}
+                              </span>
+                              {event.location.address && (
+                                <span className="text-sm text-muted-foreground">
+                                  , {event.location.address}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {event.hostedBy && (
+                  <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-border/20 hover:bg-card/70 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <Users className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground font-medium">Hosted by</p>
+                        <p className="text-foreground font-semibold">{event.hostedBy}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <Separator className="opacity-30" />
+
+              {/* Tickets Section - Enhanced design */}
+              <div className="space-y-6">
+                {!globallyTicketsOnSale ? (
+                  <div className="bg-destructive/10 border border-destructive/20 text-destructive p-6 rounded-lg backdrop-blur-sm">
+                    <p className="font-semibold text-center">
+                      {t(
+                        currentLanguage,
+                        "eventSlugPage.tickets.salesClosedGlobal",
+                      )}
+                    </p>
+                  </div>
+                ) : !hasAnyDefinedItems ? (
+                  <div className="bg-muted/50 border border-border/20 p-6 rounded-lg backdrop-blur-sm text-center">
+                    <p className="font-medium text-muted-foreground">
+                      {t(currentLanguage, "eventSlugPage.tickets.noItemsListed")}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="text-center">
+                      <h2 className="text-3xl font-bold text-foreground mb-2">
+                        {t(currentLanguage, "eventSlugPage.tickets.title")}
+                      </h2>
+                      <p className="text-muted-foreground">
+                        Select your tickets and join the experience
+                      </p>
+                    </div>
+
+                    <div className="space-y-4">
+                      {/* Ticket Types */}
+                      {hasDefinedTickets && (
+                        <div className="space-y-3">
+                          {event.ticketTypes?.map((ticket) => {
+                            console.log(
+                              "Event page - ticket.productId:",
+                              ticket.productId,
+                              "for ticket:",
+                              ticket.name,
+                            );
+                            return (
+                              <Card
+                                key={ticket._key}
+                                className="border-border/40 bg-card/30 backdrop-blur-sm shadow-lg rounded-lg overflow-hidden hover:bg-card/50 transition-all duration-300 hover:shadow-xl hover:border-primary/30"
+                              >
+                                <div className="p-6">
+                                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                                    <div className="flex-grow space-y-3">
+                                      <div className="flex flex-wrap items-center gap-3">
+                                        <h4 className="text-foreground font-bold text-xl">
                                           {ticket.name.replace(
                                             /\s*\(\d+(\s*\w+)?\)$/,
                                             "",
                                           )}
                                         </h4>
-                                        <span className="mx-2 text-gray-400 text-lg">
-                                          |
-                                        </span>
-                                        <p className="text-primary font-semibold text-xl whitespace-nowrap">
+                                        <div className="h-6 w-px bg-border"></div>
+                                        <p className="text-primary font-bold text-2xl">
                                           {formatPrice(ticket.price)}
                                           {t(
                                             currentLanguage,
@@ -414,71 +433,50 @@ async function EventPageContent({
                                           )}
                                         </p>
                                       </div>
+
                                       {ticket.description && (
-                                        <div className="text-sm mb-1 space-y-1">
+                                        <div className="space-y-2">
                                           {ticket.description
                                             .split("\n")
                                             .map((line, index) => {
                                               const trimmedLine = line.trim();
-                                              if (trimmedLine === "") {
-                                                return <br key={index} />;
-                                              }
-                                              if (
-                                                trimmedLine.startsWith("⚠️")
-                                              ) {
+                                              if (trimmedLine === "") return <br key={index} />;
+                                              if (trimmedLine.startsWith("⚠️")) {
                                                 return (
-                                                  <p
-                                                    key={index}
-                                                    className="text-amber-400 font-medium"
-                                                  >
+                                                  <p key={index} className="text-amber-400 font-medium text-sm">
                                                     {trimmedLine}
                                                   </p>
                                                 );
                                               }
                                               return (
-                                                <p
-                                                  key={index}
-                                                  className="text-gray-400 leading-relaxed"
-                                                >
+                                                <p key={index} className="text-muted-foreground text-sm leading-relaxed">
                                                   {trimmedLine}
                                                 </p>
                                               );
                                             })}
                                         </div>
                                       )}
+
                                       {ticket.details && (
-                                        <div className="text-xs text-gray-400/80 my-2 space-y-1">
+                                        <div className="space-y-1">
                                           {ticket.details
                                             .split("\n")
                                             .map((line, idx) => {
                                               const trimmedLine = line.trim();
-                                              if (trimmedLine === "") {
-                                                return <br key={idx} />;
-                                              }
-                                              const match =
-                                                trimmedLine.match(
-                                                  /^(✅|✔|•|-|\*)\s*(.*)/,
-                                                );
+                                              if (trimmedLine === "") return <br key={idx} />;
+                                              const match = trimmedLine.match(/^(✅|✔|•|-|\*)\s*(.*)/);
                                               if (match && match[2]) {
                                                 return (
-                                                  <div
-                                                    key={idx}
-                                                    className="flex items-start pl-5"
-                                                  >
-                                                    <Check className="mr-1.5 h-3.5 w-3.5 text-green-500 flex-shrink-0 mt-[1px]" />
-                                                    <span className="leading-snug">
+                                                  <div key={idx} className="flex items-start gap-2">
+                                                    <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                                                    <span className="text-sm text-muted-foreground">
                                                       {match[2]}
                                                     </span>
                                                   </div>
                                                 );
                                               }
                                               return (
-                                                <p
-                                                  key={idx}
-                                                  className="leading-snug ml-[calc(0.375rem+0.875rem)]"
-                                                >
-                                                  {" "}
-                                                  {/* Indent non-list items slightly if preferred or remove ml for full width */}
+                                                <p key={idx} className="text-sm text-muted-foreground ml-6">
                                                   {trimmedLine}
                                                 </p>
                                               );
@@ -486,7 +484,8 @@ async function EventPageContent({
                                         </div>
                                       )}
                                     </div>
-                                    <div className="flex-shrink-0 w-full sm:w-auto mt-3 sm:mt-0 flex justify-end">
+
+                                    <div className="flex-shrink-0 w-full lg:w-auto">
                                       <CheckoutButton
                                         item={{
                                           id: ticket._key,
@@ -508,54 +507,48 @@ async function EventPageContent({
                                           timeText: formattedTime,
                                           venueName: event.location?.venueName,
                                         }}
-                                        globallyTicketsOnSale={
-                                          globallyTicketsOnSale
-                                        }
+                                        globallyTicketsOnSale={globallyTicketsOnSale}
                                         currentLanguage={currentLanguage}
                                       />
                                     </div>
-                                  </CardContent>
+                                  </div>
                                 </div>
-                              </div>
-                            </Card>
-                          );
-                        })}
-                      </div>
-                    )}
+                              </Card>
+                            );
+                          })}
+                        </div>
+                      )}
 
-                    {/* List Bundles */}
-                    {hasDefinedBundles && (
-                      <div className="space-y-3">
-                        <h3 className="font-medium text-lg">
-                          {t(currentLanguage, "eventSlugPage.bundles.title")}
-                        </h3>
-                        {event.bundles?.map((bundle) => {
-                          console.log(
-                            "Event page - bundle.productId:",
-                            bundle.productId,
-                            "for bundle:",
-                            bundle.name,
-                          );
-                          return (
-                            <Card
-                              key={bundle._key}
-                              className="border-slate-700 bg-background shadow-lg rounded-sm overflow-hidden flex flex-col"
-                            >
-                              <div className="size-full bg-repeat p-1 bg-[length:20px_20px]">
-                                <div className="size-full bg-gradient-to-br from-background/95 via-background/85 to-background/70 rounded-sm pt-1 pb-1 px-3 flex flex-col flex-grow">
-                                  <CardContent className="p-0 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 flex-grow w-full">
-                                    <div className="flex-grow">
-                                      <div className="flex flex-wrap items-baseline mb-3">
-                                        <h4 className="text-gray-100 font-bold text-lg uppercase leading-tight">
+                      {/* Bundles */}
+                      {hasDefinedBundles && (
+                        <div className="space-y-3">
+                          <h3 className="font-semibold text-lg text-center">
+                            {t(currentLanguage, "eventSlugPage.bundles.title")}
+                          </h3>
+                          {event.bundles?.map((bundle) => {
+                            console.log(
+                              "Event page - bundle.productId:",
+                              bundle.productId,
+                              "for bundle:",
+                              bundle.name,
+                            );
+                            return (
+                              <Card
+                                key={bundle._key}
+                                className="border-border/40 bg-card/30 backdrop-blur-sm shadow-lg rounded-lg overflow-hidden hover:bg-card/50 transition-all duration-300 hover:shadow-xl hover:border-primary/30"
+                              >
+                                <div className="p-6">
+                                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                                    <div className="flex-grow space-y-3">
+                                      <div className="flex flex-wrap items-center gap-3">
+                                        <h4 className="text-foreground font-bold text-xl">
                                           {bundle.name.replace(
                                             /\s*\(\d+(\s*\w+)?\)$/,
                                             "",
                                           )}
                                         </h4>
-                                        <span className="mx-2 text-gray-400 text-lg">
-                                          |
-                                        </span>
-                                        <p className="text-primary font-semibold text-xl whitespace-nowrap">
+                                        <div className="h-6 w-px bg-border"></div>
+                                        <p className="text-primary font-bold text-2xl">
                                           {formatPrice(bundle.price)}
                                           {t(
                                             currentLanguage,
@@ -563,71 +556,50 @@ async function EventPageContent({
                                           )}
                                         </p>
                                       </div>
+
                                       {bundle.description && (
-                                        <div className="text-sm mb-1 space-y-1">
+                                        <div className="space-y-2">
                                           {bundle.description
                                             .split("\n")
                                             .map((line, index) => {
                                               const trimmedLine = line.trim();
-                                              if (trimmedLine === "") {
-                                                return <br key={index} />;
-                                              }
-                                              if (
-                                                trimmedLine.startsWith("⚠️")
-                                              ) {
+                                              if (trimmedLine === "") return <br key={index} />;
+                                              if (trimmedLine.startsWith("⚠️")) {
                                                 return (
-                                                  <p
-                                                    key={index}
-                                                    className="text-amber-400 font-medium"
-                                                  >
+                                                  <p key={index} className="text-amber-400 font-medium text-sm">
                                                     {trimmedLine}
                                                   </p>
                                                 );
                                               }
                                               return (
-                                                <p
-                                                  key={index}
-                                                  className="text-gray-400 leading-relaxed"
-                                                >
+                                                <p key={index} className="text-muted-foreground text-sm leading-relaxed">
                                                   {trimmedLine}
                                                 </p>
                                               );
                                             })}
                                         </div>
                                       )}
+
                                       {bundle.details && (
-                                        <div className="text-xs text-gray-400/80 my-2 space-y-1">
+                                        <div className="space-y-1">
                                           {bundle.details
                                             .split("\n")
                                             .map((line, idx) => {
                                               const trimmedLine = line.trim();
-                                              if (trimmedLine === "") {
-                                                return <br key={idx} />;
-                                              }
-                                              const match =
-                                                trimmedLine.match(
-                                                  /^(✅|✔|•|-|\*)\s*(.*)/,
-                                                );
+                                              if (trimmedLine === "") return <br key={idx} />;
+                                              const match = trimmedLine.match(/^(✅|✔|•|-|\*)\s*(.*)/);
                                               if (match && match[2]) {
                                                 return (
-                                                  <div
-                                                    key={idx}
-                                                    className="flex items-start pl-5"
-                                                  >
-                                                    <Check className="mr-1.5 h-3.5 w-3.5 text-green-500 flex-shrink-0 mt-[1px]" />
-                                                    <span className="leading-snug">
+                                                  <div key={idx} className="flex items-start gap-2">
+                                                    <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                                                    <span className="text-sm text-muted-foreground">
                                                       {match[2]}
                                                     </span>
                                                   </div>
                                                 );
                                               }
                                               return (
-                                                <p
-                                                  key={idx}
-                                                  className="leading-snug ml-[calc(0.375rem+0.875rem)]"
-                                                >
-                                                  {" "}
-                                                  {/* Indent non-list items slightly */}
+                                                <p key={idx} className="text-sm text-muted-foreground ml-6">
                                                   {trimmedLine}
                                                 </p>
                                               );
@@ -635,10 +607,11 @@ async function EventPageContent({
                                         </div>
                                       )}
                                     </div>
-                                    <div className="flex-shrink-0 w-full sm:w-auto mt-3 sm:mt-0 flex justify-end">
+
+                                    <div className="flex-shrink-0 w-full lg:w-auto">
                                       <CheckoutButton
                                         item={{
-                                          id: bundle.bundleId.current, // Use bundleId.current for bundles
+                                          id: bundle.bundleId.current,
                                           name: bundle.name,
                                           price: bundle.price,
                                           isBundle: true,
@@ -649,8 +622,7 @@ async function EventPageContent({
                                           salesStart: bundle.salesStart,
                                           salesEnd: bundle.salesEnd,
                                           productId: bundle.productId,
-                                          ticketsIncluded:
-                                            bundle.ticketsIncluded,
+                                          ticketsIncluded: bundle.ticketsIncluded,
                                         }}
                                         eventDetails={{
                                           id: event._id,
@@ -659,129 +631,126 @@ async function EventPageContent({
                                           timeText: formattedTime,
                                           venueName: event.location?.venueName,
                                         }}
-                                        globallyTicketsOnSale={
-                                          globallyTicketsOnSale
-                                        }
+                                        globallyTicketsOnSale={globallyTicketsOnSale}
                                         currentLanguage={currentLanguage}
                                       />
                                     </div>
-                                  </CardContent>
+                                  </div>
                                 </div>
-                              </div>
-                            </Card>
-                          );
-                        })}
-                      </div>
-                    )}
+                              </Card>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </>
-              )}
+                )}
+              </div>
             </div>
+          </div>
 
-            <Separator className="my-10" />
-
-            {/* Event Details, Venue, Lineup, Gallery - No longer in Tabs, shown sequentially or based on data presence */}
+          {/* Additional Content Sections - Improved with better spacing */}
+          <div className="mt-16 space-y-12">
             {event.description && (
-              <div className="mb-10 pt-6">
-                <h2 className="text-2xl font-bold text-gray-100 mb-4 tracking-tight">
-                  {t(currentLanguage, "eventSlugPage.detailsSection.title")}
-                </h2>
-                <div className="prose prose-sm sm:prose dark:prose-invert max-w-none text-gray-300 leading-relaxed mt-1">
-                  {renderFormattedText(event.description)}
+              <div className="max-w-4xl mx-auto">
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold text-foreground mb-4">
+                    {t(currentLanguage, "eventSlugPage.detailsSection.title")}
+                  </h2>
                 </div>
-              </div>
-            )}
-
-            {event.lineup && event.lineup.length > 0 && (
-              <div className="mb-10 pt-6">
-                <h2 className="text-2xl font-bold text-gray-100 mb-4 tracking-tight">
-                  {t(currentLanguage, "eventSlugPage.lineupSection.title")}
-                </h2>
-                <div className="relative">
-                  <div className="flex overflow-x-auto space-x-4 pb-4 scrollbar-none">
-                    {event.lineup.map((artist) => (
-                      <div key={artist._id} className="flex-shrink-0">
-                        <ArtistCard
-                          artist={artist}
-                          currentLanguage={currentLanguage}
-                        />
-                      </div>
-                    ))}
+                <div className="bg-card/30 backdrop-blur-sm rounded-lg p-8 border border-border/20">
+                  <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
+                    {renderFormattedText(event.description)}
                   </div>
-                  {/* Optional: Add custom scroll indicators or buttons here if needed */}
                 </div>
               </div>
             )}
 
+            {/* Venue Section - Restored */}
             {(event.location?.venueName ||
               event.location?.address ||
               event.venueDetails) && (
-                <div className="mb-10 pt-6">
-                  <h2 className="text-2xl font-bold text-gray-100 mb-4 tracking-tight">
-                    {t(currentLanguage, "eventSlugPage.venueSection.title")}
-                  </h2>
-                  {event.location?.venueName && (
-                    <p className="font-semibold text-gray-100 text-lg mt-2 mb-1">
-                      {event.location.venueName}
-                    </p>
-                  )}
-                  {event.location?.address && (
-                    <p className="text-slate-400 mb-4">
-                      {event.location.address}
-                    </p>
-                  )}
-                  {/* Embedded Map ADDED HERE */}
-                  {mapEmbedSrc && (
-                    <div className="my-6 relative w-full h-[300px] bg-muted rounded-sm shadow-lg border border-slate-700 overflow-hidden">
-                      <iframe
-                        src={mapEmbedSrc}
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0 }}
-                        allowFullScreen={false}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        title={(() => {
-                          const locationNameForMap =
-                            event.location?.venueName || event.location?.address;
-                          return locationNameForMap
-                            ? t(
-                              currentLanguage,
-                              "eventSlugPage.venueSection.mapTitleNamed",
-                              { locationName: locationNameForMap },
-                            )
-                            : t(
-                              currentLanguage,
-                              "eventSlugPage.venueSection.mapTitleDefault",
-                            );
-                        })()}
-                        className="absolute top-0 left-0 w-full h-full"
-                      ></iframe>
-                    </div>
-                  )}
-                  {event.venueDetails && (
-                    <div className="prose prose-sm sm:prose dark:prose-invert max-w-none text-gray-300 leading-relaxed mt-1">
-                      {renderFormattedText(event.venueDetails)}
-                    </div>
-                  )}
+                <div className="max-w-4xl mx-auto">
+                  <div className="text-center mb-8">
+                    <h2 className="text-3xl font-bold text-foreground mb-4">
+                      {t(currentLanguage, "eventSlugPage.venueSection.title")}
+                    </h2>
+                  </div>
+                  <div className="bg-card/30 backdrop-blur-sm rounded-lg p-8 border border-border/20 space-y-6">
+                    {event.location?.venueName && (
+                      <div>
+                        <h3 className="text-xl font-semibold text-foreground mb-2">
+                          {event.location.venueName}
+                        </h3>
+                        {event.location?.address && (
+                          <p className="text-muted-foreground mb-4">
+                            {event.location.address}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Embedded Map - Restored */}
+                    {mapEmbedSrc && (
+                      <div className="relative w-full h-[300px] bg-muted rounded-lg shadow-lg border border-border/20 overflow-hidden">
+                        <iframe
+                          src={mapEmbedSrc}
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen={false}
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                          title={(() => {
+                            const locationNameForMap =
+                              event.location?.venueName || event.location?.address;
+                            return locationNameForMap
+                              ? t(
+                                currentLanguage,
+                                "eventSlugPage.venueSection.mapTitleNamed",
+                                { locationName: locationNameForMap },
+                              )
+                              : t(
+                                currentLanguage,
+                                "eventSlugPage.venueSection.mapTitleDefault",
+                              );
+                          })()}
+                          className="absolute top-0 left-0 w-full h-full"
+                        ></iframe>
+                      </div>
+                    )}
+
+                    {event.venueDetails && (
+                      <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
+                        {renderFormattedText(event.venueDetails)}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
-            {/* Share Button - Separator above it if content sections were present */}
-            {(event.description ||
-              (event.lineup && event.lineup.length > 0) ||
-              event.location?.venueName ||
-              event.location?.address ||
-              event.venueDetails) && <Separator className="my-10" />}
-            <div className="flex items-center justify-end">
-              <EventShareButton
-                eventTitle={event.title}
-                eventSlug={event.slug.current}
-              />
+            {/* Share Section - Enhanced */}
+            <div className="max-w-4xl mx-auto">
+              <Separator className="opacity-30 mb-8" />
+              <div className="flex items-center justify-between bg-card/30 backdrop-blur-sm rounded-lg p-6 border border-border/20">
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground mb-1">
+                    Share this event
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Spread the word and invite your friends
+                  </p>
+                </div>
+                <EventShareButton
+                  eventTitle={event.title}
+                  eventSlug={event.slug.current}
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
+      <MinimalFooter />
     </>
   );
 }

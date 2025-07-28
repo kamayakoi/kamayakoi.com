@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { getAllProducts } from "@/lib/sanity/queries";
 import Header from "@/components/landing/header";
-import Footer from "@/components/landing/footer";
 import LoadingComponent from "@/components/ui/loader";
 
 async function ShopContent() {
@@ -40,7 +39,6 @@ async function ShopContent() {
           <p>No products found.</p>
         )}
       </main>
-      <Footer />
     </div>
   );
 }

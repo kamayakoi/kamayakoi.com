@@ -18,8 +18,8 @@ export default function Footer() {
   const { currentLanguage } = useTranslation();
 
   const footerLinks = [
-    { href: "", labelKey: "footer.links.terms", icon: Newspaper },
-    { href: "", labelKey: "footer.links.privacy", icon: Newspaper },
+    { href: "/terms", labelKey: "footer.links.terms", icon: Newspaper },
+    { href: "/privacy", labelKey: "footer.links.privacy", icon: Newspaper },
   ];
 
   const animatedWordsKeys = [

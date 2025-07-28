@@ -16,6 +16,13 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
   const { tracks, currentTrack, isPlaying, togglePlay, nextTrack, prevTrack } =
     useMusic();
 
+  const handleTogglePlay = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("🎵 Mini audio player button clicked - current state:", isPlaying);
+    togglePlay();
+  };
+
   if (!tracks || tracks.length === 0 || !currentTrack) return null;
 
   return (
@@ -55,7 +62,7 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
         )}
 
         <Button
-          onClick={togglePlay}
+          onClick={handleTogglePlay}
           variant="ghost"
           size="icon"
           className="text-white hover:bg-white/20 h-6 w-6 rounded-full p-0"

@@ -91,16 +91,16 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <TranslationProvider>
-            <MediaProvider>
-              <MusicWrapper tracks={musicTracks}>
+            <MusicWrapper tracks={musicTracks}>
+              <MediaProvider>
                 {/* Global Desktop Audio Player - positioned in top-left */}
                 <div className="hidden md:block fixed top-4 left-4 z-[70]">
                   <AudioPlayer />
                 </div>
 
                 <main className="flex-grow">{children}</main>
-              </MusicWrapper>
-            </MediaProvider>
+              </MediaProvider>
+            </MusicWrapper>
           </TranslationProvider>
         </ThemeProvider>
         <Analytics />

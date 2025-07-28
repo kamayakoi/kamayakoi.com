@@ -100,6 +100,67 @@
       "p2": "Nous construisons plus que de simples soirées ; nous cultivons un mouvement. Merci de faire partie de l'énergie Kamayakoi !"
     }
   },
+  "privacyPage": {
+    "pageTitle": "Politique de Confidentialité",
+    "pageDescription": "Découvrez comment Kamayakoi protège et gère vos informations personnelles conformément à nos pratiques de confidentialité.",
+    "title": "Politique de Confidentialité",
+    "subtitle": "Votre confidentialité est importante pour nous. Cette politique explique comment nous collectons, utilisons et protégeons vos informations.",
+    "lastUpdated": "Dernière mise à jour : {date}",
+    "introduction": {
+      "title": "Introduction",
+      "p1": "Kamayakoi (\"nous\", \"notre\", \"nos\") s'engage à protéger votre confidentialité. Cette Politique de Confidentialité explique comment nous collectons, utilisons, divulguons et protégeons vos informations lorsque vous visitez notre site web, achetez des billets ou assistez à nos événements.",
+      "p2": "Veuillez lire attentivement cette politique de confidentialité. Si vous n'acceptez pas les termes de cette politique, veuillez ne pas accéder à nos services."
+    },
+    "dataCollection": {
+      "title": "Informations que Nous Collectons",
+      "p1": "Nous pouvons collecter des informations vous concernant de diverses manières. Les informations que nous pouvons collecter incluent :",
+      "listItem1": "Données Personnelles : Nom, adresse e-mail, numéro de téléphone et autres informations de contact lorsque vous achetez des billets ou vous abonnez à nos mises à jour.",
+      "listItem2": "Informations d'Événement : Photos et vidéos prises lors de nos événements qui peuvent inclure votre image.",
+      "listItem3": "Données d'Utilisation : Informations sur la façon dont vous accédez et utilisez notre site web, y compris votre adresse IP, type de navigateur et informations sur l'appareil."
+    },
+    "dataUse": {
+      "title": "Comment Nous Utilisons Vos Informations",
+      "p1": "Nous utilisons les informations que nous collectons pour :",
+      "listItem1": "Traiter les achats de billets et vous envoyer les détails de confirmation",
+      "listItem2": "Communiquer avec vous concernant les événements, mises à jour et activités promotionnelles",
+      "listItem3": "Améliorer nos services et créer de meilleures expériences d'événements",
+      "listItem4": "Respecter les obligations légales et prévenir les activités frauduleuses"
+    },
+    "dataSharing": {
+      "title": "Partage d'Informations",
+      "p1": "Nous ne vendons, n'échangeons ou ne louons pas vos informations personnelles à des tiers. Nous pouvons partager vos informations dans les circonstances suivantes :",
+      "listItem1": "Avec des prestataires de services qui nous aident à exploiter notre site web et à mener nos activités",
+      "listItem2": "Lorsque requis par la loi ou pour protéger nos droits et notre sécurité",
+      "listItem3": "Avec votre consentement pour des activités promotionnelles spécifiques ou des partenariats"
+    },
+    "dataProtection": {
+      "title": "Protection des Données",
+      "p1": "Nous mettons en œuvre des mesures de sécurité appropriées pour protéger vos informations personnelles contre l'accès non autorisé, l'altération, la divulgation ou la destruction.",
+      "p2": "Cependant, aucune méthode de transmission sur internet ou de stockage électronique n'est complètement sécurisée, et nous ne pouvons garantir une sécurité absolue."
+    },
+    "cookies": {
+      "title": "Cookies et Suivi",
+      "p1": "Notre site web peut utiliser des cookies et des technologies de suivi similaires pour améliorer votre expérience de navigation et analyser le trafic du site web.",
+      "p2": "Vous pouvez choisir de désactiver les cookies via les paramètres de votre navigateur, bien que cela puisse affecter les fonctionnalités de notre site web."
+    },
+    "rights": {
+      "title": "Vos Droits",
+      "p1": "Vous avez le droit de :",
+      "listItem1": "Accéder et mettre à jour vos informations personnelles",
+      "listItem2": "Demander la suppression de vos données personnelles",
+      "listItem3": "Vous désabonner des communications marketing",
+      "listItem4": "Demander une copie des informations que nous détenons sur vous"
+    },
+    "retention": {
+      "title": "Conservation des Données",
+      "p1": "Nous conservons vos informations personnelles uniquement pendant la durée nécessaire pour atteindre les objectifs décrits dans cette politique de confidentialité, respecter les obligations légales ou résoudre les litiges."
+    },
+    "contact": {
+      "title": "Nous Contacter",
+      "p1": "Si vous avez des questions concernant cette Politique de Confidentialité ou nos pratiques de données, veuillez nous contacter à : kamayakoi@gmail.com",
+      "p2": "Nous nous engageons à résoudre toute préoccupation de confidentialité que vous pourriez avoir."
+    }
+  },
   "eventsPage": {
     "metadata": {
       "title": "Le Rendez-Vous Sauvage",

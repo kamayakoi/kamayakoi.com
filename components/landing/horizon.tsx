@@ -43,68 +43,6 @@ export const Component = () => {
   const [isReady, setIsReady] = useState(false);
   const totalSections = 3;
 
-  // Disable copy-paste functionality
-  useEffect(() => {
-    const preventCopy = (e: ClipboardEvent) => {
-      e.preventDefault();
-      return false;
-    };
-
-    const preventSelect = (e: Event) => {
-      e.preventDefault();
-      return false;
-    };
-
-    const preventContextMenu = (e: MouseEvent) => {
-      e.preventDefault();
-      return false;
-    };
-
-    const preventKeyboardShortcuts = (e: KeyboardEvent) => {
-      // Prevent Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+S, F12, Ctrl+U
-      if (
-        (e.ctrlKey &&
-          (e.key === "a" ||
-            e.key === "c" ||
-            e.key === "v" ||
-            e.key === "x" ||
-            e.key === "s" ||
-            e.key === "u")) ||
-        e.key === "F12" ||
-        (e.ctrlKey && e.shiftKey && e.key === "I") ||
-        (e.ctrlKey && e.shiftKey && e.key === "J")
-      ) {
-        e.preventDefault();
-        return false;
-      }
-    };
-
-    document.addEventListener("copy", preventCopy);
-    document.addEventListener("cut", preventCopy);
-    document.addEventListener("selectstart", preventSelect);
-    document.addEventListener("contextmenu", preventContextMenu);
-    document.addEventListener("keydown", preventKeyboardShortcuts);
-
-    // Disable text selection via CSS using setProperty to avoid TypeScript issues
-    document.body.style.setProperty("-webkit-user-select", "none");
-    document.body.style.setProperty("-moz-user-select", "none");
-    document.body.style.setProperty("-ms-user-select", "none");
-    document.body.style.setProperty("user-select", "none");
-
-    return () => {
-      document.removeEventListener("copy", preventCopy);
-      document.removeEventListener("cut", preventCopy);
-      document.removeEventListener("selectstart", preventSelect);
-      document.removeEventListener("contextmenu", preventContextMenu);
-      document.removeEventListener("keydown", preventKeyboardShortcuts);
-
-      document.body.style.setProperty("-webkit-user-select", "");
-      document.body.style.setProperty("-moz-user-select", "");
-      document.body.style.setProperty("-ms-user-select", "");
-      document.body.style.setProperty("user-select", "");
-    };
-  }, []);
-
   const threeRefs = useRef<ThreeRefs>({
     scene: null,
     camera: null,
@@ -153,9 +91,9 @@ export const Component = () => {
 
       const bloomPass = new UnrealBloomPass(
         new THREE.Vector2(window.innerWidth, window.innerHeight),
-        0.8,
-        0.4,
-        0.85,
+        0.6,
+        0.3,
+        0.75,
       );
       refs.composer.addPass(bloomPass);
 
@@ -175,7 +113,7 @@ export const Component = () => {
 
     const createStarField = () => {
       const { current: refs } = threeRefs;
-      const starCount = 5000;
+      const starCount = 2500;
 
       for (let i = 0; i < 3; i++) {
         const geometry = new THREE.BufferGeometry();
@@ -268,7 +206,7 @@ export const Component = () => {
     const createNebula = () => {
       const { current: refs } = threeRefs;
 
-      const geometry = new THREE.PlaneGeometry(8000, 4000, 100, 100);
+      const geometry = new THREE.PlaneGeometry(8000, 4000, 50, 50);
       const material = new THREE.ShaderMaterial({
         uniforms: {
           time: { value: 0 },
@@ -335,7 +273,7 @@ export const Component = () => {
 
       layers.forEach((layer, index) => {
         const points = [];
-        const segments = 50;
+        const segments = 30;
 
         for (let i = 0; i <= segments; i++) {
           const x = (i / segments - 0.5) * 1000;

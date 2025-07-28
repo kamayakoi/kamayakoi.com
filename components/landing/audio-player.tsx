@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, SkipBack, SkipForward, X, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -57,8 +57,7 @@ interface AudioPlayerProps {
 
 const AudioPlayer = ({ className }: AudioPlayerProps) => {
   const [isVisible, setIsVisible] = useState(true);
-  const [isExpanded, setIsExpanded] = useState(true); // Always start expanded to encourage interaction
-  const [hasUserInteracted, setHasUserInteracted] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false); // Always start collapsed
 
   const {
     tracks,
@@ -70,39 +69,12 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
     nextTrack,
     prevTrack,
     seekTo,
-    pause,
-    play,
+    stop
   } = useMusic();
 
   console.log("🎵 AudioPlayer - tracks:", tracks);
   console.log("🎵 AudioPlayer - currentTrack:", currentTrack);
   console.log("🎵 AudioPlayer - tracks length:", tracks?.length);
-
-  // Auto-start music on first interaction
-  useEffect(() => {
-    const handleFirstInteraction = async () => {
-      if (!hasUserInteracted && tracks.length > 0 && currentTrack && !isPlaying) {
-        setHasUserInteracted(true);
-        try {
-          await play();
-        } catch (err: unknown) {
-          console.log("Auto-play after interaction prevented:", err);
-        }
-      }
-    };
-
-    // Listen for any user interaction
-    const events = ['click', 'touchstart', 'keydown'];
-    events.forEach(event => {
-      document.addEventListener(event, handleFirstInteraction, { once: true });
-    });
-
-    return () => {
-      events.forEach(event => {
-        document.removeEventListener(event, handleFirstInteraction);
-      });
-    };
-  }, [tracks.length, currentTrack, isPlaying, hasUserInteracted, play]);
 
   const handleSeek = (value: number) => {
     if (duration && duration > 0) {
@@ -114,12 +86,19 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
   };
 
   const handleClose = () => {
-    pause(); // Stop the music
+    stop(); // Use stop to permanently stop the music
     setIsVisible(false);
   };
 
   const handleExpand = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  const handleTogglePlay = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("🎵 Audio player button clicked - current state:", isPlaying);
+    togglePlay();
   };
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
@@ -289,7 +268,7 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
                 whileTap={{ scale: 0.9 }}
               >
                 <Button
-                  onClick={togglePlay}
+                  onClick={handleTogglePlay}
                   variant="ghost"
                   size="icon"
                   className="text-white hover:bg-[#111111d1] hover:text-white h-6 w-6 rounded-sm"

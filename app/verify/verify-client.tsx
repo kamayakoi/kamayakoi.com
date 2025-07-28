@@ -20,7 +20,6 @@ import {
   Tag,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
-import Footer from "@/components/landing/footer";
 import Link from "next/link";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
@@ -463,7 +462,6 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
             </Card>
           </div>
         </div>
-        <Footer />
       </>
     );
   }
@@ -554,7 +552,6 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
             </Card>
           </div>
         </div>
-        <Footer />
       </>
     );
   }
@@ -831,7 +828,6 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
           )}
         </div>
       </div>
-      <Footer />
     </>
   );
 }

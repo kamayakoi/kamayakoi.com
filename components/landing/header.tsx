@@ -192,10 +192,6 @@ export default function Header() {
                   );
                 })}
               </div>
-
-              <p className="mt-8 text-sm text-bold text-zinc-400 max-w-md">
-                {t(currentLanguage, "header.mobileMenu.description")}
-              </p>
             </SheetContent>
           </Sheet>
         </div>

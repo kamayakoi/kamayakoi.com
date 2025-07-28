@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
   useEffect,
+  useCallback,
   ReactNode,
 } from "react";
 import type { MusicTrack } from "@/lib/sanity/queries";
@@ -26,6 +27,7 @@ interface MusicContextType {
   // Controls
   play: () => void;
   pause: () => void;
+  stop: () => void;
   togglePlay: () => void;
   nextTrack: () => void;
   prevTrack: () => void;
@@ -53,6 +55,7 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
   const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
   const currentTrack = tracks[currentTrackIndex] || null;
 
@@ -87,33 +90,102 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
     }
   };
 
-  // Player controls
-  const play = async () => {
+  // Handle background playback - continue playing when app loses focus
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      // Don't pause when page becomes hidden - allow background playback
+      if (document.hidden) {
+        console.log("🎵 Page hidden - continuing background playback");
+      } else {
+        console.log("🎵 Page visible - resuming normal playback");
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  // Detect user interaction for autoplay compliance
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      setHasUserInteracted(true);
+      // Remove listeners after first interaction
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+    };
+
+    if (!hasUserInteracted) {
+      document.addEventListener('click', handleUserInteraction);
+      document.addEventListener('touchstart', handleUserInteraction);
+      document.addEventListener('keydown', handleUserInteraction);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+    };
+  }, [hasUserInteracted]);
+
+  // Enhanced play function with autoplay handling
+  const play = useCallback(async () => {
     if (audioRef.current) {
       try {
         await audioRef.current.play();
         setIsPlaying(true);
-      } catch (error) {
-        console.error("Error playing audio:", error);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.log("🎵 Autoplay prevented:", errorMessage);
         setIsPlaying(false);
+
+        // If user hasn't interacted yet, wait for interaction
+        if (!hasUserInteracted) {
+          console.log("🎵 Waiting for user interaction to play music");
+        }
       }
     }
-  };
+  }, [hasUserInteracted]);
 
-  const pause = () => {
+  const pause = useCallback(() => {
     if (audioRef.current) {
+      console.log("🎵 Pausing audio - current state:", {
+        paused: audioRef.current.paused,
+        currentTime: audioRef.current.currentTime,
+        isPlaying
+      });
+
       audioRef.current.pause();
       setIsPlaying(false);
     }
-  };
+  }, [isPlaying]);
 
-  const togglePlay = () => {
+  const stop = useCallback(() => {
+    if (audioRef.current) {
+      console.log("🎵 Stopping audio permanently");
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setIsPlaying(false);
+      setCurrentTime(0);
+    }
+  }, []);
+
+  const togglePlay = useCallback(() => {
+    console.log("🎵 Toggle play called - current state:", {
+      isPlaying,
+      audioPaused: audioRef.current?.paused,
+      hasUserInteracted
+    });
+
     if (isPlaying) {
       pause();
     } else {
       play();
     }
-  };
+  }, [isPlaying, pause, play, hasUserInteracted]);
 
   const nextTrack = () => {
     if (tracks.length > 0) {
@@ -226,43 +298,6 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
     }
   }, [volume]);
 
-  // Handle background playback - continue playing when app loses focus
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      // Don't pause when page becomes hidden - allow background playback
-      if (document.hidden) {
-        console.log("🎵 Page hidden - continuing background playback");
-      } else {
-        console.log("🎵 Page visible - resuming normal playback");
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []);
-
-  // Auto-start music when tracks are first loaded
-  useEffect(() => {
-    if (tracks.length > 0 && currentTrack) {
-      const timer = setTimeout(() => {
-        setIsPlaying(prevIsPlaying => {
-          if (!prevIsPlaying) {
-            play().catch(err => {
-              console.log("Initial auto-play prevented:", err);
-            });
-            return true;
-          }
-          return prevIsPlaying;
-        });
-      }, 1000); // Delay to ensure user interaction has occurred
-
-      return () => clearTimeout(timer);
-    }
-  }, [tracks.length, currentTrack, play]); // Removed isPlaying from dependencies
-
   const value: MusicContextType = {
     tracks,
     currentTrackIndex,
@@ -274,6 +309,7 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
     isMuted,
     play,
     pause,
+    stop,
     togglePlay,
     nextTrack,
     prevTrack,
@@ -314,3 +350,4 @@ export function useMusic() {
   }
   return context;
 }
+

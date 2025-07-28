@@ -57,6 +57,7 @@ export async function getEventBySlug(slug: string, locale: string) {
       "flyer": {
         "url": flyer.asset->url
       },
+      "promoVideoUrl": promoVideo.asset->url,
       "description": coalesce(description[$locale], description.en),
       "venueDetails": coalesce(venueDetails[$locale], venueDetails.en),
       hostedBy,

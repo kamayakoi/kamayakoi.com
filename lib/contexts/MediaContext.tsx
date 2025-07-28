@@ -65,12 +65,18 @@ export function MediaProvider({ children }: MediaProviderProps) {
             [slug]: { currentTime, muted, wasPlaying }
         }));
 
-        // Also save to localStorage for persistence across sessions
-        localStorage.setItem(`video-state-${slug}`, JSON.stringify({
-            currentTime,
-            muted,
-            wasPlaying
-        }));
+        // Debounced localStorage save to reduce performance impact
+        setTimeout(() => {
+            try {
+                localStorage.setItem(`video-state-${slug}`, JSON.stringify({
+                    currentTime,
+                    muted,
+                    wasPlaying
+                }));
+            } catch {
+                // Ignore localStorage errors
+            }
+        }, 1000);
     };
 
     const getVideoState = (slug: string) => {
@@ -79,10 +85,10 @@ export function MediaProvider({ children }: MediaProviderProps) {
             return videoStates[slug];
         }
 
-        // Then check localStorage
-        const stored = localStorage.getItem(`video-state-${slug}`);
-        if (stored) {
-            try {
+        // Then check localStorage only once
+        try {
+            const stored = localStorage.getItem(`video-state-${slug}`);
+            if (stored) {
                 const state = JSON.parse(stored);
                 // Update in-memory state
                 setVideoStates(prev => ({
@@ -90,9 +96,9 @@ export function MediaProvider({ children }: MediaProviderProps) {
                     [slug]: state
                 }));
                 return state;
-            } catch (e) {
-                console.error("Error parsing stored video state:", e);
             }
+        } catch {
+            // Ignore localStorage errors
         }
 
         return null;

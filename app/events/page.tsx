@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import ParallaxGallery from "@/components/ui/parallax";
-import { getEventsForParallax, type EventParallaxData } from "@/lib/sanity/queries";
+import {
+  getEventsForParallax,
+  type EventParallaxData,
+} from "@/lib/sanity/queries";
 import Header from "@/components/landing/header";
 import { t } from "@/lib/i18n/translations";
 

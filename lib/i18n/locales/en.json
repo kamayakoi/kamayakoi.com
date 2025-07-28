@@ -102,10 +102,10 @@
   },
   "eventsPage": {
     "metadata": {
-      "title": "Events",
+      "title": "Rendez-Vous Sauvage",
       "description": "Explore upcoming events from Kamayakoi"
     },
-    "title": "Events",
+    "title": "Rendez-Vous Sauvage",
     "noEvents": "No upcoming events found."
   },
   "eventSlugPage": {
@@ -290,5 +290,30 @@
       "person": "person"
     },
     "checkedInLabel": "Checked in:"
+  },
+  "horizon": {
+    "sections": {
+      "kamayakoi": {
+        "title": "KAMAYAKOI",
+        "subtitle": {
+          "line1": "The wildest encounters in the city",
+          "line2": "since 2017."
+        }
+      },
+      "rvs": {
+        "title": "INTENSE",
+        "subtitle": {
+          "line1": "Every track is a ritual,",
+          "line2": "every drop a unique moment."
+        }
+      },
+      "liberation": {
+        "title": "WILD",
+        "subtitle": {
+          "line1": "In the space between beats,",
+          "line2": "we discover our wildest frequencies."
+        }
+      }
+    }
   }
 }

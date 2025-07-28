@@ -265,6 +265,7 @@ export interface EventParallaxData {
   title: string;
   slug: string;
   featuredImage: string;
+  promoVideoUrl?: string; // Add video URL support
   number?: string; // Event number for parallax display
   date?: string;
   description?: string;
@@ -294,11 +295,12 @@ export const getEventsForScroller = async (
 export const getEventsForParallax = async (
   limit = 5,
 ): Promise<EventParallaxData[]> => {
-  const query = `*[_type == "event"] | order(date desc) [0...$limit] {
+  const query = `*[_type == "event"] | order(number desc, date desc) [0...$limit] {
     _id,
     title,
     "slug": slug.current,
     "featuredImage": flyer.asset->url,
+    "promoVideoUrl": promoVideo.asset->url,
     number,
     date,
     description,
@@ -309,24 +311,104 @@ export const getEventsForParallax = async (
 
 // ================================= Homepage ================================
 
-// Fetch the URLs of up to 5 background videos from the singleton homepage document
-export const getHomepageVideoUrls = async (): Promise<string[]> => {
+// Interface for music track data
+export interface MusicTrack {
+  title: string;
+  artist?: string;
+  audioUrl: string;
+  coverImageUrl?: string;
+}
+
+// Fetch music tracks from the singleton homepage document
+export const getHomepageMusicTracks = async (): Promise<MusicTrack[]> => {
   // Query the single document of type 'homepage'
-  // Select the URLs of the assets linked in the backgroundVideos array (up to 5)
+  // Select the music tracks with their audio files and cover images
   const query = `*[_type == "homepage"][0] {
-    "videoUrls": backgroundVideos[].asset->url
+    "musicTracks": musicTracks[]{
+      title,
+      artist,
+      "audioUrl": audioFile.asset->url,
+      "coverImageUrl": coverImage.asset->url
+    }
   }`;
-  const result = await client.fetch<{ videoUrls?: string[] }>(
+  const result = await client.fetch<{ musicTracks?: MusicTrack[] }>(
     query,
     {},
     {
       next: {
         revalidate: 7200, // Cache for 2 hours
-        tags: ["homepage", "videos"],
+        tags: ["homepage", "music"],
       },
     },
   );
-  return result?.videoUrls?.filter(Boolean) ?? [];
+  return result?.musicTracks?.filter((track) => track.audioUrl) ?? [];
+};
+
+// ================================= Artists ================================
+
+// Interface for artist data
+export interface ArtistData {
+  _id: string;
+  name: string;
+  slug: string;
+  bio?: string;
+  imageUrl?: string;
+  socialLink?: string;
+  socialHandle?: string;
+  isResident: boolean;
+  role?: string;
+}
+
+// Fetch all artists
+export const getAllArtists = async (): Promise<ArtistData[]> => {
+  const query = `*[_type == "artist"] | order(isResident desc, name asc) {
+    _id,
+    name,
+    "slug": slug.current,
+    bio,
+    "imageUrl": image.asset->url,
+    socialLink,
+    socialHandle,
+    isResident,
+    role
+  }`;
+  return await client.fetch<ArtistData[]>(
+    query,
+    {},
+    {
+      next: {
+        revalidate: 3600, // Cache for 1 hour
+        tags: ["artists"],
+      },
+    },
+  );
+};
+
+// Fetch artist by slug
+export const getArtistBySlug = async (
+  slug: string,
+): Promise<ArtistData | null> => {
+  const query = `*[_type == "artist" && slug.current == $slug][0] {
+    _id,
+    name,
+    "slug": slug.current,
+    bio,
+    "imageUrl": image.asset->url,
+    socialLink,
+    socialHandle,
+    isResident,
+    role
+  }`;
+  return await client.fetch<ArtistData | null>(
+    query,
+    { slug },
+    {
+      next: {
+        revalidate: 3600, // Cache for 1 hour
+        tags: [`artist-${slug}`, "artists"],
+      },
+    },
+  );
 };
 
 // ================================= Homepage Promo Event ================================

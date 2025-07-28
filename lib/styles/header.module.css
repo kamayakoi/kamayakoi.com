@@ -127,10 +127,12 @@
   border-radius: 2px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  vertical-align: middle;
-  /* Dark background, green text */
+  vertical-align: super;
+  position: relative;
+  top: 4px;
+  /* Dark background, red text matching horizon color */
   background-color: rgba(31, 41, 55, 0.5); /* Dark grey bg (gray-800) */
-  color: #22c55e; /* Green text (green-500) */
+  color: #eb544d; /* Red text matching horizon color */
 }
 
 /* Styles to make disabled links non-interactive */

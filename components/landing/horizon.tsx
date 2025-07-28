@@ -1,13 +1,14 @@
-"use client"
+"use client";
 
-import React, { useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-
+import React, { useEffect, useRef, useState } from "react";
+import * as THREE from "three";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useTranslation } from "@/lib/contexts/TranslationContext";
+import { t } from "@/lib/i18n/translations";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,8 +28,6 @@ interface ThreeRefs {
   locations?: number[];
 }
 
-
-
 export const Component = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -37,6 +36,7 @@ export const Component = () => {
   const scrollProgressRef = useRef<HTMLDivElement>(null);
 
   const smoothCameraPos = useRef({ x: 0, y: 30, z: 100 });
+  const { currentLanguage } = useTranslation();
 
   const [scrollProgress, setScrollProgress] = useState(0);
   const [currentSection, setCurrentSection] = useState(1);
@@ -51,7 +51,7 @@ export const Component = () => {
     stars: [],
     nebula: null,
     mountains: [],
-    animationId: null
+    animationId: null,
   });
 
   // Initialize Three.js
@@ -68,7 +68,7 @@ export const Component = () => {
         75,
         window.innerWidth / window.innerHeight,
         0.1,
-        2000
+        2000,
       );
       refs.camera.position.z = 100;
       refs.camera.position.y = 20;
@@ -77,7 +77,7 @@ export const Component = () => {
       refs.renderer = new THREE.WebGLRenderer({
         canvas: canvasRef.current as HTMLCanvasElement,
         antialias: true,
-        alpha: true
+        alpha: true,
       });
       refs.renderer.setSize(window.innerWidth, window.innerHeight);
       refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -93,7 +93,7 @@ export const Component = () => {
         new THREE.Vector2(window.innerWidth, window.innerHeight),
         0.8,
         0.4,
-        0.85
+        0.85,
       );
       refs.composer.addPass(bloomPass);
 
@@ -148,14 +148,17 @@ export const Component = () => {
           sizes[j] = Math.random() * 2 + 0.5;
         }
 
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-        geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+        geometry.setAttribute(
+          "position",
+          new THREE.BufferAttribute(positions, 3),
+        );
+        geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+        geometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
 
         const material = new THREE.ShaderMaterial({
           uniforms: {
             time: { value: 0 },
-            depth: { value: i }
+            depth: { value: i },
           },
           vertexShader: `
             attribute float size;
@@ -191,7 +194,7 @@ export const Component = () => {
           `,
           transparent: true,
           blending: THREE.AdditiveBlending,
-          depthWrite: false
+          depthWrite: false,
         });
 
         const stars = new THREE.Points(geometry, material);
@@ -209,7 +212,7 @@ export const Component = () => {
           time: { value: 0 },
           color1: { value: new THREE.Color(0x0033ff) },
           color2: { value: new THREE.Color(0xff0066) },
-          opacity: { value: 0.3 }
+          opacity: { value: 0.3 },
         },
         vertexShader: `
           varying vec2 vUv;
@@ -248,7 +251,7 @@ export const Component = () => {
         transparent: true,
         blending: THREE.AdditiveBlending,
         side: THREE.DoubleSide,
-        depthWrite: false
+        depthWrite: false,
       });
 
       const nebula = new THREE.Mesh(geometry, material);
@@ -265,7 +268,7 @@ export const Component = () => {
         { distance: -50, height: 60, color: 0x1a1a2e, opacity: 1 },
         { distance: -100, height: 80, color: 0x16213e, opacity: 0.8 },
         { distance: -150, height: 100, color: 0x0f3460, opacity: 0.6 },
-        { distance: -200, height: 120, color: 0x0a4668, opacity: 0.4 }
+        { distance: -200, height: 120, color: 0x0a4668, opacity: 0.4 },
       ];
 
       layers.forEach((layer, index) => {
@@ -274,9 +277,11 @@ export const Component = () => {
 
         for (let i = 0; i <= segments; i++) {
           const x = (i / segments - 0.5) * 1000;
-          const y = Math.sin(i * 0.1) * layer.height +
+          const y =
+            Math.sin(i * 0.1) * layer.height +
             Math.sin(i * 0.05) * layer.height * 0.5 +
-            Math.random() * layer.height * 0.2 - 100;
+            Math.random() * layer.height * 0.2 -
+            100;
           points.push(new THREE.Vector2(x, y));
         }
 
@@ -289,7 +294,7 @@ export const Component = () => {
           color: layer.color,
           transparent: true,
           opacity: layer.opacity,
-          side: THREE.DoubleSide
+          side: THREE.DoubleSide,
         });
 
         const mountain = new THREE.Mesh(geometry, material);
@@ -307,7 +312,7 @@ export const Component = () => {
       const geometry = new THREE.SphereGeometry(600, 32, 32);
       const material = new THREE.ShaderMaterial({
         uniforms: {
-          time: { value: 0 }
+          time: { value: 0 },
         },
         vertexShader: `
           varying vec3 vNormal;
@@ -336,7 +341,7 @@ export const Component = () => {
         `,
         side: THREE.BackSide,
         blending: THREE.AdditiveBlending,
-        transparent: true
+        transparent: true,
       });
 
       const atmosphere = new THREE.Mesh(geometry, material);
@@ -366,9 +371,12 @@ export const Component = () => {
         const smoothingFactor = 0.05; // Lower = smoother but slower
 
         // Calculate smooth position with easing
-        smoothCameraPos.current.x += (refs.targetCameraX - smoothCameraPos.current.x) * smoothingFactor;
-        smoothCameraPos.current.y += (refs.targetCameraY! - smoothCameraPos.current.y) * smoothingFactor;
-        smoothCameraPos.current.z += (refs.targetCameraZ! - smoothCameraPos.current.z) * smoothingFactor;
+        smoothCameraPos.current.x +=
+          (refs.targetCameraX - smoothCameraPos.current.x) * smoothingFactor;
+        smoothCameraPos.current.y +=
+          (refs.targetCameraY! - smoothCameraPos.current.y) * smoothingFactor;
+        smoothCameraPos.current.z +=
+          (refs.targetCameraZ! - smoothCameraPos.current.z) * smoothingFactor;
 
         // Add subtle floating motion
         const floatX = Math.sin(time * 0.1) * 2;
@@ -385,7 +393,7 @@ export const Component = () => {
       refs.mountains.forEach((mountain, i) => {
         const parallaxFactor = 1 + i * 0.5;
         mountain.position.x = Math.sin(time * 0.1) * 2 * parallaxFactor;
-        mountain.position.y = 50 + (Math.cos(time * 0.15) * 1 * parallaxFactor);
+        mountain.position.y = 50 + Math.cos(time * 0.15) * 1 * parallaxFactor;
       });
 
       if (refs.composer) {
@@ -406,7 +414,7 @@ export const Component = () => {
       }
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     // Cleanup
     return () => {
@@ -416,15 +424,15 @@ export const Component = () => {
         cancelAnimationFrame(refs.animationId);
       }
 
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
 
       // Dispose Three.js resources
-      refs.stars.forEach(starField => {
+      refs.stars.forEach((starField) => {
         starField.geometry.dispose();
         starField.material.dispose();
       });
 
-      refs.mountains.forEach(mountain => {
+      refs.mountains.forEach((mountain) => {
         mountain.geometry.dispose();
         mountain.material.dispose();
       });
@@ -454,44 +462,60 @@ export const Component = () => {
     if (!isReady) return;
 
     // Set initial states to prevent flash
-    gsap.set([titleRef.current, subtitleRef.current, scrollProgressRef.current], {
-      visibility: 'visible'
-    });
+    gsap.set(
+      [titleRef.current, subtitleRef.current, scrollProgressRef.current],
+      {
+        visibility: "visible",
+      },
+    );
 
     const tl = gsap.timeline();
 
     // Animate title with split text
     if (titleRef.current) {
-      const titleChars = titleRef.current.querySelectorAll('.title-char');
-      tl.from(titleChars, {
-        y: 200,
-        opacity: 0,
-        duration: 1.5,
-        stagger: 0.05,
-        ease: "power4.out"
-      }, "-=0.5");
+      const titleChars = titleRef.current.querySelectorAll(".title-char");
+      tl.from(
+        titleChars,
+        {
+          y: 200,
+          opacity: 0,
+          duration: 1.5,
+          stagger: 0.05,
+          ease: "power4.out",
+        },
+        "-=0.5",
+      );
     }
 
     // Animate subtitle lines
     if (subtitleRef.current) {
-      const subtitleLines = subtitleRef.current.querySelectorAll('.subtitle-line');
-      tl.from(subtitleLines, {
-        y: 50,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.2,
-        ease: "power3.out"
-      }, "-=0.8");
+      const subtitleLines =
+        subtitleRef.current.querySelectorAll(".subtitle-line");
+      tl.from(
+        subtitleLines,
+        {
+          y: 50,
+          opacity: 0,
+          duration: 1,
+          stagger: 0.2,
+          ease: "power3.out",
+        },
+        "-=0.8",
+      );
     }
 
     // Animate scroll indicator
     if (scrollProgressRef.current) {
-      tl.from(scrollProgressRef.current, {
-        opacity: 0,
-        y: 50,
-        duration: 1,
-        ease: "power2.out"
-      }, "-=0.5");
+      tl.from(
+        scrollProgressRef.current,
+        {
+          opacity: 0,
+          y: 50,
+          duration: 1,
+          ease: "power2.out",
+        },
+        "-=0.5",
+      );
     }
 
     return () => {
@@ -529,9 +553,9 @@ export const Component = () => {
 
       // Define camera positions for each section
       const cameraPositions = [
-        { x: 0, y: 30, z: 300 },    // Section 0 - KAMAYAKOI
-        { x: 0, y: 40, z: -50 },     // Section 1 - COSMOS
-        { x: 0, y: 50, z: -700 }       // Section 2 - INFINITY
+        { x: 0, y: 30, z: 300 }, // Section 0 - KAMAYAKOI
+        { x: 0, y: 40, z: -50 }, // Section 1 - COSMOS
+        { x: 0, y: 50, z: -700 }, // Section 2 - INFINITY
       ];
 
       // Get current and next positions
@@ -539,16 +563,19 @@ export const Component = () => {
       const nextPos = cameraPositions[newSection + 1] || currentPos;
 
       // Set target positions (actual smoothing happens in animate loop)
-      refs.targetCameraX = currentPos.x + (nextPos.x - currentPos.x) * sectionProgress;
-      refs.targetCameraY = currentPos.y + (nextPos.y - currentPos.y) * sectionProgress;
-      refs.targetCameraZ = currentPos.z + (nextPos.z - currentPos.z) * sectionProgress;
+      refs.targetCameraX =
+        currentPos.x + (nextPos.x - currentPos.x) * sectionProgress;
+      refs.targetCameraY =
+        currentPos.y + (nextPos.y - currentPos.y) * sectionProgress;
+      refs.targetCameraZ =
+        currentPos.z + (nextPos.z - currentPos.z) * sectionProgress;
 
       // Smooth parallax for mountains
       refs.mountains.forEach((mountain, i) => {
         const speed = 1 + i * 0.9;
         const targetZ = mountain.userData.baseZ + scrollY * speed * 0.5;
         if (refs.nebula) {
-          refs.nebula.position.z = (targetZ + progress * speed * 0.01) - 100;
+          refs.nebula.position.z = targetZ + progress * speed * 0.01 - 100;
         }
 
         // Use the same smoothing approach
@@ -565,42 +592,38 @@ export const Component = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     handleScroll(); // Set initial position
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [totalSections]);
 
   // Function to get current section content
   const getCurrentSectionContent = () => {
-    const titles: Record<number, string> = {
-      0: 'KAMAYAKOI',
-      1: 'COSMOS',
-      2: 'INFINITY'
-    };
+    const sectionKeys = ["kamayakoi", "rvs", "liberation"];
+    const sectionKey = sectionKeys[currentSection] || "kamayakoi";
 
-    const subtitles: Record<number, { line1: string; line2: string }> = {
-      0: {
-        line1: 'Beyond our boundaries,',
-        line2: 'lies a universe of possibilities.'
-      },
-      1: {
-        line1: 'Beyond the boundaries of imagination,',
-        line2: 'lies the universe of possibilities'
-      },
-      2: {
-        line1: 'In the space between thought and creation,',
-        line2: 'we find the essence of true innovation'
-      }
-    };
+    const title = t(currentLanguage, `horizon.sections.${sectionKey}.title`);
+    const subtitleLine1 = t(
+      currentLanguage,
+      `horizon.sections.${sectionKey}.subtitle.line1`,
+    );
+    const subtitleLine2 = t(
+      currentLanguage,
+      `horizon.sections.${sectionKey}.subtitle.line2`,
+    );
 
     // Get subtitle opacity based on section
-    const subtitleOpacity = currentSection === 0 ? 'text-white/80' : 'text-white/50';
+    const subtitleOpacity =
+      currentSection === 0 ? "text-white/80" : "text-white/50";
 
     return {
-      title: titles[currentSection] || 'KAMAYAKOI',
-      subtitle: subtitles[currentSection] || subtitles[0],
-      subtitleOpacity
+      title,
+      subtitle: {
+        line1: subtitleLine1,
+        line2: subtitleLine2,
+      },
+      subtitleOpacity,
     };
   };
 
@@ -610,28 +633,36 @@ export const Component = () => {
     <div ref={containerRef} className="hero-container cosmos-style">
       <canvas ref={canvasRef} className="hero-canvas" />
 
-
-
       {/* Main content - dynamically updated based on scroll */}
       <div className="hero-content cosmos-content fixed inset-0 flex items-center justify-center z-20 pointer-events-none">
         <div className="text-center px-4">
-          <h1 ref={titleRef} className="hero-title text-8xl sm:text-9xl md:text-[10rem] lg:text-[12rem] xl:text-[14rem] font-black mb-6 text-white tracking-wider">
+          <h1
+            ref={titleRef}
+            className="hero-title text-[6rem] sm:text-8xl md:text-[10rem] lg:text-[12rem] xl:text-[14rem] font-black mb-6 text-white tracking-wider"
+          >
             {currentContent.title}
           </h1>
-          <div ref={subtitleRef} className={`hero-subtitle cosmos-subtitle text-2xl sm:text-3xl md:text-4xl ${currentContent.subtitleOpacity} max-w-4xl mx-auto font-medium`}>
+          <div
+            ref={subtitleRef}
+            className={`hero-subtitle cosmos-subtitle text-xl sm:text-2xl md:text-3xl lg:text-4xl ${currentContent.subtitleOpacity} max-w-4xl mx-auto font-medium`}
+          >
             <p className="subtitle-line mb-3">
               {currentContent.subtitle.line1}
             </p>
-            <p className="subtitle-line">
-              {currentContent.subtitle.line2}
-            </p>
+            <p className="subtitle-line">{currentContent.subtitle.line2}</p>
           </div>
         </div>
       </div>
 
       {/* Scroll progress indicator */}
-      <div ref={scrollProgressRef} className="scroll-progress fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-4 text-white z-20" style={{ visibility: 'hidden' }}>
-        <div className="scroll-text text-sm uppercase tracking-wider">SCROLL</div>
+      <div
+        ref={scrollProgressRef}
+        className="scroll-progress fixed bottom-20 md:bottom-16 left-1/2 transform -translate-x-1/2 flex items-center gap-4 text-white z-20"
+        style={{ visibility: "hidden" }}
+      >
+        <div className="scroll-text text-sm uppercase tracking-wider">
+          SCROLL
+        </div>
         <div className="progress-track w-24 h-0.5 bg-white/30">
           <div
             className="progress-fill h-full bg-white transition-all duration-300"
@@ -639,9 +670,13 @@ export const Component = () => {
           />
         </div>
         <div className="section-counter text-sm font-mono flex items-center justify-center min-w-[4rem]">
-          <span className="inline-block">{String(currentSection + 1).padStart(2, '0')}</span>
+          <span className="inline-block">
+            {String(currentSection + 1).padStart(2, "0")}
+          </span>
           <span className="inline-block mx-1">/</span>
-          <span className="inline-block">{String(totalSections).padStart(2, '0')}</span>
+          <span className="inline-block">
+            {String(totalSections).padStart(2, "0")}
+          </span>
         </div>
       </div>
 

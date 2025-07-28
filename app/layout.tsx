@@ -5,23 +5,24 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
 import { TranslationProvider } from "@/lib/contexts/TranslationContext";
+import MusicWrapper from "@/components/landing/music-wrapper";
 
 // Bold geometric fonts matching the image style
 const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
   variable: "--font-bebas-neue",
-  weight: ["400"]
+  weight: ["400"],
 });
 
 const oswald = Oswald({
   subsets: ["latin"],
   variable: "--font-oswald",
-  weight: ["300", "400", "500", "600", "700"]
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 const siteConfig = {
   name: "Kamayakoi",
-  description: "Le Rendez-Vous Sauvage pour Électrons Libres",
+  description: "Rendez-Vous Sauvage pour Électrons Libres",
   url: "https://kamayakoi.com",
   ogImage: "/banner.webp",
 };
@@ -74,7 +75,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${bebasNeue.variable} ${oswald.variable} font-oswald flex flex-col min-h-screen`}>
+      <body
+        className={`${bebasNeue.variable} ${oswald.variable} font-oswald flex flex-col min-h-screen`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
@@ -82,7 +85,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TranslationProvider>
-            <main className="flex-grow">{children}</main>
+            <MusicWrapper>
+              <main className="flex-grow">{children}</main>
+            </MusicWrapper>
           </TranslationProvider>
         </ThemeProvider>
         <Analytics />

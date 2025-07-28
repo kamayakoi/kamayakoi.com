@@ -2,95 +2,129 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { LanguageSwitcher } from "@/components/landing/LanguageSwitcher";
 import { IG } from "@/components/icons/IG";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { FacebookIcon } from "@/components/icons/FacebookIcon";
 import { Soundcloud } from "@/components/icons/Soundcloud";
+// import { useTranslation } from "@/lib/contexts/TranslationContext";
+// import { t } from "@/lib/i18n/translations";
 
 export default function MinimalFooter() {
-    const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  // const { currentLanguage } = useTranslation();
 
-    useEffect(() => {
-        const handleScroll = () => {
-            const scrollY = window.scrollY;
-            const windowHeight = window.innerHeight;
-            const documentHeight = document.documentElement.scrollHeight;
-            const maxScroll = documentHeight - windowHeight;
-            const scrollProgress = Math.min(scrollY / maxScroll, 1);
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const maxScroll = documentHeight - windowHeight;
+      const scrollProgress = Math.min(scrollY / maxScroll, 1);
 
-            // Only show footer when scroll progress is at 100% (completely scrolled)
-            setIsVisible(scrollProgress >= 0.95);
-        };
+      // Only show footer when scroll progress is at 100% (completely scrolled)
+      setIsVisible(scrollProgress >= 0.95);
+    };
 
-        window.addEventListener('scroll', handleScroll);
-        handleScroll(); // Check initial state
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Check initial state
 
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-    if (!isVisible) {
-        return null;
-    }
+  if (!isVisible) {
+    return null;
+  }
 
-    return (
-        <footer className="fixed bottom-0 left-0 right-0 h-12 bg-black/20 backdrop-blur-md border-t border-white/10 z-10">
-            <div className="container mx-auto px-4 h-full flex items-center justify-between">
-                {/* Social Icons - Left Side */}
-                <ul className="flex items-center space-x-2 list-none">
-                    {/* WhatsApp */}
-                    <li>
-                        <Link
-                            href="https://chat.whatsapp.com/I9yf0JkldJKLfu6FCnzQPQ?fbclid=PAZXh0bgNhZW0CMTEAAacIsymPxGAGZe1Y8dd04RKl0SOezf6bvn4z-8xK36S3a5bMDVddkT7DztdndQ_aem_rJkv0dc7xDHqT-vZBriGkg"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="WhatsApp"
-                            className="inline-flex items-center justify-center h-8 w-8 rounded-sm text-white transition-colors hover:text-[#25D366]"
-                        >
-                            <WhatsappIcon className="h-[18px] w-[18px]" />
-                        </Link>
-                    </li>
-                    {/* Soundcloud */}
-                    <li>
-                        <Link
-                            href="https://soundcloud.com/kamayakoi"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Soundcloud"
-                            className="inline-flex items-center justify-center h-8 w-8 rounded-sm text-white transition-colors hover:text-[#ff5500]"
-                        >
-                            <Soundcloud className="h-[16px] w-[16px]" />
-                        </Link>
-                    </li>
-                    {/* Facebook */}
-                    <li>
-                        <Link
-                            href="https://www.facebook.com/Kamayakoi/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Facebook"
-                            className="inline-flex items-center justify-center h-8 w-8 rounded-sm transition-colors text-white hover:text-[#1877F2]"
-                        >
-                            <FacebookIcon className="h-[16px] w-[16px]" />
-                        </Link>
-                    </li>
-                    {/* Instagram */}
-                    <li>
-                        <Link
-                            href="https://www.instagram.com/kamayakoi/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Instagram"
-                            className="inline-flex items-center justify-center h-8 w-8 rounded-sm transition-colors text-white hover:text-[#E4405F]"
-                        >
-                            <IG className="h-[18px] w-[18px]" />
-                        </Link>
-                    </li>
-                </ul>
+  return (
+    <footer className="fixed bottom-0 left-0 right-0 h-12 bg-black/20 backdrop-blur-md border-t border-white/10 z-10">
+      <div className="container mx-auto px-4 h-full flex items-center justify-between">
+        {/* Left Side - Logo, Separator, Social Icons, Open Source */}
+        <div className="flex items-center gap-4">
+          {/* Logo */}
+          <Link href="/" aria-label="Kamayakoi">
+            <Image
+              src="/white.svg"
+              alt="Kamayakoi Logo"
+              width={40}
+              height={40}
+              priority
+            />
+          </Link>
 
-                {/* Language Switcher - Right Side */}
-                <LanguageSwitcher className="text-white/80 hover:text-white" />
-            </div>
-        </footer>
-    );
-} 
+          {/* Vertical separator - Desktop only */}
+          <div className="hidden md:block h-6 w-px bg-white/30"></div>
+
+          {/* Social Icons */}
+          <ul className="flex items-center space-x-2 list-none">
+            {/* WhatsApp */}
+            <li>
+              <Link
+                href="https://chat.whatsapp.com/I9yf0JkldJKLfu6FCnzQPQ?fbclid=PAZXh0bgNhZW0CMTEAAacIsymPxGAGZe1Y8dd04RKl0SOezf6bvn4z-8xK36S3a5bMDVddkT7DztdndQ_aem_rJkv0dc7xDHqT-vZBriGkg"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="WhatsApp"
+                className="inline-flex items-center justify-center h-6 w-6 rounded-sm text-white transition-colors hover:text-[#25D366]"
+              >
+                <WhatsappIcon className="h-[18px] w-[18px]" />
+              </Link>
+            </li>
+            {/* Soundcloud */}
+            <li>
+              <Link
+                href="https://soundcloud.com/kamayakoi"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Soundcloud"
+                className="inline-flex items-center justify-center h-6 w-6 rounded-sm text-white transition-colors hover:text-[#ff5500]"
+              >
+                <Soundcloud className="h-[16px] w-[16px]" />
+              </Link>
+            </li>
+            {/* Facebook */}
+            <li>
+              <Link
+                href="https://www.facebook.com/Kamayakoi/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="inline-flex items-center justify-center h-6 w-6 rounded-sm transition-colors text-white hover:text-[#1877F2]"
+              >
+                <FacebookIcon className="h-[16px] w-[16px]" />
+              </Link>
+            </li>
+            {/* Instagram */}
+            <li>
+              <Link
+                href="https://www.instagram.com/kamayakoi/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="inline-flex items-center justify-center h-6 w-6 rounded-sm transition-colors text-white hover:text-[#E4405F]"
+              >
+                <IG className="h-[18px] w-[18px]" />
+              </Link>
+            </li>
+          </ul>
+
+          {/* Open Source Link - Desktop Only */}
+          {/* <Link
+                        href="https://github.com/kamayakoi/kamayakoi.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-white/60 hover:text-white/80 transition-colors hidden lg:block ml-4"
+                    >
+                        {t(currentLanguage, "barcode.opensource")}
+                    </Link> */}
+        </div>
+
+        {/* Right Side */}
+        <div className="flex items-center">
+          {/* Desktop: Language Switcher */}
+          <LanguageSwitcher className="hidden md:block text-white/80 hover:text-white" />
+        </div>
+      </div>
+    </footer>
+  );
+}

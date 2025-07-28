@@ -176,6 +176,24 @@ export default {
       ],
     },
     {
+      name: 'promoVideo',
+      title: 'Promotional Video',
+      type: 'file',
+      group: 'media',
+      description: 'Optional promotional video for the event (supports MP4, WebM, etc.)',
+      options: {
+        accept: 'video/*',
+      },
+      fields: [
+        {
+          name: 'caption',
+          title: 'Caption',
+          type: 'string',
+          options: {isHighlighted: true},
+        },
+      ],
+    },
+    {
       name: 'lineup',
       title: 'Lineup / Artists',
       type: 'array',

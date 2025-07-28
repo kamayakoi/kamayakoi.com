@@ -123,14 +123,14 @@
   body {
     @apply bg-background text-foreground;
   }
-  
+
   /* Hide scrollbar for horizon */
   html {
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* Internet Explorer 10+ */
   }
-  
-  html::-webkit-scrollbar { 
+
+  html::-webkit-scrollbar {
     display: none; /* WebKit */
   }
 }
@@ -162,8 +162,8 @@
   font-weight: 900;
   letter-spacing: 0.1em;
   line-height: 0.9;
-  color: #EB544D;
-  text-shadow: 
+  color: #eb544d;
+  text-shadow:
     0 0 5px #ff0000,
     2px 2px 4px rgba(0, 0, 0, 0.8);
   text-transform: uppercase;
@@ -172,7 +172,7 @@
 
 @media (max-width: 768px) {
   .hero-title {
-    font-size: 4.5rem;
+    font-size: 6rem;
     letter-spacing: 0.02em;
     line-height: 0.9;
   }
@@ -180,14 +180,14 @@
 
 @media (max-width: 640px) {
   .hero-title {
-    font-size: 3.5rem;
+    font-size: 5rem;
     letter-spacing: 0.01em;
   }
 }
 
 @media (max-width: 480px) {
   .hero-title {
-    font-size: 3rem;
+    font-size: 4.5rem;
     letter-spacing: 0;
   }
 }

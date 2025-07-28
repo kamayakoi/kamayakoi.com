@@ -49,6 +49,31 @@ export default defineType({
       initialValue: false,
       description: 'Check if this artist is a resident for the event series or venue.',
     }),
+    defineField({
+      name: 'role',
+      title: 'Role/Title',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Artist', value: 'artist'},
+          {title: 'Resident', value: 'resident'},
+          {title: 'Host', value: 'host'},
+          {title: 'MC', value: 'mc'},
+          {title: 'Producer', value: 'producer'},
+          {title: 'DJ', value: 'dj'},
+        ],
+        layout: 'dropdown',
+      },
+      initialValue: 'artist',
+      description: 'Role or title of the artist in the collective.',
+    }),
+    defineField({
+      name: 'socialHandle',
+      title: 'Social Handle',
+      type: 'string',
+      description: 'Username without @ symbol (e.g., johndoe)',
+      placeholder: 'johndoe',
+    }),
     // Add any other relevant fields for artists here
   ],
   preview: {

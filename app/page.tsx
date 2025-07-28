@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { Component as Horizon } from "@/components/landing/horizon";
 import Header from "@/components/landing/header";
 import MinimalFooter from "@/components/landing/minimal-footer";
+import AudioPlayer from "@/components/landing/audio-player";
 
 // Use the general site metadata for the home page
 export const metadata: Metadata = {
   title: "Kamayakoi",
-  description: "Le Rendez-Vous Sauvage pour Électrons Libres",
+  description: "Rendez-Vous Sauvage pour Électrons Libres",
 };
 
 export default async function Home() {
@@ -15,6 +16,11 @@ export default async function Home() {
       {/* Header positioned over the horizon */}
       <div className="absolute top-0 left-0 right-0 z-50">
         <Header />
+      </div>
+
+      {/* Desktop Audio Player - positioned on the left */}
+      <div className="hidden md:block fixed top-1/2 left-6 transform -translate-y-1/2 z-40">
+        <AudioPlayer />
       </div>
 
       {/* Horizon component */}

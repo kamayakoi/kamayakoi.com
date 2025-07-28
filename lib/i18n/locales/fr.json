@@ -18,7 +18,7 @@
   "header": {
     "nav": {
       "home": "ACCUEIL",
-      "events": "LE RENDEZ-VOUS SAUVAGE",
+      "events": "RENDEZ-VOUS SAUVAGE",
       "gallery": "ARCHIVES",
       "shop": "MERCH",
       "room": "ARTISTES",
@@ -102,10 +102,10 @@
   },
   "eventsPage": {
     "metadata": {
-      "title": "Événements",
+      "title": "Le Rendez-Vous Sauvage",
       "description": "Découvrez les prochains événements de Kamayakoi"
     },
-    "title": "Événements",
+    "title": "Le Rendez-Vous Sauvage",
     "noEvents": "Aucun événement à venir trouvé."
   },
   "eventSlugPage": {
@@ -290,5 +290,30 @@
       "person": "personne"
     },
     "checkedInLabel": "Enregistré :"
+  },
+  "horizon": {
+    "sections": {
+      "kamayakoi": {
+        "title": "KAMAYAKOI",
+        "subtitle": {
+          "line1": "Là où le son devient rituel,",
+          "line2": "et le rythme transcende la réalité."
+        }
+      },
+      "rvs": {
+        "title": "INTENSE",
+        "subtitle": {
+          "line1": "Au-delà du dancefloor ordinaire,",
+          "line2": "se trouve un univers électrique de sensations."
+        }
+      },
+      "liberation": {
+        "title": "WILD",
+        "subtitle": {
+          "line1": "Dans l'espace entre les beats,",
+          "line2": "nous découvrons nos fréquences les plus sauvages."
+        }
+      }
+    }
   }
 }

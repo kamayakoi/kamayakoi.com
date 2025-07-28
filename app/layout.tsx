@@ -92,8 +92,8 @@ export default async function RootLayout({
           <TranslationProvider>
             <MusicWrapper tracks={musicTracks}>
               {/* Global Desktop Audio Player - positioned in top-left */}
-              <div className="hidden md:block fixed top-4 left-4 z-40">
-                <AudioPlayer className="w-[200px] h-auto" />
+              <div className="hidden md:block fixed top-4 left-4 z-[70]">
+                <AudioPlayer />
               </div>
 
               <main className="flex-grow">{children}</main>

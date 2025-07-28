@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, X, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/actions/utils";
 import Image from "next/image";
 import { useMusic } from "@/lib/contexts/MusicContext";
+import { usePathname } from "next/navigation";
 
 const formatTime = (seconds: number = 0) => {
   const minutes = Math.floor(seconds / 60);
@@ -23,18 +24,22 @@ const CustomSlider = ({
   onChange: (value: number) => void;
   className?: string;
 }) => {
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percentage = (x / rect.width) * 100;
+    onChange(Math.min(Math.max(percentage, 0), 100));
+  };
+
   return (
-    <motion.div
+    <div
       className={cn(
         "relative w-full h-1 bg-white/20 rounded-full cursor-pointer",
         className,
       )}
-      onClick={(e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const percentage = (x / rect.width) * 100;
-        onChange(Math.min(Math.max(percentage, 0), 100));
-      }}
+      onClick={handleClick}
     >
       <motion.div
         className="absolute top-0 left-0 h-full bg-white rounded-full"
@@ -43,7 +48,7 @@ const CustomSlider = ({
         animate={{ width: `${value}%` }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       />
-    </motion.div>
+    </div>
   );
 };
 
@@ -52,6 +57,12 @@ interface AudioPlayerProps {
 }
 
 const AudioPlayer = ({ className }: AudioPlayerProps) => {
+  const pathname = usePathname();
+  const isEventsPage = pathname === '/events';
+
+  const [isVisible, setIsVisible] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(!isEventsPage); // Collapsed by default on events page
+
   const {
     tracks,
     currentTrack,
@@ -62,6 +73,7 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
     nextTrack,
     prevTrack,
     seekTo,
+    pause,
   } = useMusic();
 
   console.log("🎵 AudioPlayer - tracks:", tracks);
@@ -69,32 +81,85 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
   console.log("🎵 AudioPlayer - tracks length:", tracks?.length);
 
   const handleSeek = (value: number) => {
-    if (duration) {
+    if (duration && duration > 0) {
       const time = (value / 100) * duration;
-      if (isFinite(time)) {
+      if (isFinite(time) && time >= 0) {
         seekTo(time);
       }
     }
   };
 
+  const handleClose = () => {
+    pause(); // Stop the music
+    setIsVisible(false);
+  };
+
+  const handleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-  if (!tracks || tracks.length === 0 || !currentTrack) {
+  if (!tracks || tracks.length === 0 || !currentTrack || !isVisible) {
     console.log("🎵 AudioPlayer - Not rendering because:", {
       hasNoTracks: !tracks,
       tracksLength: tracks?.length,
-      hasNoCurrentTrack: !currentTrack
+      hasNoCurrentTrack: !currentTrack,
+      isVisible
     });
     return null;
   }
 
   console.log("🎵 AudioPlayer - Rendering with track:", currentTrack.title);
 
+  // Compact version for events page or when collapsed
+  if (!isExpanded) {
+    return (
+      <motion.div
+        className={cn(
+          "relative bg-[#1a1a1a] shadow-2xl border border-gray-800 rounded-sm w-[60px] h-[60px] overflow-visible",
+          className,
+        )}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+        onClick={handleExpand}
+      >
+        {/* Album art only */}
+        <div className="w-full h-full relative cursor-pointer group">
+          {currentTrack.coverImageUrl ? (
+            <Image
+              src={currentTrack.coverImageUrl}
+              alt={currentTrack.title}
+              width={60}
+              height={60}
+              className="w-full h-full object-cover rounded-sm"
+            />
+          ) : (
+            <div className="w-full h-full bg-white/20 rounded-sm flex items-center justify-center">
+              <Play className="h-6 w-6 text-white/70" />
+            </div>
+          )}
+
+          {/* Expand indicator */}
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-sm">
+            <ChevronRight className="h-4 w-4 text-white" />
+          </div>
+
+          {/* Playing indicator */}
+          {isPlaying && (
+            <div className="absolute bottom-1 right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          )}
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <AnimatePresence>
       <motion.div
         className={cn(
-          "relative flex flex-col mx-auto rounded-sm overflow-hidden bg-[#11111198] shadow-[0_0_20px_rgba(0,0,0,0.2)] backdrop-blur-sm p-2 w-[200px] h-auto",
+          "relative bg-[#1a1a1a] shadow-2xl border border-gray-800 rounded-sm overflow-visible w-[380px] h-[70px]",
           className,
         )}
         initial={{ opacity: 0, filter: "blur(10px)" }}
@@ -108,107 +173,127 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
         }}
         layout
       >
+        {/* Control buttons - completely outside with proper spacing */}
+        <div className="absolute -top-3 -right-3 z-20 flex space-x-1">
+          <button
+            onClick={handleClose}
+            className="bg-[#2a2a2a] rounded-sm w-4 h-4 flex items-center justify-center shadow-md hover:bg-[#3a3a3a] transition-colors border border-gray-700"
+            aria-label="Close"
+          >
+            <X className="h-2.5 w-2.5 text-gray-300" />
+          </button>
+          {/* Collapse button */}
+          <button
+            onClick={handleExpand}
+            className="bg-[#2a2a2a] rounded-sm w-4 h-4 flex items-center justify-center shadow-md hover:bg-[#3a3a3a] transition-colors border border-gray-700"
+            aria-label="Collapse"
+          >
+            <ChevronRight className="h-2.5 w-2.5 text-gray-300 rotate-180" />
+          </button>
+        </div>
+
         <motion.div
-          className="flex flex-col relative"
+          className="flex items-center w-full p-3"
           layout
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
         >
           {/* Cover Image */}
           {currentTrack.coverImageUrl && (
-            <motion.div className="bg-white/20 overflow-hidden rounded-sm h-[120px] w-full relative">
+            <motion.div className="bg-white/20 overflow-hidden rounded-sm h-[45px] w-[45px] flex-shrink-0 mr-3">
               <Image
                 src={currentTrack.coverImageUrl}
                 alt={currentTrack.title}
-                width={120}
-                height={120}
-                className="!object-cover w-full my-0 p-0 !mt-0 border-none !h-full"
+                width={45}
+                height={45}
+                className="!object-cover w-full h-full"
               />
             </motion.div>
           )}
 
-          <motion.div className="flex flex-col w-full gap-y-2">
-            {/* Title and Artist */}
-            <motion.div className="text-center mt-1">
-              <h3 className="text-white font-bold text-base">
+          {/* Content Area */}
+          <motion.div className="flex flex-col flex-grow min-w-0">
+            {/* Title and Artist - inline */}
+            <motion.div className="mb-1">
+              <h3 className="text-white font-bold text-sm truncate">
                 {currentTrack.title}
+                {currentTrack.artist && (
+                  <span className="text-white/70 font-normal"> • {currentTrack.artist}</span>
+                )}
               </h3>
-              {currentTrack.artist && (
-                <p className="text-white/70 text-sm">{currentTrack.artist}</p>
-              )}
             </motion.div>
 
             {/* Progress Slider */}
-            <motion.div className="flex flex-col gap-y-1">
+            <motion.div className="flex flex-col gap-y-1 mb-1">
               <CustomSlider
                 value={progress}
                 onChange={handleSeek}
                 className="w-full"
               />
               <div className="flex items-center justify-between">
-                <span className="text-white text-sm">
+                <span className="text-white text-xs">
                   {formatTime(currentTime)}
                 </span>
-                <span className="text-white text-sm">
+                <span className="text-white text-xs">
                   {formatTime(duration)}
                 </span>
               </div>
             </motion.div>
+          </motion.div>
 
-            {/* Controls */}
-            <motion.div className="flex items-center justify-center w-full">
-              <div className="flex items-center gap-2 w-fit bg-[#11111198] rounded-sm p-2">
-                {tracks.length > 1 && (
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={prevTrack}
-                      className="text-white hover:bg-[#111111d1] hover:text-white h-8 w-8 rounded-full"
-                    >
-                      <SkipBack className="h-5 w-5" />
-                    </Button>
-                  </motion.div>
-                )}
-
+          {/* Controls */}
+          <motion.div className="flex items-center ml-3">
+            <div className="flex items-center gap-1 bg-[#11111198] rounded-sm p-1">
+              {tracks.length > 1 && (
                 <motion.div
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
                   <Button
-                    onClick={togglePlay}
                     variant="ghost"
                     size="icon"
-                    className="text-white hover:bg-[#111111d1] hover:text-white h-8 w-8 rounded-full"
+                    onClick={prevTrack}
+                    className="text-white hover:bg-[#111111d1] hover:text-white h-6 w-6 rounded-sm"
                   >
-                    {isPlaying ? (
-                      <Pause className="h-5 w-5" />
-                    ) : (
-                      <Play className="h-5 w-5" />
-                    )}
+                    <SkipBack className="h-4 w-4" />
                   </Button>
                 </motion.div>
+              )}
 
-                {tracks.length > 1 && (
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <Button
+                  onClick={togglePlay}
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-[#111111d1] hover:text-white h-6 w-6 rounded-sm"
+                >
+                  {isPlaying ? (
+                    <Pause className="h-4 w-4" />
+                  ) : (
+                    <Play className="h-4 w-4" />
+                  )}
+                </Button>
+              </motion.div>
+
+              {tracks.length > 1 && (
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={nextTrack}
+                    className="text-white hover:bg-[#111111d1] hover:text-white h-6 w-6 rounded-sm"
                   >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={nextTrack}
-                      className="text-white hover:bg-[#111111d1] hover:text-white h-8 w-8 rounded-full"
-                    >
-                      <SkipForward className="h-5 w-5" />
-                    </Button>
-                  </motion.div>
-                )}
-              </div>
-            </motion.div>
+                    <SkipForward className="h-4 w-4" />
+                  </Button>
+                </motion.div>
+              )}
+            </div>
           </motion.div>
         </motion.div>
       </motion.div>

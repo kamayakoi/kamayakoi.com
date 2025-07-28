@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -15,8 +15,10 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const sectionRefs = useRef<(HTMLElement | null)[]>([]);
   const [mutedStates, setMutedStates] = useState<boolean[]>([]);
   const [isMobile, setIsMobile] = useState(false);
+  const [activeVideoIndex, setActiveVideoIndex] = useState<number | null>(null);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -25,9 +27,12 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
 
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
-  // Limit to 5 events max for parallax display and ensure we always have an array
-  // Sort by number descending to show highest numbers first (latest events first)
-  const displayEvents = events?.slice(0, 5) || [];
+  // Memoize displayEvents to prevent unnecessary re-renders and fix ESLint warning
+  const displayEvents = useMemo(() => {
+    // Limit to 5 events max for parallax display and ensure we always have an array
+    // Sort by number descending to show highest numbers first (latest events first)
+    return events?.slice(0, 5) || [];
+  }, [events]);
 
   // Initialize muted states
   useEffect(() => {
@@ -43,6 +48,78 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  // Scroll-based video management
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+
+      const viewportCenter = window.innerHeight / 2;
+      let closestIndex = -1;
+      let closestDistance = Infinity;
+
+      // Find which section is closest to the center of the viewport
+      sectionRefs.current.forEach((section, index) => {
+        if (!section) return;
+
+        const sectionRect = section.getBoundingClientRect();
+        const sectionCenter = sectionRect.top + sectionRect.height / 2;
+        const distance = Math.abs(viewportCenter - sectionCenter);
+
+        // Check if section is at least partially visible
+        const isVisible = sectionRect.top < window.innerHeight && sectionRect.bottom > 0;
+
+        if (isVisible && distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      // Only update if the active index changed
+      if (closestIndex !== activeVideoIndex) {
+        setActiveVideoIndex(closestIndex);
+
+        // Pause all videos first
+        videoRefs.current.forEach((video) => {
+          if (video) {
+            video.pause();
+          }
+        });
+
+        // Play the active video if it exists and has a video
+        if (closestIndex >= 0 && videoRefs.current[closestIndex] && displayEvents[closestIndex]?.promoVideoUrl) {
+          const activeVideo = videoRefs.current[closestIndex];
+          if (activeVideo) {
+            activeVideo.currentTime = 0; // Reset to beginning
+            activeVideo.play().catch(err => {
+              console.log("Video autoplay prevented:", err);
+            });
+          }
+        }
+      }
+    };
+
+    // Add scroll listener with throttling
+    let ticking = false;
+    const throttledScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', throttledScroll, { passive: true });
+
+    // Initial check
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', throttledScroll);
+    };
+  }, [activeVideoIndex, displayEvents]);
 
   // Create individual transform hooks for each potential event slot (up to 5)
   const transform1 = useTransform(
@@ -118,22 +195,29 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
     <div ref={containerRef} className="parallax-container">
       {displayEvents.map((event, index) => {
         const hasVideo = !!event.promoVideoUrl;
+        const isActiveVideo = activeVideoIndex === index;
 
         return (
-          <section key={event._id} className="img-container">
+          <section
+            key={event._id}
+            className="img-container"
+            ref={(el) => {
+              sectionRefs.current[index] = el;
+            }}
+          >
             <div className="media-wrapper">
               {hasVideo ? (
-                <div className="relative">
+                <div className="relative w-full h-full overflow-hidden rounded">
                   <video
                     ref={(el) => {
                       videoRefs.current[index] = el;
                     }}
                     src={event.promoVideoUrl}
-                    autoPlay
                     loop
                     muted={mutedStates[index]}
                     playsInline
-                    className="event-media video"
+                    preload="metadata"
+                    className="absolute inset-0 w-full h-full object-cover cursor-pointer transition-transform duration-300 hover:scale-105"
                     onClick={() => handleImageClick(event.slug)}
                     onLoadedMetadata={() => {
                       if (videoRefs.current[index]) {
@@ -147,17 +231,24 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                       e.stopPropagation();
                       toggleVideoSound(index);
                     }}
-                    className="absolute bottom-4 right-4 z-30 p-2 bg-black/20 hover:bg-black/40 rounded-sm text-white focus:outline-none transition-colors duration-200"
+                    className="absolute bottom-4 right-4 z-40 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white focus:outline-none transition-all duration-200 backdrop-blur-sm border border-white/20"
                     aria-label={
                       mutedStates[index] ? "Unmute video" : "Mute video"
                     }
                   >
                     {mutedStates[index] ? (
-                      <VolumeX size={16} />
+                      <VolumeX size={18} />
                     ) : (
-                      <Volume2 size={16} />
+                      <Volume2 size={18} />
                     )}
                   </button>
+                  {/* Playing indicator */}
+                  {isActiveVideo && (
+                    <div className="absolute top-4 left-4 z-40 flex items-center space-x-2">
+                      <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                      <span className="text-white text-sm font-medium bg-black/50 px-2 py-1 rounded backdrop-blur-sm">LIVE</span>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <Image
@@ -214,7 +305,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
           background: #f5f5f5;
           overflow: hidden;
           position: relative;
-          border-radius: 4px;
+          border-radius: 8px;
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
@@ -227,11 +318,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
         }
 
         .event-media.image {
-          border-radius: 4px;
-        }
-
-        .event-media.video {
-          border-radius: 4px;
+          border-radius: 8px;
         }
 
         .event-media:hover {
@@ -252,6 +339,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
           left: calc(50% + ${isMobile ? "200px" : "300px"});
           text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
           z-index: 20;
+          pointer-events: none;
         }
 
         .progress {

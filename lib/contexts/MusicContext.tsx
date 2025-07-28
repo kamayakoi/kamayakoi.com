@@ -73,11 +73,30 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
     setDuration(0);
   };
 
-  // Player controls
-  const play = () => {
+  const handlePlay = () => {
+    setIsPlaying(true);
+  };
+
+  const handlePause = () => {
+    setIsPlaying(false);
+  };
+
+  const handleLoadedMetadata = () => {
     if (audioRef.current) {
-      audioRef.current.play();
-      setIsPlaying(true);
+      setDuration(audioRef.current.duration || 0);
+    }
+  };
+
+  // Player controls
+  const play = async () => {
+    if (audioRef.current) {
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (error) {
+        console.error("Error playing audio:", error);
+        setIsPlaying(false);
+      }
     }
   };
 
@@ -119,7 +138,7 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
   };
 
   const seekTo = (time: number) => {
-    if (audioRef.current) {
+    if (audioRef.current && isFinite(time) && time >= 0) {
       audioRef.current.currentTime = time;
       setCurrentTime(time);
     }
@@ -158,6 +177,8 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
+      // Load the new track
+      audioRef.current.load();
     }
   }, [currentTrackIndex]);
 
@@ -167,6 +188,24 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
       audioRef.current.volume = volume;
     }
   }, [volume]);
+
+  // Handle background playback - continue playing when app loses focus
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      // Don't pause when page becomes hidden - allow background playback
+      if (document.hidden) {
+        console.log("🎵 Page hidden - continuing background playback");
+      } else {
+        console.log("🎵 Page visible - resuming normal playback");
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   const value: MusicContextType = {
     tracks,
@@ -200,8 +239,12 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleEnded}
           onLoadStart={handleLoadStart}
+          onPlay={handlePlay}
+          onPause={handlePause}
+          onLoadedMetadata={handleLoadedMetadata}
           className="hidden"
           preload="metadata"
+          playsInline
         />
       )}
     </MusicContext.Provider>

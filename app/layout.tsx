@@ -85,7 +85,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TranslationProvider>
-            <MusicWrapper>
+            <MusicWrapper tracks={[]}>
               <main className="flex-grow">{children}</main>
             </MusicWrapper>
           </TranslationProvider>

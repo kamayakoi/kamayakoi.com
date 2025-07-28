@@ -32,6 +32,7 @@ import {
   Download,
 } from "lucide-react";
 import { toast } from "sonner";
+import LoadingComponent from "@/components/ui/loader";
 
 interface Purchase {
   purchase_id: string;
@@ -541,9 +542,7 @@ export default function AdminPage() {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="text-center py-8">
-                <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
-              </div>
+              <LoadingComponent />
             ) : filteredPurchases.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-gray-400">No purchases found</p>
@@ -787,8 +786,8 @@ export default function AdminPage() {
             <DialogHeader>
               <DialogTitle className="text-gray-100">
                 {selectedPurchase &&
-                (selectedPurchase.email_dispatch_status === "NOT_INITIATED" ||
-                  selectedPurchase.email_dispatch_attempts === 0)
+                  (selectedPurchase.email_dispatch_status === "NOT_INITIATED" ||
+                    selectedPurchase.email_dispatch_attempts === 0)
                   ? "Send Ticket Email"
                   : "Resend Ticket Email"}
               </DialogTitle>
@@ -876,7 +875,7 @@ export default function AdminPage() {
                       <>
                         {selectedPurchase.email_dispatch_status ===
                           "NOT_INITIATED" ||
-                        selectedPurchase.email_dispatch_attempts === 0 ? (
+                          selectedPurchase.email_dispatch_attempts === 0 ? (
                           <>
                             <Send className="h-4 w-4 mr-2" />
                             Send Email

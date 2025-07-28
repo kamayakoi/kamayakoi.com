@@ -132,7 +132,7 @@
   top: 4px;
   /* Dark background, red text matching horizon color */
   background-color: rgba(31, 41, 55, 0.5); /* Dark grey bg (gray-800) */
-  color: #eb544d; /* Red text matching horizon color */
+  color: #E0245E; /* Red text matching horizon color */
 }
 
 /* Styles to make disabled links non-interactive */

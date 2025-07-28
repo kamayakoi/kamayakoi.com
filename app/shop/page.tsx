@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import { getAllProducts } from "@/lib/sanity/queries";
 import Header from "@/components/landing/header";
 import Footer from "@/components/landing/footer";
+import LoadingComponent from "@/components/ui/loader";
 
-export default async function ShopPage() {
+async function ShopContent() {
   const products = await getAllProducts();
 
   return (
@@ -40,5 +42,13 @@ export default async function ShopPage() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default async function ShopPage() {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <ShopContent />
+    </Suspense>
   );
 }

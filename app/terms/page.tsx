@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import TermsClientPage from "./terms-client";
+import LoadingComponent from "@/components/ui/loader";
 
 export const metadata: Metadata = {
   title: "Terms",
@@ -8,5 +10,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <TermsClientPage />;
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <TermsClientPage />
+    </Suspense>
+  );
 }

@@ -20,11 +20,11 @@ export default function LoadingComponent() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+    <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="relative">
         {/* Background text (darker) */}
         <h1
-          className="text-8xl md:text-9xl lg:text-[12rem] font-black text-gray-700"
+          className="text-2xl md:text-3xl lg:text-4xl font-black text-muted-foreground"
           style={{
             fontWeight: 900,
             letterSpacing: "0.0em",
@@ -40,7 +40,7 @@ export default function LoadingComponent() {
           style={{ width: `${fillWidth}%` }}
         >
           <h1
-            className="text-8xl md:text-9xl lg:text-[12rem] font-black whitespace-nowrap"
+            className="text-2xl md:text-2xl lg:text-4xl font-black whitespace-nowrap"
             style={{
               fontWeight: 900,
               letterSpacing: "-0.1em",

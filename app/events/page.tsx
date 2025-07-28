@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import ParallaxGallery from "@/components/ui/parallax";
 import {
   getEventsForParallax,
@@ -6,6 +7,7 @@ import {
 } from "@/lib/sanity/queries";
 import Header from "@/components/landing/header";
 import { t } from "@/lib/i18n/translations";
+import LoadingComponent from "@/components/ui/loader";
 
 const getPageLocale = (params?: { locale?: string }): string => {
   return params?.locale || process.env.NEXT_PUBLIC_DEFAULT_LOCALE || "en";
@@ -24,13 +26,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function EventsPage({
-  params: paramsPromise,
-}: {
-  params: Promise<{ locale?: string }>;
-}) {
-  const params = await paramsPromise;
-  const currentLanguage = getPageLocale(params);
+async function EventsContent() {
   const events: EventParallaxData[] = await getEventsForParallax(5);
 
   if (!events || events.length === 0) {
@@ -38,10 +34,7 @@ export default async function EventsPage({
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="container mx-auto py-20 px-4 flex-grow">
-          <h1 className="text-4xl font-bold mb-8">
-            {t(currentLanguage, "eventsPage.title")}
-          </h1>
-          <p>{t(currentLanguage, "eventsPage.noEvents")}</p>
+          {/* Removed title and no events message */}
         </main>
       </div>
     );
@@ -54,5 +47,13 @@ export default async function EventsPage({
         <ParallaxGallery events={events} />
       </main>
     </div>
+  );
+}
+
+export default async function EventsPage() {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <EventsContent />
+    </Suspense>
   );
 }

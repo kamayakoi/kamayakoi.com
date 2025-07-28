@@ -321,27 +321,40 @@ export interface MusicTrack {
 
 // Fetch music tracks from the singleton homepage document
 export const getHomepageMusicTracks = async (): Promise<MusicTrack[]> => {
-  // Query the single document of type 'homepage'
-  // Select the music tracks with their audio files and cover images
-  const query = `*[_type == "homepage"][0] {
-    "musicTracks": musicTracks[]{
-      title,
-      artist,
-      "audioUrl": audioFile.asset->url,
-      "coverImageUrl": coverImage.asset->url
-    }
-  }`;
-  const result = await client.fetch<{ musicTracks?: MusicTrack[] }>(
-    query,
-    {},
-    {
-      next: {
-        revalidate: 7200, // Cache for 2 hours
-        tags: ["homepage", "music"],
+  try {
+    // Query the single document of type 'homepage'
+    // Select the music tracks with their audio files and cover images
+    const query = `*[_type == "homepage"][0] {
+      "musicTracks": musicTracks[]{
+        title,
+        artist,
+        "audioUrl": audioFile.asset->url,
+        "coverImageUrl": coverImage.asset->url
+      }
+    }`;
+    
+    const result = await client.fetch<{ musicTracks?: MusicTrack[] }>(
+      query,
+      {},
+      {
+        next: {
+          revalidate: 7200, // Cache for 2 hours
+          tags: ["homepage", "music"],
+        },
       },
-    },
-  );
-  return result?.musicTracks?.filter((track) => track.audioUrl) ?? [];
+    );
+    
+    // Handle case when no homepage document exists or no musicTracks field
+    if (!result || !result.musicTracks) {
+      return [];
+    }
+    
+    return result.musicTracks.filter((track) => track.audioUrl) ?? [];
+  } catch (error) {
+    console.error("Error fetching homepage music tracks:", error);
+    // Return empty array instead of throwing error to prevent app crash
+    return [];
+  }
 };
 
 // ================================= Artists ================================

@@ -1,9 +1,11 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import { PortableText } from "@portabletext/react";
 import { getStory } from "@/lib/sanity/queries";
 import { notFound } from "next/navigation";
+import LoadingComponent from "@/components/ui/loader";
 
-export default async function StoryPage() {
+async function StoryContent() {
   const story = await getStory();
 
   if (!story) {
@@ -31,5 +33,13 @@ export default async function StoryPage() {
         <PortableText value={story.content} />
       </div>
     </div>
+  );
+}
+
+export default async function StoryPage() {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <StoryContent />
+    </Suspense>
   );
 }

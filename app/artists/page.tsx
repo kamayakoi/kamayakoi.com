@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { getAllArtists, type ArtistData } from "@/lib/sanity/queries";
 import Header from "@/components/landing/header";
 import { ArtistCard } from "@/components/ui/artist-card";
+import LoadingComponent from "@/components/ui/loader";
 
 export const metadata: Metadata = {
   title: "Artists",
   description: "Meet the talented artists and creators of Kamayakoi.",
 };
 
-export default async function ArtistsPage() {
+async function ArtistsContent() {
   const artists: ArtistData[] = await getAllArtists();
-
-  // Remove the empty state - always show the page structure
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -29,5 +29,13 @@ export default async function ArtistsPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default async function ArtistsPage() {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <ArtistsContent />
+    </Suspense>
   );
 }

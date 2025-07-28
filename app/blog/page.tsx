@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -6,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getAllBlogPosts } from "@/lib/sanity/queries";
 import Header from "@/components/landing/header";
+import LoadingComponent from "@/components/ui/loader";
 
 // Define a type for blog posts
 interface BlogPost {
@@ -25,7 +27,7 @@ export const metadata: Metadata = {
     "Latest news, event recaps, and entertainment insights from Kamayakoi",
 };
 
-export default async function BlogPage() {
+async function BlogContent() {
   const posts = await getAllBlogPosts();
 
   return (
@@ -68,5 +70,13 @@ export default async function BlogPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default async function BlogPage() {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <BlogContent />
+    </Suspense>
   );
 }

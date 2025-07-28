@@ -1,12 +1,14 @@
 // Placeholder for Single Product Page
+import { Suspense } from "react";
 import { getProductBySlug } from "@/lib/sanity/queries";
 import { notFound } from "next/navigation";
+import LoadingComponent from "@/components/ui/loader";
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export default async function ProductDetailPage({ params }: Props) {
+async function ProductContent({ params }: Props) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
 
@@ -25,6 +27,14 @@ export default async function ProductDetailPage({ params }: Props) {
       </div>
       {/* Add to Cart / Variant selection logic later */}
     </main>
+  );
+}
+
+export default async function ProductDetailPage({ params }: Props) {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <ProductContent params={params} />
+    </Suspense>
   );
 }
 

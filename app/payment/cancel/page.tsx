@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { PaymentCancelClient } from "./payment-cancel-client";
+import LoadingComponent from "@/components/ui/loader";
 
 interface SearchParamsProps {
   searchParams: Promise<{
@@ -13,13 +14,7 @@ export default async function PaymentCancelPage({
   const params = await searchParams;
 
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
-        </div>
-      }
-    >
+    <Suspense fallback={<LoadingComponent />}>
       <PaymentCancelClient purchaseId={params.purchase_id} />
     </Suspense>
   );

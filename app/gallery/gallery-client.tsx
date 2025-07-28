@@ -3,7 +3,7 @@
 import Image from "next/image";
 import React, { useState, useEffect, useMemo } from "react";
 import type { ImageProps } from "@/lib/utils/types";
-import LoadingSpinner from "@/components/ui/Bouncer";
+import LoadingComponent from "@/components/ui/loader";
 
 // Renamed component to GalleryClientComponent
 export default function GalleryClientComponent() {
@@ -98,15 +98,19 @@ export default function GalleryClientComponent() {
   // --- Render Logic ---
   if (isLoading) {
     // Render only the spinner, Header/Footer are in the parent page
-    return <LoadingSpinner />;
+    return <LoadingComponent />;
   }
 
   if (error) {
-    // Render error message, Header/Footer are in the parent page
+    // Hide Cloudinary error message, don't throw error
+    console.warn("Gallery error (hidden from UI):", error);
+    // Return empty gallery instead of error
     return (
-      <div className="flex justify-center items-center h-screen text-red-500 pt-20">
-        Error loading gallery: {error}
-      </div>
+      <main className="mx-auto max-w-[1960px] p-4 pt-20">
+        <div className="text-center text-gray-500">
+          {/* Error hidden as requested */}
+        </div>
+      </main>
     );
   }
 
@@ -126,12 +130,7 @@ export default function GalleryClientComponent() {
   return (
     <>
       <main className="mx-auto max-w-[1960px] p-4 pt-20">
-        {/* Display error inline if needed, without blocking gallery */}
-        {error && (
-          <p className="text-center text-red-500 mb-4">
-            Error loading images: {error}
-          </p>
-        )}
+        {/* Error display removed as requested */}
         {images.length === 0 && !isLoading && !error && (
           <p className="text-center">No images found. Check API route logs.</p>
         )}

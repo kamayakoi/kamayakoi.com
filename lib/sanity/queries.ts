@@ -332,7 +332,7 @@ export const getHomepageMusicTracks = async (): Promise<MusicTrack[]> => {
         "coverImageUrl": coverImage.asset->url
       }
     }`;
-    
+
     const result = await client.fetch<{ musicTracks?: MusicTrack[] }>(
       query,
       {},
@@ -343,12 +343,12 @@ export const getHomepageMusicTracks = async (): Promise<MusicTrack[]> => {
         },
       },
     );
-    
+
     // Handle case when no homepage document exists or no musicTracks field
     if (!result || !result.musicTracks) {
       return [];
     }
-    
+
     return result.musicTracks.filter((track) => track.audioUrl) ?? [];
   } catch (error) {
     console.error("Error fetching homepage music tracks:", error);

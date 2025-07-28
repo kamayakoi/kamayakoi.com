@@ -62,7 +62,9 @@ async function BlogPostContent({
         {post.categories && post.categories.length > 0 && (
           <div className="flex items-center gap-2">
             <Tag className="h-4 w-4" />
-            <span>{post.categories.map((cat: Category) => cat.title).join(", ")}</span>
+            <span>
+              {post.categories.map((cat: Category) => cat.title).join(", ")}
+            </span>
           </div>
         )}
       </div>

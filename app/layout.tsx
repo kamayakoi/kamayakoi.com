@@ -22,7 +22,7 @@ const oswald = Oswald({
 
 const siteConfig = {
   name: "Kamayakoi",
-  description: "Rendez-Vous Sauvage pour Électrons Libres",
+  description: "Rendez-vous sauvage pour électrons libres.",
   url: "https://kamayakoi.com",
   ogImage: "/banner.webp",
 };

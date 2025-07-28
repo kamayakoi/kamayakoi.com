@@ -7,7 +7,7 @@ import AudioPlayer from "@/components/landing/audio-player";
 // Use the general site metadata for the home page
 export const metadata: Metadata = {
   title: "Kamayakoi",
-  description: "Rendez-Vous Sauvage pour Électrons Libres",
+  description: "Rendez-vous sauvage pour électrons libres.",
 };
 
 export default async function Home() {

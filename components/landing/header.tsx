@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { Button } from "../ui/button";
 import {
@@ -47,23 +46,17 @@ export default function Header() {
   const navItems: NavItem[] = [
     { nameKey: "header.nav.home", path: "/" },
     { nameKey: "header.nav.events", path: "/events" },
+    { nameKey: "header.nav.room", path: "/room" },
+    { nameKey: "header.nav.blog", path: "/blog" },
     { nameKey: "header.nav.gallery", path: "/gallery" },
     { nameKey: "header.nav.shop", path: "/shop", isComingSoon: true },
-    { nameKey: "header.nav.blog", path: "/blog", isComingSoon: true },
   ];
 
   return (
     <header className={`${styles.header} ${isScrolled ? styles.scrolled : ""}`}>
       <div className={styles.headerContent}>
-        <Link href="/" className="flex items-center" aria-label="Kamayakoi">
-          <Image
-            src={"/white.svg"}
-            alt="Kamayakoi Logo"
-            width={120}
-            height={37.5}
-            priority
-          />
-        </Link>
+        {/* Empty div to maintain spacing for menu positioning */}
+        <div style={{ width: '120px' }}></div>
 
         <nav className="hidden md:flex items-center gap-6">
           {navItems.map((item: NavItem) => {

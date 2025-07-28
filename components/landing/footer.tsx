@@ -66,7 +66,7 @@ export default function Footer() {
               {/* WhatsApp */}
               <li>
                 <Link
-                  href="https://chat.whatsapp.com/BxTiBjirPMzFbCTAZ4eJqC?fbclid=PAZXh0bgNhZW0CMTEAAadv_FFXVz71jmu9zE5cSsaFB9b5cvqGivmL3cFD8hKPD_OtuwKXffahUqI3sw_aem_KaHbiZrZBfI2Yzzn-ozjKw"
+                  href="https://chat.whatsapp.com/I9yf0JkldJKLfu6FCnzQPQ?fbclid=PAZXh0bgNhZW0CMTEAAacIsymPxGAGZe1Y8dd04RKl0SOezf6bvn4z-8xK36S3a5bMDVddkT7DztdndQ_aem_rJkv0dc7xDHqT-vZBriGkg"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="WhatsApp"
@@ -90,7 +90,7 @@ export default function Footer() {
               {/* Facebook */}
               <li>
                 <Link
-                  href="https://www.facebook.com/people/Kamayakoi-Entertainment/61551486973759/"
+                  href="https://www.facebook.com/Kamayakoi/"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Facebook"
@@ -102,7 +102,7 @@ export default function Footer() {
               {/* Instagram */}
               <li>
                 <Link
-                  href="https://www.instagram.com/djaouli_ent/"
+                  href="https://www.instagram.com/kamayakoi/"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"

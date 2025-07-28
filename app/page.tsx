@@ -1,42 +1,27 @@
 import type { Metadata } from "next";
+import { Component as Horizon } from "@/components/landing/horizon";
 import Header from "@/components/landing/header";
-import BackgroundVideo from "@/components/landing/BackgroundVideo";
-import Footer from "@/components/landing/footer";
-import {
-  getHomepageVideoUrls,
-  getHomepagePromoEvent,
-} from "@/lib/sanity/queries";
-import FloatingPromo from "@/components/landing/floating-promo";
+import MinimalFooter from "@/components/landing/minimal-footer";
 
 // Use the general site metadata for the home page
 export const metadata: Metadata = {
-  title: "Kamayakoi | An Alternative Music Project from Abidjan",
-  description: "Breaking musical boundaries since 2022.",
+  title: "Kamayakoi",
+  description: "Le Rendez-Vous Sauvage pour Électrons Libres",
 };
 
 export default async function Home() {
-  const videoUrls = await getHomepageVideoUrls();
-  const promoEventData = await getHomepagePromoEvent();
-
   return (
-    <>
-      <div className="relative h-screen overflow-hidden">
-        <BackgroundVideo videoUrls={videoUrls} />
-        <div className="relative z-10 h-full flex flex-col">
-          <Header />
-        </div>
+    <div className="relative">
+      {/* Header positioned over the horizon */}
+      <div className="absolute top-0 left-0 right-0 z-50">
+        <Header />
       </div>
-      <Footer />
 
-      {/* Floating Promo - Renders if promoEventData is found and has a flyer and slug */}
-      {promoEventData && promoEventData.flyerUrl && promoEventData.slug && (
-        <FloatingPromo
-          imageUrl={promoEventData.flyerUrl}
-          href={`/events/${promoEventData.slug}`}
-          title={promoEventData.title || "View Event"} // Use event title for alt text or a default
-        // onClose can be implemented here if needed, e.g., to set a cookie to not show again
-        />
-      )}
-    </>
+      {/* Horizon component */}
+      <Horizon />
+
+      {/* Minimal footer - positioned absolutely, only shows when horizon is fully scrolled */}
+      <MinimalFooter />
+    </div>
   );
 }

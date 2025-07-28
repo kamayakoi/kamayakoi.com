@@ -1,16 +1,27 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Bebas_Neue, Oswald } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
 import { TranslationProvider } from "@/lib/contexts/TranslationContext";
 
-const inter = Inter({ subsets: ["latin"] });
+// Bold geometric fonts matching the image style
+const bebasNeue = Bebas_Neue({
+  subsets: ["latin"],
+  variable: "--font-bebas-neue",
+  weight: ["400"]
+});
+
+const oswald = Oswald({
+  subsets: ["latin"],
+  variable: "--font-oswald",
+  weight: ["300", "400", "500", "600", "700"]
+});
 
 const siteConfig = {
   name: "Kamayakoi",
-  description: "Breaking musical boundaries since 2022.",
+  description: "Le Rendez-Vous Sauvage pour Électrons Libres",
   url: "https://kamayakoi.com",
   ogImage: "/banner.webp",
 };
@@ -63,7 +74,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} flex flex-col min-h-screen`}>
+      <body className={`${bebasNeue.variable} ${oswald.variable} font-oswald flex flex-col min-h-screen`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

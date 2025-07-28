@@ -2,7 +2,6 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CalendarDays, Clock, MapPin, Users, Check } from "lucide-react";
 import Header from "@/components/landing/header";
-import Footer from "@/components/landing/footer";
 import { Separator } from "@/components/ui/separator";
 import { getEventBySlug } from "@/lib/sanity/queries";
 import { EventShareButton } from "@/components/event/event-share-button";
@@ -781,7 +780,6 @@ export default async function EventPage({
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 }

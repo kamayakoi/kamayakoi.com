@@ -1,0 +1,57 @@
+"use client"
+
+import { useEffect, useState } from "react"
+
+// Move loading sequence outside component to avoid dependency issues
+const loadingSequence = [0, 18, 12, 35, 28, 58, 52, 78, 71, 95, 88, 100]
+
+export default function LoadingComponent() {
+    const [fillWidth, setFillWidth] = useState(0)
+
+    useEffect(() => {
+        let stepIndex = 0
+
+        const interval = setInterval(() => {
+            stepIndex = (stepIndex + 1) % loadingSequence.length
+            setFillWidth(loadingSequence[stepIndex])
+        }, 800) // Much slower timing
+
+        return () => clearInterval(interval)
+    }, [])
+
+    return (
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+            <div className="relative">
+                {/* Background text (darker) */}
+                <h1
+                    className="text-8xl md:text-9xl lg:text-[12rem] font-black text-gray-700"
+                    style={{
+                        fontWeight: 900,
+                        letterSpacing: "0.0em",
+                        fontFamily: "Arial Black, sans-serif",
+                    }}
+                >
+                    LOADING
+                </h1>
+
+                {/* Filled text (bright magenta) */}
+                <div
+                    className="absolute top-0 left-0 overflow-hidden transition-all duration-500 ease-in-out"
+                    style={{ width: `${fillWidth}%` }}
+                >
+                    <h1
+                        className="text-8xl md:text-9xl lg:text-[12rem] font-black whitespace-nowrap"
+                        style={{
+                            fontWeight: 900,
+                            letterSpacing: "-0.1em",
+                            fontFamily: "Arial Black, sans-serif",
+                            color: "#EA3387",
+                        }}
+                    >
+                        LOADING
+                    </h1>
+                </div>
+            </div>
+        </div>
+    )
+}

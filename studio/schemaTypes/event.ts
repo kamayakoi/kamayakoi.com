@@ -41,6 +41,14 @@ export default {
       validation: (Rule: Rule) => Rule.required(),
     },
     {
+      name: 'number',
+      title: 'Event Number',
+      type: 'string',
+      group: 'details',
+      description: 'Sequential number for the event (e.g., "001", "002")',
+      placeholder: '001',
+    },
+    {
       name: 'subtitle',
       title: 'Subtitle',
       type: 'string',

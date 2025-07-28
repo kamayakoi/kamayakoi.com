@@ -259,6 +259,18 @@ interface EventScrollerData {
   ticketsAvailable?: boolean; // <-- Add this field
 }
 
+// Define interface for parallax gallery data - export for use in components
+export interface EventParallaxData {
+  _id: string;
+  title: string;
+  slug: string;
+  featuredImage: string;
+  number?: string; // Event number for parallax display
+  date?: string;
+  description?: string;
+  ticketsAvailable?: boolean;
+}
+
 // New query for ImageScroller
 export const getEventsForScroller = async (
   limit = 10,
@@ -276,6 +288,23 @@ export const getEventsForScroller = async (
   }`;
   // Use the specific interface in the fetch call as well for better type safety
   return await client.fetch<EventScrollerData[]>(query, { limit });
+};
+
+// New query for Parallax Gallery
+export const getEventsForParallax = async (
+  limit = 5,
+): Promise<EventParallaxData[]> => {
+  const query = `*[_type == "event"] | order(date desc) [0...$limit] {
+    _id,
+    title,
+    "slug": slug.current,
+    "featuredImage": flyer.asset->url,
+    number,
+    date,
+    description,
+    ticketsAvailable
+  }`;
+  return await client.fetch<EventParallaxData[]>(query, { limit });
 };
 
 // ================================= Homepage ================================

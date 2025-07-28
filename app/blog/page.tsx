@@ -6,7 +6,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getAllBlogPosts } from "@/lib/sanity/queries";
 import Header from "@/components/landing/header";
-import Footer from "@/components/landing/footer";
 
 // Define a type for blog posts
 interface BlogPost {
@@ -68,7 +67,6 @@ export default async function BlogPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

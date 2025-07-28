@@ -1,19 +1,8 @@
 import type { Metadata } from "next";
-import ImageScroller from "@/components/ui/ImageScroller";
-import { getEventsForScroller } from "@/lib/sanity/queries";
+import ParallaxGallery from "@/components/ui/parallax";
+import { getEventsForParallax, type EventParallaxData } from "@/lib/sanity/queries";
 import Header from "@/components/landing/header";
-import Footer from "@/components/landing/footer";
 import { t } from "@/lib/i18n/translations";
-
-interface EventImageData {
-  _id: string;
-  title: string;
-  slug: string;
-  featuredImage: string;
-  date?: string;
-  description?: string;
-  ticketsAvailable?: boolean;
-}
 
 const getPageLocale = (params?: { locale?: string }): string => {
   return params?.locale || process.env.NEXT_PUBLIC_DEFAULT_LOCALE || "en";
@@ -39,7 +28,7 @@ export default async function EventsPage({
 }) {
   const params = await paramsPromise;
   const currentLanguage = getPageLocale(params);
-  const events: EventImageData[] = await getEventsForScroller(10);
+  const events: EventParallaxData[] = await getEventsForParallax(5);
 
   if (!events || events.length === 0) {
     return (
@@ -51,7 +40,6 @@ export default async function EventsPage({
           </h1>
           <p>{t(currentLanguage, "eventsPage.noEvents")}</p>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -60,9 +48,8 @@ export default async function EventsPage({
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow">
-        <ImageScroller images={events} />
+        <ParallaxGallery events={events} />
       </main>
-      <Footer />
     </div>
   );
 }

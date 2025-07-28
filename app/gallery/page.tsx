@@ -2,7 +2,6 @@
 
 // Keep only necessary imports for the page structure and metadata
 import Header from "@/components/landing/header";
-import Footer from "@/components/landing/footer";
 import { Metadata } from "next";
 import GalleryClientComponent from "./gallery-client"; // Import the new client component
 
@@ -23,7 +22,6 @@ export default function GalleryPage() {
       <Header />
       {/* Render the client component which handles fetching and display */}
       <GalleryClientComponent />
-      <Footer />
     </>
   );
 }

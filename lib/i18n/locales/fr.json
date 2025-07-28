@@ -17,11 +17,12 @@
   },
   "header": {
     "nav": {
-      "home": "Accueil",
-      "events": "Events",
-      "gallery": "Galerie",
-      "shop": "Boutique",
-      "blog": "News",
+      "home": "ACCUEIL",
+      "events": "LE RENDEZ-VOUS SAUVAGE",
+      "gallery": "ARCHIVES",
+      "shop": "MERCH",
+      "room": "ARTISTES",
+      "blog": "STORIES",
       "soon": "SOON"
     },
     "mobileMenu": {

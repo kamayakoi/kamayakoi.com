@@ -12,13 +12,7 @@ interface MiniAudioPlayerProps {
 }
 
 const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
-  const {
-    tracks,
-    currentTrack,
-    isPlaying,
-    togglePlay,
-    nextTrack,
-  } = useMusic();
+  const { tracks, currentTrack, isPlaying, togglePlay, nextTrack } = useMusic();
 
   const clickTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -26,8 +20,11 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
     e.preventDefault();
     e.stopPropagation();
 
+    console.log("🎵 Mini audio player clicked"); // Debug log
+
     // If only one track or no track, double click does nothing special
     if (tracks.length <= 1) {
+      console.log("🎵 Single track - toggling play");
       togglePlay();
       return;
     }
@@ -48,18 +45,22 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
     }
   };
 
-  if (!tracks || tracks.length === 0 || !currentTrack) return null;
+  if (!tracks || tracks.length === 0 || !currentTrack) {
+    console.log("🎵 Mini audio player: No tracks available");
+    return null;
+  }
 
   return (
     <motion.div
       className={cn(
-        "relative bg-[#1a1a1a] shadow-2xl border border-gray-800 rounded-sm w-[60px] h-[60px] overflow-visible cursor-pointer",
+        "relative bg-[#1a1a1a] shadow-2xl border border-gray-800 rounded-sm w-[60px] h-[60px] overflow-visible cursor-pointer select-none",
         className,
       )}
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
       onClick={handleClick}
+      style={{ pointerEvents: "auto" }} // Ensure pointer events are enabled
     >
       <div className="w-full h-full relative group">
         {currentTrack.coverImageUrl ? (
@@ -69,6 +70,7 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
             width={60}
             height={60}
             className="w-full h-full object-cover rounded-sm"
+            draggable={false} // Prevent drag interference
           />
         ) : (
           <div className="w-full h-full bg-white/20 rounded-sm flex items-center justify-center">

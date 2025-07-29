@@ -2,12 +2,17 @@ import { Suspense } from "react";
 import { getAllProducts } from "@/lib/sanity/queries";
 import Header from "@/components/landing/header";
 import LoadingComponent from "@/components/ui/loader";
+import MiniAudioPlayer from "@/components/landing/mini-audio-player";
 
 async function ShopContent() {
   const products = await getAllProducts();
 
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Mini Audio Player */}
+      <div className="fixed top-4 left-4 z-50">
+        <MiniAudioPlayer />
+      </div>
       <Header />
       <main className="container mx-auto px-4 py-8 flex-grow">
         <h1 className="text-3xl font-bold mb-6">Shop</h1>

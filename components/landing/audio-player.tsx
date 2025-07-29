@@ -186,7 +186,7 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
     <AnimatePresence>
       <motion.div
         className={cn(
-          "relative bg-[#1a1a1a] shadow-2xl border border-gray-800 rounded-sm overflow-visible w-[380px] h-[70px]",
+          "relative bg-[#1a1a1a] shadow-2xl border border-gray-800 rounded-sm overflow-visible w-[320px] h-[65px]",
           className,
         )}
         initial={{ opacity: 0, filter: "blur(10px)" }}
@@ -202,13 +202,6 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
       >
         {/* Control buttons - completely outside with proper spacing */}
         <div className="absolute -top-3 -right-3 z-20 flex space-x-1">
-          <button
-            onClick={handleClose}
-            className="bg-[#2a2a2a] rounded-sm w-4 h-4 flex items-center justify-center shadow-md hover:bg-[#3a3a3a] transition-colors border border-gray-700"
-            aria-label="Close and stop music"
-          >
-            <X className="h-2.5 w-2.5 text-gray-300" />
-          </button>
           {/* Collapse button */}
           <button
             onClick={handleExpand}
@@ -217,10 +210,17 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
           >
             <ChevronRight className="h-2.5 w-2.5 text-gray-300 rotate-180" />
           </button>
+          <button
+            onClick={handleClose}
+            className="bg-[#2a2a2a] rounded-sm w-4 h-4 flex items-center justify-center shadow-md hover:bg-[#3a3a3a] transition-colors border border-gray-700"
+            aria-label="Close and stop music"
+          >
+            <X className="h-2.5 w-2.5 text-gray-300" />
+          </button>
         </div>
 
         <motion.div
-          className="flex items-center w-full p-3"
+          className="flex items-center w-full p-2 pt-2"
           layout
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -240,87 +240,92 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
 
           {/* Content Area */}
           <motion.div className="flex flex-col flex-grow min-w-0">
-            {/* Title and Artist - inline */}
-            <motion.div className="mb-1">
-              <h3 className="text-white font-bold text-sm truncate">
-                {currentTrack.title}
-                {currentTrack.artist && (
-                  <span className="text-white/70 font-normal">
-                    {" "}
-                    • {currentTrack.artist}
-                  </span>
-                )}
-              </h3>
-            </motion.div>
+            {/* Title, Artist and Controls on same line */}
+            <div className="flex items-center justify-between mb-1">
+              <motion.div className="flex-1 min-w-0">
+                <h3 className="text-white font-bold text-sm truncate">
+                  {currentTrack.title}
+                  {currentTrack.artist && (
+                    <span className="text-white/70 font-normal">
+                      {" "}
+                      • {currentTrack.artist}
+                    </span>
+                  )}
+                </h3>
+              </motion.div>
+
+              {/* Controls on the right */}
+              <motion.div className="flex items-center ml-2">
+                <div className="flex items-center gap-1 bg-[#11111198] rounded-sm p-1">
+                  {tracks.length > 1 && (
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={prevTrack}
+                        className="text-white hover:bg-[#111111d1] hover:text-white h-5 w-5 rounded-sm"
+                      >
+                        <SkipBack className="h-3 w-3" />
+                      </Button>
+                    </motion.div>
+                  )}
+
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <Button
+                      onClick={handleTogglePlay}
+                      variant="ghost"
+                      size="icon"
+                      className="text-white hover:bg-[#111111d1] hover:text-white h-5 w-5 rounded-sm"
+                    >
+                      {isPlaying ? (
+                        <Pause className="h-3 w-3" />
+                      ) : (
+                        <Play className="h-3 w-3" />
+                      )}
+                    </Button>
+                  </motion.div>
+
+                  {tracks.length > 1 && (
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={nextTrack}
+                        className="text-white hover:bg-[#111111d1] hover:text-white h-5 w-5 rounded-sm"
+                      >
+                        <SkipForward className="h-3 w-3" />
+                      </Button>
+                    </motion.div>
+                  )}
+                </div>
+              </motion.div>
+            </div>
 
             {/* Progress Slider */}
-            <motion.div className="flex flex-col gap-y-1 mb-1">
+            <motion.div className="flex flex-col gap-y-0.5 -translate-y-0.5">
               <CustomSlider
                 value={progress}
                 onChange={handleSeek}
                 className="w-full"
               />
               <div className="flex items-center justify-between">
-                <span className="text-white text-xs">
+                <span className="text-white text-[7px]">
                   {formatTime(currentTime)}
                 </span>
-                <span className="text-white text-xs">
+                <span className="text-white text-[7px]">
                   {formatTime(duration)}
                 </span>
               </div>
             </motion.div>
-          </motion.div>
-
-          {/* Controls */}
-          <motion.div className="flex items-center ml-3">
-            <div className="flex items-center gap-1 bg-[#11111198] rounded-sm p-1">
-              {tracks.length > 1 && (
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={prevTrack}
-                    className="text-white hover:bg-[#111111d1] hover:text-white h-6 w-6 rounded-sm"
-                  >
-                    <SkipBack className="h-4 w-4" />
-                  </Button>
-                </motion.div>
-              )}
-
-              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                <Button
-                  onClick={handleTogglePlay}
-                  variant="ghost"
-                  size="icon"
-                  className="text-white hover:bg-[#111111d1] hover:text-white h-6 w-6 rounded-sm"
-                >
-                  {isPlaying ? (
-                    <Pause className="h-4 w-4" />
-                  ) : (
-                    <Play className="h-4 w-4" />
-                  )}
-                </Button>
-              </motion.div>
-
-              {tracks.length > 1 && (
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={nextTrack}
-                    className="text-white hover:bg-[#111111d1] hover:text-white h-6 w-6 rounded-sm"
-                  >
-                    <SkipForward className="h-4 w-4" />
-                  </Button>
-                </motion.div>
-              )}
-            </div>
           </motion.div>
         </motion.div>
       </motion.div>

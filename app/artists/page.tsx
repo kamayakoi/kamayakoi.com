@@ -4,6 +4,8 @@ import { getAllArtists, type ArtistData } from "@/lib/sanity/queries";
 import Header from "@/components/landing/header";
 import { ArtistCard } from "@/components/ui/artist-card";
 import LoadingComponent from "@/components/ui/loader";
+import MiniAudioPlayer from "@/components/landing/mini-audio-player";
+import MinimalFooter from "@/components/landing/minimal-footer";
 
 export const metadata: Metadata = {
   title: "Artists",
@@ -15,19 +17,24 @@ async function ArtistsContent() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Mini Audio Player */}
+      <div className="fixed top-4 left-4 z-[60] pointer-events-auto">
+        <MiniAudioPlayer />
+      </div>
       <Header />
       <main className="flex-grow">
-        <div className="container mx-auto py-26 px-4">
+        <div className="container mx-auto py-32 md:py-26 px-4">
           {/* Artists Grid - 2 cards per row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-items-center max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-items-center max-w-5xl mx-auto">
             {artists.map((artist) => (
-              <div key={artist._id} className="w-full max-w-sm">
+              <div key={artist._id} className="w-full max-w-md">
                 <ArtistCard artist={artist} />
               </div>
             ))}
           </div>
         </div>
       </main>
+      <MinimalFooter />
     </div>
   );
 }

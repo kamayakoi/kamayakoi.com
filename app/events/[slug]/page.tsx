@@ -11,6 +11,7 @@ import CheckoutButton from "@/components/event/CheckoutButton";
 import LoadingComponent from "@/components/ui/loader";
 import { EventMediaDisplay } from "@/components/event/event-media-display";
 import MinimalFooter from "@/components/landing/minimal-footer";
+import ArtistCard from "@/components/event/ArtistCard";
 // Define specific type for TicketType
 interface TicketTypeData {
   _key: string;
@@ -66,6 +67,19 @@ type EventData = {
   ticketsAvailable?: boolean; // Master switch
   ticketTypes?: TicketTypeData[];
   bundles?: BundleData[];
+  lineup?: {
+    _id: string;
+    name: string;
+    bio?: string;
+    description?: string;
+    image?: string;
+    videoUrl?: string;
+    videoCaption?: string;
+    socialLink?: string;
+    socialHandle?: string;
+    isResident?: boolean;
+    role?: string;
+  }[];
 
   gallery?: { _key: string; url: string; caption?: string }[];
 };
@@ -260,7 +274,7 @@ async function EventPageContent({
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
             {/* Event Flyer/Video - Enhanced with better shadows and effects */}
             <div className="lg:col-span-2 relative">
-              <div className="relative aspect-[3/4] rounded-lg overflow-hidden shadow-2xl bg-gradient-to-br from-muted to-muted/50 border border-border/20">
+              <div className="relative aspect-[3/4] rounded-sm overflow-hidden shadow-2xl bg-gradient-to-br from-muted to-muted/50 border border-border/20">
                 <EventMediaDisplay
                   flyerUrl={event.flyer?.url}
                   promoVideoUrl={event.promoVideoUrl}
@@ -287,14 +301,14 @@ async function EventPageContent({
 
               {/* Event Meta Information - Redesigned with cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-border/20 hover:bg-card/70 transition-colors">
+                <div className="bg-card/50 backdrop-blur-sm rounded-sm p-4 border border-border/20 hover:bg-card/70 transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg">
+                    <div className="p-2 bg-primary/10 rounded-sm">
                       <CalendarDays className="h-5 w-5 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground font-medium">
-                        Date
+                        {t(currentLanguage, "eventSlugPage.metaInfo.date")}
                       </p>
                       <p className="text-foreground font-semibold">
                         {formattedDate}
@@ -303,14 +317,14 @@ async function EventPageContent({
                   </div>
                 </div>
 
-                <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-border/20 hover:bg-card/70 transition-colors">
+                <div className="bg-card/50 backdrop-blur-sm rounded-sm p-4 border border-border/20 hover:bg-card/70 transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg">
+                    <div className="p-2 bg-primary/10 rounded-sm">
                       <Clock className="h-5 w-5 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground font-medium">
-                        Time
+                        {t(currentLanguage, "eventSlugPage.metaInfo.time")}
                       </p>
                       <p className="text-foreground font-semibold">
                         {formattedTime}
@@ -320,14 +334,17 @@ async function EventPageContent({
                 </div>
 
                 {event.location?.venueName && (
-                  <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-border/20 hover:bg-card/70 transition-colors">
+                  <div className="bg-card/50 backdrop-blur-sm rounded-sm p-4 border border-border/20 hover:bg-card/70 transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-primary/10 rounded-lg">
+                      <div className="p-2 bg-primary/10 rounded-sm">
                         <MapPin className="h-5 w-5 text-primary" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-muted-foreground font-medium">
-                          Location
+                          {t(
+                            currentLanguage,
+                            "eventSlugPage.metaInfo.location",
+                          )}
                         </p>
                         <div className="flex items-center gap-2 flex-wrap">
                           {event.location.googleMapsUrl ? (
@@ -340,22 +357,12 @@ async function EventPageContent({
                               <span className="font-semibold text-foreground hover:text-primary transition-colors">
                                 {event.location.venueName}
                               </span>
-                              {event.location.address && (
-                                <span className="text-sm text-muted-foreground">
-                                  , {event.location.address}
-                                </span>
-                              )}
                             </a>
                           ) : (
                             <div>
                               <span className="font-semibold text-foreground">
                                 {event.location.venueName}
                               </span>
-                              {event.location.address && (
-                                <span className="text-sm text-muted-foreground">
-                                  , {event.location.address}
-                                </span>
-                              )}
                             </div>
                           )}
                         </div>
@@ -365,14 +372,17 @@ async function EventPageContent({
                 )}
 
                 {event.hostedBy && (
-                  <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-border/20 hover:bg-card/70 transition-colors">
+                  <div className="bg-card/50 backdrop-blur-sm rounded-sm p-4 border border-border/20 hover:bg-card/70 transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-primary/10 rounded-lg">
+                      <div className="p-2 bg-primary/10 rounded-sm">
                         <Users className="h-5 w-5 text-primary" />
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground font-medium">
-                          Hosted by
+                          {t(
+                            currentLanguage,
+                            "eventSlugPage.metaInfo.hostedBy",
+                          )}
                         </p>
                         <p className="text-foreground font-semibold">
                           {event.hostedBy}
@@ -388,7 +398,7 @@ async function EventPageContent({
               {/* Tickets Section - Enhanced design */}
               <div className="space-y-6">
                 {!globallyTicketsOnSale ? (
-                  <div className="bg-destructive/10 border border-destructive/20 text-destructive p-6 rounded-lg backdrop-blur-sm">
+                  <div className="bg-destructive/10 border border-destructive/20 text-destructive p-6 rounded-sm backdrop-blur-sm">
                     <p className="font-semibold text-center">
                       {t(
                         currentLanguage,
@@ -397,7 +407,7 @@ async function EventPageContent({
                     </p>
                   </div>
                 ) : !hasAnyDefinedItems ? (
-                  <div className="bg-muted/50 border border-border/20 p-6 rounded-lg backdrop-blur-sm text-center">
+                  <div className="bg-muted/50 border border-border/20 p-6 rounded-sm backdrop-blur-sm text-center">
                     <p className="font-medium text-muted-foreground">
                       {t(
                         currentLanguage,
@@ -407,12 +417,15 @@ async function EventPageContent({
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    <div className="text-center">
+                    <div className="text-left">
                       <h2 className="text-3xl font-bold text-foreground mb-2">
                         {t(currentLanguage, "eventSlugPage.tickets.title")}
                       </h2>
                       <p className="text-muted-foreground">
-                        Select your tickets and join the experience
+                        {t(
+                          currentLanguage,
+                          "eventSlugPage.tickets.selectAndJoin",
+                        )}
                       </p>
                     </div>
 
@@ -430,7 +443,7 @@ async function EventPageContent({
                             return (
                               <Card
                                 key={ticket._key}
-                                className="border-border/40 bg-card/30 backdrop-blur-sm shadow-lg rounded-lg overflow-hidden hover:bg-card/50 transition-all duration-300 hover:shadow-xl hover:border-primary/30"
+                                className="border-border/40 bg-card/30 backdrop-blur-sm shadow-lg rounded-sm overflow-hidden hover:bg-card/50 transition-all duration-300 hover:shadow-xl hover:border-primary/30"
                               >
                                 <div className="p-6">
                                   <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
@@ -522,7 +535,7 @@ async function EventPageContent({
                                       )}
                                     </div>
 
-                                    <div className="flex-shrink-0 w-full lg:w-auto">
+                                    <div className="flex-shrink-0 w-full lg:w-auto flex justify-end">
                                       <CheckoutButton
                                         item={{
                                           id: ticket._key,
@@ -574,7 +587,7 @@ async function EventPageContent({
                             return (
                               <Card
                                 key={bundle._key}
-                                className="border-border/40 bg-card/30 backdrop-blur-sm shadow-lg rounded-lg overflow-hidden hover:bg-card/50 transition-all duration-300 hover:shadow-xl hover:border-primary/30"
+                                className="border-border/40 bg-card/30 backdrop-blur-sm shadow-lg rounded-sm overflow-hidden hover:bg-card/50 transition-all duration-300 hover:shadow-xl hover:border-primary/30"
                               >
                                 <div className="p-6">
                                   <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
@@ -666,7 +679,7 @@ async function EventPageContent({
                                       )}
                                     </div>
 
-                                    <div className="flex-shrink-0 w-full lg:w-auto">
+                                    <div className="flex-shrink-0 w-full lg:w-auto flex justify-end">
                                       <CheckoutButton
                                         item={{
                                           id: bundle.bundleId.current,
@@ -719,7 +732,7 @@ async function EventPageContent({
                     {t(currentLanguage, "eventSlugPage.detailsSection.title")}
                   </h2>
                 </div>
-                <div className="bg-card/30 backdrop-blur-sm rounded-lg p-8 border border-border/20">
+                <div className="bg-card/30 backdrop-blur-sm rounded-sm p-8 border border-border/20">
                   <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
                     {renderFormattedText(event.description)}
                   </div>
@@ -737,7 +750,7 @@ async function EventPageContent({
                     {t(currentLanguage, "eventSlugPage.venueSection.title")}
                   </h2>
                 </div>
-                <div className="bg-card/30 backdrop-blur-sm rounded-lg p-8 border border-border/20 space-y-6">
+                <div className="bg-card/30 backdrop-blur-sm rounded-sm p-8 border border-border/20 space-y-6">
                   {event.location?.venueName && (
                     <div>
                       <h3 className="text-xl font-semibold text-foreground mb-2">
@@ -753,7 +766,7 @@ async function EventPageContent({
 
                   {/* Embedded Map - Restored */}
                   {mapEmbedSrc && (
-                    <div className="relative w-full h-[300px] bg-muted rounded-lg shadow-lg border border-border/20 overflow-hidden">
+                    <div className="relative w-full h-[300px] bg-muted rounded-sm shadow-lg border border-border/20 overflow-hidden">
                       <iframe
                         src={mapEmbedSrc}
                         width="100%"
@@ -791,16 +804,46 @@ async function EventPageContent({
               </div>
             )}
 
+            {/* Artists/Lineup Section */}
+            {event.lineup && event.lineup.length > 0 && (
+              <div className="max-w-4xl mx-auto">
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold text-foreground mb-4">
+                    {t(currentLanguage, "eventSlugPage.lineupSection.title")}
+                  </h2>
+                </div>
+                <div className="bg-card/30 backdrop-blur-sm rounded-sm p-8 border border-border/20">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {event.lineup.map((artist) => (
+                      <div key={artist._id} className="flex justify-center">
+                        <ArtistCard
+                          artist={{
+                            _id: artist._id,
+                            name: artist.name,
+                            bio: artist.bio || artist.description,
+                            image: artist.image,
+                            socialLink: artist.socialLink,
+                            isResident: artist.isResident,
+                          }}
+                          currentLanguage={currentLanguage}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Share Section - Enhanced */}
             <div className="max-w-4xl mx-auto">
               <Separator className="opacity-30 mb-8" />
-              <div className="flex items-center justify-between bg-card/30 backdrop-blur-sm rounded-lg p-6 border border-border/20">
+              <div className="flex items-center justify-between bg-card/30 backdrop-blur-sm rounded-sm p-6 border border-border/20">
                 <div>
                   <h3 className="text-lg font-semibold text-foreground mb-1">
-                    Share this event
+                    {t(currentLanguage, "eventSlugPage.shareSection.title")}
                   </h3>
                   <p className="text-muted-foreground">
-                    Spread the word and invite your friends
+                    {t(currentLanguage, "eventSlugPage.shareSection.subtitle")}
                   </p>
                 </div>
                 <EventShareButton

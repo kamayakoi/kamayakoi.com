@@ -40,10 +40,10 @@ export default function LoadingComponent() {
           style={{ width: `${fillWidth}%` }}
         >
           <h1
-            className="text-2xl md:text-2xl lg:text-4xl font-black whitespace-nowrap"
+            className="text-2xl md:text-3xl lg:text-4xl font-black whitespace-nowrap"
             style={{
               fontWeight: 900,
-              letterSpacing: "-0.1em",
+              letterSpacing: "0.0em",
               fontFamily: "Arial Black, sans-serif",
               color: "#EA3387",
             }}

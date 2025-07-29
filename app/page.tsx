@@ -3,6 +3,7 @@ import { Component as Horizon } from "@/components/landing/horizon";
 import Header from "@/components/landing/header";
 import MinimalFooter from "@/components/landing/minimal-footer";
 import AudioPlayer from "@/components/landing/audio-player";
+import MiniAudioPlayer from "@/components/landing/mini-audio-player";
 
 // Use the general site metadata for the home page
 export const metadata: Metadata = {
@@ -16,6 +17,10 @@ export default function Home() {
       {/* Audio Player for homepage */}
       <div className="hidden md:block fixed top-4 left-4 z-[70]">
         <AudioPlayer />
+      </div>
+      {/* Mini Audio Player for mobile */}
+      <div className="block md:hidden fixed top-4 left-4 z-[70]">
+        <MiniAudioPlayer />
       </div>
       {/* Header positioned over the horizon */}
       <div className="absolute top-0 left-0 right-0 z-50">

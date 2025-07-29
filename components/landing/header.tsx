@@ -15,7 +15,6 @@ import {
 import styles from "@/lib/styles/header.module.css";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
-import MiniAudioPlayer from "./mini-audio-player";
 
 interface NavItem {
   nameKey: string;
@@ -56,19 +55,8 @@ export default function Header() {
   return (
     <header className={`${styles.header} ${isScrolled ? styles.scrolled : ""}`}>
       <div className={styles.headerContent}>
-        {/* Mini Music Player for mobile - positioned on the left */}
-        <div
-          className="flex items-center justify-start md:hidden"
-          style={{ width: "140px" }}
-        >
-          <MiniAudioPlayer className="rounded-sm" />
-        </div>
-
-        {/* Empty space for desktop */}
-        <div
-          className="hidden md:flex items-center"
-          style={{ width: "120px" }}
-        ></div>
+        {/* Empty space for both mobile and desktop */}
+        <div className="flex items-center" style={{ width: "140px" }}></div>
 
         <nav className="hidden md:flex items-center gap-6">
           {navItems.map((item: NavItem) => {

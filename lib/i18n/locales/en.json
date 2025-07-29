@@ -18,7 +18,7 @@
   "header": {
     "nav": {
       "home": "HOME",
-      "events": "LE RENDEZ-VOUS SAUVAGE",
+      "events": "RENDEZ-VOUS SAUVAGE",
       "gallery": "ARCHIVES",
       "shop": "MERCH",
       "room": "ARTISTS",
@@ -175,6 +175,12 @@
     },
     "dateTBC": "Date TBC",
     "timeTBC": "Time TBC",
+    "metaInfo": {
+      "date": "Date",
+      "time": "Time",
+      "location": "Location",
+      "hostedBy": "Hosted by"
+    },
     "availability": {
       "inactive": "Currently Inactive",
       "soldOut": "Sold Out",
@@ -189,7 +195,8 @@
       "title": "Tickets",
       "buyNow": "Buy now",
       "getETicket": "Get E-Ticket",
-      "currencySuffix": " FCFA"
+      "currencySuffix": " FCFA",
+      "selectAndJoin": "Select your tickets and join the experience"
     },
     "bundles": {
       "title": "Bundles"
@@ -198,12 +205,16 @@
       "title": "Details"
     },
     "lineupSection": {
-      "title": "Lineup"
+      "title": "Artists"
     },
     "venueSection": {
       "title": "Venue",
       "mapTitleDefault": "Map of event location",
       "mapTitleNamed": "Map of {locationName}"
+    },
+    "shareSection": {
+      "title": "Share this event",
+      "subtitle": "Spread the word and invite your friends"
     },
     "hostedBy": "Hosted by {name}",
     "errors": {

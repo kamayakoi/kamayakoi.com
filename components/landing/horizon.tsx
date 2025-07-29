@@ -653,8 +653,8 @@ export const Component = () => {
                 0 1px 3px rgba(0, 0, 0, 1)
               `,
               background:
-                "linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%)",
-              backdropFilter: "blur(10px)",
+                "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)",
+              backdropFilter: "blur(15px)",
               borderRadius: "12px",
               padding: "20px 30px",
               border: "1px solid rgba(255, 255, 255, 0.1)",

@@ -38,7 +38,7 @@ export default function PrivacyClientPage() {
           {/* Content Sections */}
           <div className="space-y-12">
             {/* Introduction */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "privacyPage.introduction.title")}
               </h2>
@@ -49,7 +49,7 @@ export default function PrivacyClientPage() {
             </section>
 
             {/* Data Collection */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "privacyPage.dataCollection.title")}
               </h2>
@@ -70,7 +70,7 @@ export default function PrivacyClientPage() {
             </section>
 
             {/* Data Use */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "privacyPage.dataUse.title")}
               </h2>
@@ -94,7 +94,7 @@ export default function PrivacyClientPage() {
             </section>
 
             {/* Data Sharing */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "privacyPage.dataSharing.title")}
               </h2>
@@ -115,7 +115,7 @@ export default function PrivacyClientPage() {
             </section>
 
             {/* Data Protection */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "privacyPage.dataProtection.title")}
               </h2>
@@ -126,7 +126,7 @@ export default function PrivacyClientPage() {
             </section>
 
             {/* Cookies */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "privacyPage.cookies.title")}
               </h2>
@@ -137,7 +137,7 @@ export default function PrivacyClientPage() {
             </section>
 
             {/* Your Rights */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "privacyPage.rights.title")}
               </h2>
@@ -161,7 +161,7 @@ export default function PrivacyClientPage() {
             </section>
 
             {/* Data Retention */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "privacyPage.retention.title")}
               </h2>
@@ -171,7 +171,7 @@ export default function PrivacyClientPage() {
             </section>
 
             {/* Contact */}
-            <section className="bg-primary/5 rounded-lg p-6 md:p-8 border border-primary/20">
+            <section className="bg-primary/5 rounded-sm p-6 md:p-8 border border-primary/20">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "privacyPage.contact.title")}
               </h2>

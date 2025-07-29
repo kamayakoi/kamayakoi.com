@@ -38,7 +38,7 @@ export default function TermsClientPage() {
           {/* Content Sections */}
           <div className="space-y-12">
             {/* Introduction */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "termsPage.introduction.title")}
               </h2>
@@ -49,7 +49,7 @@ export default function TermsClientPage() {
             </section>
 
             {/* Mission */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "termsPage.mission.title")}
               </h2>
@@ -60,7 +60,7 @@ export default function TermsClientPage() {
             </section>
 
             {/* Conduct */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "termsPage.conduct.title")}
               </h2>
@@ -82,7 +82,7 @@ export default function TermsClientPage() {
             </section>
 
             {/* Tickets */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "termsPage.tickets.title")}
               </h2>
@@ -94,7 +94,7 @@ export default function TermsClientPage() {
             </section>
 
             {/* Intellectual Property */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "termsPage.ip.title")}
               </h2>
@@ -105,7 +105,7 @@ export default function TermsClientPage() {
             </section>
 
             {/* User Content */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "termsPage.userContent.title")}
               </h2>
@@ -116,7 +116,7 @@ export default function TermsClientPage() {
             </section>
 
             {/* Liability */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "termsPage.liability.title")}
               </h2>
@@ -128,7 +128,7 @@ export default function TermsClientPage() {
             </section>
 
             {/* Indemnification */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "termsPage.indemnification.title")}
               </h2>
@@ -138,7 +138,7 @@ export default function TermsClientPage() {
             </section>
 
             {/* Governing Law */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "termsPage.governingLaw.title")}
               </h2>
@@ -148,7 +148,7 @@ export default function TermsClientPage() {
             </section>
 
             {/* Changes */}
-            <section className="bg-card rounded-lg p-6 md:p-8 border border-border">
+            <section className="bg-card rounded-sm p-6 md:p-8 border border-border">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "termsPage.changes.title")}
               </h2>
@@ -159,7 +159,7 @@ export default function TermsClientPage() {
             </section>
 
             {/* Contact */}
-            <section className="bg-primary/5 rounded-lg p-6 md:p-8 border border-primary/20">
+            <section className="bg-primary/5 rounded-sm p-6 md:p-8 border border-primary/20">
               <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-4">
                 {t(currentLanguage, "termsPage.contact.title")}
               </h2>

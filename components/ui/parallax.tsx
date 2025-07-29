@@ -341,7 +341,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                 sectionRefs.current[index] = el;
               }}
             >
-              <div className="w-[400px] h-[533px] md:w-[500px] md:h-[667px] lg:w-[600px] lg:h-[800px] m-5 mt-16 bg-black overflow-hidden relative rounded-lg shadow-2xl">
+              <div className="w-[400px] h-[533px] md:w-[400px] md:h-[533px] lg:w-[500px] lg:h-[600px] m-5 mt-16 bg-black overflow-hidden relative rounded-sm shadow-2xl">
                 {hasVideo && currentShowVideo ? (
                   <div className="relative w-full h-full overflow-hidden rounded">
                     <video

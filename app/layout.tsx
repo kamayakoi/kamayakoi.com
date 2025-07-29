@@ -8,7 +8,6 @@ import { TranslationProvider } from "@/lib/contexts/TranslationContext";
 import { MediaProvider } from "@/lib/contexts/MediaContext";
 import MusicWrapper from "@/components/landing/music-wrapper";
 import { getHomepageMusicTracks } from "@/lib/sanity/queries";
-import AudioPlayer from "@/components/landing/audio-player";
 
 // Bold geometric fonts matching the image style
 const bebasNeue = Bebas_Neue({
@@ -94,7 +93,6 @@ export default async function RootLayout({
             <TranslationProvider>
               <MediaProvider>
                 <main className="flex-grow">{children}</main>
-                <AudioPlayer className="hidden" />
               </MediaProvider>
             </TranslationProvider>
           </ThemeProvider>

@@ -38,8 +38,8 @@ export default function MinimalFooter() {
       const maxScroll = documentHeight - windowHeight;
       const scrollProgress = Math.min(scrollY / maxScroll, 1);
 
-      // Only show footer when scroll progress is at 100% (completely scrolled)
-      setIsVisible(scrollProgress >= 0.95);
+      // Show footer when scroll progress is at 85% to appear earlier
+      setIsVisible(scrollProgress >= 0.85);
     };
 
     window.addEventListener("scroll", handleScroll);

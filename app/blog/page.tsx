@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { getAllBlogPosts } from "@/lib/sanity/queries";
 import Header from "@/components/landing/header";
 import LoadingComponent from "@/components/ui/loader";
+import MiniAudioPlayer from "@/components/landing/mini-audio-player";
 
 // Define a type for blog posts
 interface BlogPost {
@@ -32,6 +33,10 @@ async function BlogContent() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Mini Audio Player */}
+      <div className="fixed top-4 left-4 z-50">
+        <MiniAudioPlayer />
+      </div>
       <Header />
       <main className="flex-grow">
         <div className="container mx-auto py-26 px-4">

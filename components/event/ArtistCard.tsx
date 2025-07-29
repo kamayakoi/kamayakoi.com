@@ -24,13 +24,13 @@ export default function ArtistCard({
   currentLanguage,
 }: ArtistCardProps) {
   const cardBaseClasses =
-    "flex flex-col w-88 max-w-xs bg-grey-900 border border-slate-700 rounded-sm shadow-xl overflow-hidden";
+    "relative flex flex-col w-full max-w-sm bg-white dark:bg-zinc-900 rounded-sm shadow-lg dark:shadow-2xl dark:shadow-black/80 overflow-hidden";
   const artistDisplayName = artist.name || "Artist";
 
   return (
     <div className={cardBaseClasses}>
       {artist.image && (
-        <div className="relative w-full aspect-[1/1]">
+        <div className="relative w-full aspect-square overflow-hidden">
           <Image
             src={artist.image}
             alt={t(currentLanguage, "artistCard.imageAlt", {
@@ -39,57 +39,54 @@ export default function ArtistCard({
             layout="fill"
             objectFit="cover"
             priority
+            className="w-full aspect-square object-cover"
           />
-          <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 via-black/60 to-transparent">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2 min-w-0">
-                <h4 className="font-semibold text-base text-white truncate">
+
+          {/* Gradient overlay */}
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/30 dark:from-black/60 to-transparent pointer-events-none" />
+
+          {/* Artist info overlay */}
+          <div className="absolute top-6 left-6">
+            <h2 className="text-2xl font-medium text-white drop-shadow-lg">
+              {artist.name}
+            </h2>
+          </div>
+
+          {/* Resident badge at bottom right */}
+          {artist.isResident && (
+            <div className="absolute bottom-3 right-3">
+              <div className="inline-flex items-center px-2 py-1 text-xs bg-green-200/80 dark:bg-green-800/50 text-green-900 dark:text-green-200 rounded-sm font-semibold">
+                <span className="relative flex h-2 w-2 mr-1.5">
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                {t(currentLanguage, "artistCard.residentBadge")}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="p-5">
+        {!artist.image && (
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="flex flex-col">
+                <h4 className="font-bold text-2xl text-gray-100 truncate leading-tight mb-2">
                   {artist.name}
                 </h4>
                 {artist.isResident && (
-                  <div className="inline-flex items-center px-1.5 py-0.5 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-sm flex-shrink-0">
+                  <div className="inline-flex items-center px-2 py-1 text-xs bg-green-200/80 dark:bg-green-800/50 text-green-900 dark:text-green-200 rounded-sm font-semibold">
                     <span className="relative flex h-2 w-2 mr-1.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                     </span>
-                    {t(currentLanguage, "artistCard.residentBadge")}
+                    <span className="font-medium">
+                      {t(currentLanguage, "artistCard.residentBadge")}
+                    </span>
                   </div>
                 )}
               </div>
-              {artist.socialLink && (
-                <Link
-                  href={artist.socialLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={t(currentLanguage, "artistCard.socialAriaLabel", {
-                    artistName: artistDisplayName,
-                  })}
-                  className="text-white hover:text-[#E4405F] transition-colors flex-shrink-0 ml-2"
-                >
-                  <IG className="h-5 w-5" />
-                </Link>
-              )}
             </div>
-          </div>
-        </div>
-      )}
-      <div className="p-4 flex-grow flex flex-col">
-        {!artist.image && (
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2 min-w-0">
-              <h4 className="font-semibold text-lg text-gray-100 truncate">
-                {artist.name}
-              </h4>
-              {artist.isResident && (
-                <div className="inline-flex items-center px-1.5 py-0.5 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-sm flex-shrink-0">
-                  <span className="relative flex h-2 w-2 mr-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                  </span>
-                  {t(currentLanguage, "artistCard.residentBadge")}
-                </div>
-              )}
-            </div>
+
             {artist.socialLink && (
               <Link
                 href={artist.socialLink}
@@ -98,40 +95,33 @@ export default function ArtistCard({
                 aria-label={t(currentLanguage, "artistCard.socialAriaLabel", {
                   artistName: artistDisplayName,
                 })}
-                className="text-gray-300 hover:text-[#E4405F] transition-colors flex-shrink-0 ml-2"
+                className="text-gray-300 dark:text-gray-300"
               >
                 <IG className="h-6 w-6" />
               </Link>
             )}
           </div>
         )}
-        {artist.bio && (
-          <div
-            className={`text-gray-300 text-sm leading-relaxed space-y-1 flex-grow ${artist.image ? "pt-0" : "my-2"} h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-500 scrollbar-track-slate-800`}
-          >
-            {artist.bio.split("\n").map((line, index) => {
-              const trimmedLine = line.trim();
-              if (trimmedLine === "") {
-                return <br key={index} />;
-              }
-              return <p key={index}>{trimmedLine}</p>;
-            })}
+
+        {artist.image && artist.socialLink && (
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex-1 min-w-0">
+              <div className="text-gray-500 dark:text-zinc-500 text-sm">
+                Social
+              </div>
+            </div>
+            <Link
+              href={artist.socialLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={t(currentLanguage, "artistCard.socialAriaLabel", {
+                artistName: artistDisplayName,
+              })}
+              className="text-gray-300 dark:text-gray-300"
+            >
+              <IG className="h-6 w-6" />
+            </Link>
           </div>
-        )}
-        {artist.image && !artist.bio && (
-          <p className="text-gray-400 text-xs italic pt-1 pb-2 flex-grow flex items-end">
-            {t(currentLanguage, "artistCard.noBio")}
-          </p>
-        )}
-        {!artist.image && !artist.bio && !artist.socialLink && (
-          <p className="text-gray-400 text-xs italic flex-grow flex items-center justify-center">
-            {t(currentLanguage, "artistCard.noDetails")}
-          </p>
-        )}
-        {!artist.image && !artist.bio && artist.socialLink && (
-          <p className="text-gray-400 text-xs italic mt-2 flex-grow flex items-end">
-            {t(currentLanguage, "artistCard.noBio")}
-          </p>
         )}
       </div>
     </div>

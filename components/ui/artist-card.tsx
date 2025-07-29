@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ArtistData } from "@/lib/sanity/queries";
@@ -8,6 +10,8 @@ interface ArtistCardProps {
 }
 
 export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   // Extract social platform from URL or use generic social if handle exists
   const getSocialPlatform = (url?: string) => {
     if (!url) return null;
@@ -28,11 +32,13 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
       case "mc":
         return { label: "MC", color: "bg-purple-500" };
       case "producer":
-        return { label: "PRODUCER", color: "bg-green-500" };
+        return { label: "PRODUCER", color: "bg-orange-500" };
       case "dj":
         return { label: "DJ", color: "bg-red-500" };
       case "resident":
         return { label: "RESIDENT", color: "bg-yellow-500" };
+      case "artist":
+        return { label: "ARTIST", color: "bg-indigo-500" };
       default:
         return null;
     }
@@ -40,6 +46,8 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
 
   const badge = getRoleBadge(artist.role, artist.isResident);
   const socialPlatform = getSocialPlatform(artist.socialLink);
+
+  const shouldShowExpandButton = artist.bio && artist.bio.length > 150;
 
   return (
     <>
@@ -92,13 +100,13 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
         `}
       </style>
 
-      <div className="w-full max-w-lg">
+      <div className="w-full max-w-md">
         <div className="bg-white dark:bg-zinc-900 rounded-sm shadow-lg dark:shadow-2xl dark:shadow-black/80 overflow-hidden hover-scale">
           <div className="relative overflow-hidden image-container">
             <Image
               src={artist.imageUrl || "/placeholder.webp"}
-              width={400}
-              height={400}
+              width={500}
+              height={500}
               alt={artist.name}
               className="w-full aspect-square object-cover image-scale"
               placeholder="blur"
@@ -137,8 +145,8 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
             )}
           </div>
 
-          <div className="p-4">
-            <div className="flex items-center gap-3 mb-2">
+          <div className="p-5">
+            <div className="flex items-center gap-3 mb-3">
               <div className="hover-translate flex-1 min-w-0">
                 {(artist.socialHandle || artist.socialLink) && (
                   <div className="text-xl font-medium text-gray-700 dark:text-zinc-200 truncate">
@@ -167,6 +175,40 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
                 )}
               </div>
             </div>
+
+            {/* Bio Section - Improved */}
+            {artist.bio && (
+              <div className="mb-4">
+                <div
+                  className={`text-gray-700 dark:text-gray-300 text-sm leading-relaxed transition-all duration-300 ${
+                    isExpanded ? "max-h-none" : "max-h-6 overflow-hidden"
+                  }`}
+                >
+                  {artist.bio.split("\n").map((line, index) => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine === "") {
+                      return <br key={index} />;
+                    }
+                    return (
+                      <p key={index} className="mb-2">
+                        {trimmedLine}
+                      </p>
+                    );
+                  })}
+                </div>
+
+                {shouldShowExpandButton && (
+                  <div className="mt-3">
+                    <button
+                      onClick={() => setIsExpanded(!isExpanded)}
+                      className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium transition-colors"
+                    >
+                      {isExpanded ? "Show less" : "Read more..."}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Video */}
             {artist.videoUrl && (

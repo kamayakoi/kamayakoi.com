@@ -163,10 +163,10 @@
   },
   "eventsPage": {
     "metadata": {
-      "title": "Le Rendez-Vous Sauvage",
+      "title": "Rendez-Vous Sauvage",
       "description": "Découvrez les prochains événements de Kamayakoi"
     },
-    "title": "Le Rendez-Vous Sauvage",
+    "title": "Rendez-Vous Sauvage",
     "noEvents": "Aucun événement à venir trouvé."
   },
   "eventSlugPage": {
@@ -175,6 +175,12 @@
     },
     "dateTBC": "Date à confirmer",
     "timeTBC": "Heure à confirmer",
+    "metaInfo": {
+      "date": "Date",
+      "time": "Heure",
+      "location": "Lieu",
+      "hostedBy": "Organisé par"
+    },
     "availability": {
       "inactive": "Actuellement indisponible",
       "soldOut": "Épuisé",
@@ -189,7 +195,8 @@
       "title": "Billets",
       "buyNow": "Acheter",
       "getETicket": "Obtenir E-ticket",
-      "currencySuffix": " FCFA"
+      "currencySuffix": " FCFA",
+      "selectAndJoin": "Sélectionnez vos billets et rejoignez l'expérience"
     },
     "bundles": {
       "title": "Packs"
@@ -198,12 +205,16 @@
       "title": "Détails"
     },
     "lineupSection": {
-      "title": "Line-up"
+      "title": "Artistes"
     },
     "venueSection": {
       "title": "Lieu",
       "mapTitleDefault": "Carte du lieu de l'événement",
       "mapTitleNamed": "Carte de {locationName}"
+    },
+    "shareSection": {
+      "title": "Partager cet événement",
+      "subtitle": "Faites passer le mot et invitez vos amis"
     },
     "hostedBy": "Organisé par {name}",
     "errors": {

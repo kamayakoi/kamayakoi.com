@@ -317,92 +317,77 @@ export default function PurchaseFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] rounded-sm">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[380px] rounded-sm">
+        <DialogHeader className="pb-2">
           <DialogTitle className="text-lg font-semibold">
-            {t(currentLanguage, "purchaseModal.title")}
+            Purchase Tickets
           </DialogTitle>
-          <DialogDescription>
-            {t(currentLanguage, "purchaseModal.description")}
+          <DialogDescription className="text-sm">
+            Complete your order details
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-3 py-2">
             {/* Item Details */}
-            <div className="bg-muted/50 p-3 rounded-sm">
-              <h4 className="font-medium text-sm mb-1">{item.name}</h4>
+            <div className="bg-muted/30 p-2 rounded-sm">
+              <h4 className="font-medium text-sm">{item.name}</h4>
               <p className="text-xs text-muted-foreground">
                 {formatPrice(item.price)}
                 {t(currentLanguage, "eventSlugPage.tickets.currencySuffix")}
                 {item.isBundle && (
-                  <span className="ml-2 text-xs bg-teal-900/70 text-teal-300 px-2.5 py-1 rounded-full font-medium border border-teal-600/50">
-                    {t(currentLanguage, "purchaseModal.includesTickets", {
-                      count: item.ticketsIncluded || 1,
-                    })}
+                  <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
+                    {item.ticketsIncluded || 1} tickets
                   </span>
                 )}
               </p>
             </div>
 
             {/* Name Field */}
-            <div className="space-y-1.5">
-              <Label htmlFor="name" className="text-sm font-medium block">
-                {t(currentLanguage, "purchaseModal.labels.name")}
+            <div className="space-y-1">
+              <Label htmlFor="name" className="text-sm">
+                Name
               </Label>
               <Input
                 id="name"
-                name="userName"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
-                className="rounded-sm h-10 text-base w-full"
-                placeholder={t(
-                  currentLanguage,
-                  "purchaseModal.placeholders.name",
-                )}
+                className="rounded-sm h-8 text-sm"
+                placeholder="Your full name"
                 required
               />
             </div>
 
             {/* Email Field */}
-            <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm font-medium block">
-                {t(currentLanguage, "purchaseModal.labels.email")}
+            <div className="space-y-1">
+              <Label htmlFor="email" className="text-sm">
+                Email
               </Label>
               <Input
                 id="email"
-                name="userEmail"
                 type="email"
                 value={userEmail}
                 onChange={(e) => setUserEmail(e.target.value)}
-                className="rounded-sm h-10 text-base w-full"
-                placeholder={t(
-                  currentLanguage,
-                  "purchaseModal.placeholders.email",
-                )}
+                className="rounded-sm h-8 text-sm"
+                placeholder="your@email.com"
                 required
               />
             </div>
 
             {/* Phone Field */}
-            <div className="space-y-1.5">
-              <Label className="text-sm font-medium block">
-                {t(currentLanguage, "purchaseModal.labels.phone")}
-              </Label>
+            <div className="space-y-1">
+              <Label className="text-sm">Phone</Label>
               <PhoneNumberInput
                 value={userPhone}
                 onChange={(value) => setUserPhone(value || "")}
-                placeholder={t(
-                  currentLanguage,
-                  "purchaseModal.placeholders.phone",
-                )}
+                placeholder="+221 77 123 45 67"
               />
             </div>
 
             {/* Quantity Field */}
-            <div className="space-y-1.5">
-              <Label htmlFor="quantity" className="text-sm font-medium block">
-                {t(currentLanguage, "purchaseModal.labels.quantity")}
+            <div className="space-y-1">
+              <Label htmlFor="quantity" className="text-sm">
+                Quantity
               </Label>
               <div className="flex items-center space-x-2">
                 <Button
@@ -411,20 +396,18 @@ export default function PurchaseFormModal({
                   size="sm"
                   onClick={handleQuantityDecrement}
                   disabled={quantity <= 1}
-                  className="rounded-sm h-10 w-10 p-0 flex-shrink-0"
+                  className="rounded-sm h-8 w-8 p-0"
                 >
-                  <Minus className="h-4 w-4" />
+                  <Minus className="h-3 w-3" />
                 </Button>
                 <Input
                   id="quantity"
-                  name="quantity"
                   type="text"
                   inputMode="numeric"
-                  pattern="[0-9]*"
                   value={quantityDisplay}
                   onChange={handleQuantityChange}
                   onBlur={handleQuantityBlur}
-                  className="rounded-sm h-10 text-base text-center flex-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="rounded-sm h-8 text-sm text-center flex-1"
                   required
                 />
                 <Button
@@ -433,60 +416,57 @@ export default function PurchaseFormModal({
                   size="sm"
                   onClick={handleQuantityIncrement}
                   disabled={quantity >= maxQuantity}
-                  className="rounded-sm h-10 w-10 p-0 flex-shrink-0"
+                  className="rounded-sm h-8 w-8 p-0"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-3 w-3" />
                 </Button>
               </div>
             </div>
 
             {/* Error Display */}
             {error && (
-              <div className="text-sm text-red-400 text-center px-3 py-2 bg-red-900/20 rounded-sm border border-red-700/50 leading-relaxed">
+              <div className="text-xs text-red-400 text-center px-2 py-1 bg-red-900/20 rounded-sm border border-red-700/50">
                 {error}
               </div>
             )}
 
             {/* Total Price */}
-            <div className="pt-3 border-t border-border">
+            <div className="pt-2 border-t border-border">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-muted-foreground">
-                  {t(currentLanguage, "purchaseModal.totalPrice")}:
-                </span>
-                <span className="text-primary font-semibold text-lg whitespace-nowrap">
+                <span className="text-sm text-muted-foreground">Total:</span>
+                <span className="text-primary font-semibold">
                   {formatPrice(totalPrice)}
                   {t(currentLanguage, "eventSlugPage.tickets.currencySuffix")}
                 </span>
               </div>
               {item.isBundle && (
-                <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center justify-between mt-1">
                   <span className="text-xs text-muted-foreground">
-                    {t(currentLanguage, "purchaseModal.ticketsGenerated")}:
+                    Tickets:
                   </span>
                   <span className="text-xs font-medium">
-                    {actualTicketCount}{" "}
-                    {actualTicketCount === 1 ? "ticket" : "tickets"}
+                    {actualTicketCount}
                   </span>
                 </div>
               )}
             </div>
           </div>
 
-          <DialogFooter className="flex justify-center pt-4">
+          <DialogFooter className="pt-3">
             <Button
               type="submit"
               disabled={isLoading || !isFormValid()}
-              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-sm text-base w-full font-medium"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-sm text-sm w-full font-medium h-9"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t(currentLanguage, "purchaseModal.buttons.processing")}
+                  <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                  Processing...
                 </>
               ) : (
                 <>
-                  <Ticket className="mr-2 h-4 w-4" />
-                  {t(currentLanguage, "purchaseModal.buttons.pay")}
+                  <Ticket className="mr-2 h-3 w-3" />
+                  Purchase
                 </>
               )}
             </Button>

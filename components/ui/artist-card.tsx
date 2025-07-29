@@ -149,10 +149,14 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
                         rel="noopener noreferrer"
                         className="hover:text-blue-500 transition-colors"
                       >
-                        <span className="font-bold">@</span>{artist.socialHandle || "social"}
+                        <span className="font-bold">@</span>
+                        {artist.socialHandle || "social"}
                       </Link>
                     ) : (
-                      <span><span className="font-bold">@</span>{artist.socialHandle}</span>
+                      <span>
+                        <span className="font-bold">@</span>
+                        {artist.socialHandle}
+                      </span>
                     )}
                   </div>
                 )}

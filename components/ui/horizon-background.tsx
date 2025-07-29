@@ -7,143 +7,143 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 
 interface ThreeRefs {
-    scene: THREE.Scene | null;
-    camera: THREE.PerspectiveCamera | null;
-    renderer: THREE.WebGLRenderer | null;
-    composer: EffectComposer | null;
-    stars: THREE.Points<THREE.BufferGeometry, THREE.ShaderMaterial>[];
-    nebula: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial> | null;
-    mountains: THREE.Mesh<THREE.ShapeGeometry, THREE.MeshBasicMaterial>[];
-    animationId: number | null;
+  scene: THREE.Scene | null;
+  camera: THREE.PerspectiveCamera | null;
+  renderer: THREE.WebGLRenderer | null;
+  composer: EffectComposer | null;
+  stars: THREE.Points<THREE.BufferGeometry, THREE.ShaderMaterial>[];
+  nebula: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial> | null;
+  mountains: THREE.Mesh<THREE.ShapeGeometry, THREE.MeshBasicMaterial>[];
+  animationId: number | null;
 }
 
 interface HorizonBackgroundProps {
-    className?: string;
-    staticPosition?: boolean; // If true, camera doesn't move with scroll
-    opacity?: number; // Control background opacity
+  className?: string;
+  staticPosition?: boolean; // If true, camera doesn't move with scroll
+  opacity?: number; // Control background opacity
 }
 
 export default function HorizonBackground({
-    className = "",
-    staticPosition = false,
-    opacity = 1
+  className = "",
+  staticPosition = false,
+  opacity = 1,
 }: HorizonBackgroundProps) {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const threeRefs = useRef<ThreeRefs>({
-        scene: null,
-        camera: null,
-        renderer: null,
-        composer: null,
-        stars: [],
-        nebula: null,
-        mountains: [],
-        animationId: null,
-    });
+  const threeRefs = useRef<ThreeRefs>({
+    scene: null,
+    camera: null,
+    renderer: null,
+    composer: null,
+    stars: [],
+    nebula: null,
+    mountains: [],
+    animationId: null,
+  });
 
-    // Initialize Three.js
-    useEffect(() => {
-        const initThree = () => {
-            const { current: refs } = threeRefs;
+  // Initialize Three.js
+  useEffect(() => {
+    const initThree = () => {
+      const { current: refs } = threeRefs;
 
-            // Scene setup
-            refs.scene = new THREE.Scene();
-            refs.scene.fog = new THREE.FogExp2(0x000000, 0.00025);
+      // Scene setup
+      refs.scene = new THREE.Scene();
+      refs.scene.fog = new THREE.FogExp2(0x000000, 0.00025);
 
-            // Camera
-            refs.camera = new THREE.PerspectiveCamera(
-                75,
-                window.innerWidth / window.innerHeight,
-                0.1,
-                2000,
-            );
-            refs.camera.position.z = staticPosition ? -300 : 100;
-            refs.camera.position.y = staticPosition ? 40 : 20;
+      // Camera
+      refs.camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        2000,
+      );
+      refs.camera.position.z = staticPosition ? -300 : 100;
+      refs.camera.position.y = staticPosition ? 40 : 20;
 
-            // Renderer
-            refs.renderer = new THREE.WebGLRenderer({
-                canvas: canvasRef.current as HTMLCanvasElement,
-                antialias: true,
-                alpha: true,
-            });
-            refs.renderer.setSize(window.innerWidth, window.innerHeight);
-            refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            refs.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            refs.renderer.toneMappingExposure = 0.5;
+      // Renderer
+      refs.renderer = new THREE.WebGLRenderer({
+        canvas: canvasRef.current as HTMLCanvasElement,
+        antialias: true,
+        alpha: true,
+      });
+      refs.renderer.setSize(window.innerWidth, window.innerHeight);
+      refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      refs.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      refs.renderer.toneMappingExposure = 0.5;
 
-            // Post-processing
-            refs.composer = new EffectComposer(refs.renderer);
-            const renderPass = new RenderPass(refs.scene, refs.camera);
-            refs.composer.addPass(renderPass);
+      // Post-processing
+      refs.composer = new EffectComposer(refs.renderer);
+      const renderPass = new RenderPass(refs.scene, refs.camera);
+      refs.composer.addPass(renderPass);
 
-            const bloomPass = new UnrealBloomPass(
-                new THREE.Vector2(window.innerWidth, window.innerHeight),
-                0.8,
-                0.4,
-                0.85,
-            );
-            refs.composer.addPass(bloomPass);
+      const bloomPass = new UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        0.8,
+        0.4,
+        0.85,
+      );
+      refs.composer.addPass(bloomPass);
 
-            // Create scene elements
-            createStarField();
-            createNebula();
-            createMountains();
-            createAtmosphere();
+      // Create scene elements
+      createStarField();
+      createNebula();
+      createMountains();
+      createAtmosphere();
 
-            // Start animation
-            animate();
-        };
+      // Start animation
+      animate();
+    };
 
-        const createStarField = () => {
-            const { current: refs } = threeRefs;
-            const starCount = 5000;
+    const createStarField = () => {
+      const { current: refs } = threeRefs;
+      const starCount = 5000;
 
-            for (let i = 0; i < 3; i++) {
-                const geometry = new THREE.BufferGeometry();
-                const positions = new Float32Array(starCount * 3);
-                const colors = new Float32Array(starCount * 3);
-                const sizes = new Float32Array(starCount);
+      for (let i = 0; i < 3; i++) {
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(starCount * 3);
+        const colors = new Float32Array(starCount * 3);
+        const sizes = new Float32Array(starCount);
 
-                for (let j = 0; j < starCount; j++) {
-                    const radius = 200 + Math.random() * 800;
-                    const theta = Math.random() * Math.PI * 2;
-                    const phi = Math.acos(Math.random() * 2 - 1);
+        for (let j = 0; j < starCount; j++) {
+          const radius = 200 + Math.random() * 800;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(Math.random() * 2 - 1);
 
-                    positions[j * 3] = radius * Math.sin(phi) * Math.cos(theta);
-                    positions[j * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-                    positions[j * 3 + 2] = radius * Math.cos(phi);
+          positions[j * 3] = radius * Math.sin(phi) * Math.cos(theta);
+          positions[j * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+          positions[j * 3 + 2] = radius * Math.cos(phi);
 
-                    // Color variation
-                    const color = new THREE.Color();
-                    const colorChoice = Math.random();
-                    if (colorChoice < 0.7) {
-                        color.setHSL(0, 0, 0.8 + Math.random() * 0.2);
-                    } else if (colorChoice < 0.9) {
-                        color.setHSL(0.08, 0.5, 0.8);
-                    } else {
-                        color.setHSL(0.6, 0.5, 0.8);
-                    }
+          // Color variation
+          const color = new THREE.Color();
+          const colorChoice = Math.random();
+          if (colorChoice < 0.7) {
+            color.setHSL(0, 0, 0.8 + Math.random() * 0.2);
+          } else if (colorChoice < 0.9) {
+            color.setHSL(0.08, 0.5, 0.8);
+          } else {
+            color.setHSL(0.6, 0.5, 0.8);
+          }
 
-                    colors[j * 3] = color.r;
-                    colors[j * 3 + 1] = color.g;
-                    colors[j * 3 + 2] = color.b;
+          colors[j * 3] = color.r;
+          colors[j * 3 + 1] = color.g;
+          colors[j * 3 + 2] = color.b;
 
-                    sizes[j] = Math.random() * 2 + 0.5;
-                }
+          sizes[j] = Math.random() * 2 + 0.5;
+        }
 
-                geometry.setAttribute(
-                    "position",
-                    new THREE.BufferAttribute(positions, 3),
-                );
-                geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-                geometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
+        geometry.setAttribute(
+          "position",
+          new THREE.BufferAttribute(positions, 3),
+        );
+        geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+        geometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
 
-                const material = new THREE.ShaderMaterial({
-                    uniforms: {
-                        time: { value: 0 },
-                        depth: { value: i },
-                    },
-                    vertexShader: `
+        const material = new THREE.ShaderMaterial({
+          uniforms: {
+            time: { value: 0 },
+            depth: { value: i },
+          },
+          vertexShader: `
             attribute float size;
             attribute vec3 color;
             varying vec3 vColor;
@@ -164,7 +164,7 @@ export default function HorizonBackground({
               gl_Position = projectionMatrix * mvPosition;
             }
           `,
-                    fragmentShader: `
+          fragmentShader: `
             varying vec3 vColor;
             
             void main() {
@@ -175,29 +175,29 @@ export default function HorizonBackground({
               gl_FragColor = vec4(vColor, opacity);
             }
           `,
-                    transparent: true,
-                    blending: THREE.AdditiveBlending,
-                    depthWrite: false,
-                });
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
 
-                const stars = new THREE.Points(geometry, material);
-                refs.scene!.add(stars);
-                refs.stars.push(stars);
-            }
-        };
+        const stars = new THREE.Points(geometry, material);
+        refs.scene!.add(stars);
+        refs.stars.push(stars);
+      }
+    };
 
-        const createNebula = () => {
-            const { current: refs } = threeRefs;
+    const createNebula = () => {
+      const { current: refs } = threeRefs;
 
-            const geometry = new THREE.PlaneGeometry(8000, 4000, 100, 100);
-            const material = new THREE.ShaderMaterial({
-                uniforms: {
-                    time: { value: 0 },
-                    color1: { value: new THREE.Color(0x0033ff) },
-                    color2: { value: new THREE.Color(0xff0066) },
-                    opacity: { value: 0.3 },
-                },
-                vertexShader: `
+      const geometry = new THREE.PlaneGeometry(8000, 4000, 100, 100);
+      const material = new THREE.ShaderMaterial({
+        uniforms: {
+          time: { value: 0 },
+          color1: { value: new THREE.Color(0x0033ff) },
+          color2: { value: new THREE.Color(0xff0066) },
+          opacity: { value: 0.3 },
+        },
+        vertexShader: `
           varying vec2 vUv;
           varying float vElevation;
           uniform float time;
@@ -213,7 +213,7 @@ export default function HorizonBackground({
             gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
           }
         `,
-                fragmentShader: `
+        fragmentShader: `
           uniform vec3 color1;
           uniform vec3 color2;
           uniform float opacity;
@@ -231,73 +231,73 @@ export default function HorizonBackground({
             gl_FragColor = vec4(color, alpha);
           }
         `,
-                transparent: true,
-                blending: THREE.AdditiveBlending,
-                side: THREE.DoubleSide,
-                depthWrite: false,
-            });
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      });
 
-            const nebula = new THREE.Mesh(geometry, material);
-            nebula.position.z = -1050;
-            nebula.rotation.x = 0;
-            refs.scene!.add(nebula);
-            refs.nebula = nebula;
-        };
+      const nebula = new THREE.Mesh(geometry, material);
+      nebula.position.z = -1050;
+      nebula.rotation.x = 0;
+      refs.scene!.add(nebula);
+      refs.nebula = nebula;
+    };
 
-        const createMountains = () => {
-            const { current: refs } = threeRefs;
+    const createMountains = () => {
+      const { current: refs } = threeRefs;
 
-            const layers = [
-                { distance: -50, height: 60, color: 0x1a1a2e, opacity: 1 },
-                { distance: -100, height: 80, color: 0x16213e, opacity: 0.8 },
-                { distance: -150, height: 100, color: 0x0f3460, opacity: 0.6 },
-                { distance: -200, height: 120, color: 0x0a4668, opacity: 0.4 },
-            ];
+      const layers = [
+        { distance: -50, height: 60, color: 0x1a1a2e, opacity: 1 },
+        { distance: -100, height: 80, color: 0x16213e, opacity: 0.8 },
+        { distance: -150, height: 100, color: 0x0f3460, opacity: 0.6 },
+        { distance: -200, height: 120, color: 0x0a4668, opacity: 0.4 },
+      ];
 
-            layers.forEach((layer, index) => {
-                const points = [];
-                const segments = 50;
+      layers.forEach((layer, index) => {
+        const points = [];
+        const segments = 50;
 
-                for (let i = 0; i <= segments; i++) {
-                    const x = (i / segments - 0.5) * 1000;
-                    const y =
-                        Math.sin(i * 0.1) * layer.height +
-                        Math.sin(i * 0.05) * layer.height * 0.5 +
-                        Math.random() * layer.height * 0.2 -
-                        100;
-                    points.push(new THREE.Vector2(x, y));
-                }
+        for (let i = 0; i <= segments; i++) {
+          const x = (i / segments - 0.5) * 1000;
+          const y =
+            Math.sin(i * 0.1) * layer.height +
+            Math.sin(i * 0.05) * layer.height * 0.5 +
+            Math.random() * layer.height * 0.2 -
+            100;
+          points.push(new THREE.Vector2(x, y));
+        }
 
-                points.push(new THREE.Vector2(5000, -300));
-                points.push(new THREE.Vector2(-5000, -300));
+        points.push(new THREE.Vector2(5000, -300));
+        points.push(new THREE.Vector2(-5000, -300));
 
-                const shape = new THREE.Shape(points);
-                const geometry = new THREE.ShapeGeometry(shape);
-                const material = new THREE.MeshBasicMaterial({
-                    color: layer.color,
-                    transparent: true,
-                    opacity: layer.opacity,
-                    side: THREE.DoubleSide,
-                });
+        const shape = new THREE.Shape(points);
+        const geometry = new THREE.ShapeGeometry(shape);
+        const material = new THREE.MeshBasicMaterial({
+          color: layer.color,
+          transparent: true,
+          opacity: layer.opacity,
+          side: THREE.DoubleSide,
+        });
 
-                const mountain = new THREE.Mesh(geometry, material);
-                mountain.position.z = layer.distance;
-                mountain.position.y = layer.distance;
-                mountain.userData = { baseZ: layer.distance, index };
-                refs.scene!.add(mountain);
-                refs.mountains.push(mountain);
-            });
-        };
+        const mountain = new THREE.Mesh(geometry, material);
+        mountain.position.z = layer.distance;
+        mountain.position.y = layer.distance;
+        mountain.userData = { baseZ: layer.distance, index };
+        refs.scene!.add(mountain);
+        refs.mountains.push(mountain);
+      });
+    };
 
-        const createAtmosphere = () => {
-            const { current: refs } = threeRefs;
+    const createAtmosphere = () => {
+      const { current: refs } = threeRefs;
 
-            const geometry = new THREE.SphereGeometry(600, 32, 32);
-            const material = new THREE.ShaderMaterial({
-                uniforms: {
-                    time: { value: 0 },
-                },
-                vertexShader: `
+      const geometry = new THREE.SphereGeometry(600, 32, 32);
+      const material = new THREE.ShaderMaterial({
+        uniforms: {
+          time: { value: 0 },
+        },
+        vertexShader: `
           varying vec3 vNormal;
           varying vec3 vPosition;
           
@@ -307,7 +307,7 @@ export default function HorizonBackground({
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
           }
         `,
-                fragmentShader: `
+        fragmentShader: `
           varying vec3 vNormal;
           varying vec3 vPosition;
           uniform float time;
@@ -322,118 +322,118 @@ export default function HorizonBackground({
             gl_FragColor = vec4(atmosphere, intensity * 0.25);
           }
         `,
-                side: THREE.BackSide,
-                blending: THREE.AdditiveBlending,
-                transparent: true,
-            });
+        side: THREE.BackSide,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+      });
 
-            const atmosphere = new THREE.Mesh(geometry, material);
-            refs.scene!.add(atmosphere);
-        };
+      const atmosphere = new THREE.Mesh(geometry, material);
+      refs.scene!.add(atmosphere);
+    };
 
-        const animate = () => {
-            const { current: refs } = threeRefs;
-            refs.animationId = requestAnimationFrame(animate);
+    const animate = () => {
+      const { current: refs } = threeRefs;
+      refs.animationId = requestAnimationFrame(animate);
 
-            const time = Date.now() * 0.001;
+      const time = Date.now() * 0.001;
 
-            // Update stars
-            refs.stars.forEach((starField) => {
-                if (starField.material.uniforms) {
-                    starField.material.uniforms.time.value = time;
-                }
-            });
+      // Update stars
+      refs.stars.forEach((starField) => {
+        if (starField.material.uniforms) {
+          starField.material.uniforms.time.value = time;
+        }
+      });
 
-            // Update nebula
-            if (refs.nebula && refs.nebula.material.uniforms) {
-                refs.nebula.material.uniforms.time.value = time * 0.5;
-            }
+      // Update nebula
+      if (refs.nebula && refs.nebula.material.uniforms) {
+        refs.nebula.material.uniforms.time.value = time * 0.5;
+      }
 
-            // Static camera position for events page or subtle movement for home
-            if (refs.camera && staticPosition) {
-                // Keep camera in a nice position for events page
-                const floatX = Math.sin(time * 0.1) * 1;
-                const floatY = Math.cos(time * 0.15) * 0.5;
-                refs.camera.position.x = floatX;
-                refs.camera.position.y = 40 + floatY;
-                refs.camera.position.z = -300;
-                refs.camera.lookAt(0, 10, -600);
-            }
+      // Static camera position for events page or subtle movement for home
+      if (refs.camera && staticPosition) {
+        // Keep camera in a nice position for events page
+        const floatX = Math.sin(time * 0.1) * 1;
+        const floatY = Math.cos(time * 0.15) * 0.5;
+        refs.camera.position.x = floatX;
+        refs.camera.position.y = 40 + floatY;
+        refs.camera.position.z = -300;
+        refs.camera.lookAt(0, 10, -600);
+      }
 
-            // Subtle parallax for mountains
-            refs.mountains.forEach((mountain, i) => {
-                const parallaxFactor = 1 + i * 0.5;
-                mountain.position.x = Math.sin(time * 0.1) * 2 * parallaxFactor;
-                mountain.position.y = 50 + Math.cos(time * 0.15) * 1 * parallaxFactor;
-            });
+      // Subtle parallax for mountains
+      refs.mountains.forEach((mountain, i) => {
+        const parallaxFactor = 1 + i * 0.5;
+        mountain.position.x = Math.sin(time * 0.1) * 2 * parallaxFactor;
+        mountain.position.y = 50 + Math.cos(time * 0.15) * 1 * parallaxFactor;
+      });
 
-            if (refs.composer) {
-                refs.composer.render();
-            }
-        };
+      if (refs.composer) {
+        refs.composer.render();
+      }
+    };
 
-        initThree();
+    initThree();
 
-        // Handle resize
-        const handleResize = () => {
-            const { current: refs } = threeRefs;
-            if (refs.camera && refs.renderer && refs.composer) {
-                refs.camera.aspect = window.innerWidth / window.innerHeight;
-                refs.camera.updateProjectionMatrix();
-                refs.renderer.setSize(window.innerWidth, window.innerHeight);
-                refs.composer.setSize(window.innerWidth, window.innerHeight);
-            }
-        };
+    // Handle resize
+    const handleResize = () => {
+      const { current: refs } = threeRefs;
+      if (refs.camera && refs.renderer && refs.composer) {
+        refs.camera.aspect = window.innerWidth / window.innerHeight;
+        refs.camera.updateProjectionMatrix();
+        refs.renderer.setSize(window.innerWidth, window.innerHeight);
+        refs.composer.setSize(window.innerWidth, window.innerHeight);
+      }
+    };
 
-        window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize);
 
-        // Cleanup
-        return () => {
-            const { current: refs } = threeRefs;
+    // Cleanup
+    return () => {
+      const { current: refs } = threeRefs;
 
-            if (refs.animationId) {
-                cancelAnimationFrame(refs.animationId);
-            }
+      if (refs.animationId) {
+        cancelAnimationFrame(refs.animationId);
+      }
 
-            window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", handleResize);
 
-            // Dispose Three.js resources
-            refs.stars.forEach((starField) => {
-                starField.geometry.dispose();
-                starField.material.dispose();
-            });
+      // Dispose Three.js resources
+      refs.stars.forEach((starField) => {
+        starField.geometry.dispose();
+        starField.material.dispose();
+      });
 
-            refs.mountains.forEach((mountain) => {
-                mountain.geometry.dispose();
-                mountain.material.dispose();
-            });
+      refs.mountains.forEach((mountain) => {
+        mountain.geometry.dispose();
+        mountain.material.dispose();
+      });
 
-            if (refs.nebula) {
-                refs.nebula.geometry.dispose();
-                refs.nebula.material.dispose();
-            }
+      if (refs.nebula) {
+        refs.nebula.geometry.dispose();
+        refs.nebula.material.dispose();
+      }
 
-            if (refs.renderer) {
-                refs.renderer.dispose();
-            }
-        };
-    }, [staticPosition]);
+      if (refs.renderer) {
+        refs.renderer.dispose();
+      }
+    };
+  }, [staticPosition]);
 
-    return (
-        <div
-            className={`absolute inset-0 pointer-events-none ${className}`}
-            style={{ opacity }}
-        >
-            <canvas
-                ref={canvasRef}
-                className="w-full h-full"
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    zIndex: -1
-                }}
-            />
-        </div>
-    );
-} 
+  return (
+    <div
+      className={`absolute inset-0 pointer-events-none ${className}`}
+      style={{ opacity }}
+    >
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          zIndex: -1,
+        }}
+      />
+    </div>
+  );
+}

@@ -8,6 +8,7 @@ import { TranslationProvider } from "@/lib/contexts/TranslationContext";
 import { MediaProvider } from "@/lib/contexts/MediaContext";
 import MusicWrapper from "@/components/landing/music-wrapper";
 import { getHomepageMusicTracks } from "@/lib/sanity/queries";
+import AudioPlayer from "@/components/landing/audio-player";
 
 // Bold geometric fonts matching the image style
 const bebasNeue = Bebas_Neue({
@@ -83,20 +84,21 @@ export default async function RootLayout({
       <body
         className={`${bebasNeue.variable} ${oswald.variable} font-oswald flex flex-col min-h-screen`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <TranslationProvider>
-            <MusicWrapper tracks={musicTracks}>
+        <MusicWrapper tracks={musicTracks}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <TranslationProvider>
               <MediaProvider>
                 <main className="flex-grow">{children}</main>
+                <AudioPlayer className="hidden" />
               </MediaProvider>
-            </MusicWrapper>
-          </TranslationProvider>
-        </ThemeProvider>
+            </TranslationProvider>
+          </ThemeProvider>
+        </MusicWrapper>
         <Analytics />
       </body>
     </html>

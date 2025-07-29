@@ -165,7 +165,9 @@ export default function TermsClientPage() {
               </h2>
               <div className="space-y-4 text-foreground leading-relaxed">
                 <p>{t(currentLanguage, "termsPage.contact.p1")}</p>
-                <p className="font-medium">{t(currentLanguage, "termsPage.contact.p2")}</p>
+                <p className="font-medium">
+                  {t(currentLanguage, "termsPage.contact.p2")}
+                </p>
               </div>
             </section>
           </div>

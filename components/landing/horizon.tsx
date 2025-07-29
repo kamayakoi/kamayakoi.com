@@ -652,25 +652,32 @@ export const Component = () => {
                 2px 2px 8px rgba(0, 0, 0, 0.9),
                 0 1px 3px rgba(0, 0, 0, 1)
               `,
-              background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: '12px',
-              padding: '20px 30px',
-              border: '1px solid rgba(255, 255, 255, 0.1)'
+              background:
+                "linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%)",
+              backdropFilter: "blur(10px)",
+              borderRadius: "12px",
+              padding: "20px 30px",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
             }}
           >
-            <p className="subtitle-line mb-3" style={{
-              textShadow: 'inherit',
-              fontWeight: '600',
-              letterSpacing: '0.02em'
-            }}>
+            <p
+              className="subtitle-line mb-3"
+              style={{
+                textShadow: "inherit",
+                fontWeight: "600",
+                letterSpacing: "0.02em",
+              }}
+            >
               {currentContent.subtitle.line1}
             </p>
-            <p className="subtitle-line" style={{
-              textShadow: 'inherit',
-              fontWeight: '600',
-              letterSpacing: '0.02em'
-            }}>
+            <p
+              className="subtitle-line"
+              style={{
+                textShadow: "inherit",
+                fontWeight: "600",
+                letterSpacing: "0.02em",
+              }}
+            >
               {currentContent.subtitle.line2}
             </p>
           </div>

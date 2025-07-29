@@ -19,7 +19,7 @@ async function ArtistsContent() {
       <main className="flex-grow">
         <div className="container mx-auto py-26 px-4">
           {/* Artists Grid - 2 cards per row */}
-          <div className="grid grid-cols-2 gap-4 md:gap-8 justify-items-center max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-items-center max-w-4xl mx-auto">
             {artists.map((artist) => (
               <div key={artist._id} className="w-full max-w-sm">
                 <ArtistCard artist={artist} />

@@ -25,7 +25,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
     setActiveVideo,
     setVideoPlaying,
     saveVideoState,
-    getVideoState
+    getVideoState,
   } = useMedia();
 
   const { scrollYProgress } = useScroll({
@@ -43,7 +43,9 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
   // Initialize states
   useEffect(() => {
     const initialMutedStates = new Array(displayEvents.length).fill(false);
-    const initialShowVideo = displayEvents.map(event => !!event.promoVideoUrl);
+    const initialShowVideo = displayEvents.map(
+      (event) => !!event.promoVideoUrl,
+    );
 
     setMutedStates(initialMutedStates);
     setShowVideo(initialShowVideo);
@@ -60,7 +62,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
           if (savedState) {
             video.currentTime = savedState.currentTime;
             video.muted = savedState.muted;
-            setMutedStates(prev => {
+            setMutedStates((prev) => {
               const newStates = [...prev];
               newStates[index] = savedState.muted;
               return newStates;
@@ -72,22 +74,32 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
       });
 
       // Try to auto-play first video (will fail gracefully if no user interaction)
-      if (displayEvents.length > 0 && videoRefs.current[0] && displayEvents[0]?.promoVideoUrl) {
+      if (
+        displayEvents.length > 0 &&
+        videoRefs.current[0] &&
+        displayEvents[0]?.promoVideoUrl
+      ) {
         const firstVideo = videoRefs.current[0];
         setActiveVideo(0);
         setVideoPlaying(true);
-        firstVideo.currentTime = getVideoState(displayEvents[0].slug)?.currentTime || 0;
+        firstVideo.currentTime =
+          getVideoState(displayEvents[0].slug)?.currentTime || 0;
         firstVideo.play().catch((error) => {
-          console.log("🎥 Video autoplay prevented:", error.message || 'Autoplay blocked');
+          console.log(
+            "🎥 Video autoplay prevented:",
+            error.message || "Autoplay blocked",
+          );
           // Fallback: mute the video and try again
           firstVideo.muted = true;
-          setMutedStates(prev => {
+          setMutedStates((prev) => {
             const newStates = [...prev];
             newStates[0] = true;
             return newStates;
           });
           firstVideo.play().catch(() => {
-            console.log("🎥 Video autoplay failed even when muted - user interaction required");
+            console.log(
+              "🎥 Video autoplay failed even when muted - user interaction required",
+            );
             setVideoPlaying(false);
           });
         });
@@ -112,7 +124,8 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
         const sectionRect = section.getBoundingClientRect();
         const sectionCenter = sectionRect.top + sectionRect.height / 2;
         const distance = Math.abs(viewportCenter - sectionCenter);
-        const isVisible = sectionRect.top < window.innerHeight && sectionRect.bottom > 0;
+        const isVisible =
+          sectionRect.top < window.innerHeight && sectionRect.bottom > 0;
 
         if (isVisible && distance < closestDistance) {
           closestDistance = distance;
@@ -122,10 +135,19 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
 
       if (closestIndex !== activeVideoIndex) {
         // Save state of previous video
-        if (activeVideoIndex !== null && videoRefs.current[activeVideoIndex] && displayEvents[activeVideoIndex]?.promoVideoUrl) {
+        if (
+          activeVideoIndex !== null &&
+          videoRefs.current[activeVideoIndex] &&
+          displayEvents[activeVideoIndex]?.promoVideoUrl
+        ) {
           const prevVideo = videoRefs.current[activeVideoIndex];
           const prevEvent = displayEvents[activeVideoIndex];
-          saveVideoState(prevEvent.slug, prevVideo.currentTime, prevVideo.muted, !prevVideo.paused);
+          saveVideoState(
+            prevEvent.slug,
+            prevVideo.currentTime,
+            prevVideo.muted,
+            !prevVideo.paused,
+          );
         }
 
         // Pause all videos
@@ -138,7 +160,12 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
         setActiveVideo(closestIndex);
 
         // Play new active video if it exists
-        if (closestIndex >= 0 && videoRefs.current[closestIndex] && displayEvents[closestIndex]?.promoVideoUrl && showVideo[closestIndex]) {
+        if (
+          closestIndex >= 0 &&
+          videoRefs.current[closestIndex] &&
+          displayEvents[closestIndex]?.promoVideoUrl &&
+          showVideo[closestIndex]
+        ) {
           const activeVideo = videoRefs.current[closestIndex];
           if (activeVideo) {
             const savedState = getVideoState(displayEvents[closestIndex].slug);
@@ -170,13 +197,21 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
       }
     };
 
-    window.addEventListener('scroll', throttledScroll, { passive: true });
+    window.addEventListener("scroll", throttledScroll, { passive: true });
     handleScroll();
 
     return () => {
-      window.removeEventListener('scroll', throttledScroll);
+      window.removeEventListener("scroll", throttledScroll);
     };
-  }, [activeVideoIndex, displayEvents, showVideo, setActiveVideo, setVideoPlaying, saveVideoState, getVideoState]);
+  }, [
+    activeVideoIndex,
+    displayEvents,
+    showVideo,
+    setActiveVideo,
+    setVideoPlaying,
+    saveVideoState,
+    getVideoState,
+  ]);
 
   // Create individual transform hooks for each potential event slot (up to 5)
   const transform1 = useTransform(scrollYProgress, [0, 0.2], [-400, 400]);
@@ -185,7 +220,13 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
   const transform4 = useTransform(scrollYProgress, [0.6, 0.8], [-400, 400]);
   const transform5 = useTransform(scrollYProgress, [0.8, 1], [-400, 400]);
 
-  const transforms = [transform1, transform2, transform3, transform4, transform5];
+  const transforms = [
+    transform1,
+    transform2,
+    transform3,
+    transform4,
+    transform5,
+  ];
 
   const handleImageClick = (slug: string, index: number) => {
     // Defer saving video state until after render cycle
@@ -212,46 +253,57 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
   };
 
   const toggleMediaType = (index: number) => {
-    if (!displayEvents[index]?.promoVideoUrl || !displayEvents[index]?.featuredImage) return;
+    if (
+      !displayEvents[index]?.promoVideoUrl ||
+      !displayEvents[index]?.featuredImage
+    )
+      return;
 
-    setShowVideo(prev => {
+    // Decide what the next state will be and update the state
+    const nextShowVideo = !showVideo[index];
+    setShowVideo((prev) => {
       const newStates = [...prev];
-      newStates[index] = !newStates[index];
-
-      // If switching to video, pause current video and start this one
-      if (newStates[index]) {
-        videoRefs.current.forEach((video, i) => {
-          if (video && i !== index) video.pause();
-        });
-
-        const video = videoRefs.current[index];
-        if (video) {
-          setActiveVideo(index);
-          setVideoPlaying(true);
-          const savedState = getVideoState(displayEvents[index].slug);
-          if (savedState) {
-            video.currentTime = savedState.currentTime;
-            video.muted = savedState.muted;
-          }
-          video.play().catch(() => {
-            console.log("Video play prevented");
-          });
-        }
-      } else {
-        // Switching to image, pause video
-        const video = videoRefs.current[index];
-        if (video) {
-          saveVideoState(displayEvents[index].slug, video.currentTime, video.muted, !video.paused);
-          video.pause();
-        }
-        if (activeVideoIndex === index) {
-          setActiveVideo(null);
-          setVideoPlaying(false);
-        }
-      }
-
+      newStates[index] = nextShowVideo;
       return newStates;
     });
+
+    // Perform side-effects based on the new state
+    if (nextShowVideo) {
+      // Logic for switching to video
+      videoRefs.current.forEach((video, i) => {
+        if (video && i !== index) video.pause();
+      });
+
+      const video = videoRefs.current[index];
+      if (video) {
+        setActiveVideo(index);
+        setVideoPlaying(true);
+        const savedState = getVideoState(displayEvents[index].slug);
+        if (savedState) {
+          video.currentTime = savedState.currentTime;
+          video.muted = savedState.muted;
+        }
+        video.play().catch(() => {
+          console.log("Video play prevented");
+        });
+      }
+    } else {
+      // Logic for switching to image
+      const video = videoRefs.current[index];
+      if (video) {
+        saveVideoState(
+          displayEvents[index].slug,
+          video.currentTime,
+          video.muted,
+          !video.paused,
+        );
+        video.pause();
+      }
+      if (activeVideoIndex === index) {
+        setActiveVideo(null);
+        setVideoPlaying(false);
+      }
+    }
   };
 
   const getDisplayNumber = (event: EventParallaxData, index: number) => {
@@ -271,8 +323,10 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
 
   return (
     <>
-
-      <div ref={containerRef} className="relative z-10 min-h-[500vh] md:min-h-[400vh]">
+      <div
+        ref={containerRef}
+        className="relative z-10 min-h-[500vh] md:min-h-[400vh]"
+      >
         {displayEvents.map((event, index) => {
           const hasVideo = !!event.promoVideoUrl;
           const hasImage = !!event.featuredImage;
@@ -287,7 +341,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                 sectionRefs.current[index] = el;
               }}
             >
-              <div className="w-[300px] h-[400px] md:w-[350px] md:h-[467px] lg:w-[500px] lg:h-[600px] m-5 mt-16 bg-gray-100 overflow-hidden relative rounded-lg shadow-2xl">
+              <div className="w-[400px] h-[533px] md:w-[500px] md:h-[667px] lg:w-[600px] lg:h-[800px] m-5 mt-16 bg-black overflow-hidden relative rounded-lg shadow-2xl">
                 {hasVideo && currentShowVideo ? (
                   <div className="relative w-full h-full overflow-hidden rounded">
                     <video
@@ -305,10 +359,12 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                         if (videoRefs.current[index]) {
                           const savedState = getVideoState(event.slug);
                           if (savedState) {
-                            videoRefs.current[index]!.currentTime = savedState.currentTime;
+                            videoRefs.current[index]!.currentTime =
+                              savedState.currentTime;
                             videoRefs.current[index]!.muted = savedState.muted;
                           } else {
-                            videoRefs.current[index]!.muted = mutedStates[index];
+                            videoRefs.current[index]!.muted =
+                              mutedStates[index];
                           }
                         }
                       }}
@@ -323,9 +379,15 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                           toggleVideoSound(index);
                         }}
                         className="p-2 bg-black/10 hover:bg-black/30 rounded-sm text-white focus:outline-none transition-colors duration-200"
-                        aria-label={mutedStates[index] ? "Unmute video" : "Mute video"}
+                        aria-label={
+                          mutedStates[index] ? "Unmute video" : "Mute video"
+                        }
                       >
-                        {mutedStates[index] ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                        {mutedStates[index] ? (
+                          <VolumeX size={18} />
+                        ) : (
+                          <Volume2 size={18} />
+                        )}
                       </button>
 
                       {/* Media type toggle */}
@@ -342,8 +404,6 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                         </button>
                       )}
                     </div>
-
-
                   </div>
                 ) : (
                   <div className="relative w-full h-full overflow-hidden rounded">
@@ -381,17 +441,17 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                   className="fixed top-4/4 right-4 md:right-96 transform -translate-y-1/2 text-white font-black pointer-events-none z-30"
                   style={{
                     y: transforms[index],
-                    fontSize: 'clamp(2rem, 10vw, 3.75rem)',
+                    fontSize: "clamp(2rem, 10vw, 3.75rem)",
                     fontFamily: '"Inter", "Helvetica Neue", Arial, sans-serif',
-                    letterSpacing: '-4px',
-                    lineHeight: '0.8',
-                    color: '#ff6b6b',
+                    letterSpacing: "-4px",
+                    lineHeight: "0.8",
+                    color: "#ff6b6b",
                     textShadow: `
                       0 0 10px rgba(255, 107, 107, 0.6),
                       0 0 20px rgba(255, 107, 107, 0.4),
                       2px 2px 10px rgba(0, 0, 0, 0.7)
                     `,
-                    filter: 'drop-shadow(0 0 5px rgba(255, 107, 107, 0.5))'
+                    filter: "drop-shadow(0 0 5px rgba(255, 107, 107, 0.5))",
                   }}
                 >
                   {getDisplayNumber(event, index)}

@@ -2,7 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, SkipBack, SkipForward, X, ChevronRight } from "lucide-react";
+import {
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  X,
+  ChevronRight,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/actions/utils";
 import Image from "next/image";
@@ -72,7 +79,7 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
     nextTrack,
     prevTrack,
     seekTo,
-    stop
+    stop,
   } = useMusic();
 
   // Only render on client side
@@ -111,7 +118,10 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
   const handleTogglePlay = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("🎵 Audio player toggle button clicked - current state:", isPlaying);
+    console.log(
+      "🎵 Audio player toggle button clicked - current state:",
+      isPlaying,
+    );
     togglePlay();
   };
 
@@ -122,7 +132,7 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
       hasNoTracks: !tracks,
       tracksLength: tracks?.length,
       hasNoCurrentTrack: !currentTrack,
-      isVisible
+      isVisible,
     });
     return null;
   }
@@ -235,7 +245,10 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
               <h3 className="text-white font-bold text-sm truncate">
                 {currentTrack.title}
                 {currentTrack.artist && (
-                  <span className="text-white/70 font-normal"> • {currentTrack.artist}</span>
+                  <span className="text-white/70 font-normal">
+                    {" "}
+                    • {currentTrack.artist}
+                  </span>
                 )}
               </h3>
             </motion.div>
@@ -277,10 +290,7 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
                 </motion.div>
               )}
 
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
+              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <Button
                   onClick={handleTogglePlay}
                   variant="ghost"

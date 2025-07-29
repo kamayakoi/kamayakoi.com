@@ -4,15 +4,15 @@ import PrivacyClientPage from "./privacy-client";
 import LoadingComponent from "@/components/ui/loader";
 
 export const metadata: Metadata = {
-    title: "Privacy Policy",
-    description:
-        "Learn how Kamayakoi protects and manages your personal information in accordance with our privacy practices.",
+  title: "Privacy Policy",
+  description:
+    "Learn how Kamayakoi protects and manages your personal information in accordance with our privacy practices.",
 };
 
 export default function Page() {
-    return (
-        <Suspense fallback={<LoadingComponent />}>
-            <PrivacyClientPage />
-        </Suspense>
-    );
-} 
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <PrivacyClientPage />
+    </Suspense>
+  );
+}

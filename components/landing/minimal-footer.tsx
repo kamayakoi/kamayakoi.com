@@ -18,8 +18,10 @@ export default function MinimalFooter() {
   // const { currentLanguage } = useTranslation();
 
   // Pages where footer should appear as regular footer (not fixed)
-  const staticFooterPages = ['/artists', '/terms', '/privacy'];
-  const isStaticFooter = staticFooterPages.some(page => pathname?.includes(page));
+  const staticFooterPages = ["/artists", "/terms", "/privacy"];
+  const isStaticFooter = staticFooterPages.some((page) =>
+    pathname?.includes(page),
+  );
 
   useEffect(() => {
     // For static footer pages, always show

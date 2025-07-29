@@ -127,9 +127,8 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
             {/* Resident badge at bottom right */}
             {artist.isResident && (
               <div className="absolute bottom-3 right-3">
-                <div className="inline-flex items-center px-1.5 py-0.5 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-sm flex-shrink-0">
+                <div className="inline-flex items-center px-2 py-1 text-xs bg-green-200/80 dark:bg-green-800/50 text-green-900 dark:text-green-200 rounded-sm font-semibold">
                   <span className="relative flex h-2 w-2 mr-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                   </span>
                   Resident
@@ -139,7 +138,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
           </div>
 
           <div className="p-4">
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-2">
               <div className="hover-translate flex-1 min-w-0">
                 {(artist.socialHandle || artist.socialLink) && (
                   <div className="text-xl font-medium text-gray-700 dark:text-zinc-200 truncate">
@@ -158,7 +157,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
                   </div>
                 )}
                 {socialPlatform && (
-                  <div className="text-sm text-gray-500 dark:text-zinc-500 mt-1">
+                  <div className="text-sm text-gray-500 dark:text-zinc-500 mt-0">
                     {socialPlatform}
                   </div>
                 )}

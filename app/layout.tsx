@@ -7,7 +7,6 @@ import { Analytics } from "@vercel/analytics/react";
 import { TranslationProvider } from "@/lib/contexts/TranslationContext";
 import { MediaProvider } from "@/lib/contexts/MediaContext";
 import MusicWrapper from "@/components/landing/music-wrapper";
-import AudioPlayer from "@/components/landing/audio-player";
 import { getHomepageMusicTracks } from "@/lib/sanity/queries";
 
 // Bold geometric fonts matching the image style
@@ -71,20 +70,6 @@ export const metadata: Metadata = {
   // manifest: "/site.webmanifest",
 };
 
-// Safe AudioPlayer wrapper component
-function SafeAudioPlayer() {
-  try {
-    return (
-      <div className="hidden md:block fixed top-4 left-4 z-[70]">
-        <AudioPlayer />
-      </div>
-    );
-  } catch (error) {
-    console.log("🎵 SafeAudioPlayer - Failed to render AudioPlayer:", error);
-    return null;
-  }
-}
-
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -107,9 +92,6 @@ export default async function RootLayout({
           <TranslationProvider>
             <MusicWrapper tracks={musicTracks}>
               <MediaProvider>
-                {/* Global Desktop Audio Player - positioned in top-left */}
-                <SafeAudioPlayer />
-
                 <main className="flex-grow">{children}</main>
               </MediaProvider>
             </MusicWrapper>

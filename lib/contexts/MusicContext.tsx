@@ -31,7 +31,7 @@ interface MusicContextType {
   togglePlay: () => void;
   nextTrack: () => void;
   prevTrack: () => void;
-  setTrack: (index: number) => void;
+  setTrack: (index: number, autoPlay?: boolean) => void;
   seekTo: (time: number) => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
@@ -56,6 +56,14 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
   const [volume, setVolumeState] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
+
+  // Refs to avoid stale closures in callbacks and effects
+  const isPlayingRef = useRef(isPlaying);
+  const isStoppedRef = useRef(true); // Start as stopped until first play
+
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
 
   const currentTrack = tracks[currentTrackIndex] || null;
 
@@ -93,18 +101,13 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
   // Handle background playback - continue playing when app loses focus
   useEffect(() => {
     const handleVisibilityChange = () => {
-      // Don't pause when page becomes hidden - allow background playback
-      if (document.hidden) {
-        console.log("🎵 Page hidden - continuing background playback");
-      } else {
-        console.log("🎵 Page visible - resuming normal playback");
-      }
+      // This logic remains the same
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 
@@ -112,114 +115,97 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
   useEffect(() => {
     const handleUserInteraction = () => {
       setHasUserInteracted(true);
-      // Remove listeners after first interaction
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('touchstart', handleUserInteraction);
-      document.removeEventListener('keydown', handleUserInteraction);
+      document.removeEventListener("click", handleUserInteraction);
+      document.removeEventListener("touchstart", handleUserInteraction);
+      document.removeEventListener("keydown", handleUserInteraction);
     };
 
     if (!hasUserInteracted) {
-      document.addEventListener('click', handleUserInteraction);
-      document.addEventListener('touchstart', handleUserInteraction);
-      document.addEventListener('keydown', handleUserInteraction);
+      document.addEventListener("click", handleUserInteraction);
+      document.addEventListener("touchstart", handleUserInteraction);
+      document.addEventListener("keydown", handleUserInteraction);
     }
 
     return () => {
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('touchstart', handleUserInteraction);
-      document.removeEventListener('keydown', handleUserInteraction);
+      document.removeEventListener("click", handleUserInteraction);
+      document.removeEventListener("touchstart", handleUserInteraction);
+      document.removeEventListener("keydown", handleUserInteraction);
     };
   }, [hasUserInteracted]);
 
-  // Enhanced play function with autoplay handling
+  // Enhanced play function
   const play = useCallback(async () => {
     if (audioRef.current) {
       try {
+        isStoppedRef.current = false; // User wants to play
         await audioRef.current.play();
         setIsPlaying(true);
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
         console.log("🎵 Autoplay prevented:", errorMessage);
         setIsPlaying(false);
-
-        // If user hasn't interacted yet, wait for interaction
-        if (!hasUserInteracted) {
-          console.log("🎵 Waiting for user interaction to play music");
-        }
       }
     }
-  }, [hasUserInteracted]);
+  }, []);
 
   const pause = useCallback(() => {
     if (audioRef.current) {
-      console.log("🎵 Pausing audio - current state:", {
-        paused: audioRef.current.paused,
-        currentTime: audioRef.current.currentTime,
-        isPlaying
-      });
-
       audioRef.current.pause();
       setIsPlaying(false);
     }
-  }, [isPlaying]);
+  }, []);
 
   const stop = useCallback(() => {
     if (audioRef.current) {
       console.log("🎵 Stopping audio permanently");
+      isStoppedRef.current = true; // User explicitly stopped
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
       setIsPlaying(false);
       setCurrentTime(0);
-
-      // Force state update to ensure UI reflects stopped state
-      setTimeout(() => {
-        setIsPlaying(false);
-      }, 0);
     }
   }, []);
 
   const togglePlay = useCallback(() => {
     console.log("🎵 Toggle play called - current state:", {
-      isPlaying,
-      audioPaused: audioRef.current?.paused,
-      hasUserInteracted
+      isPlaying: isPlayingRef.current,
+      isAudioPaused: audioRef.current?.paused,
     });
-
-    // Use the actual audio element state for more reliable toggling
-    if (audioRef.current) {
-      if (audioRef.current.paused || audioRef.current.ended) {
-        play();
-      } else {
-        pause();
-      }
-    } else if (isPlaying) {
-      pause();
-    } else {
+    if (audioRef.current?.paused) {
       play();
+    } else {
+      pause();
     }
-  }, [isPlaying, pause, play, hasUserInteracted]);
+  }, [pause, play]);
 
-  const nextTrack = () => {
+  const nextTrack = useCallback(() => {
     if (tracks.length > 0) {
-      setCurrentTrackIndex((prev) =>
-        prev === tracks.length - 1 ? 0 : prev + 1,
+      setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
+    }
+  }, [tracks.length]);
+
+  const prevTrack = useCallback(() => {
+    if (tracks.length > 0) {
+      setCurrentTrackIndex(
+        (prev) => (prev - 1 + tracks.length) % tracks.length,
       );
     }
-  };
+  }, [tracks.length]);
 
-  const prevTrack = () => {
-    if (tracks.length > 0) {
-      setCurrentTrackIndex((prev) =>
-        prev === 0 ? tracks.length - 1 : prev - 1,
-      );
-    }
-  };
-
-  const setTrack = (index: number) => {
-    if (index >= 0 && index < tracks.length) {
-      setCurrentTrackIndex(index);
-    }
-  };
+  const setTrack = useCallback(
+    (index: number, autoPlay: boolean = true) => {
+      if (index >= 0 && index < tracks.length) {
+        if (!autoPlay) {
+          isStoppedRef.current = true;
+        } else {
+          isStoppedRef.current = false;
+        }
+        setCurrentTrackIndex(index);
+      }
+    },
+    [tracks.length],
+  );
 
   const seekTo = (time: number) => {
     if (audioRef.current && isFinite(time) && time >= 0) {
@@ -234,74 +220,52 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
     if (audioRef.current) {
       audioRef.current.volume = clampedVolume;
     }
-    if (clampedVolume === 0) {
-      setIsMuted(true);
-    } else if (isMuted) {
-      setIsMuted(false);
-    }
+    setIsMuted(clampedVolume === 0);
   };
 
   const toggleMute = () => {
     if (audioRef.current) {
-      if (isMuted) {
-        audioRef.current.volume = volume;
-        setIsMuted(false);
-      } else {
-        audioRef.current.volume = 0;
-        setIsMuted(true);
-      }
+      const newMuted = !isMuted;
+      audioRef.current.volume = newMuted ? 0 : volume;
+      setIsMuted(newMuted);
     }
   };
 
-  // Track change logic - preserve state during navigation
+  // Effect to handle track changes
   useEffect(() => {
-    // Only reset if we're actually changing to a different track
-    // This prevents resetting when navigating between pages
-    if (audioRef.current && audioRef.current.src !== currentTrack?.audioUrl) {
+    if (!audioRef.current || !currentTrack) return;
+
+    const isNewSrc = audioRef.current.src !== currentTrack.audioUrl;
+
+    if (isNewSrc) {
+      const wasPlaying = isPlayingRef.current;
       setCurrentTime(0);
       setDuration(0);
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      // Load the new track
+      audioRef.current.src = currentTrack.audioUrl;
       audioRef.current.load();
 
-      // Auto-play if we were already playing or if it's the first track
-      setIsPlaying(prevIsPlaying => {
-        const shouldPlay = prevIsPlaying || currentTrackIndex === 0;
+      const shouldPlay =
+        (wasPlaying || currentTrackIndex === 0) && !isStoppedRef.current;
 
-        if (shouldPlay) {
-          const playNewTrack = () => {
-            if (audioRef.current) {
-              audioRef.current.play().then(() => {
-                setIsPlaying(true);
-              }).catch(err => {
-                console.error("Auto-play prevented:", err);
-                setIsPlaying(false);
-              });
-            }
-          };
-
-          // Small delay to ensure the track is loaded
-          setTimeout(playNewTrack, 100);
-          return true;
-        } else {
-          return false;
-        }
+      console.log("🎵 Track change:", {
+        wasPlaying,
+        isStopped: isStoppedRef.current,
+        shouldPlay,
       });
-    } else {
-      // Same track - preserve playing state during navigation
-      if (audioRef.current && audioRef.current.paused) {
-        setIsPlaying(prevIsPlaying => {
-          if (prevIsPlaying) {
-            audioRef.current!.play().catch(err => {
-              console.error("Resume play prevented:", err);
-            });
-          }
-          return prevIsPlaying;
-        });
+
+      if (shouldPlay) {
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.error("🎵 Auto-play on track change failed:", error);
+            setIsPlaying(false);
+          });
+        }
+      } else {
+        setIsPlaying(false);
       }
     }
-  }, [currentTrackIndex, currentTrack?.audioUrl]); // Removed isPlaying from dependencies
+  }, [currentTrack, currentTrackIndex]);
 
   // Initialize audio volume
   useEffect(() => {
@@ -335,22 +299,18 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
   return (
     <MusicContext.Provider value={value}>
       {children}
-      {/* Global audio element */}
-      {currentTrack && (
-        <audio
-          ref={audioRef}
-          src={currentTrack.audioUrl}
-          onTimeUpdate={handleTimeUpdate}
-          onEnded={handleEnded}
-          onLoadStart={handleLoadStart}
-          onPlay={handlePlay}
-          onPause={handlePause}
-          onLoadedMetadata={handleLoadedMetadata}
-          className="hidden"
-          preload="metadata"
-          playsInline
-        />
-      )}
+      <audio
+        ref={audioRef}
+        onTimeUpdate={handleTimeUpdate}
+        onEnded={handleEnded}
+        onLoadStart={handleLoadStart}
+        onPlay={handlePlay}
+        onPause={handlePause}
+        onLoadedMetadata={handleLoadedMetadata}
+        className="hidden"
+        preload="metadata"
+        playsInline
+      />
     </MusicContext.Provider>
   );
 }

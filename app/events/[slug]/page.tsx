@@ -260,11 +260,12 @@ async function EventPageContent({
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
             {/* Event Flyer/Video - Enhanced with better shadows and effects */}
             <div className="lg:col-span-2 relative">
-              <div className="relative aspect-[2/3] rounded-lg overflow-hidden shadow-2xl bg-gradient-to-br from-muted to-muted/50 border border-border/20">
+              <div className="relative aspect-[3/4] rounded-lg overflow-hidden shadow-2xl bg-gradient-to-br from-muted to-muted/50 border border-border/20">
                 <EventMediaDisplay
                   flyerUrl={event.flyer?.url}
                   promoVideoUrl={event.promoVideoUrl}
                   eventTitle={event.title}
+                  eventSlug={slug}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
               </div>

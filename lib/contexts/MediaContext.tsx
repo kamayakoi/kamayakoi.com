@@ -6,6 +6,7 @@ import React, {
     useState,
     useEffect,
     ReactNode,
+    useCallback,
 } from "react";
 import { useMusic } from "./MusicContext";
 
@@ -14,9 +15,19 @@ interface MediaContextType {
     setActiveVideo: (index: number | null) => void;
     isVideoPlaying: boolean;
     setVideoPlaying: (playing: boolean) => void;
-    videoStates: Record<string, { currentTime: number; muted: boolean; wasPlaying: boolean }>;
-    saveVideoState: (slug: string, currentTime: number, muted: boolean, wasPlaying: boolean) => void;
-    getVideoState: (slug: string) => { currentTime: number; muted: boolean; wasPlaying: boolean } | null;
+    videoStates: Record<
+        string,
+        { currentTime: number; muted: boolean; wasPlaying: boolean }
+    >;
+    saveVideoState: (
+        slug: string,
+        currentTime: number,
+        muted: boolean,
+        wasPlaying: boolean,
+    ) => void;
+    getVideoState: (
+        slug: string,
+    ) => { currentTime: number; muted: boolean; wasPlaying: boolean } | null;
 }
 
 const MediaContext = createContext<MediaContextType | undefined>(undefined);
@@ -28,81 +39,81 @@ interface MediaProviderProps {
 export function MediaProvider({ children }: MediaProviderProps) {
     const [activeVideoIndex, setActiveVideoIndex] = useState<number | null>(null);
     const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-    const [videoStates, setVideoStates] = useState<Record<string, { currentTime: number; muted: boolean; wasPlaying: boolean }>>({});
+    const [videoStates, setVideoStates] = useState<
+        Record<string, { currentTime: number; muted: boolean; wasPlaying: boolean }>
+    >({});
 
-    const { pause: pauseMusic, play: playMusic } = useMusic();
+    const { pause: pauseMusic, isPlaying: isMusicPlaying } = useMusic();
 
     // Coordinate video and audio playback
     useEffect(() => {
         if (isVideoPlaying && activeVideoIndex !== null) {
-            // Pause music when video is playing
-            pauseMusic();
-        } else if (!isVideoPlaying && activeVideoIndex === null) {
-            // Resume music when no video is playing
-            const timer = setTimeout(async () => {
-                try {
-                    await playMusic();
-                } catch (err: unknown) {
-                    console.log("Music resume prevented:", err);
-                }
-            }, 500); // Small delay to avoid conflicts
-
-            return () => clearTimeout(timer);
+            if (isMusicPlaying) {
+                pauseMusic();
+            }
         }
-    }, [isVideoPlaying, activeVideoIndex, pauseMusic, playMusic]);
+    }, [isVideoPlaying, activeVideoIndex, pauseMusic, isMusicPlaying]);
 
-    const setActiveVideo = (index: number | null) => {
+    const setActiveVideo = useCallback((index: number | null) => {
         setActiveVideoIndex(index);
-    };
+    }, []);
 
-    const setVideoPlaying = (playing: boolean) => {
+    const setVideoPlaying = useCallback((playing: boolean) => {
         setIsVideoPlaying(playing);
-    };
+    }, []);
 
-    const saveVideoState = (slug: string, currentTime: number, muted: boolean, wasPlaying: boolean) => {
-        setVideoStates(prev => ({
-            ...prev,
-            [slug]: { currentTime, muted, wasPlaying }
-        }));
+    const saveVideoState = useCallback(
+        (
+            slug: string,
+            currentTime: number,
+            muted: boolean,
+            wasPlaying: boolean,
+        ) => {
+            setVideoStates((prev) => ({
+                ...prev,
+                [slug]: { currentTime, muted, wasPlaying },
+            }));
 
-        // Debounced localStorage save to reduce performance impact
-        setTimeout(() => {
+            // Debounced localStorage save to reduce performance impact
+            setTimeout(() => {
+                try {
+                    localStorage.setItem(
+                        `video-state-${slug}`,
+                        JSON.stringify({
+                            currentTime,
+                            muted,
+                            wasPlaying,
+                        }),
+                    );
+                } catch {
+                    // Ignore localStorage errors
+                }
+            }, 1000);
+        },
+        [],
+    );
+
+    const getVideoState = useCallback(
+        (slug: string) => {
+            // First check in-memory state
+            if (videoStates[slug]) {
+                return videoStates[slug];
+            }
+
+            // Then check localStorage
             try {
-                localStorage.setItem(`video-state-${slug}`, JSON.stringify({
-                    currentTime,
-                    muted,
-                    wasPlaying
-                }));
+                const stored = localStorage.getItem(`video-state-${slug}`);
+                if (stored) {
+                    return JSON.parse(stored);
+                }
             } catch {
                 // Ignore localStorage errors
             }
-        }, 1000);
-    };
 
-    const getVideoState = (slug: string) => {
-        // First check in-memory state
-        if (videoStates[slug]) {
-            return videoStates[slug];
-        }
-
-        // Then check localStorage only once
-        try {
-            const stored = localStorage.getItem(`video-state-${slug}`);
-            if (stored) {
-                const state = JSON.parse(stored);
-                // Update in-memory state
-                setVideoStates(prev => ({
-                    ...prev,
-                    [slug]: state
-                }));
-                return state;
-            }
-        } catch {
-            // Ignore localStorage errors
-        }
-
-        return null;
-    };
+            return null;
+        },
+        [videoStates],
+    );
 
     const value: MediaContextType = {
         activeVideoIndex,
@@ -115,9 +126,7 @@ export function MediaProvider({ children }: MediaProviderProps) {
     };
 
     return (
-        <MediaContext.Provider value={value}>
-            {children}
-        </MediaContext.Provider>
+        <MediaContext.Provider value={value}>{children}</MediaContext.Provider>
     );
 }
 

@@ -188,11 +188,13 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
   const transforms = [transform1, transform2, transform3, transform4, transform5];
 
   const handleImageClick = (slug: string, index: number) => {
-    // Save current video state before navigation
-    if (videoRefs.current[index] && displayEvents[index]?.promoVideoUrl) {
-      const video = videoRefs.current[index]!;
-      saveVideoState(slug, video.currentTime, video.muted, !video.paused);
-    }
+    // Defer saving video state until after render cycle
+    setTimeout(() => {
+      if (videoRefs.current[index] && displayEvents[index]?.promoVideoUrl) {
+        const video = videoRefs.current[index]!;
+        saveVideoState(slug, video.currentTime, video.muted, !video.paused);
+      }
+    }, 0);
 
     router.push(`/events/${slug}`);
   };
@@ -285,7 +287,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                 sectionRefs.current[index] = el;
               }}
             >
-              <div className="w-[500px] h-[600px] md:w-[350px] md:h-[467px] lg:w-[500px] lg:h-[600px] m-5 bg-gray-100 overflow-hidden relative rounded-lg shadow-2xl">
+              <div className="w-[300px] h-[400px] md:w-[350px] md:h-[467px] lg:w-[500px] lg:h-[600px] m-5 mt-16 bg-gray-100 overflow-hidden relative rounded-lg shadow-2xl">
                 {hasVideo && currentShowVideo ? (
                   <div className="relative w-full h-full overflow-hidden rounded">
                     <video
@@ -336,7 +338,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                           className="p-2 bg-black/10 hover:bg-black/30 rounded-sm text-white focus:outline-none transition-colors duration-200"
                           aria-label="Switch to image"
                         >
-                          <ImageIcon size={18} />
+                          <ImageIcon size={16} />
                         </button>
                       )}
                     </div>
@@ -368,7 +370,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                           className="p-2 bg-black/10 hover:bg-black/30 rounded-sm text-white focus:outline-none transition-colors duration-200"
                           aria-label="Switch to video"
                         >
-                          <Play size={18} />
+                          <Play size={16} />
                         </button>
                       </div>
                     )}
@@ -379,17 +381,17 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                   className="fixed top-4/4 right-4 md:right-96 transform -translate-y-1/2 text-white font-black pointer-events-none z-30"
                   style={{
                     y: transforms[index],
-                    fontSize: '60px',
+                    fontSize: 'clamp(2rem, 10vw, 3.75rem)',
                     fontFamily: '"Inter", "Helvetica Neue", Arial, sans-serif',
-                    letterSpacing: '-6px',
+                    letterSpacing: '-4px',
                     lineHeight: '0.8',
                     color: '#ff6b6b',
                     textShadow: `
-                      0 0 20px rgba(255, 107, 107, 0.8),
-                      0 0 40px rgba(255, 107, 107, 0.6),
-                      4px 4px 20px rgba(0, 0, 0, 0.9)
+                      0 0 10px rgba(255, 107, 107, 0.6),
+                      0 0 20px rgba(255, 107, 107, 0.4),
+                      2px 2px 10px rgba(0, 0, 0, 0.7)
                     `,
-                    filter: 'drop-shadow(0 0 10px rgba(255, 107, 107, 0.7))'
+                    filter: 'drop-shadow(0 0 5px rgba(255, 107, 107, 0.5))'
                   }}
                 >
                   {getDisplayNumber(event, index)}

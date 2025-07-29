@@ -21,14 +21,14 @@ export default function TermsClientPage() {
       <main className="flex-grow container mx-auto px-4 sm:px-6 py-12 md:py-16">
         <article className="max-w-4xl mx-auto">
           {/* Header Section */}
-          <div className="text-center mb-12 md:mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
+          <div className="mb-8 mt-8 md:mb-12 md:mt-12">
+            <h1 className="text-4xl font-bold text-primary mb-4 md:text-5xl">
               {t(currentLanguage, "termsPage.title")}
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-4 max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-muted-foreground mb-4 max-w-2xl">
               {t(currentLanguage, "termsPage.subtitle")}
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground text-right">
               {t(currentLanguage, "termsPage.lastUpdated", {
                 date: formattedDate,
               })}

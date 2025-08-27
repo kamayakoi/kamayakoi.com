@@ -8,6 +8,7 @@ import {
 import Header from "@/components/landing/header";
 import { t } from "@/lib/i18n/translations";
 import LoadingComponent from "@/components/ui/loader";
+import { Footer } from "@/components/landing/footer";
 
 const getPageLocale = (params?: { locale?: string }): string => {
   return params?.locale || process.env.NEXT_PUBLIC_DEFAULT_LOCALE || "en";
@@ -36,6 +37,7 @@ async function EventsContent() {
         <main className="container mx-auto py-20 px-4 flex-grow">
           {/* Removed title and no events message */}
         </main>
+        <Footer />
       </div>
     );
   }

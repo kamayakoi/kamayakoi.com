@@ -125,7 +125,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
             {badge && !artist.isResident && (
               <div className="absolute top-6 right-6">
                 <span
-                  className={`px-3 py-1 text-xs font-bold text-white rounded-full ${badge.color} badge-pulse`}
+                  className={`px-3 py-1 text-xs font-bold text-white rounded-sm ${badge.color} badge-pulse`}
                 >
                   {badge.label}
                 </span>
@@ -137,7 +137,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
               <div className="absolute bottom-3 right-3">
                 <div className="inline-flex items-center px-2 py-1 text-xs bg-green-200/80 dark:bg-green-800/50 text-green-900 dark:text-green-200 rounded-sm font-semibold">
                   <span className="relative flex h-2 w-2 mr-1.5">
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    <span className="relative inline-flex rounded-sm h-2 w-2 bg-green-500"></span>
                   </span>
                   Resident
                 </div>
@@ -180,9 +180,8 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
             {artist.bio && (
               <div className="mb-4">
                 <div
-                  className={`text-gray-700 dark:text-gray-300 text-sm leading-relaxed transition-all duration-300 ${
-                    isExpanded ? "max-h-none" : "max-h-6 overflow-hidden"
-                  }`}
+                  className={`text-gray-700 dark:text-gray-300 text-sm leading-relaxed transition-all duration-300 ${isExpanded ? "max-h-none" : "max-h-6 overflow-hidden"
+                    }`}
                 >
                   {artist.bio.split("\n").map((line, index) => {
                     const trimmedLine = line.trim();

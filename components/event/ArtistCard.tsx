@@ -57,7 +57,7 @@ export default function ArtistCard({
             <div className="absolute bottom-3 right-3">
               <div className="inline-flex items-center px-2 py-1 text-xs bg-green-200/80 dark:bg-green-800/50 text-green-900 dark:text-green-200 rounded-sm font-semibold">
                 <span className="relative flex h-2 w-2 mr-1.5">
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  <span className="relative inline-flex rounded-sm h-2 w-2 bg-green-500"></span>
                 </span>
                 {t(currentLanguage, "artistCard.residentBadge")}
               </div>
@@ -77,7 +77,7 @@ export default function ArtistCard({
                 {artist.isResident && (
                   <div className="inline-flex items-center px-2 py-1 text-xs bg-green-200/80 dark:bg-green-800/50 text-green-900 dark:text-green-200 rounded-sm font-semibold">
                     <span className="relative flex h-2 w-2 mr-1.5">
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                      <span className="relative inline-flex rounded-sm h-2 w-2 bg-green-500"></span>
                     </span>
                     <span className="font-medium">
                       {t(currentLanguage, "artistCard.residentBadge")}

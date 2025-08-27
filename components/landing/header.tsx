@@ -67,9 +67,6 @@ export default function Header() {
                   className={`${styles.navLink} ${styles.disabledNavLink}`}
                 >
                   {t(currentLanguage, item.nameKey)}
-                  <span className={styles.comingSoonBadge}>
-                    {t(currentLanguage, "header.nav.soon")}
-                  </span>
                 </span>
               );
             }
@@ -81,12 +78,6 @@ export default function Header() {
                   className={`${styles.navLink} ${isActive(item.path) ? styles.activeNavLink : ""}`}
                 >
                   {t(currentLanguage, item.nameKey)}
-                  <span
-                    className={styles.comingSoonBadge}
-                    style={{ marginLeft: "8px" }}
-                  >
-                    {t(currentLanguage, "header.nav.soon")}
-                  </span>
                 </Link>
               );
             }
@@ -116,7 +107,7 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent
               side="top"
-              className={`${styles.customSheetContent} bg-zinc-900 text-white h-screen w-screen p-16 duration-200 flex flex-col items-start justify-start`}
+              className={`${styles.customSheetContent} bg-black dark:bg-[#2A2522] text-white h-screen w-screen p-16 duration-200 flex flex-col items-start justify-start`}
             >
               <SheetTitle className="sr-only">
                 {t(currentLanguage, "header.mobileMenu.title")}
@@ -146,9 +137,6 @@ export default function Header() {
                         className={`${styles.mobileNavLink} ${styles.disabledMobileNavLink}`}
                       >
                         {t(currentLanguage, item.nameKey)}
-                        <span className={styles.comingSoonBadge}>
-                          {t(currentLanguage, "header.nav.soon")}
-                        </span>
                       </div>
                     );
                   }
@@ -160,15 +148,6 @@ export default function Header() {
                           className={`${styles.mobileNavLink} ${isActive(item.path) ? styles.activeMobileNavLink : ""} text-3xl font-semibold text-white hover:text-gray-400 border-none`}
                         >
                           {t(currentLanguage, item.nameKey)}
-                          <span
-                            className={styles.comingSoonBadge}
-                            style={{
-                              marginLeft: "8px",
-                              fontSize: "0.5em",
-                            }}
-                          >
-                            {t(currentLanguage, "header.nav.soon")}
-                          </span>
                         </Link>
                       </SheetClose>
                     );

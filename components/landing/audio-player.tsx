@@ -42,13 +42,13 @@ const CustomSlider = ({
   return (
     <div
       className={cn(
-        "relative w-full h-1 bg-white/20 rounded-full cursor-pointer",
+        "relative w-full h-1 bg-white/20 rounded-sm cursor-pointer",
         className,
       )}
       onClick={handleClick}
     >
       <motion.div
-        className="absolute top-0 left-0 h-full bg-white rounded-full"
+        className="absolute top-0 left-0 h-full bg-white rounded-sm"
         style={{ width: `${value}%` }}
         initial={{ width: 0 }}
         animate={{ width: `${value}%` }}
@@ -175,7 +175,7 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
 
           {/* Playing indicator */}
           {isPlaying && (
-            <div className="absolute bottom-1 right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="absolute bottom-1 right-1 w-2 h-2 bg-green-500 rounded-sm animate-pulse"></div>
           )}
         </div>
       </motion.div>

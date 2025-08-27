@@ -5,7 +5,7 @@ import Header from "@/components/landing/header";
 import { ArtistCard } from "@/components/ui/artist-card";
 import LoadingComponent from "@/components/ui/loader";
 import MiniAudioPlayer from "@/components/landing/mini-audio-player";
-import MinimalFooter from "@/components/landing/minimal-footer";
+import { Footer } from "@/components/landing/footer";
 
 export const metadata: Metadata = {
   title: "Artists",
@@ -34,7 +34,7 @@ async function ArtistsContent() {
           </div>
         </div>
       </main>
-      <MinimalFooter />
+      <Footer />
     </div>
   );
 }

@@ -621,7 +621,7 @@ export default function AdminPage() {
                                 )}
                                 {purchase.email_dispatch_error && (
                                   <div
-                                    className="w-4 h-4 flex items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 cursor-help"
+                                    className="w-4 h-4 flex items-center justify-center rounded-sm bg-red-100 dark:bg-red-900/30 cursor-help"
                                     title={purchase.email_dispatch_error}
                                   >
                                     <AlertCircle className="w-3 h-3 text-red-600 dark:text-red-400" />
@@ -786,8 +786,8 @@ export default function AdminPage() {
             <DialogHeader>
               <DialogTitle className="text-gray-100">
                 {selectedPurchase &&
-                (selectedPurchase.email_dispatch_status === "NOT_INITIATED" ||
-                  selectedPurchase.email_dispatch_attempts === 0)
+                  (selectedPurchase.email_dispatch_status === "NOT_INITIATED" ||
+                    selectedPurchase.email_dispatch_attempts === 0)
                   ? "Send Ticket Email"
                   : "Resend Ticket Email"}
               </DialogTitle>
@@ -875,7 +875,7 @@ export default function AdminPage() {
                       <>
                         {selectedPurchase.email_dispatch_status ===
                           "NOT_INITIATED" ||
-                        selectedPurchase.email_dispatch_attempts === 0 ? (
+                          selectedPurchase.email_dispatch_attempts === 0 ? (
                           <>
                             <Send className="h-4 w-4 mr-2" />
                             Send Email

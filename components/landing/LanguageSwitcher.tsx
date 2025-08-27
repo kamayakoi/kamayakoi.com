@@ -1,3 +1,5 @@
+"use client";
+
 import { memo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";

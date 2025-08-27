@@ -24,7 +24,7 @@ const CustomSlider = ({
   return (
     <motion.div
       className={cn(
-        "relative w-full h-1 bg-white/20 rounded-full cursor-pointer",
+        "relative w-full h-1 bg-white/20 rounded-sm cursor-pointer",
         className,
       )}
       onClick={(e) => {
@@ -35,7 +35,7 @@ const CustomSlider = ({
       }}
     >
       <motion.div
-        className="absolute top-0 left-0 h-full bg-white rounded-full"
+        className="absolute top-0 left-0 h-full bg-white rounded-sm"
         style={{ width: `${value}%` }}
         initial={{ width: 0 }}
         animate={{ width: `${value}%` }}

@@ -1,6 +1,6 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Bebas_Neue, Oswald } from "next/font/google";
+import { Geist_Mono } from 'next/font/google'
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
@@ -9,18 +9,11 @@ import { MediaProvider } from "@/lib/contexts/MediaContext";
 import MusicWrapper from "@/components/landing/music-wrapper";
 import { getHomepageMusicTracks } from "@/lib/sanity/queries";
 
-// Bold geometric fonts matching the image style
-const bebasNeue = Bebas_Neue({
-  subsets: ["latin"],
-  variable: "--font-bebas-neue",
-  weight: ["400"],
-});
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+})
 
-const oswald = Oswald({
-  subsets: ["latin"],
-  variable: "--font-oswald",
-  weight: ["300", "400", "500", "600", "700"],
-});
 
 const siteConfig = {
   name: "Kamayakoi",
@@ -81,7 +74,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${bebasNeue.variable} ${oswald.variable} font-oswald flex flex-col min-h-screen`}
+        className={`${geistMono.variable} font-sans flex flex-col min-h-screen`}
       >
         <MusicWrapper tracks={musicTracks}>
           <ThemeProvider

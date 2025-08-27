@@ -26,7 +26,6 @@ export function HeroSection({ contentItems = [] }: HeroSectionProps) {
     const [showLeftArrow, setShowLeftArrow] = useState(false);
     const [showRightArrow, setShowRightArrow] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
-    const bgVideoRef = useRef<HTMLVideoElement>(null);
 
     // Default content items (will be replaced with Sanity data later)
     const defaultContent: ContentItem[] = [

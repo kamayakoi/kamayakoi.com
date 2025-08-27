@@ -47,7 +47,7 @@ export default function Header() {
     { nameKey: "header.nav.home", path: "/" },
     { nameKey: "header.nav.events", path: "/events" },
     { nameKey: "header.nav.room", path: "/artists" },
-    { nameKey: "header.nav.blog", path: "/blog", isComingSoon: true },
+    { nameKey: "header.nav.blog", path: "/stories" },
     { nameKey: "header.nav.gallery", path: "/gallery", isComingSoon: true },
     { nameKey: "header.nav.shop", path: "/shop", isComingSoon: true },
   ];

@@ -74,7 +74,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
             transition={{ duration: 0.6 }}
           >
             {selectedImage ? (
-              <div className="aspect-square relative overflow-hidden rounded-lg bg-muted">
+              <div className="aspect-square relative overflow-hidden rounded-sm bg-muted">
                 <Image
                   src={
                     typeof selectedImage === "string"
@@ -100,7 +100,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 />
               </div>
             ) : (
-              <div className="aspect-square relative overflow-hidden rounded-lg bg-muted flex items-center justify-center">
+              <div className="aspect-square relative overflow-hidden rounded-sm bg-muted flex items-center justify-center">
                 <span className="text-muted-foreground">
                   No Image Available
                 </span>
@@ -114,11 +114,10 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`aspect-square relative overflow-hidden rounded-md bg-muted transition-all ${
-                      selectedImageIndex === index
-                        ? "ring-2 ring-primary"
-                        : "hover:ring-2 hover:ring-muted-foreground/50"
-                    }`}
+                    className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all ${selectedImageIndex === index
+                      ? "ring-2 ring-primary"
+                      : "hover:ring-2 hover:ring-muted-foreground/50"
+                      }`}
                   >
                     <Image
                       src={image.url}

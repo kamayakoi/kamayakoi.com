@@ -155,10 +155,10 @@ export default function Blog() {
       imageUrl={
         filteredPosts.length > 0 && filteredPosts[0]?.image
           ? urlFor(filteredPosts[0].image)
-              .width(1200)
-              .height(630)
-              .quality(90)
-              .url()
+            .width(1200)
+            .height(630)
+            .quality(90)
+            .url()
           : undefined
       }
     >
@@ -208,7 +208,7 @@ export default function Blog() {
           </div>
         ) : filteredPosts.length === 0 ? (
           <motion.div
-            className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg p-8 mb-20"
+            className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-sm p-8 mb-20"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}

@@ -2,21 +2,101 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
-
+import { ArrowRight, Loader2 } from "lucide-react";
+import { useState } from "react";
 import { IG } from "@/components/icons/IG";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { FacebookIcon } from "@/components/icons/FacebookIcon";
 import { Soundcloud } from "@/components/icons/Soundcloud";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { toast } from "@/components/ui/sonner";
+import { sendEmail } from "@/lib/actions/send-email";
+
+// Contact Form Component
+function ContactForm({ onClose }: { onClose: () => void }) {
+  const [isPending, setIsPending] = useState(false);
+
+  async function handleSubmit(formData: FormData) {
+    setIsPending(true);
+    try {
+      const result = await sendEmail(formData);
+
+      if (result.success) {
+        toast(result.success);
+        onClose();
+      } else {
+        toast(result.error || "Failed to send email");
+      }
+    } catch {
+      toast("Failed to send email");
+    } finally {
+      setIsPending(false);
+    }
+  }
+
+  return (
+    <form action={handleSubmit} className="space-y-6">
+      <div className="space-y-4">
+        <label htmlFor="email" className="block text-lg text-gray-700 dark:text-gray-300 font-medium">
+          Email address
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Enter your email"
+          required
+          className="w-full bg-white dark:bg-[#1a1a1a] rounded-sm p-4 text-base border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 placeholder:text-gray-500 dark:placeholder:text-gray-400 text-gray-900 dark:text-white transition-colors focus:bg-white dark:focus:bg-[#1a1a1a]"
+        />
+      </div>
+
+      <div className="space-y-4">
+        <label htmlFor="message" className="block text-lg text-gray-700 dark:text-gray-300 font-medium">
+          How can we help?
+        </label>
+        <textarea
+          id="message"
+          name="message"
+          placeholder="Enter your message"
+          required
+          rows={6}
+          className="w-full bg-white dark:bg-[#1a1a1a] rounded-sm p-4 text-base border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 placeholder:text-gray-500 dark:placeholder:text-gray-400 text-gray-900 dark:text-white transition-colors resize-none focus:bg-white dark:focus:bg-[#1a1a1a]"
+        />
+      </div>
+
+      <div className="flex flex-col sm:flex-row items-center justify-end space-y-4 sm:space-y-0">
+        <button
+          type="submit"
+          disabled={isPending}
+          className="bg-gray-800 hover:bg-blue-700 dark:bg-gray-200 dark:hover:bg-blue-300 text-white dark:text-black px-8 py-4 rounded-sm text-base font-medium inline-flex items-center justify-center gap-2 transition-all duration-300 ease-in-out disabled:opacity-50 disabled:hover:bg-blue-600 dark:disabled:hover:bg-blue-400 min-w-[180px] h-[60px] w-full sm:w-auto"
+        >
+          {isPending ? (
+            <Loader2 className="w-6 h-6 animate-spin" />
+          ) : (
+            <>
+              <span>Send Message</span>
+              <ArrowRight className="w-6 h-6" />
+            </>
+          )}
+        </button>
+      </div>
+    </form>
+  );
+}
 
 export function Footer() {
-  const { setTheme, theme } = useTheme();
+  const [isContactOpen, setIsContactOpen] = useState(false);
 
   return (
     // Card with rounded corners
     <footer className="relative p-4 md:p-6">
-      <div className="w-full md:h-[532px] p-4 md:p-11 text-white bg-black dark:bg-[#1a1a1a] rounded-sm flex flex-col justify-between max-md:gap-8">
+      <div className="w-full md:h-[532px] p-4 md:p-11 text-white bg-gray-900 dark:bg-[#1a1a1a] rounded-sm flex flex-col justify-between max-md:gap-8">
         <div className="flex flex-col justify-between md:flex-row relative">
           <div className="md:basis-3/4 max-md:w-full max-w-[1200px] h-auto">
             <div className="mb-6 mt-8 md:mb-4 md:mt-0 flex justify-center md:justify-start">
@@ -97,7 +177,7 @@ export function Footer() {
                     href="/"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
-                    Le Rendez Vous Sauvage
+                    RENDEZ-VOUS SAUVAGE
                   </Link>
                 </li>
                 <li>
@@ -151,12 +231,21 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href=""
-                    className="text-white/70 hover:text-white transition-colors text-sm font-light"
-                  >
-                    Contact
-                  </Link>
+                  <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
+                    <DialogTrigger asChild>
+                      <button className="text-white/70 hover:text-white transition-colors text-sm font-light text-left">
+                        Contact
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[600px] bg-gray-900 dark:bg-[#1a1a1a] border-gray-700 dark:border-gray-600 rounded-sm p-6 md:p-11">
+                      <DialogHeader>
+                        <DialogTitle className="text-3xl font-normal text-gray-900 dark:text-white text-center mb-8">
+                          Get in touch
+                        </DialogTitle>
+                      </DialogHeader>
+                      <ContactForm onClose={() => setIsContactOpen(false)} />
+                    </DialogContent>
+                  </Dialog>
                 </li>
               </ul>
             </div>
@@ -239,27 +328,9 @@ export function Footer() {
             >
               <IG className="h-[17px] w-[17px]" />
             </Link>
-            <button
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-              className="flex items-center justify-center hover:text-white transition-colors cursor-pointer ml-2"
-              aria-label="Toggle theme"
-            >
-              <Sun className="w-4 h-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute w-4 h-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            </button>
           </div>
 
-          {/* Theme Toggle - Desktop Only */}
-          <div className="hidden md:flex items-center gap-3 text-xs font-mono">
-            <button
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-              className="flex items-center justify-center hover:text-white transition-colors cursor-pointer"
-              aria-label="Toggle theme"
-            >
-              <Sun className="w-4 h-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute w-4 h-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            </button>
-          </div>
+
         </div>
       </div>
     </footer>

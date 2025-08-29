@@ -52,7 +52,7 @@ async function StoriesContent() {
   return (
     <div className="min-h-screen">
       {/* Mini Audio Player */}
-      <div className="fixed top-4 left-4 z-[60]">
+      <div className="fixed top-[13px] md:top-4 left-4 z-[60] pointer-events-auto">
         <MiniAudioPlayer />
       </div>
 

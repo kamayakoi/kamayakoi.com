@@ -51,14 +51,14 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Light mode commented out - app is now dark mode only */
+/*
 :root {
   --radius: 0.625rem;
-  /* Custom spacing variables for shop layout */
   --sides: 1rem;
   --modal-sides: 1.5rem;
   --top-spacing: 2rem;
   --height-fold: 100vh;
-  /* Light mode - clean white background */
   --background: #ffffff;
   --foreground: #000000;
   --card: #ffffff;
@@ -91,6 +91,7 @@
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
 }
+*/
 
 .dark {
   /* Dark mode - cool dark gray theme */
@@ -146,14 +147,22 @@
     color: inherit !important;
   }
 
-  /* Remove all borders on hover and focus */
+  /* Remove borders on hover and focus for non-form elements */
   *:hover,
-  *:focus,
   *:focus-visible,
   *:active {
     outline: none !important;
     border-color: transparent !important;
     box-shadow: none !important;
+  }
+
+  /* Allow focus states on form elements */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(107 114 128 / 0.5) !important;
+    background-color: inherit !important;
   }
 
   /* Remove selection borders */
@@ -163,10 +172,6 @@
     color: inherit;
   }
 
-  /* Remove focus rings */
-  input:focus,
-  textarea:focus,
-  select:focus,
   button:focus {
     outline: none !important;
     box-shadow: none !important;

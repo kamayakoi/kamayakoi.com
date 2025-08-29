@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/react";
 import { TranslationProvider } from "@/lib/contexts/TranslationContext";
 import { MediaProvider } from "@/lib/contexts/MediaContext";
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
     default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
+    template: `%s`,
   },
   description: siteConfig.description,
   icons: {
@@ -89,6 +90,7 @@ export default async function RootLayout({
             </TranslationProvider>
           </ThemeProvider>
         </MusicWrapper>
+        <Toaster />
         <Analytics />
       </body>
     </html>

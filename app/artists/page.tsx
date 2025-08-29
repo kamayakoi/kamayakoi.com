@@ -1,13 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getAllArtists, type ArtistData } from "@/lib/sanity/queries";
-import Header from "@/components/landing/header";
-
 import LoadingComponent from "@/components/ui/loader";
-import MiniAudioPlayer from "@/components/landing/mini-audio-player";
-import { Footer } from "@/components/landing/footer";
-import ArtistCard from "@/components/ui/artist-card";
-import ArtistsContentClient from "./artists-content-client";
+import ArtistsContentClient from "@/app/artists/artists-content-client";
 
 export const metadata: Metadata = {
   title: "Artists | Kamayakoi",

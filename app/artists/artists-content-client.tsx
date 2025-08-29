@@ -17,7 +17,7 @@ export default function ArtistsContentClient({
   return (
     <div className="min-h-screen bg-background">
       {/* Mini Audio Player */}
-      <div className="fixed top-4 left-4 z-[60] pointer-events-auto">
+      <div className="fixed top-[13px] md:top-4 left-4 z-[60] pointer-events-auto">
         <MiniAudioPlayer />
       </div>
 
@@ -69,7 +69,7 @@ export default function ArtistsContentClient({
             </motion.div>
           ) : (
             <motion.div
-              className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg p-8 mb-20"
+              className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-sm p-8 mb-20"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}

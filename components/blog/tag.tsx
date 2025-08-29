@@ -19,7 +19,7 @@ const Tag = ({
   return (
     <span
       className={cn(
-        "inline-flex items-center font-medium border rounded-full transition-colors",
+        "inline-flex items-center font-medium border rounded-sm transition-colors",
         {
           // Variants
           "bg-primary text-primary-foreground border-primary":

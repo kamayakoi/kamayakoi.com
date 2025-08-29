@@ -71,7 +71,7 @@ export default function TitleBox({
               {categories.map((category, index) => (
                 <span
                   key={index}
-                  className="px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground rounded-full border border-border"
+                  className="px-3 py-1 text-xs font-medium bg-secondary text-secondary-foreground rounded-sm border border-border"
                 >
                   {category}
                 </span>

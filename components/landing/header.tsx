@@ -115,7 +115,7 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent
               side="top"
-              className={`${styles.customSheetContent} bg-background text-foreground h-screen w-screen p-16 duration-200 flex flex-col items-start justify-start`}
+              className={`${styles.customSheetContent} bg-background text-foreground h-screen w-screen p-16 duration-200 flex flex-col items-center justify-center`}
             >
               <SheetTitle className="sr-only">
                 {t(currentLanguage, "header.mobileMenu.title")}
@@ -136,7 +136,7 @@ export default function Header() {
                 </SheetClose>
               </div>
 
-              <div className="mt-16 flex flex-col gap-8 text-left w-auto">
+              <div className="flex flex-col gap-8 text-center w-auto">
                 {navItems.map((item: NavItem) => {
                   if (item.isComingSoon) {
                     return (

@@ -77,7 +77,7 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
           </div>
         </div>
 
-        <div className="flex absolute inset-x-3 bottom-3 flex-col gap-8 px-2 py-3 rounded-md transition-all duration-300 pointer-events-none bg-popover md:opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 md:translate-y-1/3 group-hover:translate-y-0 group-focus-visible:translate-y-0 group-hover:pointer-events-auto group-focus-visible:pointer-events-auto max-md:pointer-events-auto">
+        <div className="flex absolute inset-x-3 bottom-3 flex-col gap-8 px-2 py-3 rounded-sm transition-all duration-300 pointer-events-none bg-popover md:opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 md:translate-y-1/3 group-hover:translate-y-0 group-focus-visible:translate-y-0 group-hover:pointer-events-auto group-focus-visible:pointer-events-auto max-md:pointer-events-auto">
           <div className="grid grid-cols-2 gap-x-4 gap-y-8 items-end">
             <p className="text-lg font-semibold text-pretty">{product.name}</p>
             <div className="flex gap-2 items-center place-self-end text-lg font-semibold">

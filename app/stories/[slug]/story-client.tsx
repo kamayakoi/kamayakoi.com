@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Tag from "@/components/blog/tag";
 import { motion } from "framer-motion";
+import MiniAudioPlayer from "@/components/landing/mini-audio-player";
 
 interface PortableTextBlock {
   _type: string;
@@ -85,6 +86,11 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* Mini Audio Player */}
+      <div className="fixed top-[13px] md:top-4 left-4 z-[60] pointer-events-auto">
+        <MiniAudioPlayer />
+      </div>
+
       <div className="container mx-auto px-4 py-0 max-w-7xl">
         <div className="mb-8 pt-24 md:pt-32">
           <div className="flex flex-col md:flex-row md:items-start mb-6">
@@ -202,7 +208,7 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
               )}
             </header>
 
-            <div className="prose prose-zinc dark:prose-invert prose-headings:font-semibold prose-h1:text-3xl prose-h1:font-semibold prose-h1:mb-6 prose-h2:text-2xl prose-h2:font-semibold prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-h3:font-normal prose-h3:mt-6 prose-h3:mb-3 prose-h4:text-lg prose-h4:font-normal prose-h4:mt-4 prose-h4:mb-2 prose-p:text-base prose-p:leading-relaxed prose-p:my-4 prose-ul:my-4 prose-ul:list-disc prose-ul:pl-5 prose-ol:my-4 prose-ol:list-decimal prose-ol:pl-5 prose-li:my-2 prose-li:pl-1 prose-blockquote:border-l-4 prose-blockquote:border-primary/30 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-zinc-600 dark:prose-blockquote:text-zinc-300 prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-img:shadow-md prose-img:max-w-full prose-img:mx-auto prose-strong:font-semibold prose-strong:text-zinc-900 dark:prose-strong:text-white prose-em:italic prose-code:bg-zinc-100 prose-code:text-zinc-800 dark:prose-code:bg-zinc-800 dark:prose-code:text-zinc-200 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-zinc-100 dark:prose-pre:bg-zinc-800 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto max-w-none mx-auto px-0">
+            <div className="prose prose-zinc dark:prose-invert prose-headings:font-semibold prose-h1:text-3xl prose-h1:font-semibold prose-h1:mb-6 prose-h2:text-2xl prose-h2:font-semibold prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-h3:font-normal prose-h3:mt-6 prose-h3:mb-3 prose-h4:text-lg prose-h4:font-normal prose-h4:mt-4 prose-h4:mb-2 prose-p:text-base prose-p:leading-relaxed prose-p:my-4 prose-ul:my-4 prose-ul:list-disc prose-ul:pl-5 prose-ol:my-4 prose-ol:list-decimal prose-ol:pl-5 prose-li:my-2 prose-li:pl-1 prose-blockquote:border-l-4 prose-blockquote:border-primary/30 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-zinc-600 dark:prose-blockquote:text-zinc-300 prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:rounded-sm prose-img:shadow-md prose-img:max-w-full prose-img:mx-auto prose-strong:font-semibold prose-strong:text-zinc-900 dark:prose-strong:text-white prose-em:italic prose-code:bg-zinc-100 prose-code:text-zinc-800 dark:prose-code:bg-zinc-800 dark:prose-code:text-zinc-200 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-zinc-100 dark:prose-pre:bg-zinc-800 prose-pre:p-4 prose-pre:rounded-sm prose-pre:overflow-x-auto max-w-none mx-auto px-0">
               {post.body ? (
                 <PortableText value={post.body} />
               ) : (
@@ -216,7 +222,7 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
                     CMS.
                   </p>
                   <div className="my-8">
-                    <div className="aspect-video bg-zinc-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center">
+                    <div className="aspect-video bg-zinc-100 dark:bg-zinc-800 rounded-sm flex items-center justify-center">
                       <p className="text-zinc-500 dark:text-zinc-400">
                         Story image placeholder
                       </p>

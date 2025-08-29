@@ -40,7 +40,7 @@ export default function MerchContentClient({
   return (
     <div className="min-h-screen bg-background">
       {/* Mini Audio Player */}
-      <div className="fixed top-4 left-4 z-[60] pointer-events-auto">
+      <div className="fixed top-[13px] md:top-4 left-4 z-[60] pointer-events-auto">
         <MiniAudioPlayer />
       </div>
 
@@ -104,13 +104,13 @@ export default function MerchContentClient({
             </motion.div>
           ) : (
             <motion.div
-              className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg p-8 mb-20"
+              className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-sm p-8 mb-20"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
               <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
-                Merch Coming Soon
+                Merch coming soon
               </h2>
               <p className="text-zinc-600 dark:text-zinc-400 mb-6">
                 We&apos;re working on bringing you amazing merchandise and

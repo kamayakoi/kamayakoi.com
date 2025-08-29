@@ -19,7 +19,7 @@ interface HorizontalCardCarouselProps {
 
 export default function HorizontalCardCarousel({
   cards,
-  cardCount = 3,
+  // cardCount = 3,
   showAddCard = true,
   onAddClick,
   className = "",

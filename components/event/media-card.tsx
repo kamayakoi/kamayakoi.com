@@ -38,12 +38,11 @@ export default function HorizontalMediaCards({
           <div
             key={card.id}
             className={`
-              relative flex-shrink-0 rounded-lg overflow-hidden cursor-pointer
+              relative flex-shrink-0 rounded-sm overflow-hidden cursor-pointer
               transition-all duration-300 hover:scale-[1.02] hover:shadow-xl
-              ${
-                card.isLarge || index === 0
-                  ? "w-[360px] md:w-[480px] h-60 md:h-64"
-                  : "w-[340px] md:w-[420px] h-60 md:h-64"
+              ${card.isLarge || index === 0
+                ? "w-[360px] md:w-[480px] h-60 md:h-64"
+                : "w-[340px] md:w-[420px] h-60 md:h-64"
               }
             `}
             onClick={() => onCardClick?.(card)}
@@ -59,10 +58,10 @@ export default function HorizontalMediaCards({
 
             {/* Top Icons */}
             <div className="absolute top-3 right-3 md:top-4 md:right-4 flex gap-1.5 md:gap-2">
-              <div className="w-6 h-6 md:w-8 md:h-8 bg-black/40 rounded-full flex items-center justify-center">
+              <div className="w-6 h-6 md:w-8 md:h-8 bg-black/40 rounded-sm flex items-center justify-center">
                 <Star className="w-3 h-3 md:w-4 md:h-4 text-white/80" />
               </div>
-              <div className="w-6 h-6 md:w-8 md:h-8 bg-black/40 rounded-full flex items-center justify-center">
+              <div className="w-6 h-6 md:w-8 md:h-8 bg-black/40 rounded-sm flex items-center justify-center">
                 <Youtube className="w-3 h-3 md:w-4 md:h-4 text-white/80" />
               </div>
             </div>

@@ -53,7 +53,7 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
   return (
     <motion.div
       className={cn(
-        "relative bg-[#1a1a1a] shadow-2xl border border-gray-800 rounded-sm w-[60px] h-[60px] overflow-visible cursor-pointer select-none",
+        "relative bg-[#1a1a1a] shadow-2xl border border-gray-800 rounded-sm w-[48px] h-[48px] md:w-[60px] md:h-[60px] overflow-visible cursor-pointer select-none",
         className,
       )}
       initial={{ opacity: 0, scale: 0.8 }}
@@ -71,6 +71,7 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
             height={60}
             className="w-full h-full object-cover rounded-sm"
             draggable={false} // Prevent drag interference
+            sizes="48px md:60px"
           />
         ) : (
           <div className="w-full h-full bg-white/20 rounded-sm flex items-center justify-center">

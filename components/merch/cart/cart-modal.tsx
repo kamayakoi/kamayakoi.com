@@ -130,7 +130,7 @@ export default function CartModal() {
         <CartContainer className="flex w-full">
           <Link
             href="/merch"
-            className="p-2 w-full rounded-lg border border-dashed bg-background border-border"
+            className="p-2 w-full rounded-sm border border-dashed bg-background border-border"
             onClick={closeCart}
           >
             <div className="flex flex-row gap-6">

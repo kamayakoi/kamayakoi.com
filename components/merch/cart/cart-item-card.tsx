@@ -33,7 +33,7 @@ export function CartItemCard({ item }: CartItemCardProps) {
   };
 
   return (
-    <div className="flex gap-4 p-4 bg-background rounded-lg border">
+    <div className="flex gap-4 p-4 bg-background rounded-sm border">
       {/* Product Image */}
       <div className="flex-shrink-0">
         {image ? (
@@ -42,10 +42,10 @@ export function CartItemCard({ item }: CartItemCardProps) {
             alt={product.name}
             width={80}
             height={100}
-            className="object-cover rounded-md"
+            className="object-cover rounded-sm"
           />
         ) : (
-          <div className="w-20 h-24 bg-muted rounded-md flex items-center justify-center">
+          <div className="w-20 h-24 bg-muted rounded-sm flex items-center justify-center">
             <span className="text-xs text-muted-foreground">No Image</span>
           </div>
         )}

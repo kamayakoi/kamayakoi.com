@@ -530,11 +530,11 @@ export default function BlogPost() {
                             prose-li:my-2 prose-li:pl-1
                             prose-blockquote:border-l-4 prose-blockquote:border-primary/30 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-zinc-600 dark:prose-blockquote:text-zinc-300
                             prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-                            prose-img:rounded-lg prose-img:shadow-md prose-img:max-w-full prose-img:mx-auto
+                            prose-img:rounded-sm prose-img:shadow-md prose-img:max-w-full prose-img:mx-auto
                             prose-strong:font-semibold prose-strong:text-zinc-900 dark:prose-strong:text-white
                             prose-em:italic
                             prose-code:bg-zinc-100 prose-code:text-zinc-800 dark:prose-code:bg-zinc-800 dark:prose-code:text-zinc-200 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-                            prose-pre:bg-zinc-100 dark:prose-pre:bg-zinc-800 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto
+                            prose-pre:bg-zinc-100 dark:prose-pre:bg-zinc-800 prose-pre:p-4 prose-pre:rounded-sm prose-pre:overflow-x-auto
                             max-w-none mx-auto px-0 sm:px-2 md:px-0"
             >
               <PortableText
@@ -589,7 +589,7 @@ export default function BlogPost() {
                       );
                     },
                     codeBlock: ({ value }) => (
-                      <div className="bg-zinc-100 dark:bg-zinc-800 rounded-lg p-4 my-6 overflow-x-auto border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                      <div className="bg-zinc-100 dark:bg-zinc-800 rounded-sm p-4 my-6 overflow-x-auto border border-zinc-200 dark:border-zinc-700 shadow-sm">
                         <pre className="text-sm font-mono">{value.code}</pre>
                       </div>
                     ),
@@ -650,7 +650,7 @@ export default function BlogPost() {
                       </div>
                     ),
                     table: ({ value }) => (
-                      <div className="overflow-x-auto my-8 rounded-lg border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                      <div className="overflow-x-auto my-8 rounded-sm border border-zinc-200 dark:border-zinc-700 shadow-sm">
                         <table className="w-full border-collapse">
                           <thead className="bg-zinc-100 dark:bg-zinc-800">
                             <tr>

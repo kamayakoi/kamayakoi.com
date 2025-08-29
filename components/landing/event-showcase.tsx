@@ -98,7 +98,7 @@ export function EventShowcase() {
             <div className="w-1 h-12 bg-white"></div>
             <div>
               <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-2">
-                Featured Media
+                Featured
               </h2>
               <p className="text-white/70 text-lg">
                 Exclusive content and behind-the-scenes
@@ -118,7 +118,7 @@ export function EventShowcase() {
             <div className="w-1 h-12 bg-white"></div>
             <div>
               <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-2">
-                Featured Events
+                Events
               </h2>
               <p className="text-white/70 text-lg">
                 Past performances and highlights

@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import Header from "@/components/landing/header";
 import MiniAudioPlayer from "@/components/landing/mini-audio-player";
-import { Footer } from "@/components/landing/footer";
 import ParallaxGallery from "@/components/ui/parallax";
 import { type EventParallaxData } from "@/lib/sanity/queries";
 
@@ -64,8 +63,6 @@ export default function EventsContentClient({
             </motion.div>
           </div>
         </main>
-
-        <Footer />
       </div>
     );
   }
@@ -113,8 +110,6 @@ export default function EventsContentClient({
           </motion.div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

@@ -2,7 +2,6 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/react";
 import { TranslationProvider } from "@/lib/contexts/TranslationContext";
@@ -72,23 +71,16 @@ export default async function RootLayout({
   const musicTracks = await getHomepageMusicTracks();
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body
         className={`${geistMono.variable} font-sans flex flex-col min-h-screen`}
       >
         <MusicWrapper tracks={musicTracks}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <TranslationProvider>
-              <MediaProvider>
-                <main className="flex-grow">{children}</main>
-              </MediaProvider>
-            </TranslationProvider>
-          </ThemeProvider>
+          <TranslationProvider>
+            <MediaProvider>
+              <main className="flex-grow">{children}</main>
+            </MediaProvider>
+          </TranslationProvider>
         </MusicWrapper>
         <Toaster />
         <Analytics />

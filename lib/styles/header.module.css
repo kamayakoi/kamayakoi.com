@@ -56,7 +56,7 @@
 
 .navLink {
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 700;
   color: inherit;
   text-decoration: none;
   padding: 0.5rem 0.25rem;
@@ -74,7 +74,7 @@
 .activeNavLink {
   color: hsl(var(--primary));
   border-bottom-color: hsl(var(--primary));
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .activeNavLink:hover {
@@ -83,7 +83,6 @@
 
 .mobileMenuButton {
   color: inherit;
-  border-color: transparent;
 }
 
 .mobileMenuButton:hover {
@@ -96,7 +95,7 @@
 
 .mobileNavLink {
   font-size: 1.1rem;
-  font-weight: 500;
+  font-weight: 700;
   color: hsl(var(--foreground));
   text-decoration: none;
   padding: 0.75rem 0;
@@ -114,7 +113,7 @@
 
 .activeMobileNavLink {
   color: hsl(var(--primary));
-  font-weight: 600;
+  font-weight: 800;
 }
 
 /* Add rule to hide default close button within our specific sheet */

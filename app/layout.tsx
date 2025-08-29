@@ -1,6 +1,6 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Geist_Mono } from 'next/font/google'
+import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
@@ -10,10 +10,9 @@ import MusicWrapper from "@/components/landing/music-wrapper";
 import { getHomepageMusicTracks } from "@/lib/sanity/queries";
 
 const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-})
-
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 const siteConfig = {
   name: "Kamayakoi",

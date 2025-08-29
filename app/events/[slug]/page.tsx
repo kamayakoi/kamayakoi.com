@@ -742,65 +742,65 @@ async function EventPageContent({
             {(event.location?.venueName ||
               event.location?.address ||
               event.venueDetails) && (
-                <div className="max-w-4xl mx-auto">
-                  <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold text-foreground mb-4">
-                      {t(currentLanguage, "eventSlugPage.venueSection.title")}
-                    </h2>
-                  </div>
-                  <div className="bg-card/30 backdrop-blur-sm rounded-sm p-8 border border-border/20 space-y-6">
-                    {event.location?.venueName && (
-                      <div>
-                        <h3 className="text-xl font-semibold text-foreground mb-2">
-                          {event.location.venueName}
-                        </h3>
-                        {event.location?.address && (
-                          <p className="text-muted-foreground mb-4">
-                            {event.location.address}
-                          </p>
-                        )}
-                      </div>
-                    )}
+              <div className="max-w-4xl mx-auto">
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold text-foreground mb-4">
+                    {t(currentLanguage, "eventSlugPage.venueSection.title")}
+                  </h2>
+                </div>
+                <div className="bg-card/30 backdrop-blur-sm rounded-sm p-8 border border-border/20 space-y-6">
+                  {event.location?.venueName && (
+                    <div>
+                      <h3 className="text-xl font-semibold text-foreground mb-2">
+                        {event.location.venueName}
+                      </h3>
+                      {event.location?.address && (
+                        <p className="text-muted-foreground mb-4">
+                          {event.location.address}
+                        </p>
+                      )}
+                    </div>
+                  )}
 
-                    {/* Embedded Map - Restored */}
-                    {mapEmbedSrc && (
-                      <div className="relative w-full h-[300px] bg-muted rounded-sm shadow-lg border border-border/20 overflow-hidden">
-                        <iframe
-                          src={mapEmbedSrc}
-                          width="100%"
-                          height="100%"
-                          style={{ border: 0 }}
-                          allowFullScreen={false}
-                          loading="lazy"
-                          referrerPolicy="no-referrer-when-downgrade"
-                          title={(() => {
-                            const locationNameForMap =
-                              event.location?.venueName ||
-                              event.location?.address;
-                            return locationNameForMap
-                              ? t(
+                  {/* Embedded Map - Restored */}
+                  {mapEmbedSrc && (
+                    <div className="relative w-full h-[300px] bg-muted rounded-sm shadow-lg border border-border/20 overflow-hidden">
+                      <iframe
+                        src={mapEmbedSrc}
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen={false}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title={(() => {
+                          const locationNameForMap =
+                            event.location?.venueName ||
+                            event.location?.address;
+                          return locationNameForMap
+                            ? t(
                                 currentLanguage,
                                 "eventSlugPage.venueSection.mapTitleNamed",
                                 { locationName: locationNameForMap },
                               )
-                              : t(
+                            : t(
                                 currentLanguage,
                                 "eventSlugPage.venueSection.mapTitleDefault",
                               );
-                          })()}
-                          className="absolute top-0 left-0 w-full h-full"
-                        ></iframe>
-                      </div>
-                    )}
+                        })()}
+                        className="absolute top-0 left-0 w-full h-full"
+                      ></iframe>
+                    </div>
+                  )}
 
-                    {event.venueDetails && (
-                      <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
-                        {renderFormattedText(event.venueDetails)}
-                      </div>
-                    )}
-                  </div>
+                  {event.venueDetails && (
+                    <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
+                      {renderFormattedText(event.venueDetails)}
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+            )}
 
             {/* Artists/Lineup Section */}
             {event.lineup && event.lineup.length > 0 && (

@@ -15,6 +15,8 @@ import {
 import styles from "@/lib/styles/header.module.css";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
+import { CartProvider } from "@/components/merch/cart/cart-context";
+import CartModal from "@/components/merch/cart/cart-modal";
 
 interface NavItem {
   nameKey: string;
@@ -48,8 +50,7 @@ export default function Header() {
     { nameKey: "header.nav.events", path: "/events" },
     { nameKey: "header.nav.room", path: "/artists" },
     { nameKey: "header.nav.blog", path: "/stories" },
-    { nameKey: "header.nav.gallery", path: "/gallery", isComingSoon: true },
-    { nameKey: "header.nav.shop", path: "/shop", isComingSoon: true },
+    { nameKey: "header.nav.shop", path: "/merch" },
   ];
 
   return (
@@ -93,13 +94,20 @@ export default function Header() {
           })}
         </nav>
 
+        {/* Cart Modal - Desktop */}
+        <div className="hidden md:flex items-center ml-4">
+          <CartProvider>
+            <CartModal />
+          </CartProvider>
+        </div>
+
         <div className="flex items-center gap-4 md:hidden">
           <Sheet>
             <SheetTrigger asChild>
               <Button
-                className={`${styles.mobileMenuButton} bg-transparent border-none hover:bg-transparent focus:ring-0`}
+                className={`${styles.mobileMenuButton} bg-transparent border border-border hover:bg-transparent focus:ring-0`}
               >
-                <Menu className="h-5 w-5 text-white" />
+                <Menu className="h-5 w-5 text-foreground" />
                 <span className="sr-only">
                   {t(currentLanguage, "header.mobileMenu.toggle")}
                 </span>
@@ -107,7 +115,7 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent
               side="top"
-              className={`${styles.customSheetContent} bg-black dark:bg-[#2A2522] text-white h-screen w-screen p-16 duration-200 flex flex-col items-start justify-start`}
+              className={`${styles.customSheetContent} bg-background text-foreground h-screen w-screen p-16 duration-200 flex flex-col items-start justify-start`}
             >
               <SheetTitle className="sr-only">
                 {t(currentLanguage, "header.mobileMenu.title")}

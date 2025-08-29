@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import "tailwindcss";
+@import "tw-animate-css";
 
 /* Custom fonts like Oroko */
 @font-face {
@@ -53,24 +53,29 @@
 
 :root {
   --radius: 0.625rem;
+  /* Custom spacing variables for shop layout */
+  --sides: 1rem;
+  --modal-sides: 1.5rem;
+  --top-spacing: 2rem;
+  --height-fold: 100vh;
   /* Light mode - clean white background */
-  --background: #FFFFFF;
+  --background: #ffffff;
   --foreground: #000000;
-  --card: #FFFFFF;
+  --card: #ffffff;
   --card-foreground: #000000;
-  --popover: #FFFFFF;
+  --popover: #ffffff;
   --popover-foreground: #000000;
   --primary: #000000;
-  --primary-foreground: #FFFFFF;
-  --secondary: #F5F5F5;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f5;
   --secondary-foreground: #000000;
-  --muted: #F5F5F5;
+  --muted: #f5f5f5;
   --muted-foreground: #666666;
-  --accent: #F5F5F5;
+  --accent: #f5f5f5;
   --accent-foreground: #000000;
-  --destructive: #FF4948;
-  --border: #E5E5E5;
-  --input: #E5E5E5;
+  --destructive: #ff4948;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
   --ring: #000000;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -88,25 +93,25 @@
 }
 
 .dark {
-  /* Dark mode - slightly darker than footer beige */
-  --background: #1A1614;
-  --foreground: #FFFFFF;
-  --card: #2A2522;
-  --card-foreground: #FFFFFF;
-  --popover: #2A2522;
-  --popover-foreground: #FFFFFF;
-  --primary: #FFFFFF;
-  --primary-foreground: #1A1614;
-  --secondary: #3A3532;
-  --secondary-foreground: #FFFFFF;
-  --muted: #3A3532;
-  --muted-foreground: #CCCCCC;
-  --accent: #3A3532;
-  --accent-foreground: #FFFFFF;
-  --destructive: #FF4948;
-  --border: #4A4542;
-  --input: #4A4542;
-  --ring: #FFFFFF;
+  /* Dark mode - cool dark gray theme */
+  --background: #0f0f0f;
+  --foreground: #ffffff;
+  --card: #1a1a1a;
+  --card-foreground: #ffffff;
+  --popover: #1a1a1a;
+  --popover-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #0f0f0f;
+  --secondary: #262626;
+  --secondary-foreground: #ffffff;
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+  --accent: #262626;
+  --accent-foreground: #ffffff;
+  --destructive: #ff4948;
+  --border: #404040;
+  --input: #404040;
+  --ring: #ffffff;
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -122,10 +127,51 @@
   --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
+  /* Minimal hover effects - just opacity change */
+  a:hover,
+  button:hover,
+  [role="button"]:hover {
+    opacity: 0.7 !important;
+    color: inherit !important;
+  }
+
+  /* Remove all borders on hover and focus */
+  *:hover,
+  *:focus,
+  *:focus-visible,
+  *:active {
+    outline: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Remove selection borders */
+  *::selection,
+  *::-moz-selection {
+    background-color: rgba(136, 136, 136, 0.1);
+    color: inherit;
+  }
+
+  /* Remove focus rings */
+  input:focus,
+  textarea:focus,
+  select:focus,
+  button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
   body {
     @apply bg-background text-foreground;
   }

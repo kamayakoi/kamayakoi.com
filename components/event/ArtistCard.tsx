@@ -24,37 +24,72 @@ export default function ArtistCard({
   currentLanguage,
 }: ArtistCardProps) {
   const cardBaseClasses =
-    "relative flex flex-col w-full max-w-sm bg-white dark:bg-zinc-900 rounded-sm shadow-lg dark:shadow-2xl dark:shadow-black/80 overflow-hidden";
+    "relative flex flex-col w-64 md:w-80 bg-white dark:bg-[#1a1a1a] rounded-sm shadow-lg dark:shadow-2xl dark:shadow-black/80 overflow-hidden";
   const artistDisplayName = artist.name || "Artist";
 
   return (
     <div className={cardBaseClasses}>
-      {artist.image && (
-        <div className="relative w-full aspect-square overflow-hidden">
+      {artist.image && artist.socialLink && (
+        <Link
+          href={artist.socialLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t(currentLanguage, "artistCard.socialAriaLabel", {
+            artistName: artistDisplayName,
+          })}
+          className="block relative w-full h-64 md:h-80 overflow-hidden group cursor-pointer"
+        >
           <Image
             src={artist.image}
             alt={t(currentLanguage, "artistCard.imageAlt", {
               artistName: artistDisplayName,
             })}
-            layout="fill"
-            objectFit="cover"
+            fill
+            style={{ objectFit: "cover" }}
             priority
-            className="w-full aspect-square object-cover"
+            className="object-cover"
           />
 
           {/* Gradient overlay */}
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/30 dark:from-black/60 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-300" />
 
-          {/* Artist info overlay */}
-          <div className="absolute top-6 left-6">
-            <h2 className="text-2xl font-medium text-white drop-shadow-lg">
+          {/* Artist name overlay - appears on hover/touch */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-300">
+            <h2 className="text-3xl font-bold text-white drop-shadow-2xl text-center px-4">
               {artist.name}
             </h2>
           </div>
 
           {/* Resident badge at bottom right */}
           {artist.isResident && (
-            <div className="absolute bottom-3 right-3">
+            <div className="absolute bottom-4 right-4 z-10">
+              <div className="inline-flex items-center px-2 py-1 text-xs bg-green-200/80 dark:bg-green-800/50 text-green-900 dark:text-green-200 rounded-sm font-semibold">
+                <span className="relative flex h-2 w-2 mr-1.5">
+                  <span className="relative inline-flex rounded-sm h-2 w-2 bg-green-500"></span>
+                </span>
+                {t(currentLanguage, "artistCard.residentBadge")}
+              </div>
+            </div>
+          )}
+        </Link>
+      )}
+
+      {artist.image && !artist.socialLink && (
+        <div className="relative w-full h-64 md:h-80 overflow-hidden">
+          <Image
+            src={artist.image}
+            alt={t(currentLanguage, "artistCard.imageAlt", {
+              artistName: artistDisplayName,
+            })}
+            fill
+            style={{ objectFit: "cover" }}
+            priority
+            className="object-cover"
+          />
+
+          {/* Resident badge at bottom right */}
+          {artist.isResident && (
+            <div className="absolute bottom-4 right-4">
               <div className="inline-flex items-center px-2 py-1 text-xs bg-green-200/80 dark:bg-green-800/50 text-green-900 dark:text-green-200 rounded-sm font-semibold">
                 <span className="relative flex h-2 w-2 mr-1.5">
                   <span className="relative inline-flex rounded-sm h-2 w-2 bg-green-500"></span>
@@ -66,8 +101,8 @@ export default function ArtistCard({
         </div>
       )}
 
-      <div className="p-5">
-        {!artist.image && (
+      {!artist.image && (
+        <div className="p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3 min-w-0 flex-1">
               <div className="flex flex-col">
@@ -101,29 +136,8 @@ export default function ArtistCard({
               </Link>
             )}
           </div>
-        )}
-
-        {artist.image && artist.socialLink && (
-          <div className="flex items-center gap-3 mb-3">
-            <div className="flex-1 min-w-0">
-              <div className="text-gray-500 dark:text-zinc-500 text-sm">
-                Social
-              </div>
-            </div>
-            <Link
-              href={artist.socialLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={t(currentLanguage, "artistCard.socialAriaLabel", {
-                artistName: artistDisplayName,
-              })}
-              className="text-gray-300 dark:text-gray-300"
-            >
-              <IG className="h-6 w-6" />
-            </Link>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

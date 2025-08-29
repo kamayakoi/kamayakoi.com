@@ -1,0 +1,52 @@
+import { Suspense } from "react";
+import { getProductBySlug } from "@/lib/sanity/queries";
+import { notFound } from "next/navigation";
+import LoadingComponent from "@/components/ui/loader";
+import Header from "@/components/landing/header";
+import MiniAudioPlayer from "@/components/landing/mini-audio-player";
+import { ProductDetailContent } from "../../../components/merch/product-detail-content";
+
+type Props = {
+  params: Promise<{ slug: string }>;
+};
+
+async function ProductContent({ params }: Props) {
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
+
+  if (!product) {
+    notFound(); // Trigger 404 if product not found
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      {/* Mini Audio Player */}
+      <div className="fixed top-4 left-4 z-[60]">
+        <MiniAudioPlayer />
+      </div>
+      <Header />
+      <main className="flex-grow">
+        <ProductDetailContent product={product} />
+      </main>
+    </div>
+  );
+}
+
+export default async function ProductDetailPage({ params }: Props) {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <ProductContent params={params} />
+    </Suspense>
+  );
+}
+
+// Optional: Generate static paths if needed
+export async function generateStaticParams() {
+  const { getAllProducts } = await import("@/lib/sanity/queries");
+  const products = await getAllProducts();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return products.map((product: any) => ({
+    slug:
+      typeof product.slug === "string" ? product.slug : product.slug?.current,
+  }));
+}

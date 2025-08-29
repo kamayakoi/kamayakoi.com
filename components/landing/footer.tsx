@@ -43,7 +43,10 @@ function ContactForm({ onClose }: { onClose: () => void }) {
   return (
     <form action={handleSubmit} className="space-y-6">
       <div className="space-y-4">
-        <label htmlFor="email" className="block text-lg text-gray-700 dark:text-gray-300 font-medium">
+        <label
+          htmlFor="email"
+          className="block text-lg text-gray-700 dark:text-gray-300 font-medium"
+        >
           Email address
         </label>
         <input
@@ -57,7 +60,10 @@ function ContactForm({ onClose }: { onClose: () => void }) {
       </div>
 
       <div className="space-y-4">
-        <label htmlFor="message" className="block text-lg text-gray-700 dark:text-gray-300 font-medium">
+        <label
+          htmlFor="message"
+          className="block text-lg text-gray-700 dark:text-gray-300 font-medium"
+        >
           How can we help?
         </label>
         <textarea
@@ -329,8 +335,6 @@ export function Footer() {
               <IG className="h-[17px] w-[17px]" />
             </Link>
           </div>
-
-
         </div>
       </div>
     </footer>

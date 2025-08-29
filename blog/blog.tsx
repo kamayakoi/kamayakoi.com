@@ -155,10 +155,10 @@ export default function Blog() {
       imageUrl={
         filteredPosts.length > 0 && filteredPosts[0]?.image
           ? urlFor(filteredPosts[0].image)
-            .width(1200)
-            .height(630)
-            .quality(90)
-            .url()
+              .width(1200)
+              .height(630)
+              .quality(90)
+              .url()
           : undefined
       }
     >

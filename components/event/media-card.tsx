@@ -40,9 +40,10 @@ export default function HorizontalMediaCards({
             className={`
               relative flex-shrink-0 rounded-sm overflow-hidden cursor-pointer
               transition-all duration-300 hover:scale-[1.02] hover:shadow-xl
-              ${card.isLarge || index === 0
-                ? "w-[360px] md:w-[480px] h-60 md:h-64"
-                : "w-[340px] md:w-[420px] h-60 md:h-64"
+              ${
+                card.isLarge || index === 0
+                  ? "w-[360px] md:w-[480px] h-60 md:h-64"
+                  : "w-[340px] md:w-[420px] h-60 md:h-64"
               }
             `}
             onClick={() => onCardClick?.(card)}

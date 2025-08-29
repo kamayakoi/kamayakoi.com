@@ -114,10 +114,11 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all ${selectedImageIndex === index
-                      ? "ring-2 ring-primary"
-                      : "hover:ring-2 hover:ring-muted-foreground/50"
-                      }`}
+                    className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all ${
+                      selectedImageIndex === index
+                        ? "ring-2 ring-primary"
+                        : "hover:ring-2 hover:ring-muted-foreground/50"
+                    }`}
                   >
                     <Image
                       src={image.url}

@@ -18,7 +18,7 @@
   "header": {
     "nav": {
       "home": "HOME",
-      "events": "RENDEZ-VOUS SAUVAGE",
+      "events": "LE RENDEZ-VOUS SAUVAGE",
       "gallery": "ARCHIVES",
       "shop": "MERCH",
       "room": "ARTISTS",
@@ -185,7 +185,7 @@
       "inactive": "Currently Inactive",
       "soldOut": "Sold Out",
       "salesStart": "Sales start {startDate}",
-      "salesEnded": "Sales have ended",
+      "salesEnded": "Sold out",
       "unavailable": "Unavailable",
       "misconfigured": "Ticketing system error."
     },

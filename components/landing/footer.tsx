@@ -181,14 +181,14 @@ export function Footer() {
                 <li>
                   <Link
                     href="/"
-                    className="text-white/70 hover:text-white transition-colors text-sm font-light"
+                    className="text-white/70 hover:text-white transition-colors text-sm font-bold"
                   >
-                    RENDEZ-VOUS SAUVAGE
+                    LE RENDEZ-VOUS SAUVAGE
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/blog"
+                    href="/stories"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
                     Stories
@@ -196,18 +196,10 @@ export function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/shop"
+                    href="/merch"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
-                    Shop
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/gallery"
-                    className="text-white/70 hover:text-white transition-colors text-sm font-light"
-                  >
-                    Archive
+                    Merch
                   </Link>
                 </li>
               </ul>

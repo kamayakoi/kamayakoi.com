@@ -4,16 +4,29 @@
       "terms": "Conditions",
       "privacy": "Confidentialité"
     },
-    "tagline": {
-      "intro": "Nous apportons",
-      "outro": "à la scène musicale Ivoirienne."
+    "copyright": "© {year} Kamayakoi — Tous droits réservés.",
+    "contact": {
+      "title": "Contactez-nous",
+      "emailLabel": "Adresse e-mail",
+      "emailPlaceholder": "Entrez votre e-mail",
+      "messageLabel": "Comment pouvons-nous vous aider ?",
+      "messagePlaceholder": "Entrez votre message",
+      "sendButton": "Envoyer le message",
+      "sendError": "Échec de l'envoi de l'e-mail"
     },
-    "animatedWords": {
-      "freedom": "liberté",
-      "energy": "énergie",
-      "respect": "respect"
+    "sections": {
+      "explore": "EXPLORER",
+      "connect": "À PROPOS",
+      "legal": "RESSOURCES"
     },
-    "copyright": "© {year} Kamayakoi — Tous droits réservés."
+    "navigation": {
+      "events": "LE RENDEZ-VOUS SAUVAGE",
+      "stories": "Stories",
+      "merch": "Merch",
+      "artists": "Artistes",
+      "archive": "Archives",
+      "contact": "Contact"
+    }
   },
   "header": {
     "nav": {
@@ -28,8 +41,7 @@
     "mobileMenu": {
       "toggle": "Ouvrir/Fermer le menu",
       "title": "Menu Mobile",
-      "close": "Fermer le menu",
-      "description": "Kamayakoi est un collectif de DJs avant-gardiste basé à Abidjan. Nous créons des espaces où la liberté musicale s'épanouit et les barrières sociales s'effacent."
+      "close": "Fermer le menu"
     }
   },
   "barcode": {
@@ -244,14 +256,14 @@
     "noDetails": "Aucun détail supplémentaire disponible."
   },
   "purchaseModal": {
-    "title": "Acheter des tickets",
-    "description": "Entrez vos coordonnées pour acheter des tickets.",
+    "title": "Purchase Tickets",
+    "description": "Complete your order details",
     "includesTickets": "Inclut {count} ticket(s)",
     "ticketsGenerated": "Tickets à générer",
     "labels": {
       "quantity": "Quantité",
-      "name": "Nom",
-      "email": "E-mail",
+      "name": "Name",
+      "email": "Email",
       "phone": "Téléphone",
       "optional": "Optionnel"
     },
@@ -260,15 +272,15 @@
       "email": "aissata@gmail.com",
       "phone": "+2250771234567"
     },
-    "totalPrice": "Prix total",
+    "totalPrice": "Total:",
     "buttons": {
       "cancel": "Annuler",
-      "pay": "Payer",
+      "pay": "Acheter",
       "processing": "Traitement..."
     },
     "errors": {
       "nameRequired": "Le nom est requis.",
-      "emailRequired": "L'e-mail est requis.",
+      "emailRequired": "L'email est requis.",
       "emailInvalid": "Veuillez entrer une adresse e-mail valide.",
       "quantityInvalid": "La quantité doit être d'au moins 1.",
       "functionError": "Impossible d'initier le paiement. Veuillez réessayer.",
@@ -282,7 +294,7 @@
     "orderId": "ID commande : {orderId}",
     "whatsNext": {
       "title": "Et maintenant ?",
-      "checkEmail": "Vérifiez votre e-mail pour votre e-ticket",
+      "checkEmail": "Vérifiez votre email pour votre e-ticket",
       "presentTicket": "Présentez votre e-ticket QR code à l'événement",
       "arriveEarly": "Arrivez tôt pour éviter les files d'attente"
     },

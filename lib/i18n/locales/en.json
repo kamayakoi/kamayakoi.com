@@ -4,16 +4,29 @@
       "terms": "Terms",
       "privacy": "Privacy"
     },
-    "tagline": {
-      "intro": "We bring",
-      "outro": "to Abidjan's music scene."
+    "copyright": "© {year} Kamayakoi — All rights reserved.",
+    "contact": {
+      "title": "Get in touch",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "Enter your email",
+      "messageLabel": "How can we help?",
+      "messagePlaceholder": "Enter your message",
+      "sendButton": "Send Message",
+      "sendError": "Failed to send email"
     },
-    "animatedWords": {
-      "freedom": "freedom",
-      "energy": "energy",
-      "respect": "respect"
+    "sections": {
+      "explore": "EXPLORE",
+      "connect": "CONNECT",
+      "legal": "RESOURCES"
     },
-    "copyright": "© {year} Kamayakoi — All rights reserved."
+    "navigation": {
+      "events": "LE RENDEZ-VOUS SAUVAGE",
+      "stories": "Stories",
+      "merch": "Merch",
+      "artists": "Artists",
+      "archive": "Archive",
+      "contact": "Contact"
+    }
   },
   "header": {
     "nav": {
@@ -28,8 +41,7 @@
     "mobileMenu": {
       "toggle": "Toggle menu",
       "title": "Mobile Menu",
-      "close": "Close menu",
-      "description": "Kamayakoi is a boundary-pushing DJ collective from Abidjan, Côte d'Ivoire. We create spaces where musical freedom thrives and social barriers dissolve."
+      "close": "Close menu"
     }
   },
   "barcode": {
@@ -52,7 +64,7 @@
       "p2": "Our values are Unity, Openness, Freedom, and Respect. We live by two commandments: \"L'égalité de chacun sur le Dancefloor\" (Equality for everyone on the Dancefloor) and \"L'enjaillement dans le respect\" (Enjoyment with respect). We expect all attendees and participants to uphold these values."
     },
     "conduct": {
-        "title": "Use of our services",
+      "title": "Use of our services",
       "p1": "You agree to use our website and services only for lawful purposes and in a manner that respects the rights and enjoyment of others. When attending Kamayakoi events:",
       "listItem1": "You must behave in a way that is respectful to all individuals, regardless of race, culture, or social class, reflecting the diverse community we cultivate.",
       "listItem2": "Prohibited behavior includes harassment, discrimination, causing distress or inconvenience to any person, transmitting obscene or offensive content, or disrupting the event.",
@@ -60,23 +72,23 @@
       "p2": "When registering for information, newsletters, or (where applicable) event pre-sales, you must provide accurate and current information."
     },
     "tickets": {
-        "title": "Event tickets and admission",
+      "title": "Event tickets and admission",
       "p1": "All ticket sales for Kamayakoi events are subject to availability and any specific terms communicated at the time of purchase (e.g., age restrictions, specific entry requirements for unique venues).",
       "p2": "Tickets are generally non-refundable and non-transferable, except as required by applicable law or as explicitly stated by us for a particular event. We reserve the right to cancel or reschedule events; in such cases, our refund or exchange policy will be communicated to ticket holders.",
       "p3": "We reserve the right to refuse admission or eject any person whose conduct is deemed disorderly, who fails to comply with these Terms, specific event rules, or our core values, or who poses a risk to the safety or enjoyment of others. No refunds will be offered in such circumstances."
     },
     "ip": {
-        "title": "Intellectual property",
+      "title": "Intellectual property",
       "p1": "All content related to Kamayakoi, including our name, logos, event concepts, DJ mixes (by Mask On, Seny.D, Dalight, and guest artists when recorded and shared by us), text, graphics, images, and audio clips on our website or promotional materials, is the property of Kamayakoi or its content suppliers/partners and protected by international copyright and trademark laws.",
       "p2": "You may not reproduce, duplicate, copy, sell, resell, or exploit any portion of our service, event content, or branding without express written permission from us."
     },
     "userContent": {
-        "title": "User-generated content",
+      "title": "User-generated content",
       "p1": "If you post content or submit material related to our events (e.g., photos, videos, comments on social media tagging Kamayakoi or using our event hashtags), and unless we indicate otherwise, you grant Kamayakoi a nonexclusive, royalty-free, perpetual, irrevocable, and fully sublicensable right to use, reproduce, modify, adapt, publish, translate, create derivative works from, distribute, and display such content throughout the world in any media. This is primarily for promoting the Kamayakoi experience, showcasing our vibrant community, and highlighting the unique atmosphere of our events.",
       "p2": "You represent and warrant that you own or control all rights to the content you post, that it's accurate, that its use doesn't violate these Terms, and will not cause injury to any person or entity. You agree to indemnify Kamayakoi for all claims resulting from content you supply."
     },
     "liability": {
-        "title": "Limitation of liability",
+      "title": "Limitation of liability",
       "p1": "Kamayakoi, including its founders (Mask On, Seny.D, Dalight) and affiliates, will not be liable for any damages of any kind arising from the use of our services or attendance at our events, including, but not limited to direct, indirect, incidental, punitive, and consequential damages, unless otherwise specified in writing.",
       "p2": "Your attendance at our events, particularly those in unconventional, \"underground,\" or repurposed venues (e.g., Doraville, Guido's Pizzeria, La Grande Maison by Venus Room), is at your own risk. While we strive to ensure safety, you acknowledge that such venues may have inherent characteristics different from traditional clubs.",
       "p3": "We do not warrant that our website, its servers, or emails sent from Kamayakoi are free of viruses or other harmful components. We strive to provide a secure online environment but cannot guarantee absolute security."
@@ -101,7 +113,7 @@
     }
   },
   "privacyPage": {
-    "pageTitle": "Privacy Policy",
+    "pageTitle": "Privacy policy",
     "pageDescription": "Learn how Kamayakoi protects and manages your personal information in accordance with our privacy practices.",
     "title": "Privacy Policy",
     "subtitle": "Your privacy is important to us. This policy explains how we collect, use, and protect your information.",
@@ -182,7 +194,7 @@
       "hostedBy": "Hosted by"
     },
     "availability": {
-      "inactive": "Currently inactive",
+      "inactive": "Currently Inactive",
       "soldOut": "Sold Out",
       "salesStart": "Sales start {startDate}",
       "salesEnded": "Sold out",
@@ -260,10 +272,10 @@
       "email": "aissata@gmail.com",
       "phone": "+221771234567"
     },
-    "totalPrice": "Total",
+    "totalPrice": "Total:",
     "buttons": {
       "cancel": "Cancel",
-      "pay": "Pay",
+      "pay": "Purchase",
       "processing": "Processing..."
     },
     "errors": {
@@ -288,7 +300,7 @@
     },
     "buttons": {
       "backToEvents": "Back to events",
-      "browseGallery": "Browse gallery"
+      "browseGallery": "Browse Gallery"
     },
     "support": "Need help? Contact our support team"
   },
@@ -304,7 +316,7 @@
     },
     "buttons": {
       "backToEvents": "Back to events",
-      "browseGallery": "Browse gallery"
+      "browseGallery": "Browse Gallery"
     },
     "support": "Need help? Contact our support team"
   },
@@ -386,109 +398,109 @@
           "line2": "every drop a unique moment."
         }
       }
+    }
+  },
+  "storyPage": {
+    "backToStories": "Back to stories",
+    "byAuthor": "By {authorName}",
+    "relatedStories": "RELATED STORIES",
+    "readMore": "Read",
+    "noRelatedStories": "No related stories found.",
+    "loading": "Loading...",
+    "noStories": {
+      "title": "Stories coming soon",
+      "description": "We're working on bringing you amazing stories and narratives. Stay tuned for exclusive Kamayakoi content!"
     },
-    "storyPage": {
-      "backToStories": "Back to stories",
-      "byAuthor": "By {authorName}",
-      "relatedStories": "RELATED STORIES",
-      "readMore": "Read",
-      "noRelatedStories": "No related stories found.",
-      "loading": "Loading...",
-      "noStories": {
-        "title": "Stories coming soon",
-        "description": "We're working on bringing you amazing stories and narratives. Stay tuned for exclusive Kamayakoi content!"
-      },
-      "share": {
-        "onFacebook": "Share on Facebook",
-        "onTwitter": "Share on Twitter",
-        "copyLink": "Copy link"
-      }
+    "share": {
+      "onFacebook": "Share on Facebook",
+      "onTwitter": "Share on Twitter",
+      "copyLink": "Copy link"
+    }
+  },
+  "merchPage": {
+    "title": "Merch",
+    "subtitle": "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products crafted for the wild at heart.",
+    "breadcrumb": "Shop",
+    "loading": "Loading...",
+    "comingSoon": {
+      "title": "Merch coming soon",
+      "description": "We're working on bringing you amazing merchandise and collectibles. Stay tuned for exclusive Kamayakoi gear!"
     },
-    "merchPage": {
-      "title": "Merch",
-      "subtitle": "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products crafted for the wild at heart.",
-      "breadcrumb": "Shop",
-      "loading": "Loading...",
+    "productDetail": {
+      "backToMerch": "Back to merch",
+      "noImage": "No Image Available",
+      "quantity": "Quantity:",
+      "outOfStock": "Out of Stock",
+      "addToCart": "Add to Cart",
+      "inStock": "in stock",
+      "addToWishlist": "Add to Wishlist",
+      "share": "Share",
+      "productDetails": "Product Details",
+      "productId": "Product ID:",
+      "category": "Category: Merchandise",
+      "shipping": "Shipping: Free shipping on orders over 50,000 F CFA"
+    },
+    "metadata": {
+      "title": "Merch | Kamayakoi",
+      "description": "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products."
+    }
+  },
+  "eventShowcase": {
+    "featured": {
+      "title": "Featured",
+      "subtitle": "Exclusive content and behind-the-scenes",
+      "clickToPlay": "Click to Play"
+    },
+    "events": {
+      "title": "Events",
+      "subtitle": "Past performances and highlights",
+      "viewEvent": "VIEW EVENT →",
       "comingSoon": {
-        "title": "Merch coming soon",
-        "description": "We're working on bringing you amazing merchandise and collectibles. Stay tuned for exclusive Kamayakoi gear!"
-      },
-      "productDetail": {
-        "backToMerch": "Back to merch",
-        "noImage": "No Image Available",
-        "quantity": "Quantity:",
-        "outOfStock": "Out of Stock",
-        "addToCart": "Add to Cart",
-        "inStock": "in stock",
-        "addToWishlist": "Add to Wishlist",
-        "share": "Share",
-        "productDetails": "Product Details",
-        "productId": "Product ID:",
-        "category": "Category: Merchandise",
-        "shipping": "Shipping: Free shipping on orders over 50,000 F CFA"
-      },
-      "metadata": {
-        "title": "Merch | Kamayakoi",
-        "description": "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products."
+        "title": "Events coming soon",
+        "description": "We're working on bringing you amazing events and experiences. Stay tuned!"
       }
     },
-    "eventShowcase": {
-      "featured": {
-        "title": "Featured",
-        "subtitle": "Exclusive content and behind-the-scenes",
-        "clickToPlay": "Click to Play"
-      },
-      "events": {
-        "title": "Events",
-        "subtitle": "Past performances and highlights",
-        "viewEvent": "VIEW EVENT →",
-        "comingSoon": {
-          "title": "Events coming soon",
-          "description": "We're working on bringing you amazing events and experiences. Stay tuned!"
-        }
-      },
-      "media": {
-        "title": "Media",
-        "subtitle": "Discover the best sounds and videos",
-        "viewAll": "View all media",
-        "comingSoon": {
-          "title": "Media coming soon",
-          "description": "We're working on bringing you amazing sounds and videos."
-        }
-      },
-      "articles": {
-        "title": "Articles",
-        "subtitle": "Discover the latest news and stories",
-        "readMore": "Read more",
-        "viewAll": "View all articles",
-        "comingSoon": {
-          "title": "Articles coming soon",
-          "description": "We're working on bringing you amazing articles and stories. Stay tuned!"
-        }
-      },
-      "hero": {
-        "contentTypes": {
-          "article": "Article",
-          "media": "Media",
-          "event": "Event",
-          "video": "Video",
-          "image": "Image"
-        },
-        "actions": {
-          "readArticle": "Read Article",
-          "viewEvent": "View Event",
-          "watchMedia": "Watch Media",
-          "watchVideo": "Watch Video",
-          "playVideo": "Play Video",
-          "pauseVideo": "Pause Video"
-        }
-      }
-    },
-    "cardCarousel": {
+    "media": {
+      "title": "Media",
+      "subtitle": "Discover the best sounds and videos",
+      "viewAll": "View all media",
       "comingSoon": {
-        "title": "Coming Soon",
-        "description": "We're working on bringing you amazing content. Stay tuned!"
+        "title": "Media coming soon",
+        "description": "We're working on bringing you amazing sounds and videos."
       }
+    },
+    "articles": {
+      "title": "Articles",
+      "subtitle": "Discover the latest news and stories",
+      "readMore": "Read more",
+      "viewAll": "View all articles",
+      "comingSoon": {
+        "title": "Articles coming soon",
+        "description": "We're working on bringing you amazing articles and stories. Stay tuned!"
+      }
+    },
+    "hero": {
+      "contentTypes": {
+        "article": "Article",
+        "media": "Media",
+        "event": "Event",
+        "video": "Video",
+        "image": "Image"
+      },
+      "actions": {
+        "readArticle": "Read Article",
+        "viewEvent": "View Event",
+        "watchMedia": "Watch Media",
+        "watchVideo": "Watch Video",
+        "playVideo": "Play Video",
+        "pauseVideo": "Pause Video"
+      }
+    }
+  },
+  "cardCarousel": {
+    "comingSoon": {
+      "title": "Coming Soon",
+      "description": "We're working on bringing you amazing content. Stay tuned!"
     }
   }
 }

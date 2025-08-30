@@ -18,6 +18,28 @@ CREATE TABLE IF NOT EXISTS public.individual_tickets (
 CREATE INDEX IF NOT EXISTS idx_individual_tickets_purchase_id ON public.individual_tickets(purchase_id);
 CREATE INDEX IF NOT EXISTS idx_individual_tickets_ticket_identifier ON public.individual_tickets(ticket_identifier);
 
+-- Enable Row Level Security (RLS) on the individual_tickets table
+ALTER TABLE public.individual_tickets ENABLE ROW LEVEL SECURITY;
+
+-- Allow service_role full access on individual_tickets
+CREATE POLICY "Allow service_role full access on individual_tickets"
+ON public.individual_tickets
+FOR ALL
+TO service_role
+USING (true)
+WITH CHECK (true);
+
+-- Allow authenticated users to read individual tickets (for verification)
+CREATE POLICY "Allow authenticated read on individual_tickets"
+ON public.individual_tickets
+FOR SELECT
+TO authenticated
+USING (true);
+
+-- Grant permissions to service_role and authenticated
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.individual_tickets TO service_role;
+GRANT SELECT ON public.individual_tickets TO authenticated;
+
 -- Add comments for clarity
 COMMENT ON TABLE public.individual_tickets IS 'Stores individual tickets for multi-ticket purchases, each with a unique identifier for QR codes.';
 COMMENT ON COLUMN public.individual_tickets.status IS 'Status of the individual ticket (e.g., active, used, cancelled).';

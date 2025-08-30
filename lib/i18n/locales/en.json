@@ -42,465 +42,465 @@
       "toggle": "Toggle menu",
       "title": "Mobile Menu",
       "close": "Close menu"
-  },
-  "barcode": {
-    "opensource": "This website is open-source."
-  },
-  "termsPage": {
-    "pageTitle": "Terms and Conditions | Kamayakoi",
-    "pageDescription": "Understand the Terms and Conditions for engaging with Kamayakoi, Abidjan's pioneering Electronic music collective and event organizer.",
-    "title": "Terms and Conditions",
-    "subtitle": "Please read these terms carefully before using our services or attending our unique events.",
-    "lastUpdated": "Last Updated: {date}",
-    "introduction": {
-      "title": "Introduction",
-      "p1": "Welcome to Kamayakoi (\"Kamayakoi,\" \"we,\" \"us,\" or \"our\"). Born in Abidjan in March 2018, Kamayakoi is a DJ collective at the forefront of an alternative music scene blending Hip-Hop & Electronic Music. These Terms and Conditions (\"Terms\") govern your use of our website (e.g., kamayakoi.com, if applicable), our services (including event promotion and organization), and your attendance at our parties and other events.",
-      "p2": "The term \"Kamayakoi\" itself, signifies energy, stubbornness, and a love for partying – qualities we channel into creating unique, freeing experiences. By accessing our services, purchasing tickets, or attending our events, you agree to be bound by these Terms. If you disagree with any part of these Terms, you may not access our services or attend our events."
     },
-    "mission": {
-      "title": "Experience",
-      "p1": "Kamayakoi was formed out of a desire for artistic freedom in Abidjan's DJ scene. Our main goal is to provide a platform where DJs can express their curation and artistic personality without the constraints of mainstream demand, and where attendees can experience rich musical diversity. We strive to create a bridge between genres and audiences, fostering social cohesion and cultural exchange.",
-      "p2": "Our values are Unity, Openness, Freedom, and Respect. We live by two commandments: \"L'égalité de chacun sur le Dancefloor\" (Equality for everyone on the Dancefloor) and \"L'enjaillement dans le respect\" (Enjoyment with respect). We expect all attendees and participants to uphold these values."
+    "barcode": {
+      "opensource": "This website is open-source."
     },
-    "conduct": {
-      "title": "Use of our services",
-      "p1": "You agree to use our website and services only for lawful purposes and in a manner that respects the rights and enjoyment of others. When attending Kamayakoi events:",
-      "listItem1": "You must behave in a way that is respectful to all individuals, regardless of race, culture, or social class, reflecting the diverse community we cultivate.",
-      "listItem2": "Prohibited behavior includes harassment, discrimination, causing distress or inconvenience to any person, transmitting obscene or offensive content, or disrupting the event.",
-      "listItem3": "You must comply with all venue regulations, health and safety guidelines, and instructions from event staff, especially given that our events often take place in atypical, underground, and unique locations (such as pizzerias, disused amusement parks, or private villas).",
-      "p2": "When registering for information, newsletters, or (where applicable) event pre-sales, you must provide accurate and current information."
+    "termsPage": {
+      "pageTitle": "Terms and Conditions | Kamayakoi",
+      "pageDescription": "Understand the Terms and Conditions for engaging with Kamayakoi, Abidjan's pioneering Electronic music collective and event organizer.",
+      "title": "Terms and Conditions",
+      "subtitle": "Please read these terms carefully before using our services or attending our unique events.",
+      "lastUpdated": "Last Updated: {date}",
+      "introduction": {
+        "title": "Introduction",
+        "p1": "Welcome to Kamayakoi (\"Kamayakoi,\" \"we,\" \"us,\" or \"our\"). Born in Abidjan in March 2018, Kamayakoi is a DJ collective at the forefront of an alternative music scene blending Hip-Hop & Electronic Music. These Terms and Conditions (\"Terms\") govern your use of our website (e.g., kamayakoi.com, if applicable), our services (including event promotion and organization), and your attendance at our parties and other events.",
+        "p2": "The term \"Kamayakoi\" itself, signifies energy, stubbornness, and a love for partying – qualities we channel into creating unique, freeing experiences. By accessing our services, purchasing tickets, or attending our events, you agree to be bound by these Terms. If you disagree with any part of these Terms, you may not access our services or attend our events."
+      },
+      "mission": {
+        "title": "Experience",
+        "p1": "Kamayakoi was formed out of a desire for artistic freedom in Abidjan's DJ scene. Our main goal is to provide a platform where DJs can express their curation and artistic personality without the constraints of mainstream demand, and where attendees can experience rich musical diversity. We strive to create a bridge between genres and audiences, fostering social cohesion and cultural exchange.",
+        "p2": "Our values are Unity, Openness, Freedom, and Respect. We live by two commandments: \"L'égalité de chacun sur le Dancefloor\" (Equality for everyone on the Dancefloor) and \"L'enjaillement dans le respect\" (Enjoyment with respect). We expect all attendees and participants to uphold these values."
+      },
+      "conduct": {
+        "title": "Use of our services",
+        "p1": "You agree to use our website and services only for lawful purposes and in a manner that respects the rights and enjoyment of others. When attending Kamayakoi events:",
+        "listItem1": "You must behave in a way that is respectful to all individuals, regardless of race, culture, or social class, reflecting the diverse community we cultivate.",
+        "listItem2": "Prohibited behavior includes harassment, discrimination, causing distress or inconvenience to any person, transmitting obscene or offensive content, or disrupting the event.",
+        "listItem3": "You must comply with all venue regulations, health and safety guidelines, and instructions from event staff, especially given that our events often take place in atypical, underground, and unique locations (such as pizzerias, disused amusement parks, or private villas).",
+        "p2": "When registering for information, newsletters, or (where applicable) event pre-sales, you must provide accurate and current information."
+      },
+      "tickets": {
+        "title": "Event tickets and admission",
+        "p1": "All ticket sales for Kamayakoi events are subject to availability and any specific terms communicated at the time of purchase (e.g., age restrictions, specific entry requirements for unique venues).",
+        "p2": "Tickets are generally non-refundable and non-transferable, except as required by applicable law or as explicitly stated by us for a particular event. We reserve the right to cancel or reschedule events; in such cases, our refund or exchange policy will be communicated to ticket holders.",
+        "p3": "We reserve the right to refuse admission or eject any person whose conduct is deemed disorderly, who fails to comply with these Terms, specific event rules, or our core values, or who poses a risk to the safety or enjoyment of others. No refunds will be offered in such circumstances."
+      },
+      "ip": {
+        "title": "Intellectual property",
+        "p1": "All content related to Kamayakoi, including our name, logos, event concepts, DJ mixes (by Mask On, Seny.D, Dalight, and guest artists when recorded and shared by us), text, graphics, images, and audio clips on our website or promotional materials, is the property of Kamayakoi or its content suppliers/partners and protected by international copyright and trademark laws.",
+        "p2": "You may not reproduce, duplicate, copy, sell, resell, or exploit any portion of our service, event content, or branding without express written permission from us."
+      },
+      "userContent": {
+        "title": "User-generated content",
+        "p1": "If you post content or submit material related to our events (e.g., photos, videos, comments on social media tagging Kamayakoi or using our event hashtags), and unless we indicate otherwise, you grant Kamayakoi a nonexclusive, royalty-free, perpetual, irrevocable, and fully sublicensable right to use, reproduce, modify, adapt, publish, translate, create derivative works from, distribute, and display such content throughout the world in any media. This is primarily for promoting the Kamayakoi experience, showcasing our vibrant community, and highlighting the unique atmosphere of our events.",
+        "p2": "You represent and warrant that you own or control all rights to the content you post, that it's accurate, that its use doesn't violate these Terms, and will not cause injury to any person or entity. You agree to indemnify Kamayakoi for all claims resulting from content you supply."
+      },
+      "liability": {
+        "title": "Limitation of liability",
+        "p1": "Kamayakoi, including its founders (Mask On, Seny.D, Dalight) and affiliates, will not be liable for any damages of any kind arising from the use of our services or attendance at our events, including, but not limited to direct, indirect, incidental, punitive, and consequential damages, unless otherwise specified in writing.",
+        "p2": "Your attendance at our events, particularly those in unconventional, \"underground,\" or repurposed venues (e.g., Doraville, Guido's Pizzeria, La Grande Maison by Venus Room), is at your own risk. While we strive to ensure safety, you acknowledge that such venues may have inherent characteristics different from traditional clubs.",
+        "p3": "We do not warrant that our website, its servers, or emails sent from Kamayakoi are free of viruses or other harmful components. We strive to provide a secure online environment but cannot guarantee absolute security."
+      },
+      "indemnification": {
+        "title": "Indemnification",
+        "p1": "You agree to indemnify, defend, and hold harmless Kamayakoi, its founders, employees, agents, and partners from and against all losses, expenses, damages, and costs, including reasonable attorneys' fees, resulting from any violation of these Terms or any activity related to your engagement with our services or events (including negligent or wrongful conduct)."
+      },
+      "governingLaw": {
+        "title": "Governing law",
+        "p1": "These Terms and any dispute or claim arising out of or in connection with them (including non-contractual disputes or claims) shall be governed by and construed in accordance with the laws of Côte d'Ivoire, the home of Kamayakoi."
+      },
+      "changes": {
+        "title": "Changes to these terms",
+        "p1": "We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will aim to provide at least 30 days' notice on our website or through direct communication (if you've subscribed to updates) before new terms take effect. What constitutes a material change will be determined at our sole discretion.",
+        "p2": "By continuing to access or use our Service or attend our events after revisions become effective, you agree to be bound by the revised terms."
+      },
+      "contact": {
+        "title": "Contact us",
+        "p1": "If you have any questions about these Terms, or wish to learn more about Kamayakoi and our mission to energize Abidjan's music scene, please contact us at: kamayakoi@gmail.com.",
+        "p2": "We're building more than just parties; we're cultivating a movement. Thank you for being part of the Kamayakoi energy!"
+      }
     },
-    "tickets": {
-      "title": "Event tickets and admission",
-      "p1": "All ticket sales for Kamayakoi events are subject to availability and any specific terms communicated at the time of purchase (e.g., age restrictions, specific entry requirements for unique venues).",
-      "p2": "Tickets are generally non-refundable and non-transferable, except as required by applicable law or as explicitly stated by us for a particular event. We reserve the right to cancel or reschedule events; in such cases, our refund or exchange policy will be communicated to ticket holders.",
-      "p3": "We reserve the right to refuse admission or eject any person whose conduct is deemed disorderly, who fails to comply with these Terms, specific event rules, or our core values, or who poses a risk to the safety or enjoyment of others. No refunds will be offered in such circumstances."
+    "privacyPage": {
+      "pageTitle": "Privacy policy",
+      "pageDescription": "Learn how Kamayakoi protects and manages your personal information in accordance with our privacy practices.",
+      "title": "Privacy Policy",
+      "subtitle": "Your privacy is important to us. This policy explains how we collect, use, and protect your information.",
+      "lastUpdated": "Last Updated: {date}",
+      "introduction": {
+        "title": "Introduction",
+        "p1": "Kamayakoi (\"we,\" \"us,\" or \"our\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, purchase tickets, or attend our events.",
+        "p2": "Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access our services."
+      },
+      "dataCollection": {
+        "title": "Information we collect",
+        "p1": "We may collect information about you in a variety of ways. The information we may collect includes:",
+        "listItem1": "Personal Data: Name, email address, phone number, and other contact information when you purchase tickets or subscribe to our updates.",
+        "listItem2": "Event Information: Photos and videos taken during our events that may include your likeness.",
+        "listItem3": "Usage Data: Information about how you access and use our website, including your IP address, browser type, and device information."
+      },
+      "dataUse": {
+        "title": "How we use your information",
+        "p1": "We use the information we collect to:",
+        "listItem1": "Process ticket purchases and send you confirmation details",
+        "listItem2": "Communicate with you about events, updates, and promotional activities",
+        "listItem3": "Improve our services and create better event experiences",
+        "listItem4": "Comply with legal obligations and prevent fraudulent activities"
+      },
+      "dataSharing": {
+        "title": "Information sharing",
+        "p1": "We do not sell, trade, or rent your personal information to third parties. We may share your information in the following circumstances:",
+        "listItem1": "With service providers who assist us in operating our website and conducting our business",
+        "listItem2": "When required by law or to protect our rights and safety",
+        "listItem3": "With your consent for specific promotional activities or partnerships"
+      },
+      "dataProtection": {
+        "title": "Data protection",
+        "p1": "We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.",
+        "p2": "However, no method of transmission over the internet or electronic storage is completely secure, and we cannot guarantee absolute security."
+      },
+      "cookies": {
+        "title": "Cookies and tracking",
+        "p1": "Our website may use cookies and similar tracking technologies to enhance your browsing experience and analyze website traffic.",
+        "p2": "You can choose to disable cookies through your browser settings, though this may affect the functionality of our website."
+      },
+      "rights": {
+        "title": "Your rights",
+        "p1": "You have the right to:",
+        "listItem1": "Access and update your personal information",
+        "listItem2": "Request deletion of your personal data",
+        "listItem3": "Opt-out of marketing communications",
+        "listItem4": "Request a copy of the information we hold about you"
+      },
+      "retention": {
+        "title": "Data retention",
+        "p1": "We retain your personal information only for as long as necessary to fulfill the purposes outlined in this privacy policy, comply with legal obligations, or resolve disputes."
+      },
+      "contact": {
+        "title": "Contact us",
+        "p1": "If you have any questions about this Privacy Policy or our data practices, please contact us at: kamayakoi@gmail.com",
+        "p2": "We are committed to resolving any privacy concerns you may have."
+      }
     },
-    "ip": {
-      "title": "Intellectual property",
-      "p1": "All content related to Kamayakoi, including our name, logos, event concepts, DJ mixes (by Mask On, Seny.D, Dalight, and guest artists when recorded and shared by us), text, graphics, images, and audio clips on our website or promotional materials, is the property of Kamayakoi or its content suppliers/partners and protected by international copyright and trademark laws.",
-      "p2": "You may not reproduce, duplicate, copy, sell, resell, or exploit any portion of our service, event content, or branding without express written permission from us."
-    },
-    "userContent": {
-      "title": "User-generated content",
-      "p1": "If you post content or submit material related to our events (e.g., photos, videos, comments on social media tagging Kamayakoi or using our event hashtags), and unless we indicate otherwise, you grant Kamayakoi a nonexclusive, royalty-free, perpetual, irrevocable, and fully sublicensable right to use, reproduce, modify, adapt, publish, translate, create derivative works from, distribute, and display such content throughout the world in any media. This is primarily for promoting the Kamayakoi experience, showcasing our vibrant community, and highlighting the unique atmosphere of our events.",
-      "p2": "You represent and warrant that you own or control all rights to the content you post, that it's accurate, that its use doesn't violate these Terms, and will not cause injury to any person or entity. You agree to indemnify Kamayakoi for all claims resulting from content you supply."
-    },
-    "liability": {
-      "title": "Limitation of liability",
-      "p1": "Kamayakoi, including its founders (Mask On, Seny.D, Dalight) and affiliates, will not be liable for any damages of any kind arising from the use of our services or attendance at our events, including, but not limited to direct, indirect, incidental, punitive, and consequential damages, unless otherwise specified in writing.",
-      "p2": "Your attendance at our events, particularly those in unconventional, \"underground,\" or repurposed venues (e.g., Doraville, Guido's Pizzeria, La Grande Maison by Venus Room), is at your own risk. While we strive to ensure safety, you acknowledge that such venues may have inherent characteristics different from traditional clubs.",
-      "p3": "We do not warrant that our website, its servers, or emails sent from Kamayakoi are free of viruses or other harmful components. We strive to provide a secure online environment but cannot guarantee absolute security."
-    },
-    "indemnification": {
-      "title": "Indemnification",
-      "p1": "You agree to indemnify, defend, and hold harmless Kamayakoi, its founders, employees, agents, and partners from and against all losses, expenses, damages, and costs, including reasonable attorneys' fees, resulting from any violation of these Terms or any activity related to your engagement with our services or events (including negligent or wrongful conduct)."
-    },
-    "governingLaw": {
-      "title": "Governing law",
-      "p1": "These Terms and any dispute or claim arising out of or in connection with them (including non-contractual disputes or claims) shall be governed by and construed in accordance with the laws of Côte d'Ivoire, the home of Kamayakoi."
-    },
-    "changes": {
-      "title": "Changes to these terms",
-      "p1": "We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will aim to provide at least 30 days' notice on our website or through direct communication (if you've subscribed to updates) before new terms take effect. What constitutes a material change will be determined at our sole discretion.",
-      "p2": "By continuing to access or use our Service or attend our events after revisions become effective, you agree to be bound by the revised terms."
-    },
-    "contact": {
-      "title": "Contact us",
-      "p1": "If you have any questions about these Terms, or wish to learn more about Kamayakoi and our mission to energize Abidjan's music scene, please contact us at: kamayakoi@gmail.com.",
-      "p2": "We're building more than just parties; we're cultivating a movement. Thank you for being part of the Kamayakoi energy!"
-    }
-  },
-  "privacyPage": {
-    "pageTitle": "Privacy policy",
-    "pageDescription": "Learn how Kamayakoi protects and manages your personal information in accordance with our privacy practices.",
-    "title": "Privacy Policy",
-    "subtitle": "Your privacy is important to us. This policy explains how we collect, use, and protect your information.",
-    "lastUpdated": "Last Updated: {date}",
-    "introduction": {
-      "title": "Introduction",
-      "p1": "Kamayakoi (\"we,\" \"us,\" or \"our\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, purchase tickets, or attend our events.",
-      "p2": "Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access our services."
-    },
-    "dataCollection": {
-      "title": "Information we collect",
-      "p1": "We may collect information about you in a variety of ways. The information we may collect includes:",
-      "listItem1": "Personal Data: Name, email address, phone number, and other contact information when you purchase tickets or subscribe to our updates.",
-      "listItem2": "Event Information: Photos and videos taken during our events that may include your likeness.",
-      "listItem3": "Usage Data: Information about how you access and use our website, including your IP address, browser type, and device information."
-    },
-    "dataUse": {
-      "title": "How we use your information",
-      "p1": "We use the information we collect to:",
-      "listItem1": "Process ticket purchases and send you confirmation details",
-      "listItem2": "Communicate with you about events, updates, and promotional activities",
-      "listItem3": "Improve our services and create better event experiences",
-      "listItem4": "Comply with legal obligations and prevent fraudulent activities"
-    },
-    "dataSharing": {
-      "title": "Information sharing",
-      "p1": "We do not sell, trade, or rent your personal information to third parties. We may share your information in the following circumstances:",
-      "listItem1": "With service providers who assist us in operating our website and conducting our business",
-      "listItem2": "When required by law or to protect our rights and safety",
-      "listItem3": "With your consent for specific promotional activities or partnerships"
-    },
-    "dataProtection": {
-      "title": "Data protection",
-      "p1": "We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.",
-      "p2": "However, no method of transmission over the internet or electronic storage is completely secure, and we cannot guarantee absolute security."
-    },
-    "cookies": {
-      "title": "Cookies and tracking",
-      "p1": "Our website may use cookies and similar tracking technologies to enhance your browsing experience and analyze website traffic.",
-      "p2": "You can choose to disable cookies through your browser settings, though this may affect the functionality of our website."
-    },
-    "rights": {
-      "title": "Your rights",
-      "p1": "You have the right to:",
-      "listItem1": "Access and update your personal information",
-      "listItem2": "Request deletion of your personal data",
-      "listItem3": "Opt-out of marketing communications",
-      "listItem4": "Request a copy of the information we hold about you"
-    },
-    "retention": {
-      "title": "Data retention",
-      "p1": "We retain your personal information only for as long as necessary to fulfill the purposes outlined in this privacy policy, comply with legal obligations, or resolve disputes."
-    },
-    "contact": {
-      "title": "Contact us",
-      "p1": "If you have any questions about this Privacy Policy or our data practices, please contact us at: kamayakoi@gmail.com",
-      "p2": "We are committed to resolving any privacy concerns you may have."
-    }
-  },
-  "eventsPage": {
-    "metadata": {
+    "eventsPage": {
+      "metadata": {
+        "title": "RENDEZ-VOUS SAUVAGE",
+        "description": "Explore upcoming events from Kamayakoi"
+      },
       "title": "RENDEZ-VOUS SAUVAGE",
-      "description": "Explore upcoming events from Kamayakoi"
+      "noEvents": "No upcoming events found."
     },
-    "title": "RENDEZ-VOUS SAUVAGE",
-    "noEvents": "No upcoming events found."
-  },
-  "eventSlugPage": {
-    "metadata": {
-      "notFoundTitle": "Event not found"
-    },
-    "dateTBC": "Date TBC",
-    "timeTBC": "Time TBC",
-    "metaInfo": {
-      "date": "Date",
-      "time": "Time",
-      "location": "Location",
-      "hostedBy": "Hosted by"
-    },
-    "availability": {
-      "inactive": "Currently Inactive",
-      "soldOut": "Sold Out",
-      "salesStart": "Sales start {startDate}",
-      "salesEnded": "Sold out",
-      "unavailable": "Unavailable",
-      "misconfigured": "Ticketing system error."
-    },
-    "tickets": {
-      "salesClosedGlobal": "Ticket sales are currently closed for this event.",
-      "noItemsListed": "No tickets or bundles are currently listed for this event.",
-      "title": "Tickets",
-      "buyNow": "Buy now",
-      "getETicket": "Get E-Ticket",
-      "currencySuffix": " FCFA",
-      "selectAndJoin": "Select your tickets and join the experience"
-    },
-    "bundles": {
-      "title": "Bundles"
-    },
-    "detailsSection": {
-      "title": "Details"
-    },
-    "lineupSection": {
-      "title": "Artists"
-    },
-    "venueSection": {
-      "title": "Venue",
-      "mapTitleDefault": "Map of event location",
-      "mapTitleNamed": "Map of {locationName}"
-    },
-    "shareSection": {
-      "title": "Share this event",
-      "subtitle": "Spread the word and invite your friends"
-    },
-    "hostedBy": "Hosted by {name}",
-    "errors": {
-      "supabaseNotInitialized": "Online ticketing is temporarily unavailable. Please try again later."
-    }
-  },
-  "floatingPromo": {
-    "getTicket": "Get your ticket"
-  },
-  "eventShare": {
-    "triggerButton": "Share",
-    "modalTitle": "Share this event",
-    "modalDescription": "Share this event on your favorite platforms.",
-    "platformTwitter": "Twitter",
-    "platformFacebook": "Facebook",
-    "platformWhatsApp": "WhatsApp",
-    "platformInstagram": "Instagram",
-    "inputPlaceholder": "Loading link...",
-    "copyButtonCopied": "Copied!",
-    "copyButtonCopy": "Copy link"
-  },
-  "artistCard": {
-    "imageAlt": "{artistName}'s image",
-    "residentBadge": "Resident",
-    "socialAriaLabel": "{artistName}'s social media",
-    "noBio": "No bio available.",
-    "noDetails": "No additional details available."
-  },
-  "purchaseModal": {
-    "title": "Purchase tickets",
-    "description": "Complete your order details",
-    "includesTickets": "Includes {count} ticket(s)",
-    "ticketsGenerated": "Tickets to be generated",
-    "labels": {
-      "quantity": "Quantity",
-      "name": "Name",
-      "email": "Email",
-      "phone": "Phone",
-      "optional": "Optional"
-    },
-    "placeholders": {
-      "name": "Aissata Diop",
-      "email": "aissata@gmail.com",
-      "phone": "+221771234567"
-    },
-    "totalPrice": "Total:",
-    "buttons": {
-      "cancel": "Cancel",
-      "pay": "Purchase",
-      "processing": "Processing..."
-    },
-    "errors": {
-      "nameRequired": "Name is required.",
-      "emailRequired": "Email is required.",
-      "emailInvalid": "Please enter a valid email address.",
-      "quantityInvalid": "Quantity must be at least 1.",
-      "functionError": "Could not initiate payment. Please try again.",
-      "lomiUrlMissing": "Payment URL not received. Please try again.",
-      "submitError": "An error occurred. Please try again."
-    }
-  },
-  "paymentSuccess": {
-    "title": "Payment successful!",
-    "description": "Your ticket purchase has been completed successfully.",
-    "orderId": "Order ID: {orderId}",
-    "whatsNext": {
-      "title": "What's next?",
-      "checkEmail": "Check your email for your e-ticket",
-      "presentTicket": "Present your e-ticket QR code at the event",
-      "arriveEarly": "Arrive early to avoid queues"
-    },
-    "buttons": {
-      "backToEvents": "Back to events",
-      "browseGallery": "Browse Gallery"
-    },
-    "support": "Need help? Contact our support team"
-  },
-  "paymentCancel": {
-    "title": "Payment cancelled",
-    "description": "Your payment was cancelled and no charges were made.",
-    "orderId": "Order ID: {orderId}",
-    "whatsNext": {
-      "title": "What's next?",
-      "tryAgain": "You can try purchasing tickets again",
-      "differentMethod": "Choose a different payment method",
-      "contactSupport": "Contact support if you need help"
-    },
-    "buttons": {
-      "backToEvents": "Back to events",
-      "browseGallery": "Browse Gallery"
-    },
-    "support": "Need help? Contact our support team"
-  },
-  "ticketVerification": {
-    "pageTitle": "Ticket verification",
-    "staffVerification": "Staff verification",
-    "eventDetails": "Event details",
-    "noTicketId": {
-      "description": "Please scan a QR code or visit with a valid ticket ID.",
-      "howToVerify": {
-        "title": "How to verify tickets",
-        "scanQr": "Scan QR code with your phone camera",
-        "enterPin": "Enter staff PIN to access verification",
-        "reviewDetails": "Review customer details and admit entry"
+    "eventSlugPage": {
+      "metadata": {
+        "notFoundTitle": "Event not found"
       },
-      "backToEvents": "Back to events",
-      "needHelp": "Need help? Contact event organizers."
-    },
-    "pinEntry": {
-      "description": "Enter 4-digit PIN to access ticket details",
-      "ticketIdLabel": "Ticket ID:",
-      "pinPlaceholder": "Enter 4-digit PIN",
-      "verifyButton": "Verify PIN",
-      "verifying": "Verifying...",
-      "staffOnly": "Staff access only. Unauthorized access is prohibited."
-    },
-    "status": {
-      "invalid": "Invalid ticket",
-      "alreadyUsed": "Already checked in",
-      "valid": "Ready for entry"
-    },
-    "badges": {
-      "invalid": "❌ INVALID",
-      "alreadyUsed": "⚠️ ALREADY USED",
-      "valid": "✅ VALID"
-    },
-    "loading": {
-      "ticketDetails": "Loading ticket details...",
-      "autoAdmitting": "⚡ Automatically admitting entry..."
-    },
-    "errors": {
-      "ticketNotFound": "❌ Ticket not found, invalid, or not paid",
-      "invalidPin": "❌ Invalid PIN. Access denied."
-    },
-    "warnings": {
-      "alreadyUsed": "⚠️ This ticket has already been used",
-      "entryNotPermitted": "Entry not permitted unless customer shows proof of previous entrance"
-    },
-    "success": {
-      "admitted": "✅ Successfully admitted!",
-      "entryGranted": "Entry granted for {quantity} {people}"
-    },
-    "quantity": {
-      "people": "people",
-      "person": "person"
-    },
-    "checkedInLabel": "Checked in:"
-  },
-  "horizon": {
-    "sections": {
-      "kamayakoi": {
-        "title": "KAMAYAKOI",
-        "subtitle": {
-          "line1": "The wildest encounters in the city",
-          "line2": "since 2017."
-        }
+      "dateTBC": "Date TBC",
+      "timeTBC": "Time TBC",
+      "metaInfo": {
+        "date": "Date",
+        "time": "Time",
+        "location": "Location",
+        "hostedBy": "Hosted by"
       },
-      "rvs": {
-        "title": "INTENSE",
-        "subtitle": {
-          "line1": "In the space between beats,",
-          "line2": "we discover our wildest frequencies."
-        }
+      "availability": {
+        "inactive": "Currently Inactive",
+        "soldOut": "Sold Out",
+        "salesStart": "Sales start {startDate}",
+        "salesEnded": "Sold out",
+        "unavailable": "Unavailable",
+        "misconfigured": "Ticketing system error."
       },
-      "liberation": {
-        "title": "WILD",
-        "subtitle": {
-          "line1": "Every track is a ritual,",
-          "line2": "every drop a unique moment."
+      "tickets": {
+        "salesClosedGlobal": "Ticket sales are currently closed for this event.",
+        "noItemsListed": "No tickets or bundles are currently listed for this event.",
+        "title": "Tickets",
+        "buyNow": "Buy now",
+        "getETicket": "Get E-Ticket",
+        "currencySuffix": " FCFA",
+        "selectAndJoin": "Select your tickets and join the experience"
+      },
+      "bundles": {
+        "title": "Bundles"
+      },
+      "detailsSection": {
+        "title": "Details"
+      },
+      "lineupSection": {
+        "title": "Artists"
+      },
+      "venueSection": {
+        "title": "Venue",
+        "mapTitleDefault": "Map of event location",
+        "mapTitleNamed": "Map of {locationName}"
+      },
+      "shareSection": {
+        "title": "Share this event",
+        "subtitle": "Spread the word and invite your friends"
+      },
+      "hostedBy": "Hosted by {name}",
+      "errors": {
+        "supabaseNotInitialized": "Online ticketing is temporarily unavailable. Please try again later."
+      }
+    },
+    "floatingPromo": {
+      "getTicket": "Get your ticket"
+    },
+    "eventShare": {
+      "triggerButton": "Share",
+      "modalTitle": "Share this event",
+      "modalDescription": "Share this event on your favorite platforms.",
+      "platformTwitter": "Twitter",
+      "platformFacebook": "Facebook",
+      "platformWhatsApp": "WhatsApp",
+      "platformInstagram": "Instagram",
+      "inputPlaceholder": "Loading link...",
+      "copyButtonCopied": "Copied!",
+      "copyButtonCopy": "Copy link"
+    },
+    "artistCard": {
+      "imageAlt": "{artistName}'s image",
+      "residentBadge": "Resident",
+      "socialAriaLabel": "{artistName}'s social media",
+      "noBio": "No bio available.",
+      "noDetails": "No additional details available."
+    },
+    "purchaseModal": {
+      "title": "Purchase tickets",
+      "description": "Complete your order details",
+      "includesTickets": "Includes {count} ticket(s)",
+      "ticketsGenerated": "Tickets to be generated",
+      "labels": {
+        "quantity": "Quantity",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "optional": "Optional"
+      },
+      "placeholders": {
+        "name": "Aissata Diop",
+        "email": "aissata@gmail.com",
+        "phone": "+221771234567"
+      },
+      "totalPrice": "Total:",
+      "buttons": {
+        "cancel": "Cancel",
+        "pay": "Purchase",
+        "processing": "Processing..."
+      },
+      "errors": {
+        "nameRequired": "Name is required.",
+        "emailRequired": "Email is required.",
+        "emailInvalid": "Please enter a valid email address.",
+        "quantityInvalid": "Quantity must be at least 1.",
+        "functionError": "Could not initiate payment. Please try again.",
+        "lomiUrlMissing": "Payment URL not received. Please try again.",
+        "submitError": "An error occurred. Please try again."
+      }
+    },
+    "paymentSuccess": {
+      "title": "Payment successful!",
+      "description": "Your ticket purchase has been completed successfully.",
+      "orderId": "Order ID: {orderId}",
+      "whatsNext": {
+        "title": "What's next?",
+        "checkEmail": "Check your email for your e-ticket",
+        "presentTicket": "Present your e-ticket QR code at the event",
+        "arriveEarly": "Arrive early to avoid queues"
+      },
+      "buttons": {
+        "backToEvents": "Back to events",
+        "browseGallery": "Browse Gallery"
+      },
+      "support": "Need help? Contact our support team"
+    },
+    "paymentCancel": {
+      "title": "Payment cancelled",
+      "description": "Your payment was cancelled and no charges were made.",
+      "orderId": "Order ID: {orderId}",
+      "whatsNext": {
+        "title": "What's next?",
+        "tryAgain": "You can try purchasing tickets again",
+        "differentMethod": "Choose a different payment method",
+        "contactSupport": "Contact support if you need help"
+      },
+      "buttons": {
+        "backToEvents": "Back to events",
+        "browseGallery": "Browse Gallery"
+      },
+      "support": "Need help? Contact our support team"
+    },
+    "ticketVerification": {
+      "pageTitle": "Ticket verification",
+      "staffVerification": "Staff verification",
+      "eventDetails": "Event details",
+      "noTicketId": {
+        "description": "Please scan a QR code or visit with a valid ticket ID.",
+        "howToVerify": {
+          "title": "How to verify tickets",
+          "scanQr": "Scan QR code with your phone camera",
+          "enterPin": "Enter staff PIN to access verification",
+          "reviewDetails": "Review customer details and admit entry"
+        },
+        "backToEvents": "Back to events",
+        "needHelp": "Need help? Contact event organizers."
+      },
+      "pinEntry": {
+        "description": "Enter 4-digit PIN to access ticket details",
+        "ticketIdLabel": "Ticket ID:",
+        "pinPlaceholder": "Enter 4-digit PIN",
+        "verifyButton": "Verify PIN",
+        "verifying": "Verifying...",
+        "staffOnly": "Staff access only. Unauthorized access is prohibited."
+      },
+      "status": {
+        "invalid": "Invalid ticket",
+        "alreadyUsed": "Already checked in",
+        "valid": "Ready for entry"
+      },
+      "badges": {
+        "invalid": "❌ INVALID",
+        "alreadyUsed": "⚠️ ALREADY USED",
+        "valid": "✅ VALID"
+      },
+      "loading": {
+        "ticketDetails": "Loading ticket details...",
+        "autoAdmitting": "⚡ Automatically admitting entry..."
+      },
+      "errors": {
+        "ticketNotFound": "❌ Ticket not found, invalid, or not paid",
+        "invalidPin": "❌ Invalid PIN. Access denied."
+      },
+      "warnings": {
+        "alreadyUsed": "⚠️ This ticket has already been used",
+        "entryNotPermitted": "Entry not permitted unless customer shows proof of previous entrance"
+      },
+      "success": {
+        "admitted": "✅ Successfully admitted!",
+        "entryGranted": "Entry granted for {quantity} {people}"
+      },
+      "quantity": {
+        "people": "people",
+        "person": "person"
+      },
+      "checkedInLabel": "Checked in:"
+    },
+    "horizon": {
+      "sections": {
+        "kamayakoi": {
+          "title": "KAMAYAKOI",
+          "subtitle": {
+            "line1": "The wildest encounters in the city",
+            "line2": "since 2017."
+          }
+        },
+        "rvs": {
+          "title": "INTENSE",
+          "subtitle": {
+            "line1": "In the space between beats,",
+            "line2": "we discover our wildest frequencies."
+          }
+        },
+        "liberation": {
+          "title": "WILD",
+          "subtitle": {
+            "line1": "Every track is a ritual,",
+            "line2": "every drop a unique moment."
+          }
         }
       }
-    }
-  },
-  "storyPage": {
-    "backToStories": "Back to stories",
-    "byAuthor": "By {authorName}",
-    "relatedStories": "RELATED STORIES",
-    "readMore": "Read",
-    "noRelatedStories": "No related stories found.",
-    "loading": "Loading...",
-    "noStories": {
-      "title": "Stories coming soon",
-      "description": "We're working on bringing you amazing stories and narratives. Stay tuned for exclusive Kamayakoi content!"
     },
-    "share": {
-      "onFacebook": "Share on Facebook",
-      "onTwitter": "Share on Twitter",
-      "copyLink": "Copy link"
-    }
-  },
-  "merchPage": {
-    "title": "Merch",
-    "subtitle": "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products crafted for the wild at heart.",
-    "breadcrumb": "Shop",
-    "loading": "Loading...",
-    "comingSoon": {
-      "title": "Merch coming soon",
-      "description": "We're working on bringing you amazing merchandise and collectibles. Stay tuned for exclusive Kamayakoi gear!"
-    },
-    "productDetail": {
-      "backToMerch": "Back to merch",
-      "noImage": "No Image Available",
-      "quantity": "Quantity:",
-      "outOfStock": "Out of Stock",
-      "addToCart": "Add to Cart",
-      "inStock": "in stock",
-      "addToWishlist": "Add to Wishlist",
-      "share": "Share",
-      "productDetails": "Product Details",
-      "productId": "Product ID:",
-      "category": "Category: Merchandise",
-      "shipping": "Shipping: Free shipping on orders over 50,000 F CFA"
-    },
-    "metadata": {
-      "title": "Merch | Kamayakoi",
-      "description": "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products."
-    }
-  },
-  "eventShowcase": {
-    "featured": {
-      "title": "Featured",
-      "subtitle": "Exclusive content and behind-the-scenes",
-      "clickToPlay": "Click to Play"
-    },
-    "events": {
-      "title": "Events",
-      "subtitle": "Past performances and highlights",
-      "viewEvent": "VIEW EVENT →",
-      "comingSoon": {
-        "title": "Events coming soon",
-        "description": "We're working on bringing you amazing events and experiences. Stay tuned!"
-      }
-    },
-    "media": {  
-      "title": "Media",
-      "subtitle": "Discover the best sounds and videos",
-      "viewAll": "View all media",
-      "comingSoon": {
-        "title": "Media coming soon",
-        "description": "We're working on bringing you amazing sounds and videos."
-      }
-    },
-    "articles": {
-      "title": "Articles",
-      "subtitle": "Discover the latest news and stories",
-      "readMore": "Read more",
-      "viewAll": "View all articles",
-      "comingSoon": {
-        "title": "Articles coming soon",
-        "description": "We're working on bringing you amazing articles and stories. Stay tuned!"
-      }
-    },
-    "hero": {
-      "contentTypes": {
-        "article": "Article",
-        "media": "Media",
-        "event": "Event",
-        "video": "Video",
-        "image": "Image"
+    "storyPage": {
+      "backToStories": "Back to stories",
+      "byAuthor": "By {authorName}",
+      "relatedStories": "RELATED STORIES",
+      "readMore": "Read",
+      "noRelatedStories": "No related stories found.",
+      "loading": "Loading...",
+      "noStories": {
+        "title": "Stories coming soon",
+        "description": "We're working on bringing you amazing stories and narratives. Stay tuned for exclusive Kamayakoi content!"
       },
-      "actions": {
-        "readArticle": "Read Article",
-        "viewEvent": "View Event",
-        "watchMedia": "Watch Media",
-        "watchVideo": "Watch Video",
-        "playVideo": "Play Video",
-        "pauseVideo": "Pause Video"
+      "share": {
+        "onFacebook": "Share on Facebook",
+        "onTwitter": "Share on Twitter",
+        "copyLink": "Copy link"
       }
-    }
-  },
-  "cardCarousel": {
-    "comingSoon": {
-      "title": "Coming Soon",
-      "description": "We're working on bringing you amazing content. Stay tuned!"
+    },
+    "merchPage": {
+      "title": "Merch",
+      "subtitle": "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products crafted for the wild at heart.",
+      "breadcrumb": "Shop",
+      "loading": "Loading...",
+      "comingSoon": {
+        "title": "Merch coming soon",
+        "description": "We're working on bringing you amazing merchandise and collectibles. Stay tuned for exclusive Kamayakoi gear!"
+      },
+      "productDetail": {
+        "backToMerch": "Back to merch",
+        "noImage": "No Image Available",
+        "quantity": "Quantity:",
+        "outOfStock": "Out of Stock",
+        "addToCart": "Add to Cart",
+        "inStock": "in stock",
+        "addToWishlist": "Add to Wishlist",
+        "share": "Share",
+        "productDetails": "Product Details",
+        "productId": "Product ID:",
+        "category": "Category: Merchandise",
+        "shipping": "Shipping: Free shipping on orders over 50,000 F CFA"
+      },
+      "metadata": {
+        "title": "Merch | Kamayakoi",
+        "description": "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products."
+      }
+    },
+    "eventShowcase": {
+      "featured": {
+        "title": "Featured",
+        "subtitle": "Exclusive content and behind-the-scenes",
+        "clickToPlay": "Click to Play"
+      },
+      "events": {
+        "title": "Events",
+        "subtitle": "Past performances and highlights",
+        "viewEvent": "VIEW EVENT →",
+        "comingSoon": {
+          "title": "Events coming soon",
+          "description": "We're working on bringing you amazing events and experiences. Stay tuned!"
+        }
+      },
+      "media": {
+        "title": "Media",
+        "subtitle": "Discover the best sounds and videos",
+        "viewAll": "View all media",
+        "comingSoon": {
+          "title": "Media coming soon",
+          "description": "We're working on bringing you amazing sounds and videos."
+        }
+      },
+      "articles": {
+        "title": "Articles",
+        "subtitle": "Discover the latest news and stories",
+        "readMore": "Read more",
+        "viewAll": "View all articles",
+        "comingSoon": {
+          "title": "Articles coming soon",
+          "description": "We're working on bringing you amazing articles and stories. Stay tuned!"
+        }
+      },
+      "hero": {
+        "contentTypes": {
+          "article": "Article",
+          "media": "Media",
+          "event": "Event",
+          "video": "Video",
+          "image": "Image"
+        },
+        "actions": {
+          "readArticle": "Read Article",
+          "viewEvent": "View Event",
+          "watchMedia": "Watch Media",
+          "watchVideo": "Watch Video",
+          "playVideo": "Play Video",
+          "pauseVideo": "Pause Video"
+        }
+      }
+    },
+    "cardCarousel": {
+      "comingSoon": {
+        "title": "Coming Soon",
+        "description": "We're working on bringing you amazing content. Stay tuned!"
+      }
     }
   }
-}
 }

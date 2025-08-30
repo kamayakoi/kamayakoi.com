@@ -113,7 +113,7 @@ export default defineType({
       url: 'url',
     },
     prepare({title, type, artist, thumbnail, url}) {
-      const typeIcons = {
+      const typeIcons: Record<string, string> = {
         youtube: '📺',
         soundcloud: '🎵',
         soundcloud_playlist: '📀',

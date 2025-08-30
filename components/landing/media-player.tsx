@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Play, Pause, Volume2, VolumeX, ExternalLink } from "lucide-react";
+import Image from "next/image";
 import { MediaItem } from "@/lib/sanity/queries";
 
 interface MediaPlayerProps {
@@ -116,10 +117,11 @@ export function MediaPlayer({ media, onPlay, onPause }: MediaPlayerProps) {
           />
         ) : media.thumbnail ? (
           <div className="relative w-full h-full">
-            <img
+            <Image
               src={media.thumbnail}
               alt={media.title}
-              className="absolute inset-0 w-full h-full object-cover"
+              fill={true}
+              className="object-cover"
             />
             {(media.type === "audio_url" || media.type === "video_url") && (
               <>

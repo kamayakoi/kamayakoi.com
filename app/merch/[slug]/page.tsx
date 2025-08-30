@@ -3,7 +3,6 @@ import { getProductBySlug } from "@/lib/sanity/queries";
 import { notFound } from "next/navigation";
 import LoadingComponent from "@/components/ui/loader";
 import Header from "@/components/landing/header";
-import MiniAudioPlayer from "@/components/landing/mini-audio-player";
 import { ProductDetailContent } from "../../../components/merch/product-detail-content";
 
 type Props = {
@@ -20,10 +19,6 @@ async function ProductContent({ params }: Props) {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Mini Audio Player */}
-      <div className="fixed top-4 left-4 z-[60]">
-        <MiniAudioPlayer />
-      </div>
       <Header />
       <main className="flex-grow">
         <ProductDetailContent product={product} />

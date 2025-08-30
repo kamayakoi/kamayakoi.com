@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { type ArtistData } from "@/lib/sanity/queries";
 import Header from "@/components/landing/header";
-import MiniAudioPlayer from "@/components/landing/mini-audio-player";
 import { Footer } from "@/components/landing/footer";
 import ArtistCard from "@/components/ui/artist-card";
 
@@ -16,11 +15,6 @@ export default function ArtistsContentClient({
 }: ArtistsContentClientProps) {
   return (
     <div className="min-h-screen bg-background">
-      {/* Mini Audio Player */}
-      <div className="fixed top-[13px] md:top-4 left-4 z-[60] pointer-events-auto">
-        <MiniAudioPlayer />
-      </div>
-
       <Header />
 
       <main>

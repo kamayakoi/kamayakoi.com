@@ -17,6 +17,7 @@ import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
 import { CartProvider } from "@/components/merch/cart/cart-context";
 import CartModal from "@/components/merch/cart/cart-modal";
+import MiniAudioPlayer from "@/components/landing/mini-audio-player";
 
 interface NavItem {
   nameKey: string;
@@ -55,8 +56,13 @@ export default function Header() {
 
   return (
     <header className={`${styles.header} ${isScrolled ? styles.scrolled : ""}`}>
+      {/* Mini Audio Player - positioned relative to header */}
+      <div className="absolute top-[14px] left-[19px] md:top-[12px] md:left-4 z-[60] pointer-events-auto">
+        <MiniAudioPlayer />
+      </div>
+
       <div className={styles.headerContent}>
-        {/* Empty space for both mobile and desktop */}
+        {/* Empty space for both mobile and desktop - adjusted for MiniAudioPlayer */}
         <div className="flex items-center" style={{ width: "140px" }}></div>
 
         <nav className="hidden md:flex items-center gap-6">
@@ -105,7 +111,7 @@ export default function Header() {
           <Sheet>
             <SheetTrigger asChild>
               <Button
-                className={`${styles.mobileMenuButton} bg-transparent border border-border hover:bg-transparent focus:ring-0`}
+                className={`${styles.mobileMenuButton} bg-transparent hover:bg-transparent focus:ring-0 border-0 -translate-y-[7px] translate-x-[6px]`}
               >
                 <Menu className="h-5 w-5 text-foreground" />
                 <span className="sr-only">

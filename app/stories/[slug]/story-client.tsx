@@ -14,7 +14,6 @@ import Tag from "@/components/blog/tag";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import MiniAudioPlayer from "@/components/landing/mini-audio-player";
 import { getRelatedPosts } from "@/lib/sanity/queries";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
@@ -147,11 +146,6 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Mini Audio Player */}
-      <div className="fixed top-[13px] md:top-4 left-4 z-[60] pointer-events-auto">
-        <MiniAudioPlayer />
-      </div>
-
       <div className="container mx-auto px-4 py-0 max-w-7xl">
         <div className="mb-8 pt-24 md:pt-32">
           <div className="flex flex-col md:flex-row md:items-start mb-6">
@@ -225,7 +219,11 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
                       />
                     )}
                     <User className="h-4 w-4 mr-2" />
-                    <span>{t(currentLanguage, "storyPage.byAuthor", { authorName: post.author.name })}</span>
+                    <span>
+                      {t(currentLanguage, "storyPage.byAuthor", {
+                        authorName: post.author.name,
+                      })}
+                    </span>
                     {post.author.role && (
                       <span className="text-zinc-500 dark:text-zinc-400 ml-1">
                         ({post.author.role})
@@ -264,15 +262,17 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
                   {post.tags && post.tags.length > 0 && (
                     <>
                       <span className="mx-2">·</span>
-                      {post.tags.slice(0, 3).map((tag: string, index: number) => (
-                        <Tag
-                          key={index}
-                          text={tag}
-                          variant="outline"
-                          size="sm"
-                          className="mr-2"
-                        />
-                      ))}
+                      {post.tags
+                        .slice(0, 3)
+                        .map((tag: string, index: number) => (
+                          <Tag
+                            key={index}
+                            text={tag}
+                            variant="outline"
+                            size="sm"
+                            className="mr-2"
+                          />
+                        ))}
                     </>
                   )}
                 </div>
@@ -287,7 +287,9 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
                       fill
                       priority
                       className="object-cover"
-                      placeholder={post.mainImage.asset.metadata?.lqip ? "blur" : undefined}
+                      placeholder={
+                        post.mainImage.asset.metadata?.lqip ? "blur" : undefined
+                      }
                       blurDataURL={post.mainImage.asset.metadata?.lqip}
                     />
                   </div>
@@ -345,7 +347,13 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
 }
 
 // Related Stories Component
-function RelatedStories({ currentSlug, tags }: { currentSlug: string; tags?: string[] }) {
+function RelatedStories({
+  currentSlug,
+  tags,
+}: {
+  currentSlug: string;
+  tags?: string[];
+}) {
   const [relatedPosts, setRelatedPosts] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
   const { currentLanguage } = useTranslation();
@@ -369,7 +377,10 @@ function RelatedStories({ currentSlug, tags }: { currentSlug: string; tags?: str
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: 3 }).map((_, index) => (
-          <article key={index} className="bg-white dark:bg-[#1a1a1a] rounded-sm overflow-hidden shadow-sm border border-zinc-200 dark:border-zinc-800">
+          <article
+            key={index}
+            className="bg-white dark:bg-[#1a1a1a] rounded-sm overflow-hidden shadow-sm border border-zinc-200 dark:border-zinc-800"
+          >
             <div className="aspect-[16/9] bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
               <div className="w-8 h-8 bg-zinc-200 dark:bg-zinc-700 rounded animate-pulse"></div>
             </div>
@@ -415,7 +426,9 @@ function RelatedStories({ currentSlug, tags }: { currentSlug: string; tags?: str
                 alt={post.mainImage.alt || post.title}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
-                placeholder={post.mainImage.asset.metadata?.lqip ? "blur" : undefined}
+                placeholder={
+                  post.mainImage.asset.metadata?.lqip ? "blur" : undefined
+                }
                 blurDataURL={post.mainImage.asset.metadata?.lqip}
               />
             ) : (
@@ -436,7 +449,7 @@ function RelatedStories({ currentSlug, tags }: { currentSlug: string; tags?: str
                 {new Date(post.publishedAt).toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
-                  year: "numeric"
+                  year: "numeric",
                 })}
               </span>
               <Link

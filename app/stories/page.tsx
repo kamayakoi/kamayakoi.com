@@ -12,16 +12,13 @@ export const metadata: Metadata = {
     "Discover inspiring stories, insights, and narratives from our community",
 };
 
-
-
-
 async function StoriesContent() {
   const allStories: Story[] = await getAllBlogPosts();
   const featuredStory = await getFeaturedPost();
 
   // Get other stories (excluding featured if it's in the list)
   const otherStories = featuredStory
-    ? allStories.filter(story => story._id !== featuredStory._id)
+    ? allStories.filter((story) => story._id !== featuredStory._id)
     : allStories;
 
   // Get featured stories (first 3 from remaining stories)

@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { getBlogPostBySlug } from "@/lib/sanity/queries";
 import LoadingComponent from "@/components/ui/loader";
 import Header from "@/components/landing/header";
-import MiniAudioPlayer from "@/components/landing/mini-audio-player";
 import { Footer } from "@/components/landing/footer";
 import StoryClient from "./story-client";
 
@@ -44,11 +43,6 @@ async function StoryPage({ params }: PageProps) {
 
     return (
       <div className="min-h-screen">
-        {/* Mini Audio Player */}
-        <div className="fixed top-4 left-4 z-[60]">
-          <MiniAudioPlayer />
-        </div>
-
         {/* Header */}
         <Header />
 

@@ -287,17 +287,19 @@ export function Footer() {
             style={{ backgroundColor: "rgb(255 255 255 / 0.2)" }}
           ></div>
           <div className="flex items-center gap-3">
-            <p className="text-xs font-mono">
-              {t(currentLanguage, "footer.copyright", { year: new Date().getFullYear() })}
+            <p className="text-[10px] font-mono md:text-xs">
+              {t(currentLanguage, "footer.copyright", {
+                year: new Date().getFullYear(),
+              })}
             </p>
           </div>
 
           {/* Desktop: Language Switcher, Mobile: Social Icons and Language Switcher */}
-          <div className="flex items-center gap-3 translate-x-12 md:translate-x-6">
+          <div className="flex items-center gap-3 translate-x-0 md:translate-x-8">
             <div className="hidden md:block">
               <LanguageSwitcher />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Link
                 href="https://chat.whatsapp.com/I9yf0JkldJKLfu6FCnzQPQ?fbclid=PAZXh0bgNhZW0CMTEAAacIsymPxGAGZe1Y8dd04RKl0SOezf6bvn4z-8xK36S3a5bMDVddkT7DztdndQ_aem_rJkv0dc7xDHqT-vZBriGkg"
                 target="_blank"
@@ -334,9 +336,6 @@ export function Footer() {
               >
                 <IG className="h-[17px] w-[17px]" />
               </Link>
-              <div className="md:hidden">
-                <LanguageSwitcher useAbbreviated />
-              </div>
             </div>
           </div>
         </div>

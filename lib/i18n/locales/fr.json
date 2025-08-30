@@ -4,15 +4,6 @@
       "terms": "Conditions",
       "privacy": "Confidentialité"
     },
-    "tagline": {
-      "intro": "Nous apportons",
-      "outro": "à la scène musicale Ivoirienne."
-    },
-    "animatedWords": {
-      "freedom": "liberté",
-      "energy": "énergie",
-      "respect": "respect"
-    },
     "copyright": "© {year} Kamayakoi — Tous droits réservés.",
     "contact": {
       "title": "Contactez-nous",
@@ -25,8 +16,8 @@
     },
     "sections": {
       "explore": "EXPLORER",
-      "connect": "CONNECTER",
-      "legal": "LÉGAL"
+      "connect": "À PROPOS",
+      "legal": "RESSOURCES"
     },
     "navigation": {
       "events": "LE RENDEZ-VOUS SAUVAGE",
@@ -50,8 +41,7 @@
     "mobileMenu": {
       "toggle": "Ouvrir/Fermer le menu",
       "title": "Menu Mobile",
-      "close": "Fermer le menu",
-      "description": "Kamayakoi est un collectif de DJs avant-gardiste basé à Abidjan. Nous créons des espaces où la liberté musicale s'épanouit et les barrières sociales s'effacent."
+      "close": "Fermer le menu"
     }
   },
   "barcode": {
@@ -59,7 +49,7 @@
   },
   "termsPage": {
     "pageTitle": "Termes et Conditions | Kamayakoi",
-    "pageDescription": "Comprendre les Termes et Conditions d'engagement avec Kamayakoi, le collectif musical et organisateur d'événements pionnier de la scène alternative Hip-Hop & Électronique d'Abidjan.",
+    "pageDescription": "Comprendre les Termes et Conditions d'engagement avec Kamayakoi, le collectif musical et organisateur d'événements pionnier de la scène alternative Électronique d'Abidjan.",
     "title": "Termes et Conditions",
     "subtitle": "Veuillez lire attentivement ces termes avant d'utiliser nos services ou d'assister à nos événements uniques.",
     "lastUpdated": "Dernière mise à jour : {date}",
@@ -69,12 +59,12 @@
       "p2": "Le terme \"Kamayakoi\" lui-même, issu du Nouchi (argot ivoirien), signifie énergie, entêtement et amour de la fête – des qualités que nous canalisons pour créer des expériences uniques et libératrices. En accédant à nos services, en achetant des billets ou en participant à nos événements, vous acceptez d'être lié par ces Termes. Si vous êtes en désaccord avec une partie de ces Termes, vous ne pouvez pas accéder à nos services ni participer à nos événements."
     },
     "mission": {
-      "title": "Notre Mission & Votre Expérience",
+      "title": "Notre Mission",
       "p1": "Kamayakoi est né d'un désir de liberté artistique sur la scène DJ d'Abidjan. Notre objectif principal est d'offrir une plateforme où les DJs peuvent exprimer leur curation et leur personnalité artistique sans les contraintes de la demande mainstream, et où le public peut découvrir une riche diversité musicale. Nous nous efforçons de créer un pont entre les genres et les publics, favorisant la cohésion sociale et l'échange culturel.",
       "p2": "Nos valeurs sont l'Unité, l'Ouverture, la Liberté et le Respect. Nous vivons selon deux commandements : \"L'égalité de chacun sur le Dancefloor\" et \"L'enjaillement dans le respect\". Nous attendons de tous les participants et participantes qu'ils respectent ces valeurs."
     },
     "conduct": {
-      "title": "Utilisation de Nos Services & Conduite aux Événements",
+      "title": "Utilisation de nos services",
       "p1": "Vous acceptez d'utiliser notre site web et nos services uniquement à des fins légales et d'une manière qui respecte les droits et la jouissance des autres. Lors de votre participation aux événements de Kamayakoi :",
       "listItem1": "Vous devez vous comporter de manière respectueuse envers toutes les personnes, sans distinction de race, de culture ou de classe sociale, reflétant la communauté diversifiée que nous cultivons.",
       "listItem2": "Les comportements interdits comprennent le harcèlement, la discrimination, le fait de causer de la détresse ou des désagréments à toute personne, la transmission de contenu obscène ou offensant, ou la perturbation de l'événement.",
@@ -82,23 +72,23 @@
       "p2": "Lors de l'inscription pour recevoir des informations, des newsletters ou (le cas échéant) pour des préventes d'événements, vous devez fournir des informations exactes et à jour."
     },
     "tickets": {
-      "title": "Billets d'Événement et Admission",
+      "title": "Billets d'événement",
       "p1": "Toutes les ventes de billets pour les événements de Kamayakoi sont soumises à disponibilité et à toutes conditions spécifiques communiquées au moment de l'achat (par exemple, restrictions d'âge, exigences d'entrée spécifiques pour des lieux uniques).",
       "p2": "Les billets sont généralement non remboursables et non transférables, sauf si requis par la loi applicable ou explicitement indiqué par nous pour un événement particulier. Nous nous réservons le droit d'annuler ou de reporter des événements ; dans ce cas, notre politique de remboursement ou d'échange sera communiquée aux détenteurs de billets.",
       "p3": "Nous nous réservons le droit de refuser l'admission ou d'expulser toute personne dont la conduite est jugée désordonnée, qui ne respecte pas ces Termes, les règles spécifiques de l'événement ou nos valeurs fondamentales, ou qui présente un risque pour la sécurité ou le plaisir des autres. Aucun remboursement ne sera offert dans de telles circonstances."
     },
     "ip": {
-      "title": "Propriété Intellectuelle",
+      "title": "Propriété intellectuelle",
       "p1": "Tout le contenu lié à Kamayakoi, y compris notre nom, nos logos, nos concepts d'événements, nos mixes DJ (par Mask On, Seny.D, Dalight, et les artistes invités lorsqu'enregistrés et partagés par nous), textes, graphiques, images et clips audio sur notre site web ou nos supports promotionnels, est la propriété de Kamayakoi ou de ses fournisseurs/partenaires de contenu et est protégé par les lois internationales sur le droit d'auteur et les marques.",
       "p2": "Vous ne pouvez pas reproduire, dupliquer, copier, vendre, revendre ou exploiter toute partie de notre service, contenu d'événement ou image de marque sans notre autorisation écrite expresse."
     },
     "userContent": {
-      "title": "Contenu Généré par l'Utilisateur",
+      "title": "Contenu généré par l'utilisateur",
       "p1": "Si vous publiez du contenu ou soumettez du matériel lié à nos événements (par exemple, photos, vidéos, commentaires sur les réseaux sociaux taguant Kamayakoi ou utilisant nos hashtags d'événement), et sauf indication contraire de notre part, vous accordez à Kamayakoi un droit non exclusif, libre de redevances, perpétuel, irrévocable et entièrement sous-licenciable d'utiliser, reproduire, modifier, adapter, publier, traduire, créer des œuvres dérivées, distribuer et afficher ce contenu dans le monde entier et sur tout support. Ceci a pour but principal de promouvoir l'expérience Kamayakoi, de mettre en valeur notre communauté dynamique et de souligner l'atmosphère unique de nos événements.",
       "p2": "Vous déclarez et garantissez que vous possédez ou contrôlez tous les droits sur le contenu que vous publiez, qu'il est exact, que son utilisation ne viole pas ces Termes et ne causera aucun préjudice à toute personne ou entité. Vous acceptez d'indemniser Kamayakoi pour toutes les réclamations résultant du contenu que vous fournissez."
     },
     "liability": {
-      "title": "Limitation de Responsabilité",
+      "title": "Limitation de responsabilité",
       "p1": "Kamayakoi, y compris ses fondateurs (Mask On, Seny.D, Dalight) et ses affiliés, ne sera pas responsable des dommages de toute nature résultant de l'utilisation de nos services ou de la participation à nos événements, y compris, mais sans s'y limiter, les dommages directs, indirects, accessoires, punitifs et consécutifs, sauf indication contraire écrite.",
       "p2": "Votre participation à nos événements, en particulier ceux qui se déroulent dans des lieux non conventionnels, \"underground\" ou réaménagés (par exemple, La Grande Maison by Venus Room), est à vos propres risques. Bien que nous nous efforçons d'assurer la sécurité, vous reconnaissez que de tels lieux peuvent présenter des caractéristiques intrinsèques différentes des clubs traditionnels.",
       "p3": "Nous ne garantissons pas que notre site web, ses serveurs ou les e-mails envoyés par Kamayakoi sont exempts de virus ou d'autres composants nuisibles. Nous nous efforçons de fournir un environnement en ligne sécurisé mais ne pouvons garantir une sécurité absolue."
@@ -108,24 +98,24 @@
       "p1": "Vous acceptez d'indemniser, de défendre et de dégager de toute responsabilité Kamayakoi, ses fondateurs, employés, agents et partenaires contre toutes pertes, dépenses, dommages et coûts, y compris les honoraires d'avocat raisonnables, résultant de toute violation de ces Termes ou de toute activité liée à votre engagement avec nos services ou événements (y compris une conduite négligente ou fautive)."
     },
     "governingLaw": {
-      "title": "Droit Applicable",
+      "title": "Droit applicable",
       "p1": "Ces Termes et tout litige ou réclamation découlant de ou en relation avec eux (y compris les litiges ou réclamations non contractuels) seront régis et interprétés conformément aux lois de la Côte d'Ivoire, pays d'origine de Kamayakoi."
     },
     "changes": {
-      "title": "Modifications de Ces Termes",
+      "title": "Modifications de ces termes",
       "p1": "Nous nous réservons le droit, à notre seule discrétion, de modifier ou de remplacer ces Termes à tout moment. Si une révision est importante, nous nous efforcerons de fournir un préavis d'au moins 30 jours sur notre site web ou par communication directe (si vous êtes abonné aux mises à jour) avant que les nouveaux termes n'entrent en vigueur. Ce qui constitue une modification importante sera déterminé à notre seule discrétion.",
       "p2": "En continuant d'accéder ou d'utiliser notre Service ou de participer à nos événements après l'entrée en vigueur des révisions, vous acceptez d'être lié par les termes révisés."
     },
     "contact": {
-      "title": "Contactez-Nous",
+      "title": "Contactez-nous",
       "p1": "Si vous avez des questions concernant ces Termes, ou si vous souhaitez en savoir plus sur Kamayakoi et notre mission pour dynamiser la scène musicale d'Abidjan, veuillez nous contacter à : kamayakoi@gmail.com.",
       "p2": "Nous construisons plus que de simples soirées ; nous cultivons un mouvement. Merci de faire partie de l'énergie Kamayakoi !"
     }
   },
   "privacyPage": {
-    "pageTitle": "Politique de Confidentialité",
+    "pageTitle": "Politique de confidentialité",
     "pageDescription": "Découvrez comment Kamayakoi protège et gère vos informations personnelles conformément à nos pratiques de confidentialité.",
-    "title": "Politique de Confidentialité",
+    "title": "Politique de confidentialité",
     "subtitle": "Votre confidentialité est importante pour nous. Cette politique explique comment nous collectons, utilisons et protégeons vos informations.",
     "lastUpdated": "Dernière mise à jour : {date}",
     "introduction": {
@@ -134,14 +124,14 @@
       "p2": "Veuillez lire attentivement cette politique de confidentialité. Si vous n'acceptez pas les termes de cette politique, veuillez ne pas accéder à nos services."
     },
     "dataCollection": {
-      "title": "Informations que Nous Collectons",
+      "title": "Informations que nous collectons",
       "p1": "Nous pouvons collecter des informations vous concernant de diverses manières. Les informations que nous pouvons collecter incluent :",
       "listItem1": "Données Personnelles : Nom, adresse e-mail, numéro de téléphone et autres informations de contact lorsque vous achetez des billets ou vous abonnez à nos mises à jour.",
       "listItem2": "Informations d'Événement : Photos et vidéos prises lors de nos événements qui peuvent inclure votre image.",
       "listItem3": "Données d'Utilisation : Informations sur la façon dont vous accédez et utilisez notre site web, y compris votre adresse IP, type de navigateur et informations sur l'appareil."
     },
     "dataUse": {
-      "title": "Comment Nous Utilisons Vos Informations",
+      "title": "Comment nous utilisons vos informations",
       "p1": "Nous utilisons les informations que nous collectons pour :",
       "listItem1": "Traiter les achats de billets et vous envoyer les détails de confirmation",
       "listItem2": "Communiquer avec vous concernant les événements, mises à jour et activités promotionnelles",
@@ -149,24 +139,24 @@
       "listItem4": "Respecter les obligations légales et prévenir les activités frauduleuses"
     },
     "dataSharing": {
-      "title": "Partage d'Informations",
+      "title": "Partage d'informations",
       "p1": "Nous ne vendons, n'échangeons ou ne louons pas vos informations personnelles à des tiers. Nous pouvons partager vos informations dans les circonstances suivantes :",
       "listItem1": "Avec des prestataires de services qui nous aident à exploiter notre site web et à mener nos activités",
       "listItem2": "Lorsque requis par la loi ou pour protéger nos droits et notre sécurité",
       "listItem3": "Avec votre consentement pour des activités promotionnelles spécifiques ou des partenariats"
     },
     "dataProtection": {
-      "title": "Protection des Données",
+      "title": "Protection des données",
       "p1": "Nous mettons en œuvre des mesures de sécurité appropriées pour protéger vos informations personnelles contre l'accès non autorisé, l'altération, la divulgation ou la destruction.",
       "p2": "Cependant, aucune méthode de transmission sur internet ou de stockage électronique n'est complètement sécurisée, et nous ne pouvons garantir une sécurité absolue."
     },
     "cookies": {
-      "title": "Cookies et Suivi",
+      "title": "Cookies et suivi",
       "p1": "Notre site web peut utiliser des cookies et des technologies de suivi similaires pour améliorer votre expérience de navigation et analyser le trafic du site web.",
       "p2": "Vous pouvez choisir de désactiver les cookies via les paramètres de votre navigateur, bien que cela puisse affecter les fonctionnalités de notre site web."
     },
     "rights": {
-      "title": "Vos Droits",
+      "title": "Vos droits",
       "p1": "Vous avez le droit de :",
       "listItem1": "Accéder et mettre à jour vos informations personnelles",
       "listItem2": "Demander la suppression de vos données personnelles",
@@ -174,11 +164,11 @@
       "listItem4": "Demander une copie des informations que nous détenons sur vous"
     },
     "retention": {
-      "title": "Conservation des Données",
+      "title": "Conservation des données",
       "p1": "Nous conservons vos informations personnelles uniquement pendant la durée nécessaire pour atteindre les objectifs décrits dans cette politique de confidentialité, respecter les obligations légales ou résoudre les litiges."
     },
     "contact": {
-      "title": "Nous Contacter",
+      "title": "Nous contacter",
       "p1": "Si vous avez des questions concernant cette Politique de Confidentialité ou nos pratiques de données, veuillez nous contacter à : kamayakoi@gmail.com",
       "p2": "Nous nous engageons à résoudre toute préoccupation de confidentialité que vous pourriez avoir."
     }
@@ -266,14 +256,14 @@
     "noDetails": "Aucun détail supplémentaire disponible."
   },
   "purchaseModal": {
-    "title": "Acheter des tickets",
-    "description": "Entrez vos coordonnées pour acheter des tickets.",
+    "title": "Purchase Tickets",
+    "description": "Complete your order details",
     "includesTickets": "Inclut {count} ticket(s)",
     "ticketsGenerated": "Tickets à générer",
     "labels": {
       "quantity": "Quantité",
-      "name": "Nom complet",
-      "email": "E-mail",
+      "name": "Name",
+      "email": "Email",
       "phone": "Téléphone",
       "optional": "Optionnel"
     },
@@ -282,15 +272,15 @@
       "email": "aissata@gmail.com",
       "phone": "+2250771234567"
     },
-    "totalPrice": "Prix total",
+    "totalPrice": "Total:",
     "buttons": {
       "cancel": "Annuler",
-      "pay": "Payer",
+      "pay": "Acheter",
       "processing": "Traitement..."
     },
     "errors": {
-      "nameRequired": "Le nom complet est requis.",
-      "emailRequired": "L'e-mail est requis.",
+      "nameRequired": "Le nom est requis.",
+      "emailRequired": "L'email est requis.",
       "emailInvalid": "Veuillez entrer une adresse e-mail valide.",
       "quantityInvalid": "La quantité doit être d'au moins 1.",
       "functionError": "Impossible d'initier le paiement. Veuillez réessayer.",
@@ -304,7 +294,7 @@
     "orderId": "ID commande : {orderId}",
     "whatsNext": {
       "title": "Et maintenant ?",
-      "checkEmail": "Vérifiez votre e-mail pour votre e-ticket",
+      "checkEmail": "Vérifiez votre email pour votre e-ticket",
       "presentTicket": "Présentez votre e-ticket QR code à l'événement",
       "arriveEarly": "Arrivez tôt pour éviter les files d'attente"
     },
@@ -411,7 +401,7 @@
     }
   },
   "storyPage": {
-    "backToStories": "Retour aux Stories",
+    "backToStories": "Retour aux stories",
     "byAuthor": "Par {authorName}",
     "relatedStories": "STORIES CONNEXES",
     "readMore": "Lire",
@@ -437,7 +427,7 @@
       "description": "Nous travaillons à vous apporter des produits dérivés et objets de collection incroyables. Restez à l'écoute pour l'équipement exclusif Kamayakoi !"
     },
     "productDetail": {
-      "backToMerch": "Retour au Merch",
+      "backToMerch": "Retour au merch",
       "noImage": "Aucune image disponible",
       "quantity": "Quantité :",
       "outOfStock": "Rupture de stock",
@@ -453,6 +443,64 @@
     "metadata": {
       "title": "Merch | Kamayakoi",
       "description": "Achetez des produits dérivés exclusifs Kamayakoi, des vêtements et des objets de collection. Soutenez le mouvement avec nos designs uniques et produits."
+    }
+  },
+  "eventShowcase": {
+    "featured": {
+      "title": "Vidéos",
+      "subtitle": "Contenu exclusif et coulisses",
+      "clickToPlay": "Cliquer pour jouer"
+    },
+    "events": {
+      "title": "Événements",
+      "subtitle": "Performances passées et temps forts",
+      "viewEvent": "VOIR L'ÉVÉNEMENT →",
+      "comingSoon": {
+        "title": "Événements bientôt disponibles",
+        "description": "Nous travaillons à vous apporter des événements et expériences inoubliables."
+      }
+    },
+    "media": {
+      "title": "Vidéos",
+      "subtitle": "Découvrez nos meilleures mixs et vidéos",
+      "viewAll": "Voir toutes les vidéos",
+      "comingSoon": {
+        "title": "Vidéos bientôt disponibles",
+        "description": "Nous travaillons à vous apporter des sons et vidéos incroyables. Restez à l'écoute !"
+      }
+    },
+    "articles": {
+      "title": "Articles",
+      "subtitle": "Découvrez les dernières nouvelles et histoires",
+      "readMore": "Lire la suite",
+      "viewAll": "Voir tous les articles",
+      "comingSoon": {
+        "title": "Articles bientôt disponibles",
+        "description": "Nous travaillons à vous apporter des articles et histoires incroyables."
+      }
+    },
+    "hero": {
+      "contentTypes": {
+        "article": "Article",
+        "media": "Média",
+        "event": "Événement",
+        "video": "Vidéo",
+        "image": "Image"
+      },
+      "actions": {
+        "readArticle": "Lire l'article",
+        "viewEvent": "Voir l'événement",
+        "watchMedia": "Voir le média",
+        "watchVideo": "Voir la vidéo",
+        "playVideo": "Lire la vidéo",
+        "pauseVideo": "Pause vidéo"
+      }
+    }
+  },
+  "cardCarousel": {
+    "comingSoon": {
+      "title": "Bientôt disponible",
+      "description": "Nous travaillons à vous apporter du contenu incroyable."
     }
   }
 }

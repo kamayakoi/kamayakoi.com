@@ -320,10 +320,10 @@ export default function PurchaseFormModal({
       <DialogContent className="sm:max-w-[380px] rounded-sm">
         <DialogHeader className="pb-2">
           <DialogTitle className="text-lg font-semibold">
-            Purchase Tickets
+            {t(currentLanguage, "purchaseModal.title")}
           </DialogTitle>
           <DialogDescription className="text-sm">
-            Complete your order details
+            {t(currentLanguage, "purchaseModal.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -346,14 +346,17 @@ export default function PurchaseFormModal({
             {/* Name Field */}
             <div className="space-y-1">
               <Label htmlFor="name" className="text-sm">
-                Name
+                {t(currentLanguage, "purchaseModal.labels.name")}
               </Label>
               <Input
                 id="name"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 className="rounded-sm h-8 text-sm"
-                placeholder="Your full name"
+                placeholder={t(
+                  currentLanguage,
+                  "purchaseModal.placeholders.name",
+                )}
                 required
               />
             </div>
@@ -361,7 +364,7 @@ export default function PurchaseFormModal({
             {/* Email Field */}
             <div className="space-y-1">
               <Label htmlFor="email" className="text-sm">
-                Email
+                {t(currentLanguage, "purchaseModal.labels.email")}
               </Label>
               <Input
                 id="email"
@@ -369,25 +372,33 @@ export default function PurchaseFormModal({
                 value={userEmail}
                 onChange={(e) => setUserEmail(e.target.value)}
                 className="rounded-sm h-8 text-sm"
-                placeholder="your@email.com"
+                placeholder={t(
+                  currentLanguage,
+                  "purchaseModal.placeholders.email",
+                )}
                 required
               />
             </div>
 
             {/* Phone Field */}
             <div className="space-y-1">
-              <Label className="text-sm">Phone</Label>
+              <Label className="text-sm">
+                {t(currentLanguage, "purchaseModal.labels.phone")}
+              </Label>
               <PhoneNumberInput
                 value={userPhone}
                 onChange={(value) => setUserPhone(value || "")}
-                placeholder="+221 77 123 45 67"
+                placeholder={t(
+                  currentLanguage,
+                  "purchaseModal.placeholders.phone",
+                )}
               />
             </div>
 
             {/* Quantity Field */}
             <div className="space-y-1">
               <Label htmlFor="quantity" className="text-sm">
-                Quantity
+                {t(currentLanguage, "purchaseModal.labels.quantity")}
               </Label>
               <div className="flex items-center space-x-2">
                 <Button
@@ -433,7 +444,9 @@ export default function PurchaseFormModal({
             {/* Total Price */}
             <div className="pt-2 border-t border-border">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Total:</span>
+                <span className="text-sm text-muted-foreground">
+                  {t(currentLanguage, "purchaseModal.totalPrice")}
+                </span>
                 <span className="text-primary font-semibold">
                   {formatPrice(totalPrice)}
                   {t(currentLanguage, "eventSlugPage.tickets.currencySuffix")}
@@ -442,7 +455,7 @@ export default function PurchaseFormModal({
               {item.isBundle && (
                 <div className="flex items-center justify-between mt-1">
                   <span className="text-xs text-muted-foreground">
-                    Tickets:
+                    {t(currentLanguage, "purchaseModal.ticketsGenerated")}
                   </span>
                   <span className="text-xs font-medium">
                     {actualTicketCount}
@@ -461,12 +474,12 @@ export default function PurchaseFormModal({
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                  Processing...
+                  {t(currentLanguage, "purchaseModal.buttons.processing")}
                 </>
               ) : (
                 <>
                   <Ticket className="mr-2 h-3 w-3" />
-                  Purchase
+                  {t(currentLanguage, "purchaseModal.buttons.pay")}
                 </>
               )}
             </Button>

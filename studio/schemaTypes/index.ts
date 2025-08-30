@@ -5,5 +5,6 @@ import category from './category'
 import product from './product'
 import homepage from './homepage'
 import artist from './artist'
+import media from './media'
 
-export const schemaTypes = [homepage, event, post, author, category, product, artist]
+export const schemaTypes = [homepage, event, post, author, category, product, artist, media]

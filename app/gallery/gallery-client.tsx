@@ -4,7 +4,6 @@ import Image from "next/image";
 import React, { useState, useEffect, useMemo } from "react";
 import type { ImageProps } from "@/lib/utils/types";
 import LoadingComponent from "@/components/ui/loader";
-import MiniAudioPlayer from "@/components/landing/mini-audio-player";
 
 // Renamed component to GalleryClientComponent
 export default function GalleryClientComponent() {
@@ -130,11 +129,6 @@ export default function GalleryClientComponent() {
   // Return the main gallery content and modal
   return (
     <>
-      {/* Mini Audio Player */}
-      <div className="fixed top-[13px] md:top-4 left-4 z-[60] pointer-events-auto">
-        <MiniAudioPlayer />
-      </div>
-
       <main className="mx-auto max-w-[1960px] p-4 pt-20">
         {/* Error display removed as requested */}
         {images.length === 0 && !isLoading && !error && (

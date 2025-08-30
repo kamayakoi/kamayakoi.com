@@ -45,7 +45,7 @@ export default function LoadingComponent() {
               fontWeight: 900,
               letterSpacing: "0.0em",
               fontFamily: "Arial Black, sans-serif",
-              color: "#EA3387",
+              color: "#FF073A",
             }}
           >
             LOADING

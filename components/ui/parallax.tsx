@@ -308,7 +308,15 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
 
   const getDisplayNumber = (event: EventParallaxData, index: number) => {
     if (event.number) {
-      return `#${event.number.padStart(3, "0")}`;
+      // Handle custom alphanumeric formats like S01, SCHOOL001, 016, ABC123
+      // Only add # prefix and pad numeric-only codes
+      if (/^\d+$/.test(event.number)) {
+        // Pure numeric - pad with zeros and add #
+        return `#${event.number.padStart(3, "0")}`;
+      } else {
+        // Alphanumeric - just add # prefix
+        return `#${event.number}`;
+      }
     }
     return `#${String(displayEvents.length - index).padStart(3, "0")}`;
   };
@@ -445,7 +453,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                     fontFamily: '"Inter", "Helvetica Neue", Arial, sans-serif',
                     letterSpacing: "-4px",
                     lineHeight: "0.8",
-                    color: "#ff6b6b",
+                    color: "#FF073A",
                     textShadow: `
                       0 0 10px rgba(255, 107, 107, 0.6),
                       0 0 20px rgba(255, 107, 107, 0.4),
@@ -462,7 +470,7 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
         })}
 
         <motion.div
-          className="fixed left-0 bottom-12 h-1 bg-red-500 z-[1000] origin-left"
+          className="fixed left-0 bottom-0 h-1 bg-red-500 z-[1000] origin-left"
           style={{ width: progressWidth }}
         />
       </div>

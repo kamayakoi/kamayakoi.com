@@ -13,7 +13,11 @@ interface LanguageSwitcherProps {
 }
 
 export const LanguageSwitcher = memo(
-  ({ onLanguageChange, className = "", useAbbreviated = false }: LanguageSwitcherProps) => {
+  ({
+    onLanguageChange,
+    className = "",
+    useAbbreviated = false,
+  }: LanguageSwitcherProps) => {
     const { currentLanguage, setLanguage } = useTranslation();
     const pathname = usePathname();
 

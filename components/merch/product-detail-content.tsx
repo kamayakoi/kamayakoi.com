@@ -117,10 +117,11 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all ${selectedImageIndex === index
-                      ? "ring-2 ring-primary"
-                      : "hover:ring-2 hover:ring-muted-foreground/50"
-                      }`}
+                    className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all ${
+                      selectedImageIndex === index
+                        ? "ring-2 ring-primary"
+                        : "hover:ring-2 hover:ring-muted-foreground/50"
+                    }`}
                   >
                     <Image
                       src={image.url}
@@ -199,7 +200,9 @@ function ProductDetail({ product }: ProductDetailContentProps) {
               <Card className="p-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium">{t(currentLanguage, "merchPage.productDetail.quantity")}</span>
+                    <span className="font-medium">
+                      {t(currentLanguage, "merchPage.productDetail.quantity")}
+                    </span>
                     <div className="flex items-center space-x-2">
                       <Button
                         variant="outline"
@@ -226,13 +229,18 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                     onClick={handleAddToCart}
                     disabled={product.stock === 0}
                   >
-                    {product.stock === 0 ? t(currentLanguage, "merchPage.productDetail.outOfStock") : t(currentLanguage, "merchPage.productDetail.addToCart")}
+                    {product.stock === 0
+                      ? t(currentLanguage, "merchPage.productDetail.outOfStock")
+                      : t(currentLanguage, "merchPage.productDetail.addToCart")}
                   </Button>
 
                   {/* Additional Actions */}
                   <div className="flex space-x-2">
                     <Button variant="outline" className="flex-1">
-                      {t(currentLanguage, "merchPage.productDetail.addToWishlist")}
+                      {t(
+                        currentLanguage,
+                        "merchPage.productDetail.addToWishlist",
+                      )}
                     </Button>
                     <Button variant="outline" className="flex-1">
                       {t(currentLanguage, "merchPage.productDetail.share")}
@@ -249,9 +257,14 @@ function ProductDetail({ product }: ProductDetailContentProps) {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.8 }}
             >
-              <h3 className="font-semibold">{t(currentLanguage, "merchPage.productDetail.productDetails")}</h3>
+              <h3 className="font-semibold">
+                {t(currentLanguage, "merchPage.productDetail.productDetails")}
+              </h3>
               <div className="text-sm text-muted-foreground space-y-1">
-                <p>{t(currentLanguage, "merchPage.productDetail.productId")} {product.productId || product._id}</p>
+                <p>
+                  {t(currentLanguage, "merchPage.productDetail.productId")}{" "}
+                  {product.productId || product._id}
+                </p>
                 <p>{t(currentLanguage, "merchPage.productDetail.category")}</p>
                 <p>{t(currentLanguage, "merchPage.productDetail.shipping")}</p>
               </div>

@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import Header from "@/components/landing/header";
-import MiniAudioPlayer from "@/components/landing/mini-audio-player";
 import { Footer } from "@/components/landing/footer";
 import { ProductListContent } from "../../components/merch/product-list-content";
 import { ProductGrid } from "../../components/merch/product-grid";
@@ -43,11 +42,6 @@ export default function MerchContentClient({
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Mini Audio Player */}
-      <div className="fixed top-[13px] md:top-4 left-4 z-[60] pointer-events-auto">
-        <MiniAudioPlayer />
-      </div>
-
       <Header />
 
       <main>

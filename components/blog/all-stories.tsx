@@ -115,7 +115,9 @@ const AllStories = ({ stories, heading = "All Stories" }: AllStoriesProps) => {
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                   quality={90}
-                  placeholder={story.mainImage?.asset.metadata?.lqip ? "blur" : undefined}
+                  placeholder={
+                    story.mainImage?.asset.metadata?.lqip ? "blur" : undefined
+                  }
                   blurDataURL={story.mainImage?.asset.metadata?.lqip}
                 />
               </div>

@@ -1,5 +1,5 @@
 import {defineType, defineField} from 'sanity'
-import {PlayIcon, SoundIcon} from '@sanity/icons'
+import {PlayIcon} from '@sanity/icons'
 
 export default defineType({
   name: 'media',

@@ -143,11 +143,11 @@ export function MediaPlayer({ media, onPlay, onPause }: MediaPlayerProps) {
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <button
                     onClick={isPlaying ? handlePause : handlePlay}
-                    className="p-4 bg-white/20 hover:bg-white/30 rounded-full text-white transition-all duration-200 backdrop-blur-sm"
+                    className="p-4 bg-white/20 hover:bg-white/30 rounded-sm text-white transition-all duration-200 backdrop-blur-sm"
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-sm animate-spin" />
                     ) : isPlaying ? (
                       <Pause className="w-6 h-6" />
                     ) : (

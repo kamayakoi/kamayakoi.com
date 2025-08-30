@@ -215,7 +215,7 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
                         alt={post.author.name}
                         width={16}
                         height={16}
-                        className="rounded-full mr-2"
+                        className="rounded-sm mr-2"
                       />
                     )}
                     <User className="h-4 w-4 mr-2" />

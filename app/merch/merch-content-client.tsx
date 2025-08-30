@@ -8,6 +8,8 @@ import { ProductListContent } from "../../components/merch/product-list-content"
 import { ProductGrid } from "../../components/merch/product-grid";
 import { ProductCardSkeleton } from "../../components/merch/product-card-skeleton";
 import { Suspense } from "react";
+import { useTranslation } from "@/lib/contexts/TranslationContext";
+import { t } from "@/lib/i18n/translations";
 
 interface SanityProduct {
   _id: string;
@@ -37,6 +39,8 @@ interface MerchContentClientProps {
 export default function MerchContentClient({
   products,
 }: MerchContentClientProps) {
+  const { currentLanguage } = useTranslation();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Mini Audio Player */}
@@ -56,7 +60,7 @@ export default function MerchContentClient({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              Merch
+              {t(currentLanguage, "merchPage.title")}
             </motion.h1>
             <motion.p
               className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-3xl"
@@ -64,9 +68,7 @@ export default function MerchContentClient({
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              Shop exclusive Kamayakoi merchandise, apparel, and collectibles.
-              Support the movement with our unique designs and products crafted
-              for the wild at heart.
+              {t(currentLanguage, "merchPage.subtitle")}
             </motion.p>
           </div>
 
@@ -83,11 +85,11 @@ export default function MerchContentClient({
                     <div className="grid grid-cols-3 items-center mb-8 w-full px-4 md:px-6 max-md:hidden">
                       <div className="ml-1">
                         <span className="text-sm text-muted-foreground">
-                          Shop
+                          {t(currentLanguage, "merchPage.breadcrumb")}
                         </span>
                       </div>
                       <p className="text-sm text-muted-foreground text-center">
-                        Loading...
+                        {t(currentLanguage, "merchPage.loading")}
                       </p>
                       <div></div>
                     </div>
@@ -110,11 +112,10 @@ export default function MerchContentClient({
               transition={{ duration: 0.5 }}
             >
               <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
-                Merch coming soon
+                {t(currentLanguage, "merchPage.comingSoon.title")}
               </h2>
               <p className="text-zinc-600 dark:text-zinc-400 mb-6">
-                We&apos;re working on bringing you amazing merchandise and
-                collectibles. Stay tuned for exclusive Kamayakoi gear!
+                {t(currentLanguage, "merchPage.comingSoon.description")}
               </p>
             </motion.div>
           )}

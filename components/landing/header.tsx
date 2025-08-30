@@ -48,7 +48,7 @@ export default function Header() {
   const navItems: NavItem[] = [
     { nameKey: "header.nav.home", path: "/" },
     { nameKey: "header.nav.events", path: "/events" },
-    { nameKey: "header.nav.room", path: "/artists" },
+    // { nameKey: "header.nav.room", path: "/artists" },
     { nameKey: "header.nav.blog", path: "/stories" },
     { nameKey: "header.nav.shop", path: "/merch" },
   ];

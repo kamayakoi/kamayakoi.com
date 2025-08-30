@@ -98,7 +98,7 @@ export default {
     },
     {
       name: 'variantOptions',
-      title: 'Variant pptions',
+      title: 'Variant options',
       type: 'array',
       group: 'variants',
       hidden: ({document}: {document: {manageVariants?: boolean}}) => !document?.manageVariants,

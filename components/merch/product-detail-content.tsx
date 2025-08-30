@@ -9,6 +9,8 @@ import { ArrowLeftIcon, PlusIcon, MinusIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { CartProvider, useCart } from "./cart/cart-context";
 import { VariantSelector } from "./variant-selector";
+import { useTranslation } from "@/lib/contexts/TranslationContext";
+import { t } from "@/lib/i18n/translations";
 
 interface SanityProduct {
   _id: string;
@@ -36,6 +38,7 @@ interface ProductDetailContentProps {
 }
 
 function ProductDetail({ product }: ProductDetailContentProps) {
+  const { currentLanguage } = useTranslation();
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { addItem } = useCart();
@@ -59,7 +62,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
         <Button variant="ghost" size="sm" asChild className="mb-4">
           <Link href="/merch">
             <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            Back to Merch
+            {t(currentLanguage, "merchPage.productDetail.backToMerch")}
           </Link>
         </Button>
       </div>
@@ -102,7 +105,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
             ) : (
               <div className="aspect-square relative overflow-hidden rounded-sm bg-muted flex items-center justify-center">
                 <span className="text-muted-foreground">
-                  No Image Available
+                  {t(currentLanguage, "merchPage.productDetail.noImage")}
                 </span>
               </div>
             )}
@@ -114,11 +117,10 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all ${
-                      selectedImageIndex === index
-                        ? "ring-2 ring-primary"
-                        : "hover:ring-2 hover:ring-muted-foreground/50"
-                    }`}
+                    className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all ${selectedImageIndex === index
+                      ? "ring-2 ring-primary"
+                      : "hover:ring-2 hover:ring-muted-foreground/50"
+                      }`}
                   >
                     <Image
                       src={image.url}
@@ -167,8 +169,8 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                   transition={{ duration: 0.5, delay: 0.5 }}
                 >
                   {product.stock > 0
-                    ? `${product.stock} in stock`
-                    : "Out of stock"}
+                    ? `${product.stock} ${t(currentLanguage, "merchPage.productDetail.inStock")}`
+                    : t(currentLanguage, "merchPage.productDetail.outOfStock")}
                 </motion.p>
               )}
             </div>
@@ -197,7 +199,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
               <Card className="p-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium">Quantity:</span>
+                    <span className="font-medium">{t(currentLanguage, "merchPage.productDetail.quantity")}</span>
                     <div className="flex items-center space-x-2">
                       <Button
                         variant="outline"
@@ -224,16 +226,16 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                     onClick={handleAddToCart}
                     disabled={product.stock === 0}
                   >
-                    {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                    {product.stock === 0 ? t(currentLanguage, "merchPage.productDetail.outOfStock") : t(currentLanguage, "merchPage.productDetail.addToCart")}
                   </Button>
 
                   {/* Additional Actions */}
                   <div className="flex space-x-2">
                     <Button variant="outline" className="flex-1">
-                      Add to Wishlist
+                      {t(currentLanguage, "merchPage.productDetail.addToWishlist")}
                     </Button>
                     <Button variant="outline" className="flex-1">
-                      Share
+                      {t(currentLanguage, "merchPage.productDetail.share")}
                     </Button>
                   </div>
                 </div>
@@ -247,11 +249,11 @@ function ProductDetail({ product }: ProductDetailContentProps) {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.8 }}
             >
-              <h3 className="font-semibold">Product Details</h3>
+              <h3 className="font-semibold">{t(currentLanguage, "merchPage.productDetail.productDetails")}</h3>
               <div className="text-sm text-muted-foreground space-y-1">
-                <p>Product ID: {product.productId || product._id}</p>
-                <p>Category: Merchandise</p>
-                <p>Shipping: Free shipping on orders over 50,000 F CFA</p>
+                <p>{t(currentLanguage, "merchPage.productDetail.productId")} {product.productId || product._id}</p>
+                <p>{t(currentLanguage, "merchPage.productDetail.category")}</p>
+                <p>{t(currentLanguage, "merchPage.productDetail.shipping")}</p>
               </div>
             </motion.div>
           </motion.div>

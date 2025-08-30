@@ -13,7 +13,29 @@
       "energy": "énergie",
       "respect": "respect"
     },
-    "copyright": "© {year} Kamayakoi — Tous droits réservés."
+    "copyright": "© {year} Kamayakoi — Tous droits réservés.",
+    "contact": {
+      "title": "Contactez-nous",
+      "emailLabel": "Adresse e-mail",
+      "emailPlaceholder": "Entrez votre e-mail",
+      "messageLabel": "Comment pouvons-nous vous aider ?",
+      "messagePlaceholder": "Entrez votre message",
+      "sendButton": "Envoyer le message",
+      "sendError": "Échec de l'envoi de l'e-mail"
+    },
+    "sections": {
+      "explore": "EXPLORER",
+      "connect": "CONNECTER",
+      "legal": "LÉGAL"
+    },
+    "navigation": {
+      "events": "LE RENDEZ-VOUS SAUVAGE",
+      "stories": "Stories",
+      "merch": "Merch",
+      "artists": "Artistes",
+      "archive": "Archives",
+      "contact": "Contact"
+    }
   },
   "header": {
     "nav": {
@@ -386,6 +408,51 @@
           "line2": "chaque mouvement un moment unique."
         }
       }
+    }
+  },
+  "storyPage": {
+    "backToStories": "Retour aux Stories",
+    "byAuthor": "Par {authorName}",
+    "relatedStories": "STORIES CONNEXES",
+    "readMore": "Lire",
+    "noRelatedStories": "Aucune story connexe trouvée.",
+    "loading": "Chargement...",
+    "noStories": {
+      "title": "Stories bientôt disponibles",
+      "description": "Nous travaillons à vous apporter des histoires et récits incroyables. Restez à l'écoute pour du contenu exclusif Kamayakoi !"
+    },
+    "share": {
+      "onFacebook": "Partager sur Facebook",
+      "onTwitter": "Partager sur Twitter",
+      "copyLink": "Copier le lien"
+    }
+  },
+  "merchPage": {
+    "title": "Merch",
+    "subtitle": "Achetez des produits dérivés exclusifs Kamayakoi, des vêtements et des objets de collection. Soutenez le mouvement avec nos designs uniques et produits conçus pour les cœurs sauvages.",
+    "breadcrumb": "Boutique",
+    "loading": "Chargement...",
+    "comingSoon": {
+      "title": "Merch bientôt disponible",
+      "description": "Nous travaillons à vous apporter des produits dérivés et objets de collection incroyables. Restez à l'écoute pour l'équipement exclusif Kamayakoi !"
+    },
+    "productDetail": {
+      "backToMerch": "Retour au Merch",
+      "noImage": "Aucune image disponible",
+      "quantity": "Quantité :",
+      "outOfStock": "Rupture de stock",
+      "addToCart": "Ajouter au panier",
+      "inStock": "en stock",
+      "addToWishlist": "Ajouter à la liste d'envies",
+      "share": "Partager",
+      "productDetails": "Détails du produit",
+      "productId": "ID produit :",
+      "category": "Catégorie : Produits dérivés",
+      "shipping": "Livraison : Livraison gratuite pour les commandes de plus de 50 000 F CFA"
+    },
+    "metadata": {
+      "title": "Merch | Kamayakoi",
+      "description": "Achetez des produits dérivés exclusifs Kamayakoi, des vêtements et des objets de collection. Soutenez le mouvement avec nos designs uniques et produits."
     }
   }
 }

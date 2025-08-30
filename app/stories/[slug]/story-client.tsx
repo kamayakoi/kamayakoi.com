@@ -12,7 +12,12 @@ import {
 } from "lucide-react";
 import Tag from "@/components/blog/tag";
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import MiniAudioPlayer from "@/components/landing/mini-audio-player";
+import { getRelatedPosts } from "@/lib/sanity/queries";
+import { useTranslation } from "@/lib/contexts/TranslationContext";
+import { t } from "@/lib/i18n/translations";
 
 interface PortableTextBlock {
   _type: string;
@@ -23,34 +28,90 @@ interface PortableTextBlock {
     text: string;
     marks?: string[];
   }>;
+  style?: string;
+  listItem?: string;
+  level?: number;
 }
 
-interface MockStory {
+interface StoryImage {
+  asset: {
+    _id: string;
+    url: string;
+    metadata?: {
+      dimensions?: {
+        width: number;
+        height: number;
+      };
+      lqip?: string;
+    };
+  };
+  alt?: string;
+  caption?: string;
+}
+
+interface Author {
+  _id: string;
+  name: string;
+  image?: {
+    asset: {
+      _id: string;
+      url: string;
+      metadata?: {
+        dimensions?: {
+          width: number;
+          height: number;
+        };
+        lqip?: string;
+      };
+    };
+    alt?: string;
+  };
+  bio?: string;
+  role?: string;
+}
+
+interface Category {
   _id: string;
   title: string;
   slug: string;
-  excerpt: string;
+}
+
+interface Story {
+  _id: string;
+  title: string;
+  title_fr?: string;
+  title_es?: string;
+  title_pt?: string;
+  title_zh?: string;
+  slug: string;
   publishedAt: string;
-  author?: {
-    name: string;
-  };
-  mainImage?: {
-    url: string;
-    alt?: string;
-    caption?: string;
-  };
-  categories?: {
-    title: string;
-  }[];
+  excerpt?: string;
+  excerpt_fr?: string;
+  excerpt_es?: string;
+  excerpt_pt?: string;
+  excerpt_zh?: string;
+  tags?: string[];
+  languages?: string[];
+  image?: StoryImage;
+  mainImage?: StoryImage;
+  category?: string;
+  categories?: Category[];
+  author?: Author;
   body?: PortableTextBlock[];
+  body_fr?: PortableTextBlock[];
+  body_es?: PortableTextBlock[];
+  body_pt?: PortableTextBlock[];
+  body_zh?: PortableTextBlock[];
 }
 
 interface StoryClientProps {
-  post: MockStory;
+  post: Story;
   slug: string;
 }
 
 export default function StoryClient({ post, slug }: StoryClientProps) {
+  const { currentLanguage } = useTranslation();
+
   const shareUrl =
     typeof window !== "undefined"
       ? `${window.location.origin}/stories/${slug}`
@@ -101,7 +162,7 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
               >
                 <span className="flex items-center transition-transform duration-300">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Stories
+                  {t(currentLanguage, "storyPage.backToStories")}
                 </span>
               </button>
 
@@ -109,7 +170,7 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
                 <button
                   onClick={() => handleShare("facebook")}
                   className="text-zinc-600 dark:text-zinc-400 inline-flex items-center justify-center h-7 w-7 p-1.5 rounded-sm border border-transparent transition-colors duration-150 hover:bg-blue-400/10 dark:hover:bg-blue-400/20 hover:text-inherit hover:border-blue-500/20 dark:hover:border-blue-400/30"
-                  aria-label="Share on Facebook"
+                  aria-label={t(currentLanguage, "storyPage.share.onFacebook")}
                 >
                   <Facebook className="h-4 w-4" />
                 </button>
@@ -117,7 +178,7 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
                 <button
                   onClick={() => handleShare("twitter")}
                   className="text-zinc-600 dark:text-zinc-400 inline-flex items-center justify-center h-7 w-7 p-1.5 rounded-sm border border-transparent transition-colors duration-150 hover:bg-blue-400/10 dark:hover:bg-blue-400/20 hover:text-inherit hover:border-blue-500/20 dark:hover:border-blue-400/30"
-                  aria-label="Share on Twitter"
+                  aria-label={t(currentLanguage, "storyPage.share.onTwitter")}
                 >
                   <Twitter className="h-4 w-4" />
                 </button>
@@ -125,7 +186,7 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
                 <button
                   onClick={() => handleShare()}
                   className="text-zinc-600 dark:text-zinc-400 inline-flex items-center justify-center h-7 w-7 p-1.5 rounded-sm border border-transparent transition-colors duration-150 hover:bg-blue-400/10 dark:hover:bg-blue-400/20 hover:text-inherit hover:border-blue-500/20 dark:hover:border-blue-400/30"
-                  aria-label="Share story"
+                  aria-label={t(currentLanguage, "storyPage.share.copyLink")}
                 >
                   <Share2 className="h-4 w-4" />
                 </button>
@@ -154,8 +215,22 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
               <div className="flex flex-wrap items-center text-sm text-zinc-600 dark:text-zinc-400 mb-6">
                 {post.author && (
                   <div className="flex items-center mr-6 mb-2">
+                    {post.author.image && (
+                      <Image
+                        src={post.author.image.asset.url}
+                        alt={post.author.name}
+                        width={16}
+                        height={16}
+                        className="rounded-full mr-2"
+                      />
+                    )}
                     <User className="h-4 w-4 mr-2" />
-                    <span>By {post.author.name}</span>
+                    <span>{t(currentLanguage, "storyPage.byAuthor", { authorName: post.author.name })}</span>
+                    {post.author.role && (
+                      <span className="text-zinc-500 dark:text-zinc-400 ml-1">
+                        ({post.author.role})
+                      </span>
+                    )}
                   </div>
                 )}
 
@@ -173,7 +248,7 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
                     <>
                       <span className="mx-2">·</span>
                       {post.categories.map(
-                        (category: { title: string }, index: number) => (
+                        (category: Category, index: number) => (
                           <Tag
                             key={index}
                             text={category.title}
@@ -185,6 +260,21 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
                       )}
                     </>
                   )}
+
+                  {post.tags && post.tags.length > 0 && (
+                    <>
+                      <span className="mx-2">·</span>
+                      {post.tags.slice(0, 3).map((tag: string, index: number) => (
+                        <Tag
+                          key={index}
+                          text={tag}
+                          variant="outline"
+                          size="sm"
+                          className="mr-2"
+                        />
+                      ))}
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -192,11 +282,13 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
                 <div className="rounded-sm overflow-hidden mb-6 shadow-md">
                   <div className="aspect-[16/9] md:aspect-[16/9] relative">
                     <Image
-                      src={post.mainImage.url}
+                      src={post.mainImage.asset.url}
                       alt={post.mainImage.alt || post.title}
                       fill
                       priority
                       className="object-cover"
+                      placeholder={post.mainImage.asset.metadata?.lqip ? "blur" : undefined}
+                      blurDataURL={post.mainImage.asset.metadata?.lqip}
                     />
                   </div>
                   {post.mainImage.caption && (
@@ -242,81 +334,122 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
           <div className="flex items-center mb-8">
             <div className="w-8 h-0.5 bg-primary mr-4"></div>
             <h3 className="text-primary text-lg font-medium tracking-wide">
-              RELATED STORIES
+              {t(currentLanguage, "storyPage.relatedStories")}
             </h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <article className="group cursor-pointer bg-white dark:bg-[#1a1a1a] rounded-sm overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-zinc-200 dark:border-zinc-800">
-              <div className="aspect-[16/9] bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                <p className="text-zinc-400 dark:text-zinc-600 text-sm">
-                  Story Image
-                </p>
-              </div>
-              <div className="p-5">
-                <h4 className="font-normal text-lg mb-3 leading-tight text-zinc-900 dark:text-white group-hover:text-primary transition-colors">
-                  The Birth of Kamayakoi: A Journey Through Sound
-                </h4>
-                <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4 line-clamp-2">
-                  Discover the origins and evolution of Kamayakoi through the
-                  stories of its founders and early community.
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                    2 hours ago
-                  </span>
-                  <Tag text="Featured" variant="outline" size="sm" />
-                </div>
-              </div>
-            </article>
-
-            <article className="group cursor-pointer bg-white dark:bg-[#1a1a1a] rounded-sm overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-zinc-200 dark:border-zinc-800">
-              <div className="aspect-[16/9] bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                <p className="text-zinc-400 dark:text-zinc-600 text-sm">
-                  Story Image
-                </p>
-              </div>
-              <div className="p-5">
-                <h4 className="font-normal text-lg mb-3 leading-tight text-zinc-900 dark:text-white group-hover:text-primary transition-colors">
-                  Behind the Decks: Meet Our Resident DJs
-                </h4>
-                <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4 line-clamp-2">
-                  Get to know the talented artists who bring Kamayakoi&apos;s
-                  sound to life every night.
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                    5 hours ago
-                  </span>
-                  <Tag text="Artists" variant="outline" size="sm" />
-                </div>
-              </div>
-            </article>
-
-            <article className="group cursor-pointer bg-white dark:bg-[#1a1a1a] rounded-sm overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-zinc-200 dark:border-zinc-800">
-              <div className="aspect-[16/9] bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                <p className="text-zinc-400 dark:text-zinc-600 text-sm">
-                  Story Image
-                </p>
-              </div>
-              <div className="p-5">
-                <h4 className="font-normal text-lg mb-3 leading-tight text-zinc-900 dark:text-white group-hover:text-primary transition-colors">
-                  Festival Season: Kamayakoi Takes the Stage
-                </h4>
-                <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4 line-clamp-2">
-                  Join us as we explore the vibrant festival scene and
-                  Kamayakoi&apos;s place in it.
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                    1 day ago
-                  </span>
-                  <Tag text="Events" variant="outline" size="sm" />
-                </div>
-              </div>
-            </article>
-          </div>
+          <RelatedStories currentSlug={slug} tags={post.tags} />
         </div>
       </div>
+    </div>
+  );
+}
+
+// Related Stories Component
+function RelatedStories({ currentSlug, tags }: { currentSlug: string; tags?: string[] }) {
+  const [relatedPosts, setRelatedPosts] = useState<Story[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { currentLanguage } = useTranslation();
+
+  useEffect(() => {
+    const fetchRelatedPosts = async () => {
+      try {
+        const posts = await getRelatedPosts(currentSlug, tags, 3);
+        setRelatedPosts(posts);
+      } catch (error) {
+        console.error("Error fetching related posts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRelatedPosts();
+  }, [currentSlug, tags]);
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <article key={index} className="bg-white dark:bg-[#1a1a1a] rounded-sm overflow-hidden shadow-sm border border-zinc-200 dark:border-zinc-800">
+            <div className="aspect-[16/9] bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+              <div className="w-8 h-8 bg-zinc-200 dark:bg-zinc-700 rounded animate-pulse"></div>
+            </div>
+            <div className="p-5">
+              <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded mb-3 animate-pulse"></div>
+              <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded mb-2 animate-pulse"></div>
+              <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded mb-4 animate-pulse w-3/4"></div>
+              <div className="flex items-center justify-between">
+                <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-16 animate-pulse"></div>
+                <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded w-12 animate-pulse"></div>
+              </div>
+              <div className="text-center text-sm text-zinc-500 dark:text-zinc-400 mt-4">
+                {t(currentLanguage, "storyPage.loading")}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    );
+  }
+
+  if (!relatedPosts || relatedPosts.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-zinc-500 dark:text-zinc-400">
+          {t(currentLanguage, "storyPage.noRelatedStories")}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {relatedPosts.map((post) => (
+        <article
+          key={post._id}
+          className="group cursor-pointer bg-white dark:bg-[#1a1a1a] rounded-sm overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-zinc-200 dark:border-zinc-800"
+        >
+          <div className="aspect-[16/9] bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center relative overflow-hidden">
+            {post.mainImage ? (
+              <Image
+                src={post.mainImage.asset.url}
+                alt={post.mainImage.alt || post.title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-700"
+                placeholder={post.mainImage.asset.metadata?.lqip ? "blur" : undefined}
+                blurDataURL={post.mainImage.asset.metadata?.lqip}
+              />
+            ) : (
+              <p className="text-zinc-400 dark:text-zinc-600 text-sm">
+                Story Image
+              </p>
+            )}
+          </div>
+          <div className="p-5">
+            <h4 className="font-normal text-lg mb-3 leading-tight text-zinc-900 dark:text-white group-hover:text-primary transition-colors line-clamp-2">
+              {post.title}
+            </h4>
+            <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4 line-clamp-2">
+              {post.excerpt}
+            </p>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                {new Date(post.publishedAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric"
+                })}
+              </span>
+              <Link
+                href={`/stories/${post.slug}`}
+                className="inline-flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
+              >
+                {t(currentLanguage, "storyPage.readMore")}
+                <span>→</span>
+              </Link>
+            </div>
+          </div>
+        </article>
+      ))}
     </div>
   );
 }

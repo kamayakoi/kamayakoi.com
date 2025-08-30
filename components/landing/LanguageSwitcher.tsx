@@ -9,15 +9,21 @@ import { useTranslation } from "@/lib/contexts/TranslationContext";
 interface LanguageSwitcherProps {
   onLanguageChange?: (language: string) => void;
   className?: string;
+  useAbbreviated?: boolean;
 }
 
 export const LanguageSwitcher = memo(
-  ({ onLanguageChange, className = "" }: LanguageSwitcherProps) => {
+  ({ onLanguageChange, className = "", useAbbreviated = false }: LanguageSwitcherProps) => {
     const { currentLanguage, setLanguage } = useTranslation();
     const pathname = usePathname();
 
     const currentLangObj = languages.find((l) => l.code === currentLanguage);
     const isPortalRoute = pathname.startsWith("/portal");
+
+    // Display abbreviated language names if requested (e.g., "FR EN" instead of "Français English")
+    const displayName = useAbbreviated
+      ? currentLanguage.toUpperCase()
+      : currentLangObj?.name;
 
     const toggleLanguage = useCallback(
       (e: React.MouseEvent) => {
@@ -72,7 +78,7 @@ export const LanguageSwitcher = memo(
                 ease: [0.16, 1, 0.3, 1],
               }}
             >
-              {currentLangObj?.name}
+              {displayName}
             </motion.span>
           </AnimatePresence>
         </div>

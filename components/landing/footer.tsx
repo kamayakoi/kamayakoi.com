@@ -8,6 +8,7 @@ import { IG } from "@/components/icons/IG";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { FacebookIcon } from "@/components/icons/FacebookIcon";
 import { Soundcloud } from "@/components/icons/Soundcloud";
+import { LanguageSwitcher } from "@/components/landing/LanguageSwitcher";
 import {
   Dialog,
   DialogContent,
@@ -17,10 +18,13 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/sonner";
 import { sendEmail } from "@/lib/actions/send-email";
+import { useTranslation } from "@/lib/contexts/TranslationContext";
+import { t } from "@/lib/i18n/translations";
 
 // Contact Form Component
 function ContactForm({ onClose }: { onClose: () => void }) {
   const [isPending, setIsPending] = useState(false);
+  const { currentLanguage } = useTranslation();
 
   async function handleSubmit(formData: FormData) {
     setIsPending(true);
@@ -31,10 +35,10 @@ function ContactForm({ onClose }: { onClose: () => void }) {
         toast(result.success);
         onClose();
       } else {
-        toast(result.error || "Failed to send email");
+        toast(result.error || t(currentLanguage, "footer.contact.sendError"));
       }
     } catch {
-      toast("Failed to send email");
+      toast(t(currentLanguage, "footer.contact.sendError"));
     } finally {
       setIsPending(false);
     }
@@ -47,13 +51,13 @@ function ContactForm({ onClose }: { onClose: () => void }) {
           htmlFor="email"
           className="block text-lg text-gray-700 dark:text-gray-300 font-medium"
         >
-          Email address
+          {t(currentLanguage, "footer.contact.emailLabel")}
         </label>
         <input
           type="email"
           id="email"
           name="email"
-          placeholder="Enter your email"
+          placeholder={t(currentLanguage, "footer.contact.emailPlaceholder")}
           required
           className="w-full bg-white dark:bg-[#1a1a1a] rounded-sm p-4 text-base border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 placeholder:text-gray-500 dark:placeholder:text-gray-400 text-gray-900 dark:text-white transition-colors focus:bg-white dark:focus:bg-[#1a1a1a]"
         />
@@ -64,12 +68,12 @@ function ContactForm({ onClose }: { onClose: () => void }) {
           htmlFor="message"
           className="block text-lg text-gray-700 dark:text-gray-300 font-medium"
         >
-          How can we help?
+          {t(currentLanguage, "footer.contact.messageLabel")}
         </label>
         <textarea
           id="message"
           name="message"
-          placeholder="Enter your message"
+          placeholder={t(currentLanguage, "footer.contact.messagePlaceholder")}
           required
           rows={6}
           className="w-full bg-white dark:bg-[#1a1a1a] rounded-sm p-4 text-base border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 placeholder:text-gray-500 dark:placeholder:text-gray-400 text-gray-900 dark:text-white transition-colors resize-none focus:bg-white dark:focus:bg-[#1a1a1a]"
@@ -86,7 +90,7 @@ function ContactForm({ onClose }: { onClose: () => void }) {
             <Loader2 className="w-6 h-6 animate-spin" />
           ) : (
             <>
-              <span>Send Message</span>
+              <span>{t(currentLanguage, "footer.contact.sendButton")}</span>
               <ArrowRight className="w-6 h-6" />
             </>
           )}
@@ -98,6 +102,7 @@ function ContactForm({ onClose }: { onClose: () => void }) {
 
 export function Footer() {
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const { currentLanguage } = useTranslation();
 
   return (
     // Card with rounded corners
@@ -174,7 +179,7 @@ export function Footer() {
             <div>
               <div className="mb-6">
                 <h4 className="text-xs font-mono uppercase tracking-widest">
-                  EXPLORE
+                  {t(currentLanguage, "footer.sections.explore")}
                 </h4>
               </div>
               <ul className="space-y-3">
@@ -183,7 +188,7 @@ export function Footer() {
                     href="/"
                     className="text-white/70 hover:text-white transition-colors text-sm font-bold"
                   >
-                    LE RENDEZ-VOUS SAUVAGE
+                    {t(currentLanguage, "footer.navigation.events")}
                   </Link>
                 </li>
                 <li>
@@ -191,7 +196,7 @@ export function Footer() {
                     href="/stories"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
-                    Stories
+                    {t(currentLanguage, "footer.navigation.stories")}
                   </Link>
                 </li>
                 <li>
@@ -199,7 +204,7 @@ export function Footer() {
                     href="/merch"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
-                    Merch
+                    {t(currentLanguage, "footer.navigation.merch")}
                   </Link>
                 </li>
               </ul>
@@ -208,7 +213,7 @@ export function Footer() {
             <div>
               <div className="mb-6">
                 <h4 className="text-xs font-mono uppercase tracking-widest">
-                  CONNECT
+                  {t(currentLanguage, "footer.sections.connect")}
                 </h4>
               </div>
               <ul className="space-y-3">
@@ -217,7 +222,7 @@ export function Footer() {
                     href="/artists"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
-                    Artists
+                    {t(currentLanguage, "footer.navigation.artists")}
                   </Link>
                 </li>
                 <li>
@@ -225,20 +230,20 @@ export function Footer() {
                     href="/gallery"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
-                    Archive
+                    {t(currentLanguage, "footer.navigation.archive")}
                   </Link>
                 </li>
                 <li>
                   <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
                     <DialogTrigger asChild>
                       <button className="text-white/70 hover:text-white transition-colors text-sm font-light text-left">
-                        Contact
+                        {t(currentLanguage, "footer.navigation.contact")}
                       </button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[600px] bg-gray-900 dark:bg-[#1a1a1a] border-gray-700 dark:border-gray-600 rounded-sm p-6 md:p-11">
                       <DialogHeader>
                         <DialogTitle className="text-3xl font-normal text-gray-900 dark:text-white text-center mb-8">
-                          Get in touch
+                          {t(currentLanguage, "footer.contact.title")}
                         </DialogTitle>
                       </DialogHeader>
                       <ContactForm onClose={() => setIsContactOpen(false)} />
@@ -251,7 +256,7 @@ export function Footer() {
             <div>
               <div className="mb-6">
                 <h4 className="text-xs font-mono uppercase tracking-widest">
-                  LEGAL
+                  {t(currentLanguage, "footer.sections.legal")}
                 </h4>
               </div>
               <ul className="space-y-3">
@@ -260,7 +265,7 @@ export function Footer() {
                     href="/privacy"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
-                    Privacy
+                    {t(currentLanguage, "footer.links.privacy")}
                   </Link>
                 </li>
                 <li>
@@ -268,7 +273,7 @@ export function Footer() {
                     href="/terms"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
-                    Terms
+                    {t(currentLanguage, "footer.links.terms")}
                   </Link>
                 </li>
               </ul>
@@ -283,49 +288,56 @@ export function Footer() {
           ></div>
           <div className="flex items-center gap-3">
             <p className="text-xs font-mono">
-              {new Date().getFullYear()}© Kamayakoi
-              <span className="hidden md:inline"> — All rights reserved</span>
+              {t(currentLanguage, "footer.copyright", { year: new Date().getFullYear() })}
             </p>
           </div>
 
-          {/* Social Icons and Theme Toggle - Mobile Only */}
-          <div className="md:hidden flex items-center gap-2">
-            <Link
-              href="https://chat.whatsapp.com/I9yf0JkldJKLfu6FCnzQPQ?fbclid=PAZXh0bgNhZW0CMTEAAacIsymPxGAGZe1Y8dd04RKl0SOezf6bvn4z-8xK36S3a5bMDVddkT7DztdndQ_aem_rJkv0dc7xDHqT-vZBriGkg"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="WhatsApp"
-              className="inline-flex items-center justify-center h-6 w-6 rounded-sm text-white/70 transition-colors hover:text-[#25D366]"
-            >
-              <WhatsappIcon className="h-[16px] w-[16px]" />
-            </Link>
-            <Link
-              href="https://soundcloud.com/kamayakoi"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Soundcloud"
-              className="inline-flex items-center justify-center h-6 w-6 rounded-sm text-white/70 transition-colors hover:text-[#ff5500]"
-            >
-              <Soundcloud className="h-[15px] w-[15px]" />
-            </Link>
-            <Link
-              href="https://www.facebook.com/Kamayakoi/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Facebook"
-              className="inline-flex items-center justify-center h-6 w-6 rounded-sm transition-colors text-white/70 hover:text-[#1877F2]"
-            >
-              <FacebookIcon className="h-[14.5px] w-[14.5px]" />
-            </Link>
-            <Link
-              href="https://www.instagram.com/kamayakoi/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram"
-              className="inline-flex items-center justify-center h-6 w-6 rounded-sm transition-colors text-white/70 hover:text-[#E4405F]"
-            >
-              <IG className="h-[17px] w-[17px]" />
-            </Link>
+          {/* Desktop: Language Switcher, Mobile: Social Icons and Language Switcher */}
+          <div className="flex items-center gap-3 translate-x-12 md:translate-x-6">
+            <div className="hidden md:block">
+              <LanguageSwitcher />
+            </div>
+            <div className="flex items-center gap-2">
+              <Link
+                href="https://chat.whatsapp.com/I9yf0JkldJKLfu6FCnzQPQ?fbclid=PAZXh0bgNhZW0CMTEAAacIsymPxGAGZe1Y8dd04RKl0SOezf6bvn4z-8xK36S3a5bMDVddkT7DztdndQ_aem_rJkv0dc7xDHqT-vZBriGkg"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="WhatsApp"
+                className="inline-flex items-center justify-center h-6 w-6 rounded-sm text-white/70 transition-colors hover:text-[#25D366] md:hidden"
+              >
+                <WhatsappIcon className="h-[16px] w-[16px]" />
+              </Link>
+              <Link
+                href="https://soundcloud.com/kamayakoi"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Soundcloud"
+                className="inline-flex items-center justify-center h-6 w-6 rounded-sm text-white/70 transition-colors hover:text-[#ff5500] md:hidden"
+              >
+                <Soundcloud className="h-[15px] w-[15px]" />
+              </Link>
+              <Link
+                href="https://www.facebook.com/Kamayakoi/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="inline-flex items-center justify-center h-6 w-6 rounded-sm transition-colors text-white/70 hover:text-[#1877F2] md:hidden"
+              >
+                <FacebookIcon className="h-[14.5px] w-[14.5px]" />
+              </Link>
+              <Link
+                href="https://www.instagram.com/kamayakoi/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="inline-flex items-center justify-center h-6 w-6 rounded-sm transition-colors text-white/70 hover:text-[#E4405F] md:hidden"
+              >
+                <IG className="h-[17px] w-[17px]" />
+              </Link>
+              <div className="md:hidden">
+                <LanguageSwitcher useAbbreviated />
+              </div>
+            </div>
           </div>
         </div>
       </div>

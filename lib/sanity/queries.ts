@@ -126,18 +126,45 @@ export async function getEventBySlug(slug: string, locale: string) {
   return event;
 }
 
-// Blog
+// Stories (using post schema)
 export async function getLatestBlogPosts(limit = 2) {
   return client.fetch(
     `
     *[_type == "post"] | order(publishedAt desc) [0...$limit] {
       _id,
       title,
+      title_fr,
       "slug": slug.current,
       publishedAt,
       excerpt,
-      "mainImage": {
-        "url": mainImage.asset->url
+      excerpt_fr,
+      "tags": tags,
+      "languages": languages,
+      "image": image {
+        asset->,
+        alt,
+        caption
+      },
+      "mainImage": image {
+        asset->,
+        alt,
+        caption
+      },
+      "category": category,
+      "categories": categories[] {
+        _id,
+        title,
+        slug
+      },
+      "author": author->{
+        _id,
+        name,
+        "image": image{
+          asset->,
+          alt
+        },
+        bio,
+        role
       }
     }
   `,
@@ -150,12 +177,40 @@ export async function getAllBlogPosts() {
     *[_type == "post"] | order(publishedAt desc) {
       _id,
       title,
+      title_fr,
       "slug": slug.current,
       publishedAt,
       excerpt,
-      "mainImage": {
-        "url": mainImage.asset->url
-      }
+      excerpt_fr,
+      "tags": tags,
+      "languages": languages,
+      "image": image {
+        asset->,
+        alt,
+        caption
+      },
+      "mainImage": image {
+        asset->,
+        alt,
+        caption
+      },
+      "category": category,
+      "categories": categories[] {
+        _id,
+        title,
+        slug
+      },
+      "author": author->{
+        _id,
+        name,
+        "image": image{
+          asset->,
+          alt
+        },
+        bio,
+        role
+      },
+      body
     }
   `);
 }
@@ -166,20 +221,185 @@ export async function getBlogPostBySlug(slug: string) {
     *[_type == "post" && slug.current == $slug][0] {
       _id,
       title,
+      title_fr,
+      title_es,
+      title_pt,
+      title_zh,
       "slug": slug.current,
       publishedAt,
-      "mainImage": {
-        "url": mainImage.asset->url
+      excerpt,
+      excerpt_fr,
+      excerpt_es,
+      excerpt_pt,
+      excerpt_zh,
+      "tags": tags,
+      "languages": languages,
+      "image": image {
+        asset->,
+        alt,
+        caption
       },
-      "author": author->{name, "image": image.asset->url},
+      "mainImage": image {
+        asset->,
+        alt,
+        caption
+      },
+      "category": category,
+      "categories": categories[] {
+        _id,
+        title,
+        slug
+      },
+      "author": author->{
+        _id,
+        name,
+        "image": image{
+          asset->,
+          alt
+        },
+        bio,
+        role
+      },
       body,
-      "categories": categories[]->{title}
+      body_fr,
+      body_es,
+      body_pt,
+      body_zh
     }
   `,
     { slug },
   );
 
   return post;
+}
+
+// Get featured post (latest featured post)
+export async function getFeaturedPost() {
+  return client.fetch(`
+    *[_type == "post"] | order(publishedAt desc)[0] {
+      _id,
+      title,
+      title_fr,
+      "slug": slug.current,
+      publishedAt,
+      excerpt,
+      excerpt_fr,
+      "tags": tags,
+      "languages": languages,
+      "image": image {
+        asset->,
+        alt,
+        caption
+      },
+      "mainImage": image {
+        asset->,
+        alt,
+        caption
+      },
+      "category": category,
+      "categories": categories[] {
+        _id,
+        title,
+        slug
+      },
+      "author": author->{
+        _id,
+        name,
+        "image": image{
+          asset->,
+          alt
+        },
+        bio,
+        role
+      },
+      body
+    }
+  `);
+}
+
+// Get related posts (posts with same tags or categories)
+export async function getRelatedPosts(currentSlug: string, tags: string[] = [], limit = 3) {
+  if (!tags || tags.length === 0) {
+    return client.fetch(`
+      *[_type == "post" && slug.current != $currentSlug] | order(publishedAt desc)[0...${limit}] {
+        _id,
+        title,
+        title_fr,
+        "slug": slug.current,
+        publishedAt,
+        excerpt,
+        excerpt_fr,
+        "tags": tags,
+        "languages": languages,
+        "image": image {
+          asset->,
+          alt,
+          caption
+        },
+        "mainImage": image {
+          asset->,
+          alt,
+          caption
+        },
+        "category": category,
+        "categories": categories[] {
+          _id,
+          title,
+          slug
+        },
+        "author": author->{
+          _id,
+          name,
+          "image": image{
+            asset->,
+            alt
+          },
+          bio,
+          role
+        }
+      }
+    `, { currentSlug });
+  }
+
+  return client.fetch(`
+    *[_type == "post" && slug.current != $currentSlug && count(tags[@ in $tags]) > 0] | order(publishedAt desc)[0...${limit}] {
+      _id,
+      title,
+      title_fr,
+      "slug": slug.current,
+      publishedAt,
+      excerpt,
+      excerpt_fr,
+      "tags": tags,
+      "languages": languages,
+      "image": image {
+        asset->,
+        alt,
+        caption
+      },
+      "mainImage": image {
+        asset->,
+        alt,
+        caption
+      },
+      "category": category,
+      "categories": categories[] {
+        _id,
+        title,
+        slug
+      },
+      "author": author->{
+        _id,
+        name,
+        "image": image{
+          asset->,
+          alt
+        },
+        bio,
+        role
+      }
+    }
+  `, { currentSlug, tags });
 }
 
 // Story
@@ -220,8 +440,20 @@ export async function getAllProducts() {
       slug,
       productId,
       "mainImage": images[0].asset->url, // Get the first image URL
-      price,
-      stock
+      "price": basePrice,
+      "stock": baseStock,
+      description,
+      images[]{
+        asset->{
+          url,
+          metadata {
+            dimensions,
+            lqip
+          }
+        },
+        alt,
+        caption
+      }
     }
   `);
 }
@@ -235,19 +467,27 @@ export async function getProductBySlug(slug: string) {
       slug,
       productId,
       description,
-      "images": images[].asset->{
-        url,
-        metadata {
-          dimensions,
-          lqip // Low Quality Image Placeholder
-        }
-       },
-      price,
-      stock,
-      // Fetch referenced categories if needed
-      "categories": categories[]->{title, slug}
-      // Fetch variants if implemented
-      // variants
+      "images": images[]{
+        asset->{
+          url,
+          metadata {
+            dimensions,
+            lqip // Low Quality Image Placeholder
+          }
+        },
+        alt,
+        caption
+      },
+      "price": basePrice,
+      "stock": baseStock,
+      manageVariants,
+      variantOptions,
+      variantInventory,
+      categories[]->{title, slug},
+      tags,
+      requiresShipping,
+      weight,
+      dimensions
     }
   `,
     { slug },

@@ -5,22 +5,70 @@ import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 
-interface Story {
+interface StoryImage {
+  asset: {
+    _id: string;
+    url: string;
+    metadata?: {
+      dimensions?: {
+        width: number;
+        height: number;
+      };
+      lqip?: string;
+    };
+  };
+  alt?: string;
+  caption?: string;
+}
+
+interface Author {
+  _id: string;
+  name: string;
+  image?: {
+    asset: {
+      _id: string;
+      url: string;
+      metadata?: {
+        dimensions?: {
+          width: number;
+          height: number;
+        };
+        lqip?: string;
+      };
+    };
+    alt?: string;
+  };
+  bio?: string;
+  role?: string;
+}
+
+export interface Category {
   _id: string;
   title: string;
   slug: string;
-  excerpt?: string;
+}
+
+export interface Story {
+  _id: string;
+  title: string;
+  title_fr?: string;
+  title_es?: string;
+  title_pt?: string;
+  title_zh?: string;
+  slug: string;
   publishedAt: string;
-  author?: {
-    name: string;
-  };
-  mainImage?: {
-    url: string;
-    alt?: string;
-  };
-  categories?: {
-    title: string;
-  }[];
+  excerpt?: string;
+  excerpt_fr?: string;
+  excerpt_es?: string;
+  excerpt_pt?: string;
+  excerpt_zh?: string;
+  tags?: string[];
+  languages?: string[];
+  image?: StoryImage;
+  mainImage?: StoryImage;
+  category?: string;
+  categories?: Category[];
+  author?: Author;
 }
 
 interface AllStoriesProps {
@@ -62,11 +110,13 @@ const AllStories = ({ stories, heading = "All Stories" }: AllStoriesProps) => {
             <article className="group cursor-pointer bg-white dark:bg-[#1a1a1a] rounded-sm overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-zinc-200 dark:border-zinc-800 h-full">
               <div className="relative aspect-[3/2] overflow-hidden">
                 <Image
-                  src={story.mainImage?.url || "/placeholder.webp"}
+                  src={story.mainImage?.asset.url || "/placeholder.webp"}
                   alt={story.mainImage?.alt || story.title}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                   quality={90}
+                  placeholder={story.mainImage?.asset.metadata?.lqip ? "blur" : undefined}
+                  blurDataURL={story.mainImage?.asset.metadata?.lqip}
                 />
               </div>
               <div className="p-5 flex flex-col flex-grow">

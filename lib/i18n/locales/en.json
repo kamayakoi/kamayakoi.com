@@ -13,7 +13,29 @@
       "energy": "energy",
       "respect": "respect"
     },
-    "copyright": "© {year} Kamayakoi — All rights reserved."
+    "copyright": "© {year} Kamayakoi — All rights reserved.",
+    "contact": {
+      "title": "Get in touch",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "Enter your email",
+      "messageLabel": "How can we help?",
+      "messagePlaceholder": "Enter your message",
+      "sendButton": "Send Message",
+      "sendError": "Failed to send email"
+    },
+    "sections": {
+      "explore": "EXPLORE",
+      "connect": "CONNECT",
+      "legal": "LEGAL"
+    },
+    "navigation": {
+      "events": "LE RENDEZ-VOUS SAUVAGE",
+      "stories": "Stories",
+      "merch": "Merch",
+      "artists": "Artists",
+      "archive": "Archive",
+      "contact": "Contact"
+    }
   },
   "header": {
     "nav": {
@@ -386,6 +408,51 @@
           "line2": "every drop a unique moment."
         }
       }
+    }
+  },
+  "storyPage": {
+    "backToStories": "Back to Stories",
+    "byAuthor": "By {authorName}",
+    "relatedStories": "RELATED STORIES",
+    "readMore": "Read",
+    "noRelatedStories": "No related stories found.",
+    "loading": "Loading...",
+    "noStories": {
+      "title": "Stories coming Soon",
+      "description": "We're working on bringing you amazing stories and narratives. Stay tuned for exclusive Kamayakoi content!"
+    },
+    "share": {
+      "onFacebook": "Share on Facebook",
+      "onTwitter": "Share on Twitter",
+      "copyLink": "Copy link"
+    }
+  },
+  "merchPage": {
+    "title": "Merch",
+    "subtitle": "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products crafted for the wild at heart.",
+    "breadcrumb": "Shop",
+    "loading": "Loading...",
+    "comingSoon": {
+      "title": "Merch coming soon",
+      "description": "We're working on bringing you amazing merchandise and collectibles. Stay tuned for exclusive Kamayakoi gear!"
+    },
+    "productDetail": {
+      "backToMerch": "Back to Merch",
+      "noImage": "No Image Available",
+      "quantity": "Quantity:",
+      "outOfStock": "Out of Stock",
+      "addToCart": "Add to Cart",
+      "inStock": "in stock",
+      "addToWishlist": "Add to Wishlist",
+      "share": "Share",
+      "productDetails": "Product Details",
+      "productId": "Product ID:",
+      "category": "Category: Merchandise",
+      "shipping": "Shipping: Free shipping on orders over 50,000 F CFA"
+    },
+    "metadata": {
+      "title": "Merch | Kamayakoi",
+      "description": "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products."
     }
   }
 }

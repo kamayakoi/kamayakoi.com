@@ -3,7 +3,7 @@
 import Header from "@/components/landing/header";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
-import MinimalFooter from "@/components/landing/minimal-footer";
+import { Footer } from "@/components/landing/footer";
 
 const today = new Date();
 const formattedDate = today.toLocaleDateString("en-US", {
@@ -185,7 +185,7 @@ export default function PrivacyClientPage() {
           </div>
         </article>
       </main>
-      <MinimalFooter />
+      <Footer />
     </div>
   );
 }

@@ -6,8 +6,7 @@ import MerchContentClient from "./merch-content-client";
 
 export const metadata: Metadata = {
   title: "Merch | Kamayakoi",
-  description:
-    "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products.",
+  description: "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products.",
 };
 
 async function MerchContent() {

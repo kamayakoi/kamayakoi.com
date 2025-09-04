@@ -93,15 +93,15 @@ export function HeroSection({
         id: item._key,
         type: item.type,
         src:
-          item.type === "image" && item.image
+          item.type === "image" && item.image?.asset?.url
             ? item.image.asset.url
-            : item.video
+            : item.video?.asset?.url
               ? item.video.asset.url
               : item.videoUrl || "",
         title: item.title,
         description: item.description,
         thumbnail:
-          item.type === "video" && item.image
+          item.type === "video" && item.image?.asset?.url
             ? item.image.asset.url
             : undefined,
       }))

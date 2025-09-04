@@ -211,7 +211,7 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
                   <div className="flex items-center mr-6 mb-2">
                     {post.author.image && (
                       <Image
-                        src={post.author.image.asset.url}
+                        src={post.author.image?.asset?.url || "/placeholder.webp"}
                         alt={post.author.name}
                         width={16}
                         height={16}
@@ -282,7 +282,7 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
                 <div className="rounded-sm overflow-hidden mb-6 shadow-md">
                   <div className="aspect-[16/9] md:aspect-[16/9] relative">
                     <Image
-                      src={post.mainImage.asset.url}
+                      src={post.mainImage?.asset?.url || "/placeholder.webp"}
                       alt={post.mainImage.alt || post.title}
                       fill
                       priority
@@ -422,14 +422,14 @@ function RelatedStories({
           <div className="aspect-[16/9] bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center relative overflow-hidden">
             {post.mainImage ? (
               <Image
-                src={post.mainImage.asset.url}
+                src={post.mainImage?.asset?.url || "/placeholder.webp"}
                 alt={post.mainImage.alt || post.title}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
                 placeholder={
-                  post.mainImage.asset.metadata?.lqip ? "blur" : undefined
+                  post.mainImage?.asset?.metadata?.lqip ? "blur" : undefined
                 }
-                blurDataURL={post.mainImage.asset.metadata?.lqip}
+                blurDataURL={post.mainImage?.asset?.metadata?.lqip}
               />
             ) : (
               <p className="text-zinc-400 dark:text-zinc-600 text-sm">

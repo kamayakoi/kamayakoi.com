@@ -979,12 +979,12 @@ export const getHomepageContent = async (): Promise<HomepageData | null> => {
                   type: "article" as const,
                   title: item.article.title,
                   description: item.article.excerpt,
-                  image: item.article.image.asset.url,
+                  image: item.article.image?.asset?.url,
                   slug: item.article.slug.current,
                   publishedAt: item.article.publishedAt,
                   author: {
                     name: item.article.author.name,
-                    image: item.article.author.image.asset.url,
+                    image: item.article.author.image?.asset?.url,
                   },
                 }
               : null;
@@ -995,7 +995,7 @@ export const getHomepageContent = async (): Promise<HomepageData | null> => {
                   type: "media" as const,
                   title: item.media.title,
                   description: item.media.description,
-                  image: item.media.thumbnail.asset.url,
+                  image: item.media.thumbnail?.asset?.url,
                   videoUrl: item.media.url,
                   artist: item.media.artist,
                   publishedAt: item.media.publishedAt,
@@ -1008,7 +1008,7 @@ export const getHomepageContent = async (): Promise<HomepageData | null> => {
                   type: "event" as const,
                   title: item.event.title,
                   description: item.event.description,
-                  image: item.event.flyer.asset.url,
+                  image: item.event.flyer?.asset?.url,
                   slug: item.event.slug.current,
                   date: item.event.date,
                 }
@@ -1020,7 +1020,7 @@ export const getHomepageContent = async (): Promise<HomepageData | null> => {
                   type: "video" as const,
                   title: item.customVideo.title,
                   description: item.customVideo.description,
-                  image: item.customVideo.thumbnail.asset.url,
+                  image: item.customVideo.thumbnail?.asset?.url,
                   videoUrl: item.customVideo.videoUrl,
                 }
               : null;

@@ -32,10 +32,10 @@ export function PaymentSuccessClient({
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="text-center text-gray-600 dark:text-gray-300">
+              <div className="text-center text-gray-300">
                 <p>{t(currentLanguage, "paymentSuccess.description")}</p>
                 {purchaseId && (
-                  <p className="text-sm mt-2 font-mono bg-gray-100 dark:bg-gray-800 p-2 rounded-sm">
+                  <p className="text-sm mt-2 font-mono bg-gray-800 p-2 rounded-sm">
                     {t(currentLanguage, "paymentSuccess.orderId", {
                       orderId: purchaseId,
                     })}

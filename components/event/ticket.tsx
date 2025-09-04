@@ -302,7 +302,7 @@ export default function EventTicket({
 
         {/* Footer */}
         <div className="px-5 py-2 bg-black border-t border-gray-900">
-          <p className="text-[10px] text-center text-gray-600 font-medium">
+          <p className="text-[10px] text-center text-gray-400 font-medium">
             MADE IN BABI • OFFICIAL TICKET
           </p>
         </div>

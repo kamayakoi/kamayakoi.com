@@ -49,7 +49,7 @@ function ContactForm({ onClose }: { onClose: () => void }) {
       <div className="space-y-4">
         <label
           htmlFor="email"
-          className="block text-lg text-gray-700 dark:text-gray-300 font-medium"
+          className="block text-lg text-gray-300 font-medium"
         >
           {t(currentLanguage, "footer.contact.emailLabel")}
         </label>
@@ -59,14 +59,14 @@ function ContactForm({ onClose }: { onClose: () => void }) {
           name="email"
           placeholder={t(currentLanguage, "footer.contact.emailPlaceholder")}
           required
-          className="w-full bg-white dark:bg-[#1a1a1a] rounded-sm p-4 text-base border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 placeholder:text-gray-500 dark:placeholder:text-gray-400 text-gray-900 dark:text-white transition-colors focus:bg-white dark:focus:bg-[#1a1a1a]"
+          className="w-full bg-[#1a1a1a] rounded-sm p-4 text-base border border-gray-700 focus:ring-2 focus:ring-gray-400 placeholder:text-gray-400 text-white transition-colors focus:bg-[#1a1a1a]"
         />
       </div>
 
       <div className="space-y-4">
         <label
           htmlFor="message"
-          className="block text-lg text-gray-700 dark:text-gray-300 font-medium"
+          className="block text-lg text-gray-300 font-medium"
         >
           {t(currentLanguage, "footer.contact.messageLabel")}
         </label>
@@ -76,7 +76,7 @@ function ContactForm({ onClose }: { onClose: () => void }) {
           placeholder={t(currentLanguage, "footer.contact.messagePlaceholder")}
           required
           rows={6}
-          className="w-full bg-white dark:bg-[#1a1a1a] rounded-sm p-4 text-base border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 placeholder:text-gray-500 dark:placeholder:text-gray-400 text-gray-900 dark:text-white transition-colors resize-none focus:bg-white dark:focus:bg-[#1a1a1a]"
+          className="w-full bg-[#1a1a1a] rounded-sm p-4 text-base border border-gray-700 focus:ring-2 focus:ring-gray-400 placeholder:text-gray-400 text-white transition-colors resize-none focus:bg-[#1a1a1a]"
         />
       </div>
 
@@ -84,7 +84,7 @@ function ContactForm({ onClose }: { onClose: () => void }) {
         <button
           type="submit"
           disabled={isPending}
-          className="bg-gray-800 hover:bg-blue-700 dark:bg-gray-200 dark:hover:bg-blue-300 text-white dark:text-black px-8 py-4 rounded-sm text-base font-medium inline-flex items-center justify-center gap-2 transition-all duration-300 ease-in-out disabled:opacity-50 disabled:hover:bg-blue-600 dark:disabled:hover:bg-blue-400 min-w-[180px] h-[60px] w-full sm:w-auto"
+          className="bg-gray-200 hover:bg-blue-300 text-black px-8 py-4 rounded-sm text-base font-medium inline-flex items-center justify-center gap-2 transition-all duration-300 ease-in-out disabled:opacity-50 disabled:hover:bg-blue-400 min-w-[180px] h-[60px] w-full sm:w-auto"
         >
           {isPending ? (
             <Loader2 className="w-6 h-6 animate-spin" />
@@ -107,7 +107,7 @@ export function Footer() {
   return (
     // Card with rounded corners
     <footer className="relative p-4 md:p-6">
-      <div className="w-full md:h-[532px] p-4 md:p-11 text-white bg-gray-900 dark:bg-[#1a1a1a] rounded-sm flex flex-col justify-between max-md:gap-8">
+      <div className="w-full md:h-[532px] p-4 md:p-11 text-white bg-[#1a1a1a] rounded-sm flex flex-col justify-between max-md:gap-8">
         <div className="flex flex-col justify-between md:flex-row relative">
           <div className="md:basis-3/4 max-md:w-full max-w-[1200px] h-auto">
             <div className="mb-6 mt-8 md:mb-4 md:mt-0 flex justify-center md:justify-start">
@@ -240,9 +240,9 @@ export function Footer() {
                         {t(currentLanguage, "footer.navigation.contact")}
                       </button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[600px] bg-gray-900 dark:bg-[#1a1a1a] border-gray-700 dark:border-gray-600 rounded-sm p-6 md:p-11">
+                    <DialogContent className="sm:max-w-[600px] bg-[#1a1a1a] border-gray-600 rounded-sm p-6 md:p-11">
                       <DialogHeader>
-                        <DialogTitle className="text-3xl font-normal text-gray-900 dark:text-white text-center mb-8">
+                        <DialogTitle className="text-3xl font-normal text-white text-center mb-8">
                           {t(currentLanguage, "footer.contact.title")}
                         </DialogTitle>
                       </DialogHeader>

@@ -399,7 +399,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="text-center text-gray-600 dark:text-gray-300">
+                <div className="text-center text-gray-300">
                   <p className="text-sm">
                     {t(
                       currentLanguage,
@@ -482,14 +482,14 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="text-center text-gray-600 dark:text-gray-300">
+                <div className="text-center text-gray-300">
                   <p className="text-lg mb-2">
                     {t(
                       currentLanguage,
                       "ticketVerification.pinEntry.description",
                     )}
                   </p>
-                  <p className="text-sm font-mono bg-gray-100 dark:bg-gray-800 p-2 rounded-sm">
+                  <p className="text-sm font-mono bg-gray-800 p-2 rounded-sm">
                     {t(
                       currentLanguage,
                       "ticketVerification.pinEntry.ticketIdLabel",
@@ -606,10 +606,10 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                         <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                           {ticketData.customer_name}
                         </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-gray-400">
                           {/* Differentiate between individual and legacy ticket display */}
                           {ticketData.use_count !== undefined &&
-                          ticketData.total_quantity ? (
+                            ticketData.total_quantity ? (
                             <span>
                               {ticketData.use_count} /{" "}
                               {ticketData.total_quantity}{" "}
@@ -623,13 +623,13 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                               {ticketData.quantity}{" "}
                               {ticketData.quantity > 1
                                 ? t(
-                                    currentLanguage,
-                                    "ticketVerification.quantity.people",
-                                  )
+                                  currentLanguage,
+                                  "ticketVerification.quantity.people",
+                                )
                                 : t(
-                                    currentLanguage,
-                                    "ticketVerification.quantity.person",
-                                  )}
+                                  currentLanguage,
+                                  "ticketVerification.quantity.person",
+                                )}
                             </span>
                           )}
                         </p>
@@ -645,15 +645,15 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                     <div className="text-center mt-3">
                       <p className="text-orange-800 dark:text-orange-200 font-medium">
                         {ticketData.use_count !== undefined &&
-                        ticketData.total_quantity
+                          ticketData.total_quantity
                           ? t(
-                              currentLanguage,
-                              "ticketVerification.warnings.fullyUsed",
-                            )
+                            currentLanguage,
+                            "ticketVerification.warnings.fullyUsed",
+                          )
                           : t(
-                              currentLanguage,
-                              "ticketVerification.warnings.alreadyUsed",
-                            )}
+                            currentLanguage,
+                            "ticketVerification.warnings.alreadyUsed",
+                          )}
                       </p>
                       <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">
                         {t(
@@ -680,13 +680,13 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                             people:
                               ticketData?.quantity && ticketData.quantity > 1
                                 ? t(
-                                    currentLanguage,
-                                    "ticketVerification.quantity.people",
-                                  )
+                                  currentLanguage,
+                                  "ticketVerification.quantity.people",
+                                )
                                 : t(
-                                    currentLanguage,
-                                    "ticketVerification.quantity.person",
-                                  ),
+                                  currentLanguage,
+                                  "ticketVerification.quantity.person",
+                                ),
                           },
                         )}
                       </p>
@@ -708,10 +708,10 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Ticket Type Details */}
-                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-sm p-3 border">
+                <div className="bg-gray-800/50 rounded-sm p-3 border">
                   <div className="flex items-center gap-2 mb-2">
-                    <Tag className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    <Tag className="h-4 w-4 text-gray-400" />
+                    <span className="text-sm font-medium text-gray-400">
                       Ticket Type & Purchase Details
                     </span>
                   </div>
@@ -719,7 +719,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                     {ticketData.ticket_name}
                   </p>
                   <div className="flex justify-between items-center mt-2">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-400">
                       Quantity: {ticketData.quantity}{" "}
                       {ticketData.quantity > 1 ? "tickets" : "ticket"}
                     </p>
@@ -744,8 +744,8 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                   ticketData.total_quantity && (
                     <div className="pt-4 border-t">
                       <div className="flex items-center gap-2 mb-2">
-                        <Users className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                        <Users className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm font-medium text-gray-400">
                           Legacy Ticket Status
                         </span>
                       </div>
@@ -753,7 +753,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                         Scanned: {ticketData.use_count} of{" "}
                         {ticketData.total_quantity}
                       </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-gray-400">
                         This is a multi-person ticket. It can be scanned{" "}
                         {ticketData.total_quantity - ticketData.use_count} more
                         time(s).

@@ -81,7 +81,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
       </style>
 
       <div className="w-full max-w-full">
-        <div className="bg-white dark:bg-[#1a1a1a] rounded-sm shadow-lg dark:shadow-2xl dark:shadow-black/80 overflow-hidden hover-scale">
+        <div className="bg-[#1a1a1a] rounded-sm shadow-2xl shadow-black/80 overflow-hidden hover-scale">
           <div className="flex flex-col md:flex-row">
             {/* Image Section */}
             <div className="relative overflow-hidden md:w-1/3">
@@ -94,7 +94,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
                 placeholder="blur"
                 blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
               />
-              <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/30 dark:from-black/60 to-transparent pointer-events-none"></div>
+              <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
 
               {/* Artist name */}
               <div className="absolute top-4 left-4">
@@ -117,7 +117,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
               {/* Resident badge at bottom right */}
               {artist.isResident && (
                 <div className="absolute bottom-2 right-2">
-                  <div className="inline-flex items-center px-2 py-1 text-xs bg-green-200/80 dark:bg-green-800/50 text-green-900 dark:text-green-200 rounded-sm font-semibold">
+                  <div className="inline-flex items-center px-2 py-1 text-xs bg-green-800/50 text-green-200 rounded-sm font-semibold">
                     <span className="relative flex h-2 w-2 mr-1.5">
                       <span className="relative inline-flex rounded-sm h-2 w-2 bg-green-500"></span>
                     </span>
@@ -132,7 +132,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
               <div className="flex items-center gap-1.5 mb-6">
                 <div className="hover-translate flex-1 min-w-0">
                   {(artist.socialHandle || artist.socialLink) && (
-                    <div className="text-lg md:text-xl font-medium text-gray-700 dark:text-zinc-200 truncate">
+                    <div className="text-lg md:text-xl font-medium text-zinc-200 truncate">
                       {artist.socialLink ? (
                         <Link
                           href={artist.socialLink}
@@ -156,7 +156,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
                     </div>
                   )}
                   {socialPlatform && (
-                    <div className="text-base text-gray-500 dark:text-zinc-500 mt-1">
+                    <div className="text-base text-zinc-500 mt-1">
                       {socialPlatform}
                     </div>
                   )}
@@ -166,7 +166,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
               {/* Bio Section */}
               {artist.bio && (
                 <div className="mb-1.5">
-                  <div className="text-gray-700 dark:text-gray-300 text-base leading-snug">
+                  <div className="text-gray-300 text-base leading-snug">
                     {artist.bio.split("\n").map((line, index) => {
                       const trimmedLine = line.trim();
                       if (trimmedLine === "") {
@@ -194,7 +194,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
                     Your browser does not support the video tag.
                   </video>
                   {artist.videoCaption && (
-                    <p className="text-xs text-gray-500 dark:text-zinc-500 mt-2 italic">
+                    <p className="text-xs text-zinc-500 mt-2 italic">
                       {artist.videoCaption}
                     </p>
                   )}

@@ -88,53 +88,53 @@ export function HeroSection({
   // Convert Sanity hero items to ContentItem format
   const sanityContent: ContentItem[] = sanityHeroItems
     ? sanityHeroItems
-        .filter((item) => item.isActive)
-        .map((item) => ({
-          id: item._key,
-          type: item.type,
-          src:
-            item.type === "image" && item.image
-              ? item.image.asset.url
-              : item.video
-                ? item.video.asset.url
-                : item.videoUrl || "",
-          title: item.title,
-          description: item.description,
-          thumbnail:
-            item.type === "video" && item.image
-              ? item.image.asset.url
-              : undefined,
-        }))
+      .filter((item) => item.isActive)
+      .map((item) => ({
+        id: item._key,
+        type: item.type,
+        src:
+          item.type === "image" && item.image
+            ? item.image.asset.url
+            : item.video
+              ? item.video.asset.url
+              : item.videoUrl || "",
+        title: item.title,
+        description: item.description,
+        thumbnail:
+          item.type === "video" && item.image
+            ? item.image.asset.url
+            : undefined,
+      }))
     : [];
 
   // Convert highlighted content to ContentItem format
   const highlightedItems: ContentItem[] = highlightedContent
     ? highlightedContent.slice(0, 15).map((item) => {
-        // Ensure we have a valid src - prioritize image for display, videoUrl for videos
-        let src = "";
-        if (item.type === "video" && item.videoUrl) {
-          src = item.videoUrl;
-        } else if (item.image) {
-          src = item.image;
-        } else if (item.videoUrl) {
-          src = item.videoUrl;
-        }
+      // Ensure we have a valid src - prioritize image for display, videoUrl for videos
+      let src = "";
+      if (item.type === "video" && item.videoUrl) {
+        src = item.videoUrl;
+      } else if (item.image) {
+        src = item.image;
+      } else if (item.videoUrl) {
+        src = item.videoUrl;
+      }
 
-        return {
-          id: item._id,
-          type: item.type === "video" ? "video" : "image", // Normalize type for hero display
-          src: src,
-          title: item.title,
-          description: item.description,
-          thumbnail: item.image,
-          slug: item.slug,
-          author: item.author,
-          artist: item.artist,
-          date: item.date,
-          publishedAt: item.publishedAt,
-          videoUrl: item.videoUrl,
-        };
-      })
+      return {
+        id: item._id,
+        type: item.type === "video" ? "video" : "image", // Normalize type for hero display
+        src: src,
+        title: item.title,
+        description: item.description,
+        thumbnail: item.image,
+        slug: item.slug,
+        author: item.author,
+        artist: item.artist,
+        date: item.date,
+        publishedAt: item.publishedAt,
+        videoUrl: item.videoUrl,
+      };
+    })
     : [];
 
   // Combine all content sources with priority: highlighted > sanity > props > defaults
@@ -365,19 +365,17 @@ export function HeroSection({
             {(currentItem.type === "video" || currentItem.type === "media") && (
               <button
                 onClick={togglePlayPause}
-                className={`p-4 rounded-sm border-2 transition-all duration-300 ${
-                  showControls ? "opacity-100 scale-100" : "opacity-0 scale-95"
-                } ${
-                  isPlaying
+                className={`p-4 rounded-sm border-2 transition-all duration-300 ${showControls ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                  } ${isPlaying
                     ? "bg-white/20 border-white text-white hover:bg-white/30"
-                    : "bg-white border-white text-black hover:bg-white/90"
-                }`}
+                    : "bg-white border-white text-white hover:bg-white/90"
+                  }`}
                 aria-label={
                   isPlaying
                     ? t(
-                        currentLanguage,
-                        "eventShowcase.hero.actions.pauseVideo",
-                      )
+                      currentLanguage,
+                      "eventShowcase.hero.actions.pauseVideo",
+                    )
                     : t(currentLanguage, "eventShowcase.hero.actions.playVideo")
                 }
               >
@@ -393,29 +391,29 @@ export function HeroSection({
             {((currentItem.type === "article" && currentItem.slug) ||
               (currentItem.type === "event" && currentItem.slug) ||
               currentItem.type === "media") && (
-              <button
-                onClick={() => {
-                  if (currentItem.type === "article" && currentItem.slug) {
-                    window.location.href = `/stories/${currentItem.slug}`;
-                  } else if (currentItem.type === "event" && currentItem.slug) {
-                    window.location.href = `/events/${currentItem.slug}`;
-                  } else if (
-                    currentItem.type === "media" &&
-                    currentItem.videoUrl
-                  ) {
-                    window.open(currentItem.videoUrl, "_blank");
-                  }
-                }}
-                className="px-6 py-3 bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 rounded-sm transition-all duration-300"
-              >
-                {currentItem.type === "article" &&
-                  t(currentLanguage, "eventShowcase.hero.actions.readArticle")}
-                {currentItem.type === "event" &&
-                  t(currentLanguage, "eventShowcase.hero.actions.viewEvent")}
-                {currentItem.type === "media" &&
-                  t(currentLanguage, "eventShowcase.hero.actions.watchMedia")}
-              </button>
-            )}
+                <button
+                  onClick={() => {
+                    if (currentItem.type === "article" && currentItem.slug) {
+                      window.location.href = `/stories/${currentItem.slug}`;
+                    } else if (currentItem.type === "event" && currentItem.slug) {
+                      window.location.href = `/events/${currentItem.slug}`;
+                    } else if (
+                      currentItem.type === "media" &&
+                      currentItem.videoUrl
+                    ) {
+                      window.open(currentItem.videoUrl, "_blank");
+                    }
+                  }}
+                  className="px-6 py-3 bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 rounded-sm transition-all duration-300"
+                >
+                  {currentItem.type === "article" &&
+                    t(currentLanguage, "eventShowcase.hero.actions.readArticle")}
+                  {currentItem.type === "event" &&
+                    t(currentLanguage, "eventShowcase.hero.actions.viewEvent")}
+                  {currentItem.type === "media" &&
+                    t(currentLanguage, "eventShowcase.hero.actions.watchMedia")}
+                </button>
+              )}
           </div>
         </div>
       </div>
@@ -468,11 +466,10 @@ export function HeroSection({
                 console.log("Dot clicked:", index);
                 goToIndex(index);
               }}
-              className={`w-3 h-1.5 rounded-sm transition-all duration-200 cursor-pointer ${
-                index === currentIndex
-                  ? "bg-white scale-110"
-                  : "bg-white/30 hover:bg-white/50"
-              }`}
+              className={`w-3 h-1.5 rounded-sm transition-all duration-200 cursor-pointer ${index === currentIndex
+                ? "bg-white scale-110"
+                : "bg-white/30 hover:bg-white/50"
+                }`}
               aria-label={`Go to content ${index + 1}`}
             />
           ))}

@@ -35,10 +35,10 @@ export default function StoriesContentClient({
         <div className="container mx-auto px-4 py-0 max-w-7xl">
           {/* Hero Section */}
           <div className="relative pt-24 md:pt-32 mb-12">
-            <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-white mb-6">
               Stories
             </h1>
-            <p className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-3xl">
+            <p className="text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-3xl">
               Discover inspiring stories, insights, and narratives from our
               community. Each story captures the essence of Kamayakoi&apos;s
               journey and the people who make it special.
@@ -54,7 +54,7 @@ export default function StoriesContentClient({
                   <div className="grid grid-cols-1 gap-8">
                     {/* Main Featured Story */}
                     <div className="w-full">
-                      <article className="group cursor-pointer bg-white dark:bg-[#1a1a1a] rounded-sm overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-zinc-200 dark:border-zinc-800">
+                      <article className="group cursor-pointer bg-[#1a1a1a] rounded-sm overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-zinc-800">
                         <div className="relative h-96 md:h-[36rem] overflow-hidden">
                           <Image
                             src={
@@ -86,15 +86,15 @@ export default function StoriesContentClient({
                         <div className="p-6">
                           <div className="flex justify-between items-start gap-4">
                             <div className="flex-1">
-                              <h3 className="text-2xl md:text-3xl font-semibold text-zinc-900 dark:text-white group-hover:text-primary transition-colors mb-2">
+                              <h3 className="text-2xl md:text-3xl font-semibold text-white group-hover:text-primary transition-colors mb-2">
                                 {featuredStory.title}
                               </h3>
                               {featuredStory.excerpt && (
-                                <p className="text-zinc-600 dark:text-zinc-400 mb-4 line-clamp-2">
+                                <p className="text-zinc-400 mb-4 line-clamp-2">
                                   {featuredStory.excerpt}
                                 </p>
                               )}
-                              <div className="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400">
+                              <div className="flex items-center gap-4 text-sm text-zinc-400">
                                 {featuredStory.author && (
                                   <span>By {featuredStory.author.name}</span>
                                 )}
@@ -131,7 +131,7 @@ export default function StoriesContentClient({
                     {featuredStories.slice(0, 3).map((story: Story) => (
                       <article
                         key={story._id}
-                        className="group cursor-pointer bg-white dark:bg-[#1a1a1a] rounded-sm overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-zinc-200 dark:border-zinc-800"
+                        className="group cursor-pointer bg-[#1a1a1a] rounded-sm overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-zinc-800"
                       >
                         <div className="relative h-48 overflow-hidden">
                           <Image
@@ -156,23 +156,23 @@ export default function StoriesContentClient({
                               .map((category: Category, index: number) => (
                                 <span
                                   key={index}
-                                  className="px-2 py-1 text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded"
+                                  className="px-2 py-1 text-xs bg-zinc-800 text-zinc-400 rounded"
                                 >
                                   {category.title}
                                 </span>
                               ))}
                           </div>
 
-                          <h4 className="font-semibold mb-2 text-zinc-900 dark:text-white group-hover:text-primary transition-colors line-clamp-2">
+                          <h4 className="font-semibold mb-2 text-white group-hover:text-primary transition-colors line-clamp-2">
                             {story.title}
                           </h4>
 
-                          <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3 line-clamp-2">
+                          <p className="text-sm text-zinc-400 mb-3 line-clamp-2">
                             {story.excerpt}
                           </p>
 
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                            <span className="text-xs text-zinc-400">
                               {new Date(story.publishedAt).toLocaleDateString(
                                 "en-US",
                                 { month: "short", day: "numeric" },
@@ -205,10 +205,10 @@ export default function StoriesContentClient({
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
+              <h2 className="text-2xl font-semibold mb-4 text-white">
                 {t(currentLanguage, "storyPage.noStories.title")}
               </h2>
-              <p className="text-zinc-600 dark:text-zinc-400 mb-6">
+              <p className="text-zinc-400 mb-6">
                 {t(currentLanguage, "storyPage.noStories.description")}
               </p>
             </motion.div>

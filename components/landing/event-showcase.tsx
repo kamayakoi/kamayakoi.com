@@ -5,27 +5,51 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
+import { useEffect, useState } from "react";
+import { getLatestEvents } from "@/lib/sanity/queries";
 
 // Props interface
 interface ShowcaseEvent {
   _id: string;
   title: string;
-  slug: string;
+  slug: {
+    current: string;
+  };
   date?: string;
   time?: string;
   location?: string;
-  flyer: string;
+  flyer: {
+    url: string;
+  };
   ticketsAvailable: boolean;
   description?: string;
 }
 
 interface EventShowcaseProps {
-  sanityEvents?: ShowcaseEvent[];
+  limit?: number;
 }
 
-export function EventShowcase({ sanityEvents }: EventShowcaseProps = {}) {
+export function EventShowcase({ limit = 6 }: EventShowcaseProps = {}) {
   const { currentLanguage } = useTranslation();
-  const hasEvents = sanityEvents && sanityEvents.length > 0;
+  const [events, setEvents] = useState<ShowcaseEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const fetchedEvents = await getLatestEvents(limit);
+        setEvents(fetchedEvents);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, [limit]);
+
+  const hasEvents = events && events.length > 0;
 
   return (
     <section className="py-20 md:py-16 px-4 md:px-8">
@@ -43,7 +67,11 @@ export function EventShowcase({ sanityEvents }: EventShowcaseProps = {}) {
             </div>
           </div>
 
-          {hasEvents ? (
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="text-white/70">Loading events...</div>
+            </div>
+          ) : hasEvents ? (
             <>
               {/* Header with arrow for carousel */}
               <div className="flex items-center justify-between mb-4 mt-8">
@@ -53,24 +81,24 @@ export function EventShowcase({ sanityEvents }: EventShowcaseProps = {}) {
 
               <div className="max-w-full">
                 <div className="flex gap-6 overflow-x-auto pb-2 pt-8 mt-4 px-4 scrollbar-hide">
-                  {sanityEvents.map((event) => {
+                  {events.map((event) => {
                     const eventData = {
                       title: event.title,
                       description:
                         typeof event.description === "string"
                           ? event.description
                           : "",
-                      image: event.flyer || "/placeholder.webp",
+                      image: event.flyer?.url || "/placeholder.webp",
                       date: event.date
                         ? new Date(event.date).toLocaleDateString(
-                            currentLanguage === "fr" ? "fr-FR" : "en-US",
-                            {
-                              year: "numeric",
-                              month: "long",
-                            },
-                          )
+                          currentLanguage === "fr" ? "fr-FR" : "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                          },
+                        )
                         : "TBD",
-                      slug: event.slug,
+                      slug: event.slug.current,
                     };
 
                     return (

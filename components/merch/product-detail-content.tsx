@@ -114,7 +114,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                       ? selectedImage
                       : selectedImage.url
                   }
-                  alt={product.name}
+                  alt={typeof product.name === 'string' ? product.name : "Product"}
                   fill
                   className="object-cover"
                   quality={100}
@@ -150,15 +150,14 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                     <button
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
-                      className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all ${
-                        selectedImageIndex === index
-                          ? "ring-2 ring-primary"
-                          : "hover:ring-2 hover:ring-muted-foreground/50"
-                      }`}
+                      className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all ${selectedImageIndex === index
+                        ? "ring-2 ring-primary"
+                        : "hover:ring-2 hover:ring-muted-foreground/50"
+                        }`}
                     >
                       <Image
                         src={image.url}
-                        alt={`${product.name} view ${index + 1}`}
+                        alt={`${typeof product.name === 'string' ? product.name : "Product"} view ${index + 1}`}
                         fill
                         className="object-cover"
                         quality={80}
@@ -186,7 +185,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
-                {product.name || "Product"}
+                {typeof product.name === 'string' ? product.name : "Product"}
               </motion.h1>
               <motion.p
                 className="text-2xl font-semibold text-primary"

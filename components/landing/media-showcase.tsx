@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
+import { getAllMedia } from "@/lib/sanity/queries";
 
 interface MediaItem {
   _id: string;
@@ -11,7 +12,7 @@ interface MediaItem {
   type: string;
   url: string;
   description?: string;
-  thumbnail: string;
+  thumbnail?: string;
   duration?: string;
   artist?: string;
   genre?: string;
@@ -21,12 +22,39 @@ interface MediaItem {
 }
 
 interface MediaShowcaseProps {
-  media: MediaItem[];
+  limit?: number;
 }
 
-export function MediaShowcase({ media }: MediaShowcaseProps) {
+export function MediaShowcase({ limit = 10 }: MediaShowcaseProps = {}) {
   const { currentLanguage } = useTranslation();
+  const [media, setMedia] = useState<MediaItem[]>([]);
   const [playingMediaId, setPlayingMediaId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMedia = async () => {
+      try {
+        const fetchedMedia = await getAllMedia();
+        // Sort by publishedAt desc and take the limit
+        const sortedMedia = fetchedMedia
+          .sort((a, b) => {
+            if (!a.publishedAt && !b.publishedAt) return 0;
+            if (!a.publishedAt) return 1;
+            if (!b.publishedAt) return -1;
+            return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+          })
+          .slice(0, limit);
+        setMedia(sortedMedia);
+      } catch (error) {
+        console.error('Error fetching media:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMedia();
+  }, [limit]);
+
   const hasMedia = media && media.length > 0;
 
   const handleMediaPlay = (mediaId: string) => {
@@ -65,12 +93,16 @@ export function MediaShowcase({ media }: MediaShowcaseProps) {
           </div>
         </div>
 
-        {hasMedia ? (
+        {loading ? (
+          <div className="text-center py-20">
+            <div className="text-white/70">Loading media...</div>
+          </div>
+        ) : hasMedia ? (
           <>
             {/* Horizontal Scrolling Media */}
             <div className="overflow-x-auto pb-4">
               <div className="flex gap-6 min-w-max">
-                {media.slice(0, 50).map((mediaItem) => (
+                {media.map((mediaItem) => (
                   <div
                     key={mediaItem._id}
                     className="flex-shrink-0 w-72 relative overflow-hidden rounded-sm bg-black/20 backdrop-blur-sm group cursor-pointer"

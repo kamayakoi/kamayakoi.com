@@ -5,30 +5,60 @@ import Link from "next/link";
 import { Calendar, User } from "lucide-react";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
+import { useEffect, useState } from "react";
+import { getLatestBlogPosts } from "@/lib/sanity/queries";
 
 interface FeaturedArticle {
   _id: string;
   title: string;
   title_fr?: string;
-  slug: string;
+  slug: {
+    current: string;
+  };
   publishedAt: string;
   excerpt: string;
   excerpt_fr?: string;
-  image: string;
+  image: {
+    asset: {
+      url: string;
+    };
+  };
   author: {
     _id: string;
     name: string;
-    image?: string;
+    image?: {
+      asset: {
+        url: string;
+      };
+    };
     bio?: string;
   };
 }
 
 interface FeaturedArticlesProps {
-  articles: FeaturedArticle[];
+  limit?: number;
 }
 
-export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
+export function FeaturedArticles({ limit = 6 }: FeaturedArticlesProps = {}) {
   const { currentLanguage } = useTranslation();
+  const [articles, setArticles] = useState<FeaturedArticle[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const fetchedArticles = await getLatestBlogPosts(limit);
+        setArticles(fetchedArticles);
+      } catch (error) {
+        console.error('Error fetching articles:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, [limit]);
+
   const hasArticles = articles && articles.length > 0;
 
   const formatDate = (dateString: string) => {
@@ -60,7 +90,11 @@ export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
           </div>
         </div>
 
-        {hasArticles ? (
+        {loading ? (
+          <div className="text-center py-20">
+            <div className="text-white/70">Loading articles...</div>
+          </div>
+        ) : hasArticles ? (
           <>
             {/* Articles Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -79,11 +113,11 @@ export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
                     key={article._id}
                     className="group bg-black/20 backdrop-blur-sm rounded-sm overflow-hidden hover:bg-black/30 transition-all duration-300"
                   >
-                    <Link href={`/stories/${article.slug}`} className="block">
+                    <Link href={`/stories/${article.slug.current}`} className="block">
                       {/* Article Image */}
                       <div className="relative aspect-[16/10] overflow-hidden">
                         <Image
-                          src={article.image}
+                          src={article.image?.asset?.url || "/placeholder.webp"}
                           alt={title}
                           fill
                           className="object-cover transition-transform duration-500 group-hover:scale-105"

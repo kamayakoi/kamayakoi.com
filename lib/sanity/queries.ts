@@ -445,7 +445,7 @@ export async function getAllProducts() {
   return client.fetch(`
     *[_type == "product"] | order(name asc) {
       _id,
-      name,
+      "name": name,
       "slug": slug.current,
       productId,
       "mainImage": images[0].asset->url, // Get the first image URL
@@ -474,7 +474,7 @@ export async function getProductBySlug(slug: string) {
     `
     *[_type == "product" && slug.current == $slug][0] {
       _id,
-      name,
+      "name": name,
       productId,
       description,
       "images": images[]{
@@ -716,119 +716,10 @@ export interface HomepageHeroItem {
   isActive: boolean;
 }
 
-// Interface for article data
-export interface FeaturedArticle {
-  _id: string;
-  title: string;
-  title_fr?: string;
-  slug: {
-    current: string;
-  };
-  publishedAt: string;
-  excerpt: string;
-  excerpt_fr?: string;
-  image: {
-    asset: {
-      url: string;
-    };
-  };
-  author: {
-    _id: string;
-    name: string;
-    image: {
-      asset: {
-        url: string;
-      };
-    };
-    bio: string;
-  };
-}
-
-// Interface for media data
-export interface FeaturedMedia {
-  _id: string;
-  title: string;
-  type: string;
-  url: string;
-  description?: string;
-  thumbnail: {
-    asset: {
-      url: string;
-    };
-  };
-  duration?: string;
-  artist?: string;
-  genre?: string;
-  isFeatured: boolean;
-  tags?: string[];
-  publishedAt?: string;
-}
-
-// Interface for event data
-export interface ShowcaseEvent {
-  _id: string;
-  title: string;
-  slug: {
-    current: string;
-  };
-  date?: string;
-  time?: string;
-  location?: string;
-  flyer: {
-    asset: {
-      url: string;
-    };
-  };
-  ticketsAvailable: boolean;
-  description?: string;
-}
-
-// Interface for highlighted content item (raw from Sanity query)
-export interface HighlightedContentRaw {
-  _key: string;
-  contentType: "article" | "media" | "event" | "video";
-  isActive: boolean;
-  article?: FeaturedArticle;
-  media?: FeaturedMedia;
-  event?: ShowcaseEvent;
-  customVideo?: {
-    title: string;
-    description?: string;
-    videoUrl: string;
-    thumbnail: {
-      asset: {
-        url: string;
-      };
-    };
-  };
-}
-
-// Interface for highlighted content item (processed)
-export interface HighlightedContentItem {
-  _id: string;
-  type: "article" | "media" | "event" | "video";
-  title: string;
-  description?: string;
-  image?: string;
-  videoUrl?: string;
-  slug?: string;
-  publishedAt?: string;
-  artist?: string;
-  date?: string;
-  author?: {
-    name: string;
-    image?: string;
-  };
-}
 
 // Interface for homepage data
 export interface HomepageData {
   heroContent?: HomepageHeroItem[];
-  featuredArticles?: FeaturedArticle[];
-  featuredMedia?: FeaturedMedia[];
-  showcaseEvents?: ShowcaseEvent[];
-  highlightedContent?: HighlightedContentRaw[];
-  highlightedContentProcessed?: HighlightedContentItem[];
 }
 
 // Fetch homepage content
@@ -849,87 +740,6 @@ export const getHomepageContent = async (): Promise<HomepageData | null> => {
       },
       videoUrl,
       isActive
-    },
-    highlightedContent[]{
-      _key,
-      contentType,
-      isActive,
-      article->{
-        _id,
-        title,
-        excerpt,
-        "slug": slug.current,
-        publishedAt,
-        "image": image.asset->url,
-        "author": author->{
-          name,
-          "image": image.asset->url
-        }
-      },
-      media->{
-        _id,
-        title,
-        description,
-        url,
-        "image": thumbnail.asset->url,
-        artist,
-        publishedAt
-      },
-      event->{
-        _id,
-        title,
-        description,
-        "slug": slug.current,
-        date,
-        "image": flyer.asset->url
-      },
-      customVideo{
-        title,
-        description,
-        videoUrl,
-        "image": thumbnail.asset->url
-      }
-    },
-    featuredArticles[]->{
-      _id,
-      title,
-      title_fr,
-      "slug": slug.current,
-      publishedAt,
-      excerpt,
-      excerpt_fr,
-      "image": image.asset->url,
-      "author": author->{
-        _id,
-        name,
-        "image": image.asset->url,
-        bio
-      }
-    },
-    featuredMedia[]->{
-      _id,
-      title,
-      type,
-      url,
-      description,
-      "thumbnail": thumbnail.asset->url,
-      duration,
-      artist,
-      genre,
-      isFeatured,
-      tags,
-      publishedAt
-    },
-    showcaseEvents[]->{
-      _id,
-      title,
-      "slug": slug.current,
-      date,
-      time,
-      location,
-      "flyer": flyer.asset->url,
-      ticketsAvailable,
-      description
     }
   }`;
 
@@ -938,75 +748,6 @@ export const getHomepageContent = async (): Promise<HomepageData | null> => {
     {},
     getCacheConfig(["homepage"]),
   );
-
-  // Transform highlighted content into processed format
-  if (result?.highlightedContent) {
-    const processedHighlightedContent = result.highlightedContent
-      .filter((item: HighlightedContentRaw) => item.isActive)
-      .map((item: HighlightedContentRaw): HighlightedContentItem | null => {
-        switch (item.contentType) {
-          case "article":
-            return item.article
-              ? {
-                  _id: item.article._id,
-                  type: "article" as const,
-                  title: item.article.title,
-                  description: item.article.excerpt,
-                  image: item.article.image?.asset?.url,
-                  slug: item.article.slug.current,
-                  publishedAt: item.article.publishedAt,
-                  author: {
-                    name: item.article.author.name,
-                    image: item.article.author.image?.asset?.url,
-                  },
-                }
-              : null;
-          case "media":
-            return item.media
-              ? {
-                  _id: item.media._id,
-                  type: "media" as const,
-                  title: item.media.title,
-                  description: item.media.description,
-                  image: item.media.thumbnail?.asset?.url,
-                  videoUrl: item.media.url,
-                  artist: item.media.artist,
-                  publishedAt: item.media.publishedAt,
-                }
-              : null;
-          case "event":
-            return item.event
-              ? {
-                  _id: item.event._id,
-                  type: "event" as const,
-                  title: item.event.title,
-                  description: item.event.description,
-                  image: item.event.flyer?.asset?.url,
-                  slug: item.event.slug.current,
-                  date: item.event.date,
-                }
-              : null;
-          case "video":
-            return item.customVideo
-              ? {
-                  _id: item._key,
-                  type: "video" as const,
-                  title: item.customVideo.title,
-                  description: item.customVideo.description,
-                  image: item.customVideo.thumbnail?.asset?.url,
-                  videoUrl: item.customVideo.videoUrl,
-                }
-              : null;
-          default:
-            return null;
-        }
-      })
-      .filter((item): item is HighlightedContentItem => item !== null);
-
-    // Replace the raw highlighted content with the processed version
-    (result as HomepageData).highlightedContentProcessed =
-      processedHighlightedContent;
-  }
 
   return result;
 };

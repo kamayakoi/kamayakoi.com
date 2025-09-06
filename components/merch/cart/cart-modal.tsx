@@ -1,7 +1,6 @@
 "use client";
 
 import { PlusCircleIcon, ShoppingCart, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { useCart } from "./cart-context";
@@ -12,6 +11,7 @@ import { CartItemCard } from "./cart-item-card";
 import Link from "next/link";
 import { cn } from "@/lib/actions/utils";
 import { createPortal } from "react-dom";
+import CartPurchaseForm from "./cart-purchase-form";
 
 const CartContainer = ({
   children,
@@ -23,7 +23,13 @@ const CartContainer = ({
   return <div className={cn("px-3 md:px-4", className)}>{children}</div>;
 };
 
-const CartItems = ({ closeCart }: { closeCart: () => void }) => {
+const CartItems = ({
+  closeCart,
+  onProceedToCheckout
+}: {
+  closeCart: () => void;
+  onProceedToCheckout: () => void;
+}) => {
   const { cart } = useCart();
 
   if (!cart) return <></>;
@@ -68,7 +74,7 @@ const CartItems = ({ closeCart }: { closeCart: () => void }) => {
             </div>
           </CartContainer>
         </div>
-        <CheckoutButton />
+        <CheckoutButton onProceedToCheckout={onProceedToCheckout} />
       </CartContainer>
     </div>
   );
@@ -87,6 +93,7 @@ export default function CartModal() {
   const { cart } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [showPurchaseForm, setShowPurchaseForm] = useState(false);
   const serializedCart = useRef(cart ? serializeCart(cart) : undefined);
 
   // Ensure component is mounted before rendering portal
@@ -130,7 +137,10 @@ export default function CartModal() {
   }, [isOpen]);
 
   const openCart = () => setIsOpen(true);
-  const closeCart = () => setIsOpen(false);
+  const closeCart = () => {
+    setIsOpen(false);
+    setShowPurchaseForm(false);
+  };
 
   const renderCartContent = () => {
     if (!cart || cart.lines.length === 0) {
@@ -159,7 +169,13 @@ export default function CartModal() {
       );
     }
 
-    return <CartItems closeCart={closeCart} />;
+    return showPurchaseForm ? (
+      <CartPurchaseForm
+        onClose={() => setShowPurchaseForm(false)}
+      />
+    ) : (
+      <CartItems closeCart={closeCart} onProceedToCheckout={() => setShowPurchaseForm(true)} />
+    );
   };
 
   // Only show cart button if there are items in the cart
@@ -251,10 +267,9 @@ export default function CartModal() {
   );
 }
 
-function CheckoutButton() {
+function CheckoutButton({ onProceedToCheckout }: { onProceedToCheckout: () => void }) {
   const { pending } = useFormStatus();
   const { cart, isPending } = useCart();
-  const router = useRouter();
 
   const isLoading = pending;
   const isDisabled = !cart || cart.lines.length === 0 || isPending;
@@ -266,10 +281,7 @@ function CheckoutButton() {
         disabled={isDisabled}
         size="lg"
         className="flex relative gap-3 justify-between items-center w-full bg-teal-800 hover:bg-teal-700 text-teal-200 rounded-sm font-semibold py-4"
-        onClick={() => {
-          // For now, redirect to checkout page or show message
-          router.push("/checkout");
-        }}
+        onClick={onProceedToCheckout}
       >
         <AnimatePresence initial={false} mode="wait">
           <motion.div

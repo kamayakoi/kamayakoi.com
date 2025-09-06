@@ -76,7 +76,10 @@ export function PaymentCancelClient({ purchaseId }: PaymentCancelClientProps) {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <Button asChild className="w-full bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700">
+                  <Button
+                    asChild
+                    className="w-full bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700"
+                  >
                     <Link href="/">
                       <Calendar className="w-4 h-4 mr-2" />
                       {t(currentLanguage, "paymentCancel.buttons.backToEvents")}
@@ -86,12 +89,18 @@ export function PaymentCancelClient({ purchaseId }: PaymentCancelClientProps) {
                   <div className="flex gap-3">
                     <Button variant="outline" asChild className="flex-1">
                       <Link href="/archives">
-                        {t(currentLanguage, "paymentCancel.buttons.browseGallery")}
+                        {t(
+                          currentLanguage,
+                          "paymentCancel.buttons.browseGallery",
+                        )}
                       </Link>
                     </Button>
                     <Button variant="outline" asChild className="flex-1">
                       <Link href="/merch">
-                        {t(currentLanguage, "paymentCancel.buttons.backToMerch")}
+                        {t(
+                          currentLanguage,
+                          "paymentCancel.buttons.backToMerch",
+                        )}
                       </Link>
                     </Button>
                   </div>

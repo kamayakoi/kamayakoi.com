@@ -283,7 +283,7 @@ export default function PurchaseFormModal({
         console.error("Supabase function error:", functionError);
         setError(
           functionError.message ||
-          t(currentLanguage, "purchaseModal.errors.functionError"),
+            t(currentLanguage, "purchaseModal.errors.functionError"),
         );
         setIsLoading(false);
         return;
@@ -296,7 +296,7 @@ export default function PurchaseFormModal({
         console.error("Lomi checkout URL not found in response:", data);
         setError(
           data.error ||
-          t(currentLanguage, "purchaseModal.errors.lomiUrlMissing"),
+            t(currentLanguage, "purchaseModal.errors.lomiUrlMissing"),
         );
       }
     } catch (e: unknown) {
@@ -397,7 +397,10 @@ export default function PurchaseFormModal({
                     <h4 className="font-medium text-sm">{item.name}</h4>
                     <p className="text-xs text-muted-foreground mt-1">
                       {formatPrice(item.price)}
-                      {t(currentLanguage, "eventSlugPage.tickets.currencySuffix")}
+                      {t(
+                        currentLanguage,
+                        "eventSlugPage.tickets.currencySuffix",
+                      )}
                       {item.isBundle && (
                         <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-sm">
                           {item.ticketsIncluded || 1} tickets
@@ -512,7 +515,10 @@ export default function PurchaseFormModal({
                       </span>
                       <span className="text-primary font-semibold">
                         {formatPrice(totalPrice)}
-                        {t(currentLanguage, "eventSlugPage.tickets.currencySuffix")}
+                        {t(
+                          currentLanguage,
+                          "eventSlugPage.tickets.currencySuffix",
+                        )}
                       </span>
                     </div>
                     {item.isBundle && (

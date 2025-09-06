@@ -59,7 +59,10 @@ export function PaymentSuccessClient({
                   <ul className="text-sm text-green-300 space-y-1">
                     <li>
                       •{" "}
-                      {t(currentLanguage, "paymentSuccess.whatsNext.checkEmail")}
+                      {t(
+                        currentLanguage,
+                        "paymentSuccess.whatsNext.checkEmail",
+                      )}
                     </li>
                     <li>
                       •{" "}
@@ -70,32 +73,50 @@ export function PaymentSuccessClient({
                     </li>
                     <li>
                       •{" "}
-                      {t(currentLanguage, "paymentSuccess.whatsNext.arriveEarly")}
+                      {t(
+                        currentLanguage,
+                        "paymentSuccess.whatsNext.arriveEarly",
+                      )}
                     </li>
                     <li>
                       •{" "}
-                      {t(currentLanguage, "paymentSuccess.whatsNext.trackOrder")}
+                      {t(
+                        currentLanguage,
+                        "paymentSuccess.whatsNext.trackOrder",
+                      )}
                     </li>
                   </ul>
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <Button asChild className="w-full bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700">
+                  <Button
+                    asChild
+                    className="w-full bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700"
+                  >
                     <Link href="/">
                       <Calendar className="w-4 h-4 mr-2" />
-                      {t(currentLanguage, "paymentSuccess.buttons.backToEvents")}
+                      {t(
+                        currentLanguage,
+                        "paymentSuccess.buttons.backToEvents",
+                      )}
                     </Link>
                   </Button>
 
                   <div className="flex gap-3">
                     <Button variant="outline" asChild className="flex-1">
                       <Link href="/archives">
-                        {t(currentLanguage, "paymentSuccess.buttons.browseGallery")}
+                        {t(
+                          currentLanguage,
+                          "paymentSuccess.buttons.browseGallery",
+                        )}
                       </Link>
                     </Button>
                     <Button variant="outline" asChild className="flex-1">
                       <Link href="/merch">
-                        {t(currentLanguage, "paymentSuccess.buttons.backToMerch")}
+                        {t(
+                          currentLanguage,
+                          "paymentSuccess.buttons.backToMerch",
+                        )}
                       </Link>
                     </Button>
                   </div>

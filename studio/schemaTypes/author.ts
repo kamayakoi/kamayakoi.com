@@ -2,7 +2,7 @@ import {Rule} from 'sanity'
 
 export default {
   name: 'author',
-  title: 'Author',
+  title: 'Authors',
   type: 'document',
   fields: [
     {

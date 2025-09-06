@@ -2,7 +2,7 @@ import {Rule} from 'sanity'
 
 export default {
   name: 'event',
-  title: 'Event',
+  title: 'Events',
   type: 'document',
   groups: [
     {name: 'details', title: 'Event details', default: true},
@@ -491,7 +491,9 @@ export default {
     },
     prepare: (value: any) => {
       const formattedDate = value.date ? new Date(value.date).toLocaleDateString() : 'No date'
-      const previewSubtitle = [value.subtitle, value.venue, formattedDate].filter(Boolean).join(' | ')
+      const previewSubtitle = [value.subtitle, value.venue, formattedDate]
+        .filter(Boolean)
+        .join(' | ')
 
       return {
         title: value.title,

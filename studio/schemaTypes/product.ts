@@ -2,7 +2,7 @@ import {Rule} from 'sanity'
 
 export default {
   name: 'product',
-  title: 'Product',
+  title: 'Products',
   type: 'document',
   groups: [
     {name: 'details', title: 'Product details', default: true},

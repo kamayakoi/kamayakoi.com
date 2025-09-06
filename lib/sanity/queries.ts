@@ -681,10 +681,12 @@ export interface HomepageData {
     slug: { current: string };
     date: string;
     time?: string;
-    location?: string | {
-      venueName?: string;
-      address?: string;
-    };
+    location?:
+      | string
+      | {
+          venueName?: string;
+          address?: string;
+        };
     description?: {
       en?: string;
       fr?: string;

@@ -3,7 +3,7 @@ import {PlayIcon} from '@sanity/icons'
 
 export default defineType({
   name: 'media',
-  title: 'Media Embed',
+  title: 'DJ Sets',
   type: 'document',
   icon: PlayIcon,
   fields: [

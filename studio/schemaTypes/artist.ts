@@ -3,7 +3,7 @@ import {UsersIcon} from '@sanity/icons' // Optional: Add an icon
 
 export default defineType({
   name: 'artist',
-  title: 'Artist / Performer',
+  title: 'Artists',
   type: 'document',
   icon: UsersIcon, // Optional icon
   fields: [

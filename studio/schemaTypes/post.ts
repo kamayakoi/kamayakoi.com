@@ -2,7 +2,7 @@ import {Rule} from 'sanity'
 
 export default {
   name: 'post',
-  title: 'Blog Post',
+  title: 'Stories',
   type: 'document',
   fields: [
     {

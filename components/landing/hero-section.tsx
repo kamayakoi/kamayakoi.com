@@ -62,7 +62,12 @@ interface HeroSectionProps {
     };
     date: string;
     time?: string;
-    location?: string;
+    location?:
+      | string
+      | {
+          venueName?: string;
+          address?: string;
+        };
     description?: {
       en?: string;
       fr?: string;

@@ -489,19 +489,7 @@ export default {
       venue: 'location.venueName',
       media: 'flyer',
     },
-    prepare({
-      title,
-      subtitle,
-      date,
-      venue,
-      media,
-    }: {
-      title: string
-      subtitle?: string
-      date: string
-      venue?: string
-      media: any
-    }) {
+    prepare({title, subtitle, date, venue, media}: {title: string; subtitle?: string; date: string; venue?: string; media: any}) {
       const formattedDate = date ? new Date(date).toLocaleDateString() : 'No date'
       const previewSubtitle = [subtitle, venue, formattedDate].filter(Boolean).join(' | ')
 

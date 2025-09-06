@@ -31,7 +31,7 @@ export default {
           {title: 'Purple', value: 'purple'},
           {title: 'Yellow', value: 'yellow'},
           {title: 'Emerald', value: 'emerald'},
-          { title: 'Blue', value: 'blue' },
+          {title: 'Blue', value: 'blue'},
         ],
         layout: 'radio',
       },

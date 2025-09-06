@@ -89,7 +89,8 @@ export default defineType({
           to: [{type: 'event'}],
         },
       ],
-      description: 'Select events to feature in the hero section carousel. These will appear alongside videos and images.',
+      description:
+        'Select events to feature in the hero section carousel. These will appear alongside videos and images.',
       validation: (Rule) => Rule.max(5),
     }),
     defineField({
@@ -213,13 +214,7 @@ export default defineType({
       heroItems: 'heroContent',
       featuredEvents: 'featuredEvents',
     },
-    prepare({
-      title,
-      firstTrack,
-      promoEventTitle,
-      heroItems,
-      featuredEvents,
-    }) {
+    prepare({title, firstTrack, promoEventTitle, heroItems, featuredEvents}) {
       let previewTitle = title || 'Homepage Settings'
 
       const counts = []

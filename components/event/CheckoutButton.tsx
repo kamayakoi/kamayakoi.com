@@ -160,7 +160,7 @@ export default function CheckoutButton({
       return (
         <Button
           asChild
-          className="sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground rounded-sm font-medium h-10 px-6"
+          className="sm:w-auto bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700 rounded-sm font-medium h-10 px-6 uppercase w-full md:w-auto justify-center"
         >
           <Link
             href={item.paymentLink}
@@ -178,8 +178,8 @@ export default function CheckoutButton({
         ? t(currentLanguage, "eventSlugPage.tickets.buyNow")
         : t(currentLanguage, "eventSlugPage.tickets.getETicket");
       const buttonClassName = isBundle
-        ? "sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white rounded-sm font-medium h-10 px-6"
-        : "sm:w-auto bg-green-600 hover:bg-green-700 text-white rounded-sm font-medium h-10 px-6";
+        ? "sm:w-auto bg-orange-600 hover:bg-orange-700 text-white rounded-sm font-medium h-10 px-6 uppercase w-full md:w-auto justify-center"
+        : "sm:w-auto bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700 rounded-sm font-medium h-10 px-6 uppercase w-full md:w-auto justify-center";
       return (
         <>
           <Button onClick={handleOpenPurchaseModal} className={buttonClassName}>
@@ -220,7 +220,7 @@ export default function CheckoutButton({
     const isSoldOut = typeof item.stock === "number" && item.stock <= 0;
 
     let badgeStyles =
-      "text-sm sm:w-auto justify-center py-2 px-4 rounded-sm h-10 inline-flex items-center font-medium";
+      "text-sm sm:w-auto justify-center py-2 px-4 rounded-sm h-10 inline-flex items-center font-medium w-full md:w-auto uppercase";
 
     if (isComingSoon) {
       badgeStyles +=

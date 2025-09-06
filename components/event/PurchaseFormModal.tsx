@@ -283,7 +283,7 @@ export default function PurchaseFormModal({
         console.error("Supabase function error:", functionError);
         setError(
           functionError.message ||
-            t(currentLanguage, "purchaseModal.errors.functionError"),
+          t(currentLanguage, "purchaseModal.errors.functionError"),
         );
         setIsLoading(false);
         return;
@@ -296,7 +296,7 @@ export default function PurchaseFormModal({
         console.error("Lomi checkout URL not found in response:", data);
         setError(
           data.error ||
-            t(currentLanguage, "purchaseModal.errors.lomiUrlMissing"),
+          t(currentLanguage, "purchaseModal.errors.lomiUrlMissing"),
         );
       }
     } catch (e: unknown) {
@@ -345,8 +345,12 @@ export default function PurchaseFormModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-0 z-[60] bg-foreground/30 will-change-auto"
-            onClick={onClose}
+            className="fixed inset-0 z-[60] bg-foreground/30 will-change-auto cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClose();
+            }}
             aria-hidden="true"
             style={{
               position: "fixed",
@@ -363,15 +367,15 @@ export default function PurchaseFormModal({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed top-0 bottom-0 right-0 flex w-full md:w-[420px] p-4 z-[70] will-change-transform"
+            className="fixed top-0 bottom-0 right-0 flex w-full md:w-[500px] p-4 z-[70] will-change-transform pointer-events-auto"
             style={{ position: "fixed", top: 0, right: 0, bottom: 0 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()} // Prevent event bubbling to backdrop
           >
             <div className="flex flex-col w-full bg-[#1a1a1a] backdrop-blur-xl rounded-sm shadow-2xl">
               {/* Header */}
-              <div className="flex justify-between items-center px-4 md:px-6 py-6 mb-4">
+              <div className="flex justify-between items-center px-3 md:px-4 py-6 mb-0">
                 <div>
-                  <h2 className="text-2xl font-bold text-foreground">
+                  <h2 className="text-3xl font-bold text-foreground">
                     {t(currentLanguage, "purchaseModal.title")}
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">
@@ -384,13 +388,14 @@ export default function PurchaseFormModal({
                   className="hover:bg-muted/50"
                   aria-label="Close modal"
                   onClick={onClose}
+                  type="button"
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
 
               {/* Form Content */}
-              <div className="flex-1 overflow-y-auto px-4 md:px-6">
+              <div className="flex-1 overflow-y-auto px-3 md:px-4">
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Item Details */}
                   <div className="bg-muted/30 p-3 rounded-sm">
@@ -418,7 +423,7 @@ export default function PurchaseFormModal({
                       id="name"
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      className="rounded-sm h-9 text-sm"
+                      className="rounded-sm h-9 text-sm mt-2"
                       placeholder={t(
                         currentLanguage,
                         "purchaseModal.placeholders.name",
@@ -437,7 +442,7 @@ export default function PurchaseFormModal({
                       type="email"
                       value={userEmail}
                       onChange={(e) => setUserEmail(e.target.value)}
-                      className="rounded-sm h-9 text-sm"
+                      className="rounded-sm h-9 text-sm mt-2"
                       placeholder={t(
                         currentLanguage,
                         "purchaseModal.placeholders.email",
@@ -454,6 +459,7 @@ export default function PurchaseFormModal({
                     <PhoneNumberInput
                       value={userPhone}
                       onChange={(value) => setUserPhone(value || "")}
+                      className="rounded-sm h-9 text-sm mt-2"
                       placeholder={t(
                         currentLanguage,
                         "purchaseModal.placeholders.phone",
@@ -473,7 +479,7 @@ export default function PurchaseFormModal({
                         size="sm"
                         onClick={handleQuantityDecrement}
                         disabled={quantity <= 1}
-                        className="rounded-sm h-9 w-9 p-0"
+                        className="rounded-sm h-9 w-9 p-0 mt-2"
                       >
                         <Minus className="h-3 w-3" />
                       </Button>
@@ -484,7 +490,7 @@ export default function PurchaseFormModal({
                         value={quantityDisplay}
                         onChange={handleQuantityChange}
                         onBlur={handleQuantityBlur}
-                        className="rounded-sm h-9 text-sm text-center flex-1"
+                        className="rounded-sm h-9 text-sm text-center flex-1 mt-2"
                         required
                       />
                       <Button
@@ -493,7 +499,7 @@ export default function PurchaseFormModal({
                         size="sm"
                         onClick={handleQuantityIncrement}
                         disabled={quantity >= maxQuantity}
-                        className="rounded-sm h-9 w-9 p-0"
+                        className="rounded-sm h-9 w-9 p-0 mt-2"
                       >
                         <Plus className="h-3 w-3" />
                       </Button>
@@ -502,7 +508,7 @@ export default function PurchaseFormModal({
 
                   {/* Error Display */}
                   {error && (
-                    <div className="text-xs text-red-400 text-center px-3 py-2 bg-red-900/20 rounded-sm border border-red-700/50">
+                    <div className="text-xs text-red-400 text-center px-3 py-2 bg-red-900/20 rounded-sm border border-red-700/50 mt-2">
                       {error}
                     </div>
                   )}
@@ -536,12 +542,12 @@ export default function PurchaseFormModal({
               </div>
 
               {/* Footer with Submit Button */}
-              <div className="px-4 md:px-6 py-4 border-t border-border">
+              <div className="px-3 md:px-4 py-4 border-t border-border">
                 <Button
                   type="submit"
                   disabled={isLoading || !isFormValid()}
                   onClick={handleSubmit}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-sm text-sm w-full font-medium h-10"
+                  className="bg-teal-800 hover:bg-teal-700 text-teal-200 rounded-sm text-sm w-full font-medium h-10"
                 >
                   {isLoading ? (
                     <>

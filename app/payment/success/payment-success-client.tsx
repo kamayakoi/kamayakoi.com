@@ -21,14 +21,14 @@ export function PaymentSuccessClient({
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-[#1a1a1a] flex flex-col justify-center py-12 px-4">
-        <div className="max-w-md mx-auto">
+      <div className="min-h-screen bg-[#1a1a1a] flex flex-col py-12 px-4">
+        <div className="max-w-md mx-auto mt-32">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
           >
-            <Card className="bg-card/30 backdrop-blur-sm border-border/50">
+            <Card className="bg-card/30 backdrop-blur-sm border-border">
               <CardHeader className="text-center pb-4">
                 <div className="mx-auto w-16 h-16 bg-green-900/30 rounded-sm flex items-center justify-center mb-4">
                   <CheckCircle className="w-8 h-8 text-green-400" />

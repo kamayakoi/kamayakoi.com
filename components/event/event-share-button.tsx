@@ -111,7 +111,7 @@ export function EventShareButton({
       {/* Button to trigger the modal */}
       <Button
         variant="outline"
-        className="flex items-center gap-2"
+        className="flex items-center justify-center gap-2 w-full"
         onClick={() => setIsOpen(true)}
       >
         <Share2 className="h-4 w-4" />

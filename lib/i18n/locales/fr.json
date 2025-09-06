@@ -339,7 +339,7 @@
     "buttons": {
       "backToEvents": "Retour aux événements",
       "browseGallery": "Parcourir les archives",
-      "backToMerch": "Retour au merch"
+      "backToMerch": "Merch"
     },
     "support": "Besoin d'aide ? Contactez notre équipe de support"
   },
@@ -356,7 +356,7 @@
     "buttons": {
       "backToEvents": "Retour aux événements",
       "browseGallery": "Parcourir les archives",
-      "backToMerch": "Retour au merch"
+      "backToMerch": "Merch"
     },
     "support": "Besoin d'aide ? Contactez notre équipe de support"
   },
@@ -472,7 +472,7 @@
       "description": "Nous travaillons à vous apporter des produits dérivés et objets de collection incroyables. Restez à l'écoute pour l'équipement exclusif Kamayakoi !"
     },
     "productDetail": {
-      "backToMerch": "Retour au merch",
+      "backToMerch": "Merch",
       "noImage": "Aucune image disponible",
       "quantity": "Quantité",
       "total": "Total",

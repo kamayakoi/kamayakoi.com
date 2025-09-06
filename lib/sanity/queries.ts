@@ -369,33 +369,24 @@ export async function getAllProducts() {
       name,
       slug,
       productId,
-      "mainImage": select(
-        defined(images) && length(images) > 0 && defined(images[0].asset) => images[0].asset->url,
-        null
-      ),
+      "mainImage": images[0].asset->url,
       "price": basePrice,
       "stock": baseStock,
       description,
-      "categories": select(
-        defined(categories) => categories[]->{
-          _id,
-          title
-        },
-        []
-      ),
+      "categories": categories[]->{
+        _id,
+        title
+      },
       tags,
       images[]{
-        select(
-          defined(asset) => asset->{
-            _id,
-            url,
-            metadata {
-              dimensions,
-              lqip
-            }
-          },
-          null
-        ),
+        asset->{
+          _id,
+          url,
+          metadata {
+            dimensions,
+            lqip
+          }
+        },
         alt,
         caption
       }

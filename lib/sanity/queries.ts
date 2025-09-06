@@ -445,14 +445,17 @@ export async function getAllProducts() {
   return client.fetch(`
     *[_type == "product"] | order(name asc) {
       _id,
-      "name": name,
+      name,
       "slug": slug.current,
       productId,
-      "mainImage": images[0].asset->url, // Get the first image URL
+      "mainImage": images[0].asset->url,
       "price": basePrice,
       "stock": baseStock,
       description,
-      "categories": categories[]->{title, "slug": slug.current},
+      "categories": categories[]->{
+        title,
+        "slug": slug.current
+      },
       tags,
       images[]{
         asset->{
@@ -495,7 +498,10 @@ export async function getProductBySlug(slug: string) {
       manageVariants,
       variantOptions,
       variantInventory,
-      "categories": categories[]->{title, "slug": slug.current},
+      "categories": categories[]->{
+        title,
+        "slug": slug.current
+      },
       tags,
       requiresShipping,
       weight,

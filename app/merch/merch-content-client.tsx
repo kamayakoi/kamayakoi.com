@@ -112,8 +112,8 @@ export default function MerchContentClient({
           >
             <div className="mb-6">
               {/* Search and Filters */}
-              <div className="flex items-center gap-4 flex-wrap">
-                <div className="relative w-48">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-wrap">
+                <div className="relative w-full sm:w-48">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
                     placeholder="Search products..."
@@ -127,7 +127,7 @@ export default function MerchContentClient({
                   value={selectedCategory}
                   onValueChange={setSelectedCategory}
                 >
-                  <SelectTrigger className="w-48 rounded-sm bg-background h-10 border border-border">
+                  <SelectTrigger className="w-full sm:w-48 rounded-sm bg-background h-10 border border-border">
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -141,7 +141,7 @@ export default function MerchContentClient({
                 </Select>
 
                 <Select value={selectedTag} onValueChange={setSelectedTag}>
-                  <SelectTrigger className="w-48 rounded-sm bg-background h-10 border border-border">
+                  <SelectTrigger className="w-full sm:w-48 rounded-sm bg-background h-10 border border-border">
                     <SelectValue placeholder="Tag" />
                   </SelectTrigger>
                   <SelectContent>

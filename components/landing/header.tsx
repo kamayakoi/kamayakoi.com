@@ -15,8 +15,6 @@ import {
 import styles from "@/lib/styles/header.module.css";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
-import { CartProvider } from "@/components/merch/cart/cart-context";
-import { WishlistProvider } from "@/components/merch/wishlist/wishlist-context";
 import CartModal from "@/components/merch/cart/cart-modal";
 import WishlistModal from "@/components/merch/wishlist/wishlist-modal";
 import MiniAudioPlayer from "@/components/landing/mini-audio-player";
@@ -51,8 +49,9 @@ export default function Header() {
   const navItems: NavItem[] = [
     { nameKey: "header.nav.home", path: "/" },
     { nameKey: "header.nav.events", path: "/events" },
-    // { nameKey: "header.nav.room", path: "/artists" },
+    { nameKey: "header.nav.room", path: "/artists" },
     { nameKey: "header.nav.blog", path: "/stories" },
+    { nameKey: "header.nav.gallery", path: "/gallery" },
     { nameKey: "header.nav.shop", path: "/merch" },
   ];
 
@@ -104,19 +103,17 @@ export default function Header() {
 
         {/* Cart and Wishlist Modals - Desktop */}
         <div className="hidden md:flex items-center ml-4 gap-2">
-          <CartProvider>
-            <WishlistProvider>
-              <CartModal />
-              <WishlistModal />
-            </WishlistProvider>
-          </CartProvider>
+          <CartModal />
+          <WishlistModal />
         </div>
 
-        <div className="flex items-center gap-4 md:hidden">
+        <div className="flex items-center gap-2 md:hidden -translate-y-[7px]">
+          <CartModal />
+          <WishlistModal />
           <Sheet>
             <SheetTrigger asChild>
               <Button
-                className={`${styles.mobileMenuButton} bg-transparent hover:bg-transparent focus:ring-0 border-0 -translate-y-[7px] translate-x-[6px]`}
+                className={`${styles.mobileMenuButton} bg-transparent hover:bg-transparent focus:ring-0 border-0 translate-x-[6px]`}
               >
                 <Menu className="h-5 w-5 text-foreground" />
                 <span className="sr-only">

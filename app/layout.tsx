@@ -7,6 +7,8 @@ import { Analytics } from "@vercel/analytics/react";
 import { TranslationProvider } from "@/lib/contexts/TranslationContext";
 import { MediaProvider } from "@/lib/contexts/MediaContext";
 import MusicWrapper from "@/components/landing/music-wrapper";
+import { CartProvider } from "@/components/merch/cart/cart-context";
+import { WishlistProvider } from "@/components/merch/wishlist/wishlist-context";
 import { getHomepageMusicTracks } from "@/lib/sanity/queries";
 
 const geistMono = Geist_Mono({
@@ -78,7 +80,11 @@ export default async function RootLayout({
         <MusicWrapper tracks={musicTracks}>
           <TranslationProvider>
             <MediaProvider>
-              <main className="flex-grow">{children}</main>
+              <CartProvider>
+                <WishlistProvider>
+                  <main className="flex-grow">{children}</main>
+                </WishlistProvider>
+              </CartProvider>
             </MediaProvider>
           </TranslationProvider>
         </MusicWrapper>

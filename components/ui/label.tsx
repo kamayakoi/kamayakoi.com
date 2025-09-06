@@ -10,6 +10,7 @@ const labelVariants = cva(
     "text-foreground/80",
     "transition-colors duration-200",
     "select-none",
+    "mb-6 pb-2", // Increased spacing below labels
 
     // States
     "peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
@@ -21,7 +22,7 @@ const labelVariants = cva(
 const Label = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &
-    VariantProps<typeof labelVariants>
+  VariantProps<typeof labelVariants>
 >(({ className, ...props }, ref) => (
   <LabelPrimitive.Root
     ref={ref}

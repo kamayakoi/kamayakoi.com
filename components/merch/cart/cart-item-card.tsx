@@ -33,19 +33,20 @@ export function CartItemCard({ item }: CartItemCardProps) {
   };
 
   return (
-    <div className="flex gap-3 p-3 bg-[#1a1a1a]/50 hover:bg-[#1a1a1a]/70 rounded-sm transition-colors">
+    <div className="flex gap-8 p-3 bg-[#1a1a1a]/50 hover:bg-[#1a1a1a]/70 rounded-sm transition-colors items-stretch">
       {/* Product Image */}
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 w-16">
         {image ? (
-          <Image
-            src={image}
-            alt={product.name}
-            width={60}
-            height={60}
-            className="object-cover rounded-sm"
-          />
+          <div className="h-full aspect-square relative overflow-hidden rounded-sm bg-muted">
+            <Image
+              src={image}
+              alt={product.name}
+              fill
+              className="object-cover"
+            />
+          </div>
         ) : (
-          <div className="w-12 h-12 bg-muted rounded-sm flex items-center justify-center">
+          <div className="h-full aspect-square bg-muted rounded-sm flex items-center justify-center">
             <span className="text-xs text-white/70">No Image</span>
           </div>
         )}
@@ -53,12 +54,12 @@ export function CartItemCard({ item }: CartItemCardProps) {
 
       {/* Product Details */}
       <div className="flex-1 min-w-0">
-        <div className="flex justify-between items-start mb-1">
+        <div className="flex justify-between items-start mb-3">
           <div className="flex-1 min-w-0">
             <h3 className="font-medium text-sm truncate text-white">
               {product.name}
             </h3>
-            <p className="text-xs text-white/70">
+            <p className="text-xs text-white/70 mt-1">
               {product.price.toLocaleString("fr-FR")} F CFA
             </p>
           </div>

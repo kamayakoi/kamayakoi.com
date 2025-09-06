@@ -9,6 +9,7 @@ import React, {
     useState,
 } from "react";
 import { SanityProduct } from "../types";
+import { getAllProducts } from "@/lib/sanity/queries";
 
 // Wishlist types
 export interface WishlistItem {
@@ -37,6 +38,7 @@ type WishlistReturn = {
     removeFromWishlist: (productId: string) => void;
     isInWishlist: (productId: string) => boolean;
     wishlistCount: number;
+    cleanupWishlist: () => Promise<void>;
 };
 
 type WishlistContextType = WishlistReturn | undefined;
@@ -80,17 +82,42 @@ function wishlistReducer(state: Wishlist, action: WishlistAction): Wishlist {
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
     const [wishlist, setWishlist] = useState<Wishlist>({ items: [] });
 
-    // Load wishlist from localStorage on mount
+    // Load wishlist from localStorage on mount and validate against current products
     useEffect(() => {
-        const savedWishlist = localStorage.getItem("merch-wishlist");
-        if (savedWishlist) {
-            try {
-                const parsedWishlist = JSON.parse(savedWishlist);
-                setWishlist(parsedWishlist);
-            } catch (error) {
-                console.error("Error parsing saved wishlist:", error);
+        const loadAndValidateWishlist = async () => {
+            const savedWishlist = localStorage.getItem("merch-wishlist");
+            if (savedWishlist) {
+                try {
+                    const parsedWishlist = JSON.parse(savedWishlist);
+
+                    // Get current products from Sanity
+                    const currentProducts = await getAllProducts();
+
+                    // Create a set of current product IDs for quick lookup
+                    const currentProductIds = new Set(currentProducts.map((p: SanityProduct) => p._id));
+
+                    // Filter out items that no longer exist
+                    const validatedItems = parsedWishlist.items.filter((item: WishlistItem) =>
+                        currentProductIds.has(item.product._id)
+                    );
+
+                    // Update wishlist with only valid items
+                    const validatedWishlist = { items: validatedItems };
+                    setWishlist(validatedWishlist);
+
+                    // Update localStorage with cleaned wishlist
+                    if (validatedItems.length !== parsedWishlist.items.length) {
+                        localStorage.setItem("merch-wishlist", JSON.stringify(validatedWishlist));
+                    }
+                } catch (error) {
+                    console.error("Error parsing saved wishlist:", error);
+                    // Reset to empty wishlist if parsing fails
+                    setWishlist({ items: [] });
+                }
             }
-        }
+        };
+
+        loadAndValidateWishlist();
     }, []);
 
     // Save wishlist to localStorage whenever it changes (async, non-blocking)
@@ -115,6 +142,29 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         [wishlist.items]
     );
 
+    // Function to cleanup wishlist by removing items that no longer exist
+    const cleanupWishlist = useCallback(async () => {
+        try {
+            const currentProducts = await getAllProducts();
+            const currentProductIds = new Set(currentProducts.map((p: SanityProduct) => p._id));
+
+            setWishlist(prevWishlist => {
+                const validatedItems = prevWishlist.items.filter(item =>
+                    currentProductIds.has(item.product._id)
+                );
+
+                const newWishlist = { items: validatedItems };
+
+                // Update localStorage
+                localStorage.setItem("merch-wishlist", JSON.stringify(newWishlist));
+
+                return newWishlist;
+            });
+        } catch (error) {
+            console.error("Error cleaning up wishlist:", error);
+        }
+    }, []);
+
     const value = useMemo<WishlistReturn>(
         () => ({
             wishlist,
@@ -122,8 +172,9 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
             removeFromWishlist,
             isInWishlist,
             wishlistCount: wishlist.items.length,
+            cleanupWishlist,
         }),
-        [wishlist, addToWishlist, removeFromWishlist, isInWishlist]
+        [wishlist, addToWishlist, removeFromWishlist, isInWishlist, cleanupWishlist]
     );
 
     return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;

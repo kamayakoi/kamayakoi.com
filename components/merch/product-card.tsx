@@ -4,8 +4,8 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart } from "lucide-react";
-import { useCart, CartProvider } from "./cart/cart-context";
-import { useWishlist, WishlistProvider } from "./wishlist/wishlist-context";
+import { useCart } from "./cart/cart-context";
+import { useWishlist } from "./wishlist/wishlist-context";
 import { SanityProduct } from "./types";
 
 function ProductCardContent({ product }: { product: SanityProduct }) {
@@ -129,11 +129,5 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
 }
 
 export const ProductCard = ({ product }: { product: SanityProduct }) => {
-  return (
-    <CartProvider>
-      <WishlistProvider>
-        <ProductCardContent product={product} />
-      </WishlistProvider>
-    </CartProvider>
-  );
+  return <ProductCardContent product={product} />;
 };

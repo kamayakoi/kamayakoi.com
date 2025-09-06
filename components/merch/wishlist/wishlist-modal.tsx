@@ -126,19 +126,20 @@ export default function WishlistModal() {
                                                             transition={{ duration: 0.3, delay: i * 0.1, ease: "easeOut" }}
                                                         >
                                                             <Card className="bg-[#2a2a2a]/50 hover:bg-[#2a2a2a]/70 rounded-sm p-4 transition-colors">
-                                                                <div className="flex gap-3">
+                                                                <div className="flex gap-8 items-stretch">
                                                                     {/* Product Image */}
-                                                                    <div className="flex-shrink-0">
+                                                                    <div className="flex-shrink-0 w-16">
                                                                         {item.product.mainImage ? (
-                                                                            <Image
-                                                                                src={item.product.mainImage}
-                                                                                alt={item.product.name}
-                                                                                width={60}
-                                                                                height={60}
-                                                                                className="object-cover rounded-sm"
-                                                                            />
+                                                                            <div className="h-full aspect-square relative overflow-hidden rounded-sm bg-muted">
+                                                                                <Image
+                                                                                    src={item.product.mainImage}
+                                                                                    alt={item.product.name}
+                                                                                    fill
+                                                                                    className="object-cover"
+                                                                                />
+                                                                            </div>
                                                                         ) : (
-                                                                            <div className="w-12 h-12 bg-muted rounded-sm flex items-center justify-center">
+                                                                            <div className="h-full aspect-square bg-muted rounded-sm flex items-center justify-center">
                                                                                 <span className="text-xs text-white/70">No Image</span>
                                                                             </div>
                                                                         )}
@@ -146,12 +147,12 @@ export default function WishlistModal() {
 
                                                                     {/* Product Details */}
                                                                     <div className="flex-1 min-w-0">
-                                                                        <div className="flex justify-between items-start mb-2">
+                                                                        <div className="flex justify-between items-start mb-3">
                                                                             <div className="flex-1 min-w-0">
                                                                                 <h3 className="font-medium text-sm truncate text-white">
                                                                                     {item.product.name}
                                                                                 </h3>
-                                                                                <p className="text-xs text-white/70">
+                                                                                <p className="text-xs text-white/70 mt-1">
                                                                                     {formatPrice(item.product.price)} F CFA
                                                                                 </p>
                                                                             </div>
@@ -169,14 +170,6 @@ export default function WishlistModal() {
                                                                         <div className="flex gap-2">
                                                                             <Button
                                                                                 size="sm"
-                                                                                className="flex-1 bg-teal-800 hover:bg-teal-700 text-teal-200 h-8 text-xs"
-                                                                                onClick={() => handleAddToCart(item.product)}
-                                                                            >
-                                                                                <ShoppingCart className="h-3 w-3 mr-1" />
-                                                                                Add to Cart
-                                                                            </Button>
-                                                                            <Button
-                                                                                size="sm"
                                                                                 variant="outline"
                                                                                 className="flex-1 h-8 text-xs border-white/20 text-white/70 hover:bg-white/10"
                                                                                 asChild
@@ -184,6 +177,14 @@ export default function WishlistModal() {
                                                                                 <Link href={`/merch/${typeof item.product.slug === 'string' ? item.product.slug : item.product.slug?.current || ''}`}>
                                                                                     View
                                                                                 </Link>
+                                                                            </Button>
+                                                                            <Button
+                                                                                size="sm"
+                                                                                className="flex-1 bg-teal-800 hover:bg-teal-700 text-teal-200 h-8 text-xs"
+                                                                                onClick={() => handleAddToCart(item.product)}
+                                                                            >
+                                                                                <ShoppingCart className="h-3 w-3 mr-1" />
+                                                                                Add to Cart
                                                                             </Button>
                                                                         </div>
                                                                     </div>

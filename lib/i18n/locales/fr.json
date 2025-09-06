@@ -288,6 +288,39 @@
       "submitError": "Une erreur est survenue. Veuillez réessayer."
     }
   },
+  "cartPurchaseForm": {
+    "title": "Paiement",
+    "itemCount": "{count} article",
+    "itemCountPlural": "{count} articles",
+    "labels": {
+      "name": "Nom",
+      "email": "Email",
+      "phone": "Téléphone"
+    },
+    "placeholders": {
+      "name": "Entrez votre nom complet",
+      "email": "Entrez votre email",
+      "phone": "Entrez votre numéro de téléphone"
+    },
+    "shipping": "Livraison",
+    "shippingCalculated": "Calculée à la caisse",
+    "total": "Total",
+    "currency": "F CFA",
+    "buttons": {
+      "processing": "Traitement...",
+      "completePurchase": "Finaliser l'achat"
+    },
+    "errors": {
+      "nameRequired": "Le nom est requis",
+      "emailRequired": "L'email est requis",
+      "emailInvalid": "Veuillez entrer une adresse e-mail valide",
+      "phoneRequired": "Le numéro de téléphone est requis",
+      "cartEmpty": "Votre panier est vide",
+      "checkoutFailed": "Échec du traitement du paiement",
+      "checkoutUrlFailed": "Échec de l'obtention de l'URL de paiement",
+      "unexpectedError": "Une erreur inattendue s'est produite"
+    }
+  },
   "paymentSuccess": {
     "title": "Paiement réussi !",
     "description": "Votre achat de ticket a été complété avec succès.",

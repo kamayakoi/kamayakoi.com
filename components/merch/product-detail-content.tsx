@@ -5,10 +5,10 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { PlusIcon, MinusIcon, Heart, Share2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { CartProvider, useCart } from "./cart/cart-context";
+import { useCart } from "./cart/cart-context";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
-import { WishlistProvider, useWishlist } from "./wishlist/wishlist-context";
+import { useWishlist } from "./wishlist/wishlist-context";
 import { SanityProduct } from "./types";
 
 interface ProductDetailContentProps {
@@ -54,16 +54,16 @@ function ProductDetail({ product }: ProductDetailContentProps) {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 pt-28 pb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 lg:items-stretch">
           {/* Product Images */}
           <motion.div
-            className="space-y-4 mt-6"
+            className="space-y-4 flex flex-col h-full"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
             {image ? (
-              <div className="aspect-square relative overflow-hidden rounded-sm bg-muted shadow-2xl">
+              <div className="flex-1 min-h-[350px] relative overflow-hidden rounded-sm bg-muted shadow-2xl">
                 <Image
                   src={image}
                   alt={typeof product.name === 'string' ? product.name : "Product"}
@@ -74,7 +74,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent"></div>
               </div>
             ) : (
-              <div className="aspect-square relative overflow-hidden rounded-sm bg-muted flex items-center justify-center shadow-2xl">
+              <div className="flex-1 min-h-[400px] relative overflow-hidden rounded-sm bg-muted flex items-center justify-center shadow-2xl">
                 <span className="text-muted-foreground">
                   {t(currentLanguage, "merchPage.productDetail.noImage")}
                 </span>
@@ -83,7 +83,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
 
             {/* Additional Images Gallery */}
             {allImages.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-4 gap-2 flex-shrink-0">
                 {allImages.slice(0, 4).map((imageData, index) => {
                   const thumbnailImage = imageData.url;
                   return thumbnailImage ? (
@@ -113,7 +113,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
 
           {/* Product Information */}
           <motion.div
-            className="space-y-8"
+            className="space-y-8 min-h-[350px] flex flex-col mt-0"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -129,7 +129,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 {typeof product.name === 'string' ? product.name : "Product"}
               </motion.h1>
 
-              <div className="flex justify-end">
+              <div className="flex justify-start">
                 <motion.p
                   className="text-3xl md:text-4xl font-bold text-primary"
                   initial={{ opacity: 0, y: -10 }}
@@ -288,11 +288,5 @@ function ProductDetail({ product }: ProductDetailContentProps) {
 }
 
 export function ProductDetailContent({ product }: ProductDetailContentProps) {
-  return (
-    <CartProvider>
-      <WishlistProvider>
-        <ProductDetail product={product} />
-      </WishlistProvider>
-    </CartProvider>
-  );
+  return <ProductDetail product={product} />;
 }

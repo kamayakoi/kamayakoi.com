@@ -96,6 +96,16 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Enhanced form spacing */
+  .form-label {
+    @apply mb-6 pb-2;
+  }
+
+  /* Ensure labels in forms have proper spacing */
+  form label {
+    @apply mb-6 pb-2;
+  }
 }
 
 @layer base {

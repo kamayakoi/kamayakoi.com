@@ -9,6 +9,8 @@ import { useCart } from "./cart-context";
 import { supabase } from "@/lib/supabase/client";
 import PhoneNumberInput from "@/components/ui/phone-number-input";
 import { cn } from "@/lib/actions/utils";
+import { useTranslation } from "@/lib/contexts/TranslationContext";
+import { t } from "@/lib/i18n/translations";
 
 const CartContainer = ({
     children,
@@ -20,12 +22,9 @@ const CartContainer = ({
     return <div className={cn("px-3 md:px-4", className)}>{children}</div>;
 };
 
-interface CartPurchaseFormProps {
-    onClose: () => void;
-}
-
-export default function CartPurchaseForm({ onClose }: CartPurchaseFormProps) {
+export default function CartPurchaseForm() {
     const { cart } = useCart();
+    const { currentLanguage } = useTranslation();
     const [userName, setUserName] = useState("");
     const [userEmail, setUserEmail] = useState("");
     const [userPhone, setUserPhone] = useState("");
@@ -42,24 +41,24 @@ export default function CartPurchaseForm({ onClose }: CartPurchaseFormProps) {
         setError(null);
 
         if (!userName.trim()) {
-            setError("Name is required");
+            setError(t(currentLanguage, "cartPurchaseForm.errors.nameRequired"));
             return;
         }
         if (!userEmail.trim()) {
-            setError("Email is required");
+            setError(t(currentLanguage, "cartPurchaseForm.errors.emailRequired"));
             return;
         }
         if (!validateEmail(userEmail)) {
-            setError("Please enter a valid email address");
+            setError(t(currentLanguage, "cartPurchaseForm.errors.emailInvalid"));
             return;
         }
         if (!userPhone.trim()) {
-            setError("Phone number is required");
+            setError(t(currentLanguage, "cartPurchaseForm.errors.phoneRequired"));
             return;
         }
 
         if (!cart || cart.lines.length === 0) {
-            setError("Your cart is empty");
+            setError(t(currentLanguage, "cartPurchaseForm.errors.cartEmpty"));
             return;
         }
 
@@ -94,18 +93,18 @@ export default function CartPurchaseForm({ onClose }: CartPurchaseFormProps) {
 
             if (functionError) {
                 console.error("Function error:", functionError);
-                setError(functionError.message || "Failed to process checkout");
+                setError(functionError.message || t(currentLanguage, "cartPurchaseForm.errors.checkoutFailed"));
                 return;
             }
 
             if (data?.checkout_url) {
                 window.location.href = data.checkout_url;
             } else {
-                setError("Failed to get checkout URL");
+                setError(t(currentLanguage, "cartPurchaseForm.errors.checkoutUrlFailed"));
             }
         } catch (e: unknown) {
             console.error("Checkout error:", e);
-            const message = e instanceof Error ? e.message : "An unexpected error occurred";
+            const message = e instanceof Error ? e.message : t(currentLanguage, "cartPurchaseForm.errors.unexpectedError");
             setError(message);
         } finally {
             setIsLoading(false);
@@ -117,52 +116,56 @@ export default function CartPurchaseForm({ onClose }: CartPurchaseFormProps) {
     return (
         <div className="flex flex-col justify-between h-full overflow-hidden">
             <CartContainer className="flex justify-between items-center px-2 text-sm text-muted-foreground mb-4">
-                <span className="font-medium">Checkout</span>
+                <span className="font-medium">{t(currentLanguage, "cartPurchaseForm.title")}</span>
                 <span className="bg-muted/50 px-2 py-1 rounded-sm text-xs">
-                    {cart?.lines.length} item{cart?.lines.length !== 1 ? "s" : ""}
+                    {cart?.lines.length === 1
+                        ? t(currentLanguage, "cartPurchaseForm.itemCount", { count: cart?.lines.length || 0 })
+                        : t(currentLanguage, "cartPurchaseForm.itemCountPlural", { count: cart?.lines.length || 0 })
+                    }
                 </span>
             </CartContainer>
 
             <div className="relative flex-1 min-h-0 py-4 overflow-y-auto">
                 <CartContainer>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="space-y-1">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="space-y-6">
                             <Label htmlFor="name" className="text-sm font-medium">
-                                Full Name *
+                                {t(currentLanguage, "cartPurchaseForm.labels.name")} *
                             </Label>
                             <Input
                                 id="name"
                                 value={userName}
                                 onChange={(e) => setUserName(e.target.value)}
-                                className="rounded-sm h-9"
-                                placeholder="Enter your full name"
+                                className="rounded-sm mt-2"
+                                placeholder={t(currentLanguage, "cartPurchaseForm.placeholders.name")}
                                 required
                             />
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="space-y-6">
                             <Label htmlFor="email" className="text-sm font-medium">
-                                Email Address *
+                                {t(currentLanguage, "cartPurchaseForm.labels.email")} *
                             </Label>
                             <Input
                                 id="email"
                                 type="email"
                                 value={userEmail}
                                 onChange={(e) => setUserEmail(e.target.value)}
-                                className="rounded-sm h-9"
-                                placeholder="Enter your email"
+                                className="rounded-sm mt-2"
+                                placeholder={t(currentLanguage, "cartPurchaseForm.placeholders.email")}
                                 required
                             />
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="space-y-6">
                             <Label className="text-sm font-medium">
-                                Phone Number *
+                                {t(currentLanguage, "cartPurchaseForm.labels.phone")} *
                             </Label>
                             <PhoneNumberInput
                                 value={userPhone}
                                 onChange={(value) => setUserPhone(value || "")}
-                                placeholder="Enter your phone number"
+                                className="mt-2"
+                                placeholder={t(currentLanguage, "cartPurchaseForm.placeholders.phone")}
                             />
                         </div>
 
@@ -172,6 +175,8 @@ export default function CartPurchaseForm({ onClose }: CartPurchaseFormProps) {
                             </div>
                         )}
                     </form>
+                    {/* Mobile spacing below form fields */}
+                    <div className="md:hidden h-6"></div>
                 </CartContainer>
             </div>
 
@@ -179,41 +184,32 @@ export default function CartPurchaseForm({ onClose }: CartPurchaseFormProps) {
                 <div className="py-3 text-sm shrink-0">
                     <CartContainer className="space-y-2">
                         <div className="flex justify-between items-center py-3">
-                            <p className="font-medium text-foreground">Shipping</p>
-                            <p className="text-muted-foreground">Calculated at checkout</p>
+                            <p className="font-medium text-foreground">{t(currentLanguage, "cartPurchaseForm.shipping")}</p>
+                            <p className="text-muted-foreground">{t(currentLanguage, "cartPurchaseForm.shippingCalculated")}</p>
                         </div>
                         <div className="flex justify-between items-center py-2">
-                            <p className="text-lg font-bold text-foreground">Total</p>
+                            <p className="text-lg font-bold text-foreground">{t(currentLanguage, "cartPurchaseForm.total")}</p>
                             <p className="text-xl font-bold text-primary">
-                                {Number(totalAmount).toLocaleString("fr-FR")} F CFA
+                                {Number(totalAmount).toLocaleString("fr-FR")} {t(currentLanguage, "cartPurchaseForm.currency")}
                             </p>
                         </div>
                     </CartContainer>
                 </div>
 
-                <div className="flex gap-2 mt-4">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onClose}
-                        disabled={isLoading}
-                        className="flex-1 rounded-sm"
-                    >
-                        Back
-                    </Button>
+                <div className="mt-4">
                     <Button
                         type="submit"
                         onClick={handleSubmit}
                         disabled={isLoading || !userName.trim() || !userEmail.trim() || !userPhone.trim()}
-                        className="flex-1 bg-teal-800 hover:bg-teal-700 text-teal-200 rounded-sm font-semibold h-9"
+                        className="w-full bg-teal-800 hover:bg-teal-700 text-teal-200 rounded-sm font-semibold h-9"
                     >
                         {isLoading ? (
                             <>
                                 <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                                Processing...
+                                {t(currentLanguage, "cartPurchaseForm.buttons.processing")}
                             </>
                         ) : (
-                            "Complete Purchase"
+                            t(currentLanguage, "cartPurchaseForm.buttons.completePurchase")
                         )}
                     </Button>
                 </div>

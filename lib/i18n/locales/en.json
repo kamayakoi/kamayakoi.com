@@ -288,6 +288,39 @@
       "submitError": "An error occurred. Please try again."
     }
   },
+  "cartPurchaseForm": {
+    "title": "Checkout",
+    "itemCount": "{count} item",
+    "itemCountPlural": "{count} items",
+    "labels": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone"
+    },
+    "placeholders": {
+      "name": "Enter your full name",
+      "email": "Enter your email",
+      "phone": "Enter your phone number"
+    },
+    "shipping": "Shipping",
+    "shippingCalculated": "Calculated at checkout",
+    "total": "Total",
+    "currency": "F CFA",
+    "buttons": {
+      "processing": "Processing...",
+      "completePurchase": "Complete Purchase"
+    },
+    "errors": {
+      "nameRequired": "Name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "phoneRequired": "Phone number is required",
+      "cartEmpty": "Your cart is empty",
+      "checkoutFailed": "Failed to process checkout",
+      "checkoutUrlFailed": "Failed to get checkout URL",
+      "unexpectedError": "An unexpected error occurred"
+    }
+  },
   "paymentSuccess": {
     "title": "Payment successful!",
     "description": "Your ticket purchase has been completed successfully.",

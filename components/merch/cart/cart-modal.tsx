@@ -171,9 +171,7 @@ export default function CartModal() {
     }
 
     return showPurchaseForm ? (
-      <CartPurchaseForm
-        onClose={() => setShowPurchaseForm(false)}
-      />
+      <CartPurchaseForm />
     ) : (
       <CartItems closeCart={closeCart} onProceedToCheckout={() => setShowPurchaseForm(true)} />
     );

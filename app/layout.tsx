@@ -46,6 +46,7 @@ export const metadata: Metadata = {
         width: 1200,
         height: 630,
         alt: siteConfig.name,
+        type: "image/webp",
       },
     ],
     locale: "en_US",
@@ -56,8 +57,8 @@ export const metadata: Metadata = {
     title: siteConfig.name,
     description: siteConfig.description,
     images: [siteConfig.ogImage],
-    creator: "@lomiafrica",
-    site: "https://lomi.africa",
+    creator: "@kamayakoi",
+    site: "https://www.kamayakoi.com",
   },
   // Optional: Add robots and manifest info if needed
   // robots: { index: true, follow: true },

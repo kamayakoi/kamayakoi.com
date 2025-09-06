@@ -452,7 +452,7 @@ export async function getAllProducts() {
       "price": basePrice,
       "stock": baseStock,
       description,
-      categories[]->{title, "slug": slug.current},
+      "categories": categories[]->{title, "slug": slug.current},
       tags,
       images[]{
         asset->{
@@ -475,7 +475,9 @@ export async function getProductBySlug(slug: string) {
     *[_type == "product" && slug.current == $slug][0] {
       _id,
       "name": name,
+      "slug": slug.current,
       productId,
+      "mainImage": images[0].asset->url,
       description,
       "images": images[]{
         asset->{
@@ -493,7 +495,7 @@ export async function getProductBySlug(slug: string) {
       manageVariants,
       variantOptions,
       variantInventory,
-      categories[]->{title, "slug": slug.current},
+      "categories": categories[]->{title, "slug": slug.current},
       tags,
       requiresShipping,
       weight,
@@ -501,6 +503,7 @@ export async function getProductBySlug(slug: string) {
     }
   `,
     { slug },
+    getCacheConfig([`product-${slug}`, "products"]),
   );
 }
 

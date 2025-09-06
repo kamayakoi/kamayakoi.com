@@ -16,7 +16,9 @@ import styles from "@/lib/styles/header.module.css";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
 import { CartProvider } from "@/components/merch/cart/cart-context";
+import { WishlistProvider } from "@/components/merch/wishlist/wishlist-context";
 import CartModal from "@/components/merch/cart/cart-modal";
+import WishlistModal from "@/components/merch/wishlist/wishlist-modal";
 import MiniAudioPlayer from "@/components/landing/mini-audio-player";
 
 interface NavItem {
@@ -100,10 +102,13 @@ export default function Header() {
           })}
         </nav>
 
-        {/* Cart Modal - Desktop */}
-        <div className="hidden md:flex items-center ml-4">
+        {/* Cart and Wishlist Modals - Desktop */}
+        <div className="hidden md:flex items-center ml-4 gap-2">
           <CartProvider>
-            <CartModal />
+            <WishlistProvider>
+              <CartModal />
+              <WishlistModal />
+            </WishlistProvider>
           </CartProvider>
         </div>
 

@@ -32,12 +32,10 @@ export default {
     },
     {
       name: 'productId',
-      title: 'Product ID',
-      type: 'slug',
-      options: {source: 'name', maxLength: 50},
+      title: 'lomi. Product ID',
+      type: 'string',
       description:
-        'Unique identifier for this product (e.g., kamayakoi-tee-black-m). Auto-generated from name if not specified.',
-      validation: (Rule: Rule) => Rule.required(),
+        'Optional lomi.africa product ID for this product (UUID format). Leave empty if not this product is not tied to a specific lomi product.',
     },
     {
       name: 'description',
@@ -150,8 +148,7 @@ export default {
               name: 'sku',
               title: 'V-ID',
               type: 'string',
-              validation: (Rule: Rule) => Rule.required(),
-              description: 'Unique identifier for this specific variant',
+              description: 'Optional unique identifier for this specific variant',
             },
             {
               name: 'price',

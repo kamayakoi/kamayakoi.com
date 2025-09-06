@@ -3,49 +3,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Heart } from "lucide-react";
 import { useCart, CartProvider } from "./cart/cart-context";
-
-interface PortableTextBlock {
-  _key: string;
-  _type: string;
-  children: Array<{
-    _key: string;
-    _type: string;
-    text: string;
-    marks?: string[];
-  }>;
-  markDefs?: unknown[];
-  style?: string;
-}
-
-interface SanityProduct {
-  _id: string;
-  name: string;
-  slug: string | { current: string };
-  productId?: string;
-  mainImage?: string;
-  price: number;
-  stock?: number;
-  description?: string | PortableTextBlock[];
-  categories?: Array<{
-    title: string;
-    slug: { current: string };
-  }>;
-  tags?: string[];
-  images?: Array<{
-    url: string;
-    metadata?: {
-      dimensions?: {
-        width: number;
-        height: number;
-      };
-      lqip?: string;
-    };
-  }>;
-}
+import { useWishlist, WishlistProvider } from "./wishlist/wishlist-context";
+import { SanityProduct } from "./types";
 
 function ProductCardContent({ product }: { product: SanityProduct }) {
   const { addItem } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const slug =
     typeof product.slug === "string"
       ? product.slug
@@ -53,10 +18,20 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
   const mainImage = product.mainImage || product.images?.[0]?.url;
   const hasValidImage = mainImage && mainImage.trim() !== "";
 
-  const handleAddToCart = async (e: React.MouseEvent) => {
+  const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    await addItem(product);
+    addItem(product); // Now synchronous, no need for await
+  };
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isInWishlist(product._id)) {
+      removeFromWishlist(product._id);
+    } else {
+      addToWishlist(product);
+    }
   };
 
   // Format price with non-breaking space instead of comma
@@ -67,6 +42,17 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0 mb-6">
       <div className="relative rounded-t-sm overflow-hidden">
+        {/* Wishlist Button */}
+        <div
+          onClick={handleWishlistToggle}
+          className="absolute top-2 right-2 z-10 cursor-pointer p-1.5 rounded-sm bg-black/10 hover:bg-black/20 text-white/70 hover:text-white transition-all"
+          aria-label={isInWishlist(product._id) ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <Heart
+            className={`h-6 w-6 ${isInWishlist(product._id) ? "fill-red-500 text-red-500" : ""}`}
+          />
+        </div>
+
         <Link
           href={`/merch/${slug}`}
           className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -96,9 +82,9 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
         </Link>
       </div>
 
-      <CardContent className="p-4 space-y-3 px-4">
+      <CardContent className="pt-1 pb-4 px-4 space-y-1">
         <Link href={`/merch/${slug}`} className="block">
-          <h3 className="font-medium text-sm leading-tight hover:text-primary transition-colors line-clamp-2">
+          <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2">
             {product.name}
           </h3>
         </Link>
@@ -112,21 +98,9 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
           </p>
         )} */}
 
-        {product.categories && product.categories.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {product.categories.slice(0, 2).map((category, index) => (
-              <span
-                key={index}
-                className="inline-block px-2 py-1 text-xs bg-muted text-muted-foreground rounded-sm"
-              >
-                {category.title}
-              </span>
-            ))}
-          </div>
-        )}
 
         <div className="flex items-center justify-between pt-2">
-          <span className="text-lg font-semibold">
+          <span className="text-sm font-semibold">
             {formatPrice(product.price)} F CFA
           </span>
           <Suspense
@@ -157,7 +131,9 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
 export const ProductCard = ({ product }: { product: SanityProduct }) => {
   return (
     <CartProvider>
-      <ProductCardContent product={product} />
+      <WishlistProvider>
+        <ProductCardContent product={product} />
+      </WishlistProvider>
     </CartProvider>
   );
 };

@@ -3,6 +3,7 @@ import { getProductBySlug } from "@/lib/sanity/queries";
 import { notFound } from "next/navigation";
 import LoadingComponent from "@/components/ui/loader";
 import Header from "@/components/landing/header";
+import { Footer } from "@/components/landing/footer";
 import { ProductDetailContent } from "../../../components/merch/product-detail-content";
 
 type Props = {
@@ -17,15 +18,13 @@ async function ProductContent({ params }: Props) {
     notFound(); // Trigger 404 if product not found
   }
 
-  // Add slug to product for cart functionality
-  const productWithSlug = { ...product, slug };
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow">
-        <ProductDetailContent product={productWithSlug} />
+        <ProductDetailContent product={product} />
       </main>
+      <Footer />
     </div>
   );
 }

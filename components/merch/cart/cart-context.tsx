@@ -8,48 +8,8 @@ import React, {
   useMemo,
   useOptimistic,
   useState,
-  useTransition,
 } from "react";
-
-// Sanity product type
-interface PortableTextBlock {
-  _key: string;
-  _type: string;
-  children: Array<{
-    _key: string;
-    _type: string;
-    text: string;
-    marks?: string[];
-  }>;
-  markDefs?: unknown[];
-  style?: string;
-}
-
-interface SanityProduct {
-  _id: string;
-  name: string;
-  slug: { current: string } | string;
-  productId?: string;
-  mainImage?: string;
-  price: number;
-  stock?: number;
-  description?: string | PortableTextBlock[];
-  categories?: Array<{
-    title: string;
-    slug: { current: string };
-  }>;
-  tags?: string[];
-  images?: Array<{
-    url: string;
-    metadata?: {
-      dimensions?: {
-        width: number;
-        height: number;
-      };
-      lqip?: string;
-    };
-  }>;
-}
+import { SanityProduct } from "../types";
 
 // Cart types
 export interface CartItem {
@@ -79,13 +39,13 @@ export type UpdateType = "plus" | "minus" | "delete";
 
 type CartAction =
   | {
-      type: "UPDATE_ITEM";
-      payload: { merchandiseId: string; nextQuantity: number };
-    }
+    type: "UPDATE_ITEM";
+    payload: { merchandiseId: string; nextQuantity: number };
+  }
   | {
-      type: "ADD_ITEM";
-      payload: { product: SanityProduct; previousQuantity: number };
-    };
+    type: "ADD_ITEM";
+    payload: { product: SanityProduct; previousQuantity: number };
+  };
 
 type UseCartReturn = {
   isPending: boolean;
@@ -197,39 +157,39 @@ function cartReducer(state: Cart | undefined, action: CartAction): Cart {
 
       const updatedLines = existingItem
         ? currentCart.lines.map((item) => {
-            if (item.product._id !== product._id) return item;
+          if (item.product._id !== product._id) return item;
 
-            const newTotalAmount = calculateItemCost(
-              targetQuantity,
-              item.product.price,
-            );
+          const newTotalAmount = calculateItemCost(
+            targetQuantity,
+            item.product.price,
+          );
 
-            return {
-              ...item,
-              quantity: targetQuantity,
-              cost: {
-                ...item.cost,
-                totalAmount: {
-                  ...item.cost.totalAmount,
-                  amount: newTotalAmount,
-                },
+          return {
+            ...item,
+            quantity: targetQuantity,
+            cost: {
+              ...item.cost,
+              totalAmount: {
+                ...item.cost.totalAmount,
+                amount: newTotalAmount,
               },
-            } satisfies CartItem;
-          })
+            },
+          } satisfies CartItem;
+        })
         : [
-            {
-              id: `temp-${Date.now()}`,
-              quantity: targetQuantity,
-              product: product,
-              cost: {
-                totalAmount: {
-                  amount: calculateItemCost(targetQuantity, product.price),
-                  currencyCode: "XOF",
-                },
+          {
+            id: `temp-${Date.now()}`,
+            quantity: targetQuantity,
+            product: product,
+            cost: {
+              totalAmount: {
+                amount: calculateItemCost(targetQuantity, product.price),
+                currencyCode: "XOF",
               },
-            } satisfies CartItem,
-            ...currentCart.lines,
-          ];
+            },
+          } satisfies CartItem,
+          ...currentCart.lines,
+        ];
 
       return {
         ...currentCart,
@@ -243,7 +203,6 @@ function cartReducer(state: Cart | undefined, action: CartAction): Cart {
 }
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [isPending, startTransition] = useTransition();
   const [cart, setCart] = useState<Cart | undefined>(undefined);
   const [optimisticCart, updateOptimisticCart] = useOptimistic<
     Cart | undefined,
@@ -263,23 +222,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Save cart to localStorage whenever it changes
+  // Save cart to localStorage whenever it changes (async, non-blocking)
   useEffect(() => {
     if (cart) {
-      localStorage.setItem("merch-cart", JSON.stringify(cart));
+      // Use setTimeout to make localStorage write non-blocking
+      setTimeout(() => {
+        localStorage.setItem("merch-cart", JSON.stringify(cart));
+      }, 0);
     }
   }, [cart]);
 
   const update = useCallback(
-    async (lineId: string, merchandiseId: string, nextQuantity: number) => {
-      startTransition(() => {
-        updateOptimisticCart({
-          type: "UPDATE_ITEM",
-          payload: { merchandiseId, nextQuantity },
-        });
+    (lineId: string, merchandiseId: string, nextQuantity: number) => {
+      // Update optimistic cart immediately (synchronous)
+      updateOptimisticCart({
+        type: "UPDATE_ITEM",
+        payload: { merchandiseId, nextQuantity },
       });
 
-      // Update the actual cart
+      // Update the actual cart immediately after optimistic update
       if (cart) {
         const updatedCart = cartReducer(cart, {
           type: "UPDATE_ITEM",
@@ -287,28 +248,34 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         });
         setCart(updatedCart);
       }
+
+      // Return promise for compatibility
+      return Promise.resolve();
     },
     [updateOptimisticCart, cart],
   );
 
   const add = useCallback(
-    async (product: SanityProduct) => {
+    (product: SanityProduct) => {
       const previousQuantity =
         optimisticCart?.lines.find((l) => l.product._id === product._id)
           ?.quantity || 0;
-      startTransition(() => {
-        updateOptimisticCart({
-          type: "ADD_ITEM",
-          payload: { product, previousQuantity },
-        });
+
+      // Update optimistic cart immediately (synchronous)
+      updateOptimisticCart({
+        type: "ADD_ITEM",
+        payload: { product, previousQuantity },
       });
 
-      // Update the actual cart
+      // Update actual cart immediately after optimistic update
       const updatedCart = cartReducer(cart, {
         type: "ADD_ITEM",
         payload: { product, previousQuantity },
       });
       setCart(updatedCart);
+
+      // Return promise for compatibility
+      return Promise.resolve();
     },
     [updateOptimisticCart, optimisticCart, cart],
   );
@@ -318,9 +285,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       cart: optimisticCart,
       addItem: add,
       updateItem: update,
-      isPending,
+      isPending: false, // No longer needed for instant updates
     }),
-    [optimisticCart, add, update, isPending],
+    [optimisticCart, add, update],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

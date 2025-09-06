@@ -2,45 +2,7 @@
 
 import { ProductCard } from "@/components/merch/product-card";
 import { Card } from "@/components/ui/card";
-
-interface PortableTextBlock {
-  _key: string;
-  _type: string;
-  children: Array<{
-    _key: string;
-    _type: string;
-    text: string;
-    marks?: string[];
-  }>;
-  markDefs?: unknown[];
-  style?: string;
-}
-
-interface SanityProduct {
-  _id: string;
-  name: string;
-  slug: { current: string } | string;
-  productId?: string;
-  mainImage?: string;
-  price: number;
-  stock?: number;
-  description?: string | PortableTextBlock[];
-  categories?: Array<{
-    title: string;
-    slug: { current: string };
-  }>;
-  tags?: string[];
-  images?: Array<{
-    url: string;
-    metadata?: {
-      dimensions?: {
-        width: number;
-        height: number;
-      };
-      lqip?: string;
-    };
-  }>;
-}
+import { SanityProduct } from "./types";
 
 interface ProductListContentProps {
   products: SanityProduct[];

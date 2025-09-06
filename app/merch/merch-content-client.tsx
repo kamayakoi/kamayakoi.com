@@ -18,45 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search } from "lucide-react";
-
-interface PortableTextBlock {
-  _key: string;
-  _type: string;
-  children: Array<{
-    _key: string;
-    _type: string;
-    text: string;
-    marks?: string[];
-  }>;
-  markDefs?: unknown[];
-  style?: string;
-}
-
-interface SanityProduct {
-  _id: string;
-  name: string;
-  slug: { current: string } | string;
-  productId?: string;
-  mainImage?: string;
-  price: number;
-  stock?: number;
-  description?: string | PortableTextBlock[];
-  categories?: Array<{
-    title: string;
-    slug: { current: string };
-  }>;
-  tags?: string[];
-  images?: Array<{
-    url: string;
-    metadata?: {
-      dimensions?: {
-        width: number;
-        height: number;
-      };
-      lqip?: string;
-    };
-  }>;
-}
+import { SanityProduct } from "../../components/merch/types";
 
 interface MerchContentClientProps {
   products: SanityProduct[];
@@ -83,7 +45,7 @@ export default function MerchContentClient({
       const matchesCategory =
         selectedCategory === "all" ||
         product.categories?.some(
-          (cat) => cat.slug?.current === selectedCategory,
+          (cat) => cat.slug === selectedCategory,
         );
       const matchesTag =
         selectedTag === "all" || product.tags?.includes(selectedTag);
@@ -99,8 +61,8 @@ export default function MerchContentClient({
     const cats = new Set<string>();
     products.forEach((product) => {
       product.categories?.forEach((cat) => {
-        if (cat.slug?.current) {
-          cats.add(cat.slug.current);
+        if (cat.slug) {
+          cats.add(cat.slug);
         }
       });
     });
@@ -157,7 +119,7 @@ export default function MerchContentClient({
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 rounded-sm bg-background h-10"
+                    className="pl-10 rounded-sm bg-background h-10 border border-border"
                   />
                 </div>
 
@@ -165,7 +127,7 @@ export default function MerchContentClient({
                   value={selectedCategory}
                   onValueChange={setSelectedCategory}
                 >
-                  <SelectTrigger className="w-48 rounded-sm bg-background h-10">
+                  <SelectTrigger className="w-48 rounded-sm bg-background h-10 border border-border">
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -179,7 +141,7 @@ export default function MerchContentClient({
                 </Select>
 
                 <Select value={selectedTag} onValueChange={setSelectedTag}>
-                  <SelectTrigger className="w-48 rounded-sm bg-background h-10">
+                  <SelectTrigger className="w-48 rounded-sm bg-background h-10 border border-border">
                     <SelectValue placeholder="Tag" />
                   </SelectTrigger>
                   <SelectContent>
@@ -223,15 +185,15 @@ export default function MerchContentClient({
             >
               <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
                 {searchQuery ||
-                selectedCategory !== "all" ||
-                selectedTag !== "all"
+                  selectedCategory !== "all" ||
+                  selectedTag !== "all"
                   ? "No products found"
                   : t(currentLanguage, "merchPage.comingSoon.title")}
               </h2>
               <p className="text-zinc-600 dark:text-zinc-400 mb-6">
                 {searchQuery ||
-                selectedCategory !== "all" ||
-                selectedTag !== "all"
+                  selectedCategory !== "all" ||
+                  selectedTag !== "all"
                   ? "Try adjusting your filters or search terms."
                   : t(currentLanguage, "merchPage.comingSoon.description")}
               </p>

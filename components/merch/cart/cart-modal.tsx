@@ -113,9 +113,10 @@ export default function CartModal() {
       return;
     }
 
-    // Only open cart if items were actually added/changed
-    if (serializedCart.current !== newSerializedCart) {
+    // Only open cart if items were actually added/changed and cart has items
+    if (serializedCart.current !== newSerializedCart && cart.totalQuantity > 0) {
       serializedCart.current = newSerializedCart;
+      // Open cart instantly when items are added
       setIsOpen(true);
     }
   }, [cart]);

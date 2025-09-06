@@ -3,53 +3,13 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import Link from "next/link";
-import { ArrowLeftIcon, PlusIcon, MinusIcon } from "lucide-react";
+import { PlusIcon, MinusIcon, Heart, Share2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { CartProvider, useCart } from "./cart/cart-context";
-import { VariantSelector } from "./variant-selector";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
-
-interface PortableTextBlock {
-  _key: string;
-  _type: string;
-  children: Array<{
-    _key: string;
-    _type: string;
-    text: string;
-    marks?: string[];
-  }>;
-  markDefs?: unknown[];
-  style?: string;
-}
-
-interface SanityProduct {
-  _id: string;
-  name: string;
-  slug: string | { current: string };
-  productId?: string;
-  description?: string | PortableTextBlock[];
-  price: number;
-  stock?: number;
-  categories?: Array<{
-    title: string;
-    slug: { current: string };
-  }>;
-  tags?: string[];
-  images?: Array<{
-    url: string;
-    metadata?: {
-      dimensions?: {
-        width: number;
-        height: number;
-      };
-      lqip?: string;
-    };
-  }>;
-  mainImage?: string;
-}
+import { WishlistProvider, useWishlist } from "./wishlist/wishlist-context";
+import { SanityProduct } from "./types";
 
 interface ProductDetailContentProps {
   product: SanityProduct;
@@ -60,80 +20,61 @@ function ProductDetail({ product }: ProductDetailContentProps) {
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { addItem } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   const allImages = product.images || [];
   const mainImage = product.mainImage || allImages[0]?.url;
-  const selectedImage = allImages[selectedImageIndex] || mainImage;
+  const selectedImage = allImages[selectedImageIndex]?.url || mainImage;
+  const image = selectedImage;
 
-  // Ensure we have a valid image URL (not empty string)
-  let hasValidImage = false;
-  if (typeof selectedImage === "string" && selectedImage) {
-    hasValidImage = (selectedImage as string).trim() !== "";
-  } else if (
-    selectedImage &&
-    typeof selectedImage === "object" &&
-    selectedImage.url
-  ) {
-    hasValidImage = (selectedImage.url as string).trim() !== "";
-  }
-
-  const handleAddToCart = async () => {
-    await addItem(product);
+  const handleAddToCart = () => {
+    addItem(product);
     // Could add toast notification here
   };
 
   const incrementQuantity = () => setQuantity((prev) => prev + 1);
   const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1));
 
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: typeof product.name === 'string' ? product.name : "Product",
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.log('Error sharing:', err);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(window.location.href);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Back to Merch */}
-      <div className="container mx-auto px-4 py-4">
-        <Button variant="ghost" size="sm" asChild className="mb-4">
-          <Link href="/merch">
-            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            {t(currentLanguage, "merchPage.productDetail.backToMerch")}
-          </Link>
-        </Button>
-      </div>
-
-      <div className="container mx-auto px-4 pb-12">
+      <div className="container mx-auto px-4 pt-28 pb-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Product Images */}
           <motion.div
-            className="space-y-4"
+            className="space-y-4 mt-6"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {hasValidImage ? (
-              <div className="aspect-square relative overflow-hidden rounded-sm bg-muted">
+            {image ? (
+              <div className="aspect-square relative overflow-hidden rounded-sm bg-muted shadow-2xl">
                 <Image
-                  src={
-                    typeof selectedImage === "string"
-                      ? selectedImage
-                      : selectedImage.url
-                  }
+                  src={image}
                   alt={typeof product.name === 'string' ? product.name : "Product"}
                   fill
                   className="object-cover"
                   quality={100}
-                  placeholder={
-                    typeof selectedImage === "string"
-                      ? undefined
-                      : selectedImage.metadata?.lqip
-                        ? "blur"
-                        : undefined
-                  }
-                  blurDataURL={
-                    typeof selectedImage === "string"
-                      ? undefined
-                      : selectedImage.metadata?.lqip
-                  }
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent"></div>
               </div>
             ) : (
-              <div className="aspect-square relative overflow-hidden rounded-sm bg-muted flex items-center justify-center">
+              <div className="aspect-square relative overflow-hidden rounded-sm bg-muted flex items-center justify-center shadow-2xl">
                 <span className="text-muted-foreground">
                   {t(currentLanguage, "merchPage.productDetail.noImage")}
                 </span>
@@ -143,28 +84,27 @@ function ProductDetail({ product }: ProductDetailContentProps) {
             {/* Additional Images Gallery */}
             {allImages.length > 1 && (
               <div className="grid grid-cols-4 gap-2">
-                {allImages.slice(0, 4).map((image, index) => {
-                  const hasValidThumbnail =
-                    image.url && image.url.trim() !== "";
-                  return hasValidThumbnail ? (
-                    <button
+                {allImages.slice(0, 4).map((imageData, index) => {
+                  const thumbnailImage = imageData.url;
+                  return thumbnailImage ? (
+                    <motion.button
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
-                      className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all ${selectedImageIndex === index
-                        ? "ring-2 ring-primary"
-                        : "hover:ring-2 hover:ring-muted-foreground/50"
+                      className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all duration-300 ${selectedImageIndex === index
+                        ? "ring-2 ring-primary shadow-lg scale-105"
+                        : "hover:ring-2 hover:ring-muted-foreground/50 hover:shadow-md"
                         }`}
+                      whileHover={{ scale: selectedImageIndex === index ? 1.05 : 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       <Image
-                        src={image.url}
+                        src={thumbnailImage}
                         alt={`${typeof product.name === 'string' ? product.name : "Product"} view ${index + 1}`}
                         fill
                         className="object-cover"
                         quality={80}
-                        placeholder={image.metadata?.lqip ? "blur" : undefined}
-                        blurDataURL={image.metadata?.lqip}
                       />
-                    </button>
+                    </motion.button>
                   ) : null;
                 })}
               </div>
@@ -173,142 +113,171 @@ function ProductDetail({ product }: ProductDetailContentProps) {
 
           {/* Product Information */}
           <motion.div
-            className="space-y-6"
+            className="space-y-8"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div>
+            {/* Title and Price Section */}
+            <div className="space-y-4">
               <motion.h1
-                className="text-3xl font-bold mb-2"
+                className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent leading-tight"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
                 {typeof product.name === 'string' ? product.name : "Product"}
               </motion.h1>
-              <motion.p
-                className="text-2xl font-semibold text-primary"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-              >
-                {typeof product.price === "number"
-                  ? product.price.toLocaleString()
-                  : "0"}{" "}
-                F CFA
-              </motion.p>
-              {product.stock !== undefined && (
+
+              <div className="flex justify-end">
                 <motion.p
-                  className="text-sm text-muted-foreground mt-1"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.5 }}
+                  className="text-3xl md:text-4xl font-bold text-primary"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
                 >
-                  {typeof product.stock === "number" && product.stock > 0
-                    ? `${product.stock} ${t(currentLanguage, "merchPage.productDetail.inStock")}`
-                    : t(currentLanguage, "merchPage.productDetail.outOfStock")}
+                  {typeof product.price === "number"
+                    ? product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+                    : "0"}{" "}
+                  F CFA
                 </motion.p>
-              )}
+              </div>
             </div>
 
             {/* Product Description */}
-            {/* {product.description && (
+            {product.description && (
               <motion.div
-                className="prose prose-sm max-w-none"
+                className="bg-card/30 backdrop-blur-sm rounded-sm p-6 border border-border/20"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
               >
-                <p>
-                  {typeof product.description === 'string'
-                    ? product.description
-                    : (Array.isArray(product.description) && product.description[0]?.children?.[0]?.text)
-                      ? product.description[0].children[0].text
-                      : 'No description available'}
-                </p>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-foreground">
+                    {t(currentLanguage, "merchPage.productDetail.description")}
+                  </h3>
+                  {product.stock !== undefined && (
+                    <div className={`px-4 py-2 rounded-sm text-sm font-medium ${typeof product.stock === "number" && product.stock > 0
+                      ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                      : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                      }`}>
+                      {typeof product.stock === "number" && product.stock > 0
+                        ? `${product.stock} in stock`
+                        : "Out of Stock"}
+                    </div>
+                  )}
+                </div>
+                <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
+                  <p>
+                    {typeof product.description === 'string'
+                      ? product.description
+                      : (Array.isArray(product.description) && product.description[0]?.children?.[0]?.text)
+                        ? product.description[0].children[0].text
+                        : 'No description available'}
+                  </p>
+                </div>
               </motion.div>
-            )} */}
+            )}
 
-            {/* Variant Selector (placeholder for now) */}
-            <VariantSelector />
-
-            {/* Add to Cart Section */}
+            {/* Quantity and Actions */}
             <motion.div
+              className="space-y-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.7 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
             >
-              <Card className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">
-                      {t(currentLanguage, "merchPage.productDetail.quantity")}
-                    </span>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={decrementQuantity}
-                        disabled={quantity <= 1}
-                      >
-                        <MinusIcon className="h-4 w-4" />
-                      </Button>
-                      <span className="w-8 text-center">{quantity}</span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={incrementQuantity}
-                      >
-                        <PlusIcon className="h-4 w-4" />
-                      </Button>
+              {/* In Stock Actions */}
+              {product.stock !== 0 && (
+                <>
+                  {/* Quantity Selector */}
+                  <div className="bg-card/30 backdrop-blur-sm rounded-sm p-6 border border-border/20">
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-medium text-foreground">
+                        {t(currentLanguage, "merchPage.productDetail.quantity")}
+                      </span>
+                      <div className="flex items-center space-x-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={decrementQuantity}
+                          disabled={quantity <= 1}
+                          className="h-10 w-10 rounded-sm"
+                        >
+                          <MinusIcon className="h-4 w-4" />
+                        </Button>
+                        <motion.span
+                          key={quantity}
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          className="w-12 text-center text-lg font-semibold"
+                        >
+                          {quantity}
+                        </motion.span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={incrementQuantity}
+                          className="h-10 w-10 rounded-sm"
+                        >
+                          <PlusIcon className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    {/* Total Price Display */}
+                    <div className="mt-4 pt-4 border-t border-border/20">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">
+                          {t(currentLanguage, "merchPage.productDetail.total")}
+                        </span>
+                        <span className="text-xl font-bold text-primary">
+                          {((typeof product.price === "number" ? product.price : 0) * quantity)
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")} F CFA
+                        </span>
+                      </div>
                     </div>
                   </div>
 
+                  {/* Add to Cart Button */}
                   <Button
-                    className="w-full"
+                    className="w-full bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700 h-14 text-lg font-semibold rounded-sm"
                     size="lg"
                     onClick={handleAddToCart}
-                    disabled={product.stock === 0}
                   >
-                    {product.stock === 0
-                      ? t(currentLanguage, "merchPage.productDetail.outOfStock")
-                      : t(currentLanguage, "merchPage.productDetail.addToCart")}
+                    {t(currentLanguage, "merchPage.productDetail.addToCart")}
                   </Button>
+                </>
+              )}
 
-                  {/* Additional Actions */}
-                  <div className="flex space-x-2">
-                    <Button variant="outline" className="flex-1">
-                      {t(
-                        currentLanguage,
-                        "merchPage.productDetail.addToWishlist",
-                      )}
-                    </Button>
-                    <Button variant="outline" className="flex-1">
-                      {t(currentLanguage, "merchPage.productDetail.share")}
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-
-            {/* Product Details */}
-            <motion.div
-              className="space-y-2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.8 }}
-            >
-              <h3 className="font-semibold">
-                {t(currentLanguage, "merchPage.productDetail.productDetails")}
-              </h3>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p>
-                  {t(currentLanguage, "merchPage.productDetail.productId")}{" "}
-                  {product.productId || product._id || "N/A"}
-                </p>
-                <p>{t(currentLanguage, "merchPage.productDetail.category")}</p>
-                <p>{t(currentLanguage, "merchPage.productDetail.shipping")}</p>
+              {/* Secondary Actions - Always Visible */}
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1 h-12 rounded-sm border-border/40 hover:bg-card/50"
+                  onClick={() => {
+                    if (isInWishlist(product._id)) {
+                      removeFromWishlist(product._id);
+                    } else {
+                      addToWishlist(product);
+                    }
+                  }}
+                >
+                  <Heart
+                    className={`mr-2 h-4 w-4 ${isInWishlist(product._id) ? "fill-red-500 text-red-500" : ""
+                      }`}
+                  />
+                  {isInWishlist(product._id)
+                    ? t(currentLanguage, "merchPage.productDetail.removeFromWishlist") || "Remove from Wishlist"
+                    : t(currentLanguage, "merchPage.productDetail.addToWishlist")}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1 h-12 rounded-sm border-border/40 hover:bg-card/50"
+                  onClick={handleShare}
+                >
+                  <Share2 className="mr-2 h-4 w-4" />
+                  {t(currentLanguage, "merchPage.productDetail.share")}
+                </Button>
               </div>
             </motion.div>
           </motion.div>
@@ -321,7 +290,9 @@ function ProductDetail({ product }: ProductDetailContentProps) {
 export function ProductDetailContent({ product }: ProductDetailContentProps) {
   return (
     <CartProvider>
-      <ProductDetail product={product} />
+      <WishlistProvider>
+        <ProductDetail product={product} />
+      </WishlistProvider>
     </CartProvider>
   );
 }

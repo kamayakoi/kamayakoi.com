@@ -161,16 +161,24 @@ SECURITY DEFINER
 SET search_path = ''
 AS $$
 BEGIN
+    -- Only update if the purchase doesn't already have a lomi session ID
+    -- This prevents duplicate key errors when the same checkout is retried
     UPDATE public.purchases
-    SET 
+    SET
         lomi_session_id = p_lomi_session_id,
         lomi_checkout_url = p_lomi_checkout_url,
         payment_processor_details = COALESCE(p_payment_processor_details, payment_processor_details),
         updated_at = NOW()
-    WHERE id = p_purchase_id;
+    WHERE id = p_purchase_id
+      AND (lomi_session_id IS NULL OR lomi_session_id = '');
 
     IF NOT FOUND THEN
-        RAISE WARNING 'Purchase ID % not found during lomi session update', p_purchase_id;
+        -- Check if the purchase exists but already has a session ID
+        IF EXISTS (SELECT 1 FROM public.purchases WHERE id = p_purchase_id) THEN
+            RAISE WARNING 'Purchase ID % already has a lomi session ID, skipping update', p_purchase_id;
+        ELSE
+            RAISE WARNING 'Purchase ID % not found during lomi session update', p_purchase_id;
+        END IF;
     END IF;
 END;
 $$;

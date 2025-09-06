@@ -14,7 +14,7 @@ export default function LoadingComponent() {
     const interval = setInterval(() => {
       stepIndex = (stepIndex + 1) % loadingSequence.length;
       setFillWidth(loadingSequence[stepIndex]);
-    }, 800); // Much slower timing
+    }, 200); // Faster timing to start effect sooner
 
     return () => clearInterval(interval);
   }, []);
@@ -45,7 +45,7 @@ export default function LoadingComponent() {
               fontWeight: 900,
               letterSpacing: "0.0em",
               fontFamily: "Arial Black, sans-serif",
-              color: "#FF073A",
+              color: "#5EEAD4",
             }}
           >
             LOADING

@@ -375,11 +375,13 @@ export async function getAllProducts() {
       "stock": baseStock,
       description,
       "categories": categories[]->{
+        _id,
         title
       },
       tags,
       images[]{
         asset->{
+          _id,
           url,
           metadata {
             dimensions,

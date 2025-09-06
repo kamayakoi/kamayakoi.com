@@ -33,31 +33,31 @@ export function CartItemCard({ item }: CartItemCardProps) {
   };
 
   return (
-    <div className="flex gap-4 p-4 bg-background rounded-sm border">
+    <div className="flex gap-3 p-3 bg-[#1a1a1a]/50 hover:bg-[#1a1a1a]/70 rounded-sm transition-colors">
       {/* Product Image */}
       <div className="flex-shrink-0">
         {image ? (
           <Image
             src={image}
             alt={product.name}
-            width={80}
-            height={100}
+            width={60}
+            height={60}
             className="object-cover rounded-sm"
           />
         ) : (
-          <div className="w-20 h-24 bg-muted rounded-sm flex items-center justify-center">
-            <span className="text-xs text-muted-foreground">No Image</span>
+          <div className="w-12 h-12 bg-muted rounded-sm flex items-center justify-center">
+            <span className="text-xs text-white/70">No Image</span>
           </div>
         )}
       </div>
 
       {/* Product Details */}
       <div className="flex-1 min-w-0">
-        <div className="flex justify-between items-start mb-2">
+        <div className="flex justify-between items-start mb-1">
           <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-sm truncate">{product.name}</h3>
-            <p className="text-xs text-muted-foreground">
-              {product.price.toLocaleString()} F CFA
+            <h3 className="font-medium text-sm truncate text-white">{product.name}</h3>
+            <p className="text-xs text-white/70">
+              {product.price.toLocaleString('fr-FR')} F CFA
             </p>
           </div>
           <Button
@@ -83,7 +83,7 @@ export function CartItemCard({ item }: CartItemCardProps) {
             >
               <MinusIcon className="h-3 w-3" />
             </Button>
-            <span className="text-sm font-medium min-w-[2rem] text-center">
+            <span className="text-sm font-medium min-w-[2rem] text-center text-white">
               {quantity}
             </span>
             <Button
@@ -97,8 +97,8 @@ export function CartItemCard({ item }: CartItemCardProps) {
             </Button>
           </div>
 
-          <div className="text-sm font-medium">
-            {(product.price * quantity).toLocaleString()} F CFA
+          <div className="text-sm font-medium text-white">
+            {(product.price * quantity).toLocaleString('fr-FR')} F CFA
           </div>
         </div>
       </div>

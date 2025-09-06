@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronRight, Star, Youtube } from "lucide-react";
+import { ChevronRight, Star, Youtube, Radio, Video } from "lucide-react";
+import { Soundcloud } from "@/components/icons/Soundcloud";
 
 interface MediaCard {
   id: string;
@@ -11,6 +12,9 @@ interface MediaCard {
   genres: string[];
   image: string;
   isLarge?: boolean;
+  type?: "youtube" | "soundcloud" | "soundcloud_playlist" | "audio_url" | "video_url";
+  url?: string;
+  artist?: string;
 }
 
 interface HorizontalMediaCardsProps {
@@ -18,6 +22,32 @@ interface HorizontalMediaCardsProps {
   cards: MediaCard[];
   onCardClick?: (card: MediaCard) => void;
 }
+
+// Helper function to get the appropriate icon based on media type
+const getMediaIcon = (type?: string) => {
+  switch (type) {
+    case "youtube":
+      return <Youtube className="w-3 h-3 md:w-4 md:h-4 text-white/80" />;
+    case "soundcloud":
+    case "soundcloud_playlist":
+      return <Soundcloud className="w-3 h-3 md:w-4 md:h-4 text-white/80" />;
+    case "audio_url":
+      return <Radio className="w-3 h-3 md:w-4 md:h-4 text-white/80" />;
+    case "video_url":
+      return <Video className="w-3 h-3 md:w-4 md:h-4 text-white/80" />;
+    default:
+      return <Star className="w-3 h-3 md:w-4 md:h-4 text-white/80" />;
+  }
+};
+
+// Helper function to handle card clicks
+const handleCardClick = (card: MediaCard, onCardClick?: (card: MediaCard) => void) => {
+  if (card.url) {
+    window.open(card.url, '_blank', 'noopener,noreferrer');
+  } else if (onCardClick) {
+    onCardClick(card);
+  }
+};
 
 export default function HorizontalMediaCards({
   title = "Must Watch",
@@ -40,13 +70,12 @@ export default function HorizontalMediaCards({
             className={`
               relative flex-shrink-0 rounded-sm overflow-hidden cursor-pointer
               transition-all duration-300 hover:scale-[1.02] hover:shadow-xl
-              ${
-                card.isLarge || index === 0
-                  ? "w-[360px] md:w-[480px] h-60 md:h-64"
-                  : "w-[340px] md:w-[420px] h-60 md:h-64"
+              ${card.isLarge || index === 0
+                ? "w-[450px] md:w-[600px] h-60 md:h-64"
+                : "w-[420px] md:w-[520px] h-60 md:h-64"
               }
             `}
-            onClick={() => onCardClick?.(card)}
+            onClick={() => handleCardClick(card, onCardClick)}
           >
             {/* Background Image */}
             <div
@@ -60,11 +89,13 @@ export default function HorizontalMediaCards({
             {/* Top Icons */}
             <div className="absolute top-3 right-3 md:top-4 md:right-4 flex gap-1.5 md:gap-2">
               <div className="w-6 h-6 md:w-8 md:h-8 bg-black/40 rounded-sm flex items-center justify-center">
-                <Star className="w-3 h-3 md:w-4 md:h-4 text-white/80" />
+                {getMediaIcon(card.type)}
               </div>
-              <div className="w-6 h-6 md:w-8 md:h-8 bg-black/40 rounded-sm flex items-center justify-center">
-                <Youtube className="w-3 h-3 md:w-4 md:h-4 text-white/80" />
-              </div>
+              {card.url && (
+                <div className="w-6 h-6 md:w-8 md:h-8 bg-black/40 rounded-sm flex items-center justify-center">
+                  <Star className="w-3 h-3 md:w-4 md:h-4 text-white/80" />
+                </div>
+              )}
             </div>
 
             {/* Content */}
@@ -72,9 +103,9 @@ export default function HorizontalMediaCards({
               <h3 className="text-white font-semibold text-base md:text-lg mb-1 line-clamp-2">
                 {card.title}
               </h3>
-              {card.subtitle && (
+              {(card.subtitle || card.artist) && (
                 <p className="text-white/80 text-xs md:text-sm mb-2 line-clamp-1">
-                  {card.subtitle}
+                  {card.artist || card.subtitle}
                 </p>
               )}
               <p className="text-white/60 text-xs md:text-sm mb-2 md:mb-3">

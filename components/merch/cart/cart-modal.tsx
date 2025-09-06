@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, PlusCircleIcon } from "lucide-react";
+import { PlusCircleIcon, ShoppingCart, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
@@ -11,6 +11,7 @@ import Loader from "@/components/ui/loader";
 import { CartItemCard } from "./cart-item-card";
 import Link from "next/link";
 import { cn } from "@/lib/actions/utils";
+import { createPortal } from "react-dom";
 
 const CartContainer = ({
   children,
@@ -29,9 +30,11 @@ const CartItems = ({ closeCart }: { closeCart: () => void }) => {
 
   return (
     <div className="flex flex-col justify-between h-full overflow-hidden">
-      <CartContainer className="flex justify-between px-2 text-sm text-muted-foreground">
-        <span>Products</span>
-        <span>{cart.lines.length} items</span>
+      <CartContainer className="flex justify-between items-center px-2 text-sm text-muted-foreground mb-4">
+        <span className="font-medium">Products</span>
+        <span className="bg-muted/50 px-2 py-1 rounded-sm text-xs">
+          {cart.lines.length} item{cart.lines.length !== 1 ? 's' : ''}
+        </span>
       </CartContainer>
       <div className="relative flex-1 min-h-0 py-4 overflow-x-hidden">
         <CartContainer className="overflow-y-auto flex flex-col gap-y-3 h-full scrollbar-hide">
@@ -50,22 +53,19 @@ const CartItems = ({ closeCart }: { closeCart: () => void }) => {
         </CartContainer>
       </div>
       <CartContainer>
-        <div className="py-4 text-sm text-foreground/50 shrink-0">
-          <div className="flex justify-between items-center pb-1 mb-3 border-b border-muted-foreground/20">
-            <p>Taxes</p>
-            <p className="text-right">Calculated at checkout</p>
-          </div>
-          <div className="flex justify-between items-center pt-1 pb-1 mb-3 border-b border-muted-foreground/20">
-            <p>Shipping</p>
-            <p className="text-right">Calculated at checkout</p>
-          </div>
-          <div className="flex justify-between items-center pt-1 pb-1 mb-1.5 text-lg font-semibold">
-            <p>Total</p>
-            <p className="text-base text-right text-foreground">
-              {Number(cart.cost.totalAmount.amount).toLocaleString()}{" "}
-              {cart.cost.totalAmount.currencyCode}
-            </p>
-          </div>
+        <div className="py-3 text-sm shrink-0">
+          <CartContainer className="space-y-2">
+            <div className="flex justify-between items-center py-3">
+              <p className="font-medium text-foreground">Shipping</p>
+              <p className="text-muted-foreground">Calculated at checkout</p>
+            </div>
+            <div className="flex justify-between items-center py-2">
+              <p className="text-lg font-bold text-foreground">Total</p>
+              <p className="text-xl font-bold text-primary">
+                {Number(cart.cost.totalAmount.amount).toLocaleString('fr-FR')} F CFA
+              </p>
+            </div>
+          </CartContainer>
         </div>
         <CheckoutButton />
       </CartContainer>
@@ -85,7 +85,14 @@ const serializeCart = (cart: { lines: { id: string; quantity: number }[] }) => {
 export default function CartModal() {
   const { cart } = useCart();
   const [isOpen, setIsOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const serializedCart = useRef(cart ? serializeCart(cart) : undefined);
+
+  // Ensure component is mounted before rendering portal
+  useEffect(() => {
+    setIsMounted(true);
+    return () => setIsMounted(false);
+  }, []);
 
   useEffect(() => {
     if (!cart) return;
@@ -130,19 +137,19 @@ export default function CartModal() {
         <CartContainer className="flex w-full">
           <Link
             href="/merch"
-            className="p-2 w-full rounded-sm border border-dashed bg-background border-border"
+            className="p-6 w-full bg-card/30 backdrop-blur-sm rounded-sm hover:bg-card/50 transition-all duration-300"
             onClick={closeCart}
           >
-            <div className="flex flex-row gap-6">
-              <div className="flex overflow-hidden relative justify-center items-center rounded-sm border border-dashed size-20 shrink-0 border-border">
+            <div className="flex flex-row gap-6 items-center">
+              <div className="flex overflow-hidden relative justify-center items-center rounded-sm border border-dashed size-20 shrink-0 border-border/50 bg-muted/30">
                 <PlusCircleIcon className="size-6 text-muted-foreground" />
               </div>
-              <div className="flex flex-col flex-1 gap-2 justify-center 2xl:gap-3">
-                <span className="text-lg font-semibold 2xl:text-xl">
-                  Cart is empty
+              <div className="flex flex-col flex-1 gap-2">
+                <span className="text-xl font-bold text-foreground">
+                  Your cart is empty
                 </span>
-                <p className="text-sm text-muted-foreground hover:underline">
-                  Start shopping to get started
+                <p className="text-muted-foreground hover:text-primary transition-colors">
+                  Start shopping to get started →
                 </p>
               </div>
             </div>
@@ -164,52 +171,72 @@ export default function CartModal() {
       <Button
         aria-label="Open cart"
         onClick={openCart}
-        className="uppercase"
+        className="uppercase relative bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700"
         size={"sm"}
+        onClickCapture={(e) => {
+          // Prevent event bubbling that might interfere with modal
+          e.stopPropagation();
+          openCart();
+        }}
       >
-        <span className="max-md:hidden">cart</span> ({cart.totalQuantity})
-      </Button>
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="fixed inset-0 z-50 bg-foreground/30"
-              onClick={closeCart}
-              aria-hidden="true"
-            />
-
-            {/* Panel */}
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="fixed top-0 bottom-0 right-0 flex w-full md:w-[500px] p-4 z-50"
-            >
-              <div className="flex flex-col py-3 w-full rounded bg-muted md:py-4">
-                <CartContainer className="flex justify-between items-baseline mb-10">
-                  <p className="text-2xl font-semibold">Cart</p>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    aria-label="Close cart"
-                    onClick={closeCart}
-                  >
-                    Close
-                  </Button>
-                </CartContainer>
-
-                {renderCartContent()}
-              </div>
-            </motion.div>
-          </>
+        <ShoppingCart className="h-4 w-4" />
+        {cart.totalQuantity > 0 && (
+          <span className="absolute -top-1 -right-1 bg-teal-600 text-teal-100 text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium border border-teal-500">
+            {cart.totalQuantity}
+          </span>
         )}
-      </AnimatePresence>
+      </Button>
+
+      {/* Render modal at document body level using portal */}
+      {isMounted && createPortal(
+        <AnimatePresence>
+          {isOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="fixed inset-0 z-[60] bg-foreground/30 will-change-auto"
+                onClick={closeCart}
+                aria-hidden="true"
+                style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+              />
+
+              {/* Panel */}
+              <motion.div
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="fixed top-0 bottom-0 right-0 flex w-full md:w-[500px] p-4 z-[70] will-change-transform"
+                style={{ position: 'fixed', top: 0, right: 0, bottom: 0 }}
+              >
+                <div className="flex flex-col py-6 w-full bg-[#1a1a1a] backdrop-blur-xl rounded-sm shadow-2xl">
+                  <CartContainer className="flex justify-between items-center mb-8">
+                    <div>
+                      <h2 className="text-3xl font-bold text-foreground">Cart</h2>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="hover:bg-muted/50"
+                      aria-label="Close cart"
+                      onClick={closeCart}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </CartContainer>
+
+                  {renderCartContent()}
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 }
@@ -223,35 +250,34 @@ function CheckoutButton() {
   const isDisabled = !cart || cart.lines.length === 0 || isPending;
 
   return (
-    <Button
-      type="submit"
-      disabled={isDisabled}
-      size="lg"
-      className="flex relative gap-3 justify-between items-center w-full"
-      onClick={() => {
-        // For now, redirect to checkout page or show message
-        router.push("/checkout");
-      }}
-    >
-      <AnimatePresence initial={false} mode="wait">
-        <motion.div
-          key={isLoading ? "loading" : "content"}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
-          className="flex justify-center items-center w-full"
-        >
-          {isLoading ? (
-            <Loader />
-          ) : (
-            <div className="flex justify-between items-center w-full">
-              <span>Proceed to Checkout</span>
-              <ArrowRight className="size-6" />
-            </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
-    </Button>
+    <CartContainer className="mt-4">
+      <Button
+        type="submit"
+        disabled={isDisabled}
+        size="lg"
+        className="flex relative gap-3 justify-between items-center w-full bg-teal-800 hover:bg-teal-700 text-teal-200 rounded-sm font-semibold py-4"
+        onClick={() => {
+          // For now, redirect to checkout page or show message
+          router.push("/checkout");
+        }}
+      >
+        <AnimatePresence initial={false} mode="wait">
+          <motion.div
+            key={isLoading ? "loading" : "content"}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="flex justify-center items-center w-full"
+          >
+            {isLoading ? (
+              <Loader />
+            ) : (
+              <span className="font-semibold">Proceed to checkout</span>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </Button>
+    </CartContainer>
   );
 }

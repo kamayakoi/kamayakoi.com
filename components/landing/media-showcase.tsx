@@ -67,97 +67,83 @@ export function MediaShowcase({ media }: MediaShowcaseProps) {
 
         {hasMedia ? (
           <>
-            {/* Media Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {media.map((mediaItem) => (
-                <div
-                  key={mediaItem._id}
-                  className="relative overflow-hidden rounded-sm bg-black/20 backdrop-blur-sm group cursor-pointer"
-                  onClick={() => {
-                    if (playingMediaId === mediaItem._id) {
-                      handleMediaPause();
-                    } else {
-                      handleMediaPlay(mediaItem._id);
-                    }
-                  }}
-                >
-                  {/* Thumbnail or Placeholder */}
-                  <div className="aspect-[4/3] relative">
-                    {mediaItem.thumbnail ? (
-                      <Image
-                        src={mediaItem.thumbnail}
-                        alt={mediaItem.title}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                        <div className="text-white/50 text-center">
-                          <div className="text-3xl mb-2">
-                            {mediaItem.type === "youtube"
-                              ? "📺"
-                              : mediaItem.type === "soundcloud"
-                                ? "🎵"
-                                : mediaItem.type === "audio_url"
-                                  ? "🎧"
-                                  : "🎬"}
+            {/* Horizontal Scrolling Media */}
+            <div className="overflow-x-auto pb-4">
+              <div className="flex gap-6 min-w-max">
+                {media.slice(0, 50).map((mediaItem) => (
+                  <div
+                    key={mediaItem._id}
+                    className="flex-shrink-0 w-72 relative overflow-hidden rounded-sm bg-black/20 backdrop-blur-sm group cursor-pointer"
+                    onClick={() => {
+                      if (playingMediaId === mediaItem._id) {
+                        handleMediaPause();
+                      } else {
+                        handleMediaPlay(mediaItem._id);
+                      }
+                    }}
+                  >
+                    {/* Thumbnail or Placeholder */}
+                    <div className="aspect-[4/3] relative">
+                      {mediaItem.thumbnail ? (
+                        <Image
+                          src={mediaItem.thumbnail}
+                          alt={mediaItem.title}
+                          fill
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                          <div className="text-white/50 text-center">
+                            <div className="text-3xl mb-2">
+                              {mediaItem.type === "youtube"
+                                ? "📺"
+                                : mediaItem.type === "soundcloud"
+                                  ? "🎵"
+                                  : mediaItem.type === "audio_url"
+                                    ? "🎧"
+                                    : "🎬"}
+                            </div>
+                            <div className="text-xs uppercase tracking-wide">
+                              {mediaItem.type.replace("_", " ")}
+                            </div>
                           </div>
-                          <div className="text-xs uppercase tracking-wide">
-                            {mediaItem.type.replace("_", " ")}
+                        </div>
+                      )}
+
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <div className="text-white text-center">
+                          <div className="text-lg font-bold mb-1">
+                            {mediaItem.title}
+                          </div>
+                          {mediaItem.artist && (
+                            <div className="text-sm text-white/80">
+                              {mediaItem.artist}
+                            </div>
+                          )}
+                          <div className="text-xs text-white/60 mt-2 uppercase tracking-wide">
+                            {currentLanguage === "fr"
+                              ? "Cliquer pour jouer"
+                              : "Click to Play"}
                           </div>
                         </div>
                       </div>
-                    )}
+                    </div>
 
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <div className="text-white text-center">
-                        <div className="text-lg font-bold mb-1">
-                          {mediaItem.title}
-                        </div>
-                        {mediaItem.artist && (
-                          <div className="text-sm text-white/80">
-                            {mediaItem.artist}
-                          </div>
-                        )}
-                        <div className="text-xs text-white/60 mt-2 uppercase tracking-wide">
-                          {currentLanguage === "fr"
-                            ? "Cliquer pour jouer"
-                            : "Click to Play"}
-                        </div>
+                    {/* Media Info */}
+                    <div className="p-4">
+                      <h3 className="text-white font-semibold text-sm mb-2 line-clamp-2">
+                        {mediaItem.title}
+                      </h3>
+                      <div className="flex items-center justify-between text-xs text-white/60">
+                        <span>{mediaItem.genre || mediaItem.type}</span>
+                        {mediaItem.duration && <span>{mediaItem.duration}</span>}
                       </div>
                     </div>
                   </div>
-
-                  {/* Media Info */}
-                  <div className="p-4">
-                    <h3 className="text-white font-semibold text-sm mb-2 line-clamp-2">
-                      {mediaItem.title}
-                    </h3>
-                    <div className="flex items-center justify-between text-xs text-white/60">
-                      <span>{mediaItem.genre || mediaItem.type}</span>
-                      {mediaItem.duration && <span>{mediaItem.duration}</span>}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* View All Media Button */}
-            <div className="text-center mt-12">
-              <button
-                className="inline-flex items-center px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-sm transition-all duration-300 backdrop-blur-sm"
-                onClick={() => {
-                  // TODO: Navigate to media page or open modal
-                  console.log("View all media clicked");
-                }}
-              >
-                {currentLanguage === "fr"
-                  ? "Voir toutes les vidéos"
-                  : "View all videos"}
-                <span className="ml-2">→</span>
-              </button>
+                ))}
+              </div>
             </div>
           </>
         ) : (

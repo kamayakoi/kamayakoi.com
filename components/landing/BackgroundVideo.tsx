@@ -6,9 +6,15 @@ import { Volume2, VolumeX, ChevronLeft, ChevronRight } from "lucide-react"; // I
 // Define props interface
 interface BackgroundVideoProps {
   videoUrls: string[];
+  height?: string; // e.g., "h-screen", "h-96", "min-h-screen"
+  className?: string; // Additional classes for positioning/sizing
 }
 
-export default function BackgroundVideo({ videoUrls }: BackgroundVideoProps) {
+export default function BackgroundVideo({
+  videoUrls,
+  height = "min-h-screen",
+  className = ""
+}: BackgroundVideoProps) {
   // State to manage sound, default to muted
   const [isMuted, setIsMuted] = useState(false);
   const [current, setCurrent] = useState(0);
@@ -71,9 +77,9 @@ export default function BackgroundVideo({ videoUrls }: BackgroundVideoProps) {
   // We'll use a wrapper div to conditionally render the blurred background
 
   return (
-    <div className="absolute inset-0 w-full h-full overflow-hidden">
+    <div className={`relative w-full overflow-hidden flex items-center justify-center ${height} ${className}`}>
       {/* Blurred background for portrait on desktop only */}
-      <div className="hidden md:block absolute inset-0 w-full h-full z-0 pointer-events-none">
+      <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
         {isPortrait && (
           <video
             ref={bgVideoRef}
@@ -97,10 +103,7 @@ export default function BackgroundVideo({ videoUrls }: BackgroundVideoProps) {
         loop
         muted={isMuted}
         playsInline
-        className={`absolute top-0 left-0 w-full h-full z-10
-          ${isPortrait ? "object-contain md:object-contain" : "object-cover"}
-          object-cover md:object-cover
-        `}
+        className="w-full h-full object-cover z-10"
         src={videoUrls[current]}
         key={videoUrls[current]} // force reload on change
         onLoadedMetadata={handleLoadedMetadata}

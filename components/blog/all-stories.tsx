@@ -132,7 +132,7 @@ const AllStories = ({ stories, heading = "All Stories" }: AllStoriesProps) => {
                   <h3 className="font-semibold text-lg mb-3 leading-tight text-zinc-900 dark:text-white group-hover:text-primary transition-colors min-h-fit">
                     {story.title}
                   </h3>
-                  <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4 overflow-hidden line-clamp-2">
+                  <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4 overflow-hidden line-clamp-2 pr-4 max-w-[90%]">
                     {story.excerpt}
                   </p>
                 </div>
@@ -144,7 +144,7 @@ const AllStories = ({ stories, heading = "All Stories" }: AllStoriesProps) => {
                   )}
 
                   <div className="flex items-center text-primary text-sm font-normal">
-                    Read more →
+                    Read more
                   </div>
                 </div>
               </div>

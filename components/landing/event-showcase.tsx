@@ -56,16 +56,16 @@ export function EventShowcase({ sanityEvents }: EventShowcaseProps = {}) {
                   {sanityEvents.map((event) => {
                     const eventData = {
                       title: event.title,
-                      description: event.description || "",
+                      description: typeof event.description === 'string' ? event.description : "",
                       image: event.flyer || "/placeholder.webp",
                       date: event.date
                         ? new Date(event.date).toLocaleDateString(
-                            currentLanguage === "fr" ? "fr-FR" : "en-US",
-                            {
-                              year: "numeric",
-                              month: "long",
-                            },
-                          )
+                          currentLanguage === "fr" ? "fr-FR" : "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                          },
+                        )
                         : "TBD",
                       slug: event.slug,
                     };
@@ -89,7 +89,7 @@ export function EventShowcase({ sanityEvents }: EventShowcaseProps = {}) {
                               {eventData.title}
                             </h3>
                             <p className="text-white/90 text-sm leading-relaxed mb-4 text-pretty">
-                              {eventData.description.split(".")[0] + "."}
+                              {eventData.description ? eventData.description.split(".")[0] + "." : ""}
                             </p>
                             <div className="flex justify-between items-center">
                               <span className="text-white/70 text-xs font-medium uppercase tracking-wide">

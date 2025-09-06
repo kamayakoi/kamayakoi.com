@@ -47,32 +47,19 @@ export function FeaturedMedia({ media }: FeaturedMediaProps) {
           </div>
         </div>
 
-        {/* Media Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {media.map((mediaItem) => (
-            <MediaPlayer
-              key={mediaItem._id}
-              media={mediaItem}
-              onPlay={() => handleMediaPlay(mediaItem._id)}
-              onPause={handleMediaPause}
-            />
-          ))}
-        </div>
-
-        {/* View All Media Button */}
-        <div className="text-center mt-12">
-          <button
-            className="inline-flex items-center px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-sm transition-all duration-300 backdrop-blur-sm"
-            onClick={() => {
-              // TODO: Navigate to media page or open modal
-              console.log("View all media clicked");
-            }}
-          >
-            {currentLanguage === "fr"
-              ? "Voir toutes les vidéos"
-              : "View all videos"}
-            <span className="ml-2">→</span>
-          </button>
+        {/* Horizontal Scrolling Media */}
+        <div className="overflow-x-auto pb-4">
+          <div className="flex gap-6 min-w-max">
+            {media.slice(0, 50).map((mediaItem) => (
+              <div key={mediaItem._id} className="flex-shrink-0 w-80">
+                <MediaPlayer
+                  media={mediaItem}
+                  onPlay={() => handleMediaPlay(mediaItem._id)}
+                  onPause={handleMediaPause}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

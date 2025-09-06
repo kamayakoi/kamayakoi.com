@@ -213,20 +213,6 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
     getVideoState,
   ]);
 
-  // Create individual transform hooks for each potential event slot (up to 5)
-  const transform1 = useTransform(scrollYProgress, [0, 0.2], [-400, 400]);
-  const transform2 = useTransform(scrollYProgress, [0.2, 0.4], [-400, 400]);
-  const transform3 = useTransform(scrollYProgress, [0.4, 0.6], [-400, 400]);
-  const transform4 = useTransform(scrollYProgress, [0.6, 0.8], [-400, 400]);
-  const transform5 = useTransform(scrollYProgress, [0.8, 1], [-400, 400]);
-
-  const transforms = [
-    transform1,
-    transform2,
-    transform3,
-    transform4,
-    transform5,
-  ];
 
   const handleImageClick = (slug: string, index: number) => {
     // Defer saving video state until after render cycle
@@ -306,20 +292,6 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
     }
   };
 
-  const getDisplayNumber = (event: EventParallaxData, index: number) => {
-    if (event.number) {
-      // Handle custom alphanumeric formats like S01, SCHOOL001, 016, ABC123
-      // Only add # prefix and pad numeric-only codes
-      if (/^\d+$/.test(event.number)) {
-        // Pure numeric - pad with zeros and add #
-        return `#${event.number.padStart(3, "0")}`;
-      } else {
-        // Alphanumeric - just add # prefix
-        return `#${event.number}`;
-      }
-    }
-    return `#${String(displayEvents.length - index).padStart(3, "0")}`;
-  };
 
   if (displayEvents.length === 0) {
     return (
@@ -445,32 +417,13 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                   </div>
                 )}
 
-                <motion.h2
-                  className="fixed top-4/4 right-4 md:right-96 transform -translate-y-1/2 text-white font-black pointer-events-none z-30"
-                  style={{
-                    y: transforms[index],
-                    fontSize: "clamp(2rem, 10vw, 3.75rem)",
-                    fontFamily: '"Inter", "Helvetica Neue", Arial, sans-serif',
-                    letterSpacing: "-4px",
-                    lineHeight: "0.8",
-                    color: "#FF073A",
-                    textShadow: `
-                      0 0 10px rgba(255, 107, 107, 0.6),
-                      0 0 20px rgba(255, 107, 107, 0.4),
-                      2px 2px 10px rgba(0, 0, 0, 0.7)
-                    `,
-                    filter: "drop-shadow(0 0 5px rgba(255, 107, 107, 0.5))",
-                  }}
-                >
-                  {getDisplayNumber(event, index)}
-                </motion.h2>
               </div>
             </section>
           );
         })}
 
         <motion.div
-          className="fixed left-0 bottom-0 h-1 bg-red-500 z-[1000] origin-left"
+          className="fixed left-0 bottom-0 h-1 bg-teal-500 z-[1000] origin-left"
           style={{ width: progressWidth }}
         />
       </div>

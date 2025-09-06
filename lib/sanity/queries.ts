@@ -1,5 +1,13 @@
 import { client } from "./client";
 
+// Helper function to get cache configuration based on environment
+const getCacheConfig = (tags: string[]) => ({
+  next: {
+    revalidate: process.env.NODE_ENV === 'production' ? 900 : 0, // No cache in development, 15 minutes in production
+    tags,
+  },
+});
+
 // Events
 export async function getLatestEvents(limit = 3) {
   return client.fetch(
@@ -19,12 +27,7 @@ export async function getLatestEvents(limit = 3) {
     }
   `,
     { limit },
-    {
-      next: {
-        revalidate: 3600, // Cache for 1 hour
-        tags: ["events"],
-      },
-    },
+    getCacheConfig(["events"]),
   );
 }
 
@@ -49,7 +52,7 @@ export async function getEventBySlug(slug: string, locale: string) {
       _id,
       title,
       subtitle,
-      slug,
+      "slug": slug.current,
       date,
       "dateFormatted": dateTime(date),
       "time": coalesce(time, "TBD"),
@@ -115,12 +118,7 @@ export async function getEventBySlug(slug: string, locale: string) {
     }
   `,
     { slug, locale },
-    {
-      next: {
-        revalidate: 3600, // Cache for 1 hour
-        tags: [`event-${slug}`, "events"],
-      },
-    },
+    getCacheConfig([`event-${slug}`, "events"]),
   );
 
   return event;
@@ -169,8 +167,9 @@ export async function getLatestBlogPosts(limit = 2) {
     }
   `,
     { limit },
-  );
-}
+    getCacheConfig(["posts"]),
+    );
+  }
 
 export async function getAllBlogPosts() {
   return client.fetch(`
@@ -447,12 +446,14 @@ export async function getAllProducts() {
     *[_type == "product"] | order(name asc) {
       _id,
       name,
-      slug,
+      "slug": slug.current,
       productId,
       "mainImage": images[0].asset->url, // Get the first image URL
       "price": basePrice,
       "stock": baseStock,
       description,
+      categories[]->{title, "slug": slug.current},
+      tags,
       images[]{
         asset->{
           url,
@@ -474,7 +475,6 @@ export async function getProductBySlug(slug: string) {
     *[_type == "product" && slug.current == $slug][0] {
       _id,
       name,
-      slug,
       productId,
       description,
       "images": images[]{
@@ -493,7 +493,7 @@ export async function getProductBySlug(slug: string) {
       manageVariants,
       variantOptions,
       variantInventory,
-      categories[]->{title, slug},
+      categories[]->{title, "slug": slug.current},
       tags,
       requiresShipping,
       weight,
@@ -522,7 +522,6 @@ export interface EventParallaxData {
   slug: string;
   featuredImage: string;
   promoVideoUrl?: string; // Add video URL support
-  number?: string; // Event number for parallax display
   date?: string;
   description?: string;
   ticketsAvailable?: boolean;
@@ -551,13 +550,12 @@ export const getEventsForScroller = async (
 export const getEventsForParallax = async (
   limit = 5,
 ): Promise<EventParallaxData[]> => {
-  const query = `*[_type == "event"] | order(number desc, date desc) [0...$limit] {
+  const query = `*[_type == "event"] | order(date desc) [0...$limit] {
     _id,
     title,
     "slug": slug.current,
     "featuredImage": flyer.asset->url,
     "promoVideoUrl": promoVideo.asset->url,
-    number,
     date,
     description,
     ticketsAvailable
@@ -592,12 +590,7 @@ export const getHomepageMusicTracks = async (): Promise<MusicTrack[]> => {
     const result = await client.fetch<{ musicTracks?: MusicTrack[] }>(
       query,
       {},
-      {
-        next: {
-          revalidate: 7200, // Cache for 2 hours
-          tags: ["homepage", "music"],
-        },
-      },
+      getCacheConfig(["homepage", "music"]),
     );
 
     // Handle case when no homepage document exists or no musicTracks field
@@ -650,12 +643,7 @@ export const getAllArtists = async (): Promise<ArtistData[]> => {
   return await client.fetch<ArtistData[]>(
     query,
     {},
-    {
-      next: {
-        revalidate: 3600, // Cache for 1 hour
-        tags: ["artists"],
-      },
-    },
+    getCacheConfig(["artists"]),
   );
 };
 
@@ -680,12 +668,7 @@ export const getArtistBySlug = async (
   return await client.fetch<ArtistData | null>(
     query,
     { slug },
-    {
-      next: {
-        revalidate: 3600, // Cache for 1 hour
-        tags: [`artist-${slug}`, "artists"],
-      },
-    },
+    getCacheConfig([`artist-${slug}`, "artists"]),
   );
 };
 
@@ -708,12 +691,7 @@ export const getHomepagePromoEvent =
     const result = await client.fetch<{ promoEvent?: HomepagePromoEventData }>(
       query,
       {},
-      {
-        next: {
-          revalidate: 3600, // Cache for 1 hour
-          tags: ["homepage", "events"],
-        },
-      },
+      getCacheConfig(["homepage", "events"]),
     );
     return result?.promoEvent ?? null;
   };
@@ -958,12 +936,7 @@ export const getHomepageContent = async (): Promise<HomepageData | null> => {
   const result = await client.fetch<HomepageData | null>(
     query,
     {},
-    {
-      next: {
-        revalidate: 3600, // Cache for 1 hour
-        tags: ["homepage"],
-      },
-    },
+    getCacheConfig(["homepage"]),
   );
 
   // Transform highlighted content into processed format
@@ -1081,12 +1054,7 @@ export const getAllMedia = async (): Promise<MediaItem[]> => {
   return await client.fetch<MediaItem[]>(
     query,
     {},
-    {
-      next: {
-        revalidate: 3600, // Cache for 1 hour
-        tags: ["media"],
-      },
-    },
+    getCacheConfig(["media"]),
   );
 };
 
@@ -1110,12 +1078,7 @@ export const getFeaturedMedia = async (limit = 10): Promise<MediaItem[]> => {
   return await client.fetch<MediaItem[]>(
     query,
     { limit },
-    {
-      next: {
-        revalidate: 3600, // Cache for 1 hour
-        tags: ["media"],
-      },
-    },
+    getCacheConfig(["media"]),
   );
 };
 
@@ -1142,11 +1105,6 @@ export const getMediaByType = async (
   return await client.fetch<MediaItem[]>(
     query,
     { type, limit },
-    {
-      next: {
-        revalidate: 3600, // Cache for 1 hour
-        tags: ["media"],
-      },
-    },
+    getCacheConfig(["media"]),
   );
 };

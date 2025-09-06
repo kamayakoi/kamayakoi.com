@@ -12,14 +12,32 @@ import { VariantSelector } from "./variant-selector";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
 
+interface PortableTextBlock {
+  _key: string;
+  _type: string;
+  children: Array<{
+    _key: string;
+    _type: string;
+    text: string;
+    marks?: string[];
+  }>;
+  markDefs?: unknown[];
+  style?: string;
+}
+
 interface SanityProduct {
   _id: string;
   name: string;
-  slug: { current: string } | string;
+  slug: string | { current: string };
   productId?: string;
-  description?: string;
+  description?: string | PortableTextBlock[];
   price: number;
   stock?: number;
+  categories?: Array<{
+    title: string;
+    slug: { current: string };
+  }>;
+  tags?: string[];
   images?: Array<{
     url: string;
     metadata?: {
@@ -46,6 +64,14 @@ function ProductDetail({ product }: ProductDetailContentProps) {
   const allImages = product.images || [];
   const mainImage = product.mainImage || allImages[0]?.url;
   const selectedImage = allImages[selectedImageIndex] || mainImage;
+
+  // Ensure we have a valid image URL (not empty string)
+  let hasValidImage = false;
+  if (typeof selectedImage === 'string' && selectedImage) {
+    hasValidImage = (selectedImage as string).trim() !== '';
+  } else if (selectedImage && typeof selectedImage === 'object' && selectedImage.url) {
+    hasValidImage = (selectedImage.url as string).trim() !== '';
+  }
 
   const handleAddToCart = async () => {
     await addItem(product);
@@ -76,7 +102,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {selectedImage ? (
+            {hasValidImage ? (
               <div className="aspect-square relative overflow-hidden rounded-sm bg-muted">
                 <Image
                   src={
@@ -113,27 +139,29 @@ function ProductDetail({ product }: ProductDetailContentProps) {
             {/* Additional Images Gallery */}
             {allImages.length > 1 && (
               <div className="grid grid-cols-4 gap-2">
-                {allImages.slice(0, 4).map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImageIndex(index)}
-                    className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all ${
-                      selectedImageIndex === index
+                {allImages.slice(0, 4).map((image, index) => {
+                  const hasValidThumbnail = image.url && image.url.trim() !== '';
+                  return hasValidThumbnail ? (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImageIndex(index)}
+                      className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all ${selectedImageIndex === index
                         ? "ring-2 ring-primary"
                         : "hover:ring-2 hover:ring-muted-foreground/50"
-                    }`}
-                  >
-                    <Image
-                      src={image.url}
-                      alt={`${product.name} view ${index + 1}`}
-                      fill
-                      className="object-cover"
-                      quality={80}
-                      placeholder={image.metadata?.lqip ? "blur" : undefined}
-                      blurDataURL={image.metadata?.lqip}
-                    />
-                  </button>
-                ))}
+                        }`}
+                    >
+                      <Image
+                        src={image.url}
+                        alt={`${product.name} view ${index + 1}`}
+                        fill
+                        className="object-cover"
+                        quality={80}
+                        placeholder={image.metadata?.lqip ? "blur" : undefined}
+                        blurDataURL={image.metadata?.lqip}
+                      />
+                    </button>
+                  ) : null;
+                })}
               </div>
             )}
           </motion.div>
@@ -152,7 +180,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
-                {product.name}
+                {product.name || 'Product'}
               </motion.h1>
               <motion.p
                 className="text-2xl font-semibold text-primary"
@@ -160,7 +188,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
               >
-                {product.price.toLocaleString()} F CFA
+                {typeof product.price === 'number' ? product.price.toLocaleString() : '0'} F CFA
               </motion.p>
               {product.stock !== undefined && (
                 <motion.p
@@ -169,7 +197,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5, delay: 0.5 }}
                 >
-                  {product.stock > 0
+                  {typeof product.stock === 'number' && product.stock > 0
                     ? `${product.stock} ${t(currentLanguage, "merchPage.productDetail.inStock")}`
                     : t(currentLanguage, "merchPage.productDetail.outOfStock")}
                 </motion.p>
@@ -177,16 +205,22 @@ function ProductDetail({ product }: ProductDetailContentProps) {
             </div>
 
             {/* Product Description */}
-            {product.description && (
+            {/* {product.description && (
               <motion.div
                 className="prose prose-sm max-w-none"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.6 }}
               >
-                <p>{product.description}</p>
+                <p>
+                  {typeof product.description === 'string'
+                    ? product.description
+                    : (Array.isArray(product.description) && product.description[0]?.children?.[0]?.text)
+                      ? product.description[0].children[0].text
+                      : 'No description available'}
+                </p>
               </motion.div>
-            )}
+            )} */}
 
             {/* Variant Selector (placeholder for now) */}
             <VariantSelector />
@@ -263,7 +297,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
               <div className="text-sm text-muted-foreground space-y-1">
                 <p>
                   {t(currentLanguage, "merchPage.productDetail.productId")}{" "}
-                  {product.productId || product._id}
+                  {product.productId || product._id || 'N/A'}
                 </p>
                 <p>{t(currentLanguage, "merchPage.productDetail.category")}</p>
                 <p>{t(currentLanguage, "merchPage.productDetail.shipping")}</p>

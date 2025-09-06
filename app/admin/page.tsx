@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import supabase from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -415,7 +416,7 @@ export default function AdminPage() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md rounded-sm border-slate-700">
+        <Card className="w-full max-w-md rounded-sm border-slate-700 bg-card/30 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-gray-100">
               Admin Access
@@ -464,79 +465,84 @@ export default function AdminPage() {
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-100">Admin panel</h1>
-            <p className="text-gray-300">Manage purchases and email dispatch</p>
+        <div className="relative pt-12 md:pt-12 mb-12">
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex-1 max-w-4xl">
+              <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-white mb-6">
+                Admin panel
+              </h1>
+              <p className="text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-3xl">
+                Manage purchases, track email dispatch status, and oversee ticket
+                sales for Kamayakoi events. Monitor customer interactions and
+                ensure smooth operations.
+              </p>
+            </div>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="rounded-sm border-slate-700 text-gray-100 hover:bg-card/70 shrink-0 ml-6"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
           </div>
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="rounded-sm border-slate-700 text-gray-100 hover:bg-slate-800"
-          >
-            <X className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
         </div>
 
         {/* Search and Actions */}
-        <Card className="mb-6 rounded-sm border-slate-700 bg-background">
-          <CardContent className="pt-6">
-            <div className="flex gap-4 items-end">
-              <div className="flex-1">
-                <Label htmlFor="search" className="text-gray-200">
-                  Search purchases
-                </Label>
-                <div className="flex gap-2 mt-2">
-                  <Input
-                    id="search"
-                    placeholder="Search by name, email, event, or purchase ID..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="rounded-sm bg-background border-slate-700 text-gray-100 placeholder:text-gray-400"
-                  />
-                  <Button
-                    onClick={searchPurchases}
-                    variant="outline"
-                    size="sm"
-                    className="rounded-sm border-slate-700 text-gray-100 hover:bg-slate-800 h-10 px-3"
-                    disabled={loading}
-                  >
-                    <Search className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              <Button
-                onClick={loadPurchases}
-                variant="outline"
-                className="rounded-sm border-slate-700 text-gray-100 hover:bg-slate-800"
-                disabled={loading}
-              >
-                <RefreshCw
-                  className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`}
+        <div className="mb-12">
+          <div className="flex flex-col gap-6">
+            <div className="flex-1">
+              <Label htmlFor="search" className="text-zinc-200 font-medium text-sm uppercase tracking-wider mb-4 block">
+                Search Purchases
+              </Label>
+              <div className="flex gap-3 items-center">
+                <Input
+                  id="search"
+                  placeholder="Search by name, email, event, or purchase ID..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="rounded-sm bg-card/30 backdrop-blur-sm border-slate-700 text-gray-100 placeholder:text-gray-400 h-12 flex-1"
                 />
-                Refresh
-              </Button>
-              <Button
-                onClick={downloadCSV}
-                variant="outline"
-                className="rounded-sm border-slate-700 text-gray-100 hover:bg-slate-800"
-                disabled={loading}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
-              </Button>
+                <Button
+                  onClick={searchPurchases}
+                  variant="outline"
+                  className="rounded-sm border-slate-700 text-gray-100 hover:bg-card/70 h-12 px-3 shrink-0"
+                  disabled={loading}
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+                <Button
+                  onClick={loadPurchases}
+                  variant="outline"
+                  className="rounded-sm border-slate-700 text-gray-100 hover:bg-card/70 h-12 px-3 shrink-0"
+                  disabled={loading}
+                >
+                  <RefreshCw
+                    className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+                  />
+                </Button>
+                <Button
+                  onClick={downloadCSV}
+                  variant="outline"
+                  className="rounded-sm border-slate-700 text-gray-100 hover:bg-card/70 h-12 px-3 shrink-0"
+                  disabled={loading}
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Purchases Table */}
-        <Card className="rounded-sm border-slate-700 bg-background">
-          <CardHeader>
-            <CardTitle className="text-gray-100">
-              Purchases ({filteredPurchases.length})
-            </CardTitle>
-            <CardDescription className="text-gray-300">
+        <Card className="rounded-sm border-slate-700 bg-card/30 backdrop-blur-sm">
+          <CardHeader className="pb-6">
+            <div className="mb-2">
+              <CardTitle className="text-white text-2xl font-semibold">
+                Purchases{filteredPurchases.length > 0 ? ` (${filteredPurchases.length})` : ''}
+              </CardTitle>
+            </div>
+            <CardDescription className="text-zinc-300 text-base leading-relaxed">
               Manage customer purchases and email dispatch status
             </CardDescription>
           </CardHeader>
@@ -544,9 +550,19 @@ export default function AdminPage() {
             {loading ? (
               <LoadingComponent />
             ) : filteredPurchases.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-400">No purchases found</p>
-              </div>
+              <motion.div
+                className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-sm p-8 mb-20"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <h2 className="text-2xl font-semibold mb-4 text-white">
+                  No purchases found
+                </h2>
+                <p className="text-zinc-400 mb-6">
+                  Try adjusting your search or check back later for new purchases.
+                </p>
+              </motion.div>
             ) : (
               <div className="overflow-x-auto">
                 {/* Desktop Table View */}
@@ -577,7 +593,7 @@ export default function AdminPage() {
                         return (
                           <tr
                             key={purchase.purchase_id}
-                            className="border-b border-slate-700 hover:bg-slate-800/50"
+                            className="border-b border-slate-700"
                           >
                             <td className="p-3">
                               <div>
@@ -682,7 +698,7 @@ export default function AdminPage() {
                     return (
                       <Card
                         key={purchase.purchase_id}
-                        className="rounded-sm border-slate-700 bg-background"
+                        className="rounded-sm border-slate-700 bg-card/30 backdrop-blur-sm"
                       >
                         <CardContent className="p-4">
                           <div className="space-y-3">
@@ -782,7 +798,7 @@ export default function AdminPage() {
 
         {/* Email Dialog */}
         <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
-          <DialogContent className="rounded-sm border-slate-700 bg-background">
+          <DialogContent className="rounded-sm border-slate-700 bg-card/30 backdrop-blur-sm">
             <DialogHeader>
               <DialogTitle className="text-gray-100">
                 {selectedPurchase &&
@@ -836,7 +852,7 @@ export default function AdminPage() {
                     className="rounded-sm bg-background border-slate-700 text-gray-100 placeholder:text-gray-400"
                   />
                 </div>
-                <div className="bg-slate-800/50 p-4 rounded-sm border border-slate-700">
+                <div className="bg-card/50 backdrop-blur-sm p-4 rounded-sm border border-slate-700">
                   <h4 className="font-medium mb-2 text-gray-100">
                     Purchase Details
                   </h4>
@@ -857,7 +873,7 @@ export default function AdminPage() {
                   <Button
                     variant="outline"
                     onClick={() => setIsEmailDialogOpen(false)}
-                    className="rounded-sm border-slate-700 text-gray-100 hover:bg-slate-800"
+                    className="rounded-sm border-slate-700 text-gray-100 hover:bg-card/70"
                   >
                     Cancel
                   </Button>

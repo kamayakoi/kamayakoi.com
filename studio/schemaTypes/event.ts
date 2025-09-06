@@ -41,28 +41,6 @@ export default {
       validation: (Rule: Rule) => Rule.required(),
     },
     {
-      name: 'number',
-      title: 'Event Number',
-      type: 'string',
-      group: 'details',
-      description:
-        'Custom number for this event (used in parallax display). Supports formats like: S01, SCHOOL001, 016, ABC123',
-      validation: (Rule: Rule) =>
-        Rule.required()
-          .regex(/^[A-Za-z0-9]{1,20}$/, {
-            name: 'alphanumeric',
-            invert: false,
-          })
-          .custom((value: string) => {
-            // Ensure leading zeros are preserved by treating as string
-            if (value && /^0\d+$/.test(value)) {
-              // This is a string with leading zero - should be preserved
-              return true
-            }
-            return true
-          }),
-    },
-    {
       name: 'subtitle',
       title: 'Subtitle',
       type: 'string',

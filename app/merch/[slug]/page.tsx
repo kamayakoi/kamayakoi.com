@@ -17,11 +17,14 @@ async function ProductContent({ params }: Props) {
     notFound(); // Trigger 404 if product not found
   }
 
+  // Add slug to product for cart functionality
+  const productWithSlug = { ...product, slug };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow">
-        <ProductDetailContent product={product} />
+        <ProductDetailContent product={productWithSlug} />
       </main>
     </div>
   );
@@ -41,7 +44,6 @@ export async function generateStaticParams() {
   const products = await getAllProducts();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return products.map((product: any) => ({
-    slug:
-      typeof product.slug === "string" ? product.slug : product.slug?.current,
+    slug: typeof product.slug === "string" ? product.slug : product.slug?.current || '',
   }));
 }

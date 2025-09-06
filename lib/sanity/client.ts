@@ -5,7 +5,7 @@ export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: false, // Set to true for production
+  useCdn: false, // Always use direct API for consistency
 });
 
 export const config = {

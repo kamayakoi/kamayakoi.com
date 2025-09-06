@@ -34,7 +34,7 @@ export default function StoriesContentClient({
       <main>
         <div className="container mx-auto px-4 py-0 max-w-7xl">
           {/* Hero Section */}
-          <div className="relative pt-24 md:pt-32 mb-12">
+          <div className="relative pt-24 md:pt-32 mb-6">
             <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-white mb-6">
               Stories
             </h1>
@@ -50,7 +50,7 @@ export default function StoriesContentClient({
             <>
               {/* Featured Story */}
               {featuredStory && (
-                <section className="py-16 md:py-20 -mb-24">
+                <section className="py-8 md:py-8 -mb-16">
                   <div className="grid grid-cols-1 gap-8">
                     {/* Main Featured Story */}
                     <div className="w-full">
@@ -78,7 +78,7 @@ export default function StoriesContentClient({
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                           <div className="absolute top-4 left-4">
-                            <span className="px-3 py-1 bg-primary text-primary-foreground text-sm font-medium rounded-sm">
+                            <span className="px-3 py-1 bg-teal-600 text-teal-100 text-sm font-medium rounded-sm">
                               Featured
                             </span>
                           </div>
@@ -90,7 +90,7 @@ export default function StoriesContentClient({
                                 {featuredStory.title}
                               </h3>
                               {featuredStory.excerpt && (
-                                <p className="text-zinc-400 mb-4 line-clamp-2">
+                                <p className="text-zinc-400 mb-4 line-clamp-2 pr-6 max-w-[85%]">
                                   {featuredStory.excerpt}
                                 </p>
                               )}
@@ -183,7 +183,6 @@ export default function StoriesContentClient({
                               className="inline-flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
                             >
                               Read
-                              <span>→</span>
                             </Link>
                           </div>
                         </div>
@@ -215,6 +214,7 @@ export default function StoriesContentClient({
           )}
         </div>
       </main>
+      <div className="mt-12"></div>
       <Footer />
     </div>
   );

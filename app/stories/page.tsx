@@ -43,11 +43,7 @@ export const metadata: Metadata = {
 async function StoriesContent() {
   const allStories: Story[] = await getAllBlogPosts();
 
-  return (
-    <StoriesContentClient
-      allStories={allStories}
-    />
-  );
+  return <StoriesContentClient allStories={allStories} />;
 }
 
 export default async function StoriesPage() {

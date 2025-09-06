@@ -18,7 +18,7 @@ export async function sendEmail(formData: FormData) {
         const response = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+            Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -58,7 +58,7 @@ export async function sendEmail(formData: FormData) {
       const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -74,7 +74,7 @@ export async function sendEmail(formData: FormData) {
               <hr>
               <p><strong>Message:</strong></p>
               <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 10px 0;">
-                ${message.replace(/\n/g, '<br>')}
+                ${message.replace(/\n/g, "<br>")}
               </div>
             </div>
           `,

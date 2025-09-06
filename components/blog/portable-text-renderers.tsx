@@ -258,7 +258,9 @@ export const portableTextRenderers: Partial<PortableTextReactComponents> = {
   },
   block: {
     normal: ({ children }) => (
-      <p className="my-5 leading-relaxed text-base md:text-lg break-words overflow-wrap-anywhere">{children}</p>
+      <p className="my-5 leading-relaxed text-base md:text-lg break-words overflow-wrap-anywhere">
+        {children}
+      </p>
     ),
     h1: ({ children }) => (
       <h1 className="text-3xl md:text-4xl font-bold text-primary mt-10 mb-5 pb-2 border-b border-border break-words overflow-wrap-anywhere">
@@ -276,7 +278,9 @@ export const portableTextRenderers: Partial<PortableTextReactComponents> = {
       </h3>
     ),
     h4: ({ children }) => (
-      <h4 className="text-lg md:text-xl font-semibold mt-6 mb-2 break-words overflow-wrap-anywhere">{children}</h4>
+      <h4 className="text-lg md:text-xl font-semibold mt-6 mb-2 break-words overflow-wrap-anywhere">
+        {children}
+      </h4>
     ),
     blockquote: ({ children }) => (
       <blockquote className="border-l-4 border-primary/80 pl-5 italic text-zinc-600 dark:text-zinc-300 my-6 py-3 bg-zinc-50 dark:bg-zinc-800/40 rounded-r-sm shadow break-words overflow-wrap-anywhere">
@@ -308,10 +312,14 @@ export const portableTextRenderers: Partial<PortableTextReactComponents> = {
   },
   listItem: {
     bullet: ({ children }) => (
-      <li className="pl-1 leading-relaxed break-words overflow-wrap-anywhere">{children}</li>
+      <li className="pl-1 leading-relaxed break-words overflow-wrap-anywhere">
+        {children}
+      </li>
     ),
     number: ({ children }) => (
-      <li className="pl-1 leading-relaxed break-words overflow-wrap-anywhere">{children}</li>
+      <li className="pl-1 leading-relaxed break-words overflow-wrap-anywhere">
+        {children}
+      </li>
     ),
     customList: ({ children }) => (
       <li className="relative pl-1 leading-relaxed break-words overflow-wrap-anywhere before:content-['▸'] before:absolute before:left-[-1.2em] before:text-primary before:font-bold">

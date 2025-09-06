@@ -39,13 +39,13 @@ export type UpdateType = "plus" | "minus" | "delete";
 
 type CartAction =
   | {
-    type: "UPDATE_ITEM";
-    payload: { merchandiseId: string; nextQuantity: number };
-  }
+      type: "UPDATE_ITEM";
+      payload: { merchandiseId: string; nextQuantity: number };
+    }
   | {
-    type: "ADD_ITEM";
-    payload: { product: SanityProduct; previousQuantity: number };
-  };
+      type: "ADD_ITEM";
+      payload: { product: SanityProduct; previousQuantity: number };
+    };
 
 type UseCartReturn = {
   isPending: boolean;
@@ -157,39 +157,39 @@ function cartReducer(state: Cart | undefined, action: CartAction): Cart {
 
       const updatedLines = existingItem
         ? currentCart.lines.map((item) => {
-          if (item.product._id !== product._id) return item;
+            if (item.product._id !== product._id) return item;
 
-          const newTotalAmount = calculateItemCost(
-            targetQuantity,
-            item.product.price,
-          );
+            const newTotalAmount = calculateItemCost(
+              targetQuantity,
+              item.product.price,
+            );
 
-          return {
-            ...item,
-            quantity: targetQuantity,
-            cost: {
-              ...item.cost,
-              totalAmount: {
-                ...item.cost.totalAmount,
-                amount: newTotalAmount,
+            return {
+              ...item,
+              quantity: targetQuantity,
+              cost: {
+                ...item.cost,
+                totalAmount: {
+                  ...item.cost.totalAmount,
+                  amount: newTotalAmount,
+                },
               },
-            },
-          } satisfies CartItem;
-        })
+            } satisfies CartItem;
+          })
         : [
-          {
-            id: `temp-${Date.now()}`,
-            quantity: targetQuantity,
-            product: product,
-            cost: {
-              totalAmount: {
-                amount: calculateItemCost(targetQuantity, product.price),
-                currencyCode: "XOF",
+            {
+              id: `temp-${Date.now()}`,
+              quantity: targetQuantity,
+              product: product,
+              cost: {
+                totalAmount: {
+                  amount: calculateItemCost(targetQuantity, product.price),
+                  currencyCode: "XOF",
+                },
               },
-            },
-          } satisfies CartItem,
-          ...currentCart.lines,
-        ];
+            } satisfies CartItem,
+            ...currentCart.lines,
+          ];
 
       return {
         ...currentCart,

@@ -56,7 +56,7 @@ export function MusicProvider({
   children,
   tracks,
   audioPlayerEnabled = true,
-  autoPlayMusic = false
+  autoPlayMusic = false,
 }: MusicProviderProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);

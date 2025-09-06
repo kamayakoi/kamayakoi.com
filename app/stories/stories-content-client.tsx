@@ -12,7 +12,9 @@ import { Card, CardContent } from "@/components/ui/card";
 interface Category {
   _id: string;
   title: string;
-  slug: string;
+  slug: {
+    current: string;
+  };
   color?: string;
 }
 
@@ -64,7 +66,7 @@ function StoryCard({ story }: { story: Story }) {
       green: { bg: "bg-green-600", text: "text-white" },
       blue: { bg: "bg-blue-600", text: "text-white" },
     };
-    return colorMap[color || 'teal'] || colorMap.teal;
+    return colorMap[color || "teal"] || colorMap.teal;
   };
 
   return (
@@ -124,9 +126,7 @@ function StoryCard({ story }: { story: Story }) {
                 {story.author && <span className="mx-1">·</span>}
               </>
             )}
-            {story.author && (
-              <span>{story.author.name}</span>
-            )}
+            {story.author && <span>{story.author.name}</span>}
           </div>
           <Link
             href={`/stories/${story.slug.current}`}

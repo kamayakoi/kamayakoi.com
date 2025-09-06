@@ -68,7 +68,10 @@ export default function Header() {
 
       <div className={styles.headerContent}>
         {/* Empty space for both mobile and desktop - adjusted for MiniAudioPlayer */}
-        <div className="flex items-center" style={{ width: audioPlayerEnabled ? "140px" : "20px" }}></div>
+        <div
+          className="flex items-center"
+          style={{ width: audioPlayerEnabled ? "140px" : "20px" }}
+        ></div>
 
         <nav className="hidden md:flex items-center gap-6">
           {navItems.map((item: NavItem) => {

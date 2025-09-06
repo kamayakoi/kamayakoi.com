@@ -39,11 +39,11 @@ function ProductDetail({ product }: ProductDetailContentProps) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: typeof product.name === 'string' ? product.name : "Product",
+          title: typeof product.name === "string" ? product.name : "Product",
           url: window.location.href,
         });
       } catch (err) {
-        console.log('Error sharing:', err);
+        console.log("Error sharing:", err);
       }
     } else {
       // Fallback: copy to clipboard
@@ -66,7 +66,9 @@ function ProductDetail({ product }: ProductDetailContentProps) {
               <div className="flex-1 min-h-[350px] relative overflow-hidden rounded-sm bg-muted shadow-2xl">
                 <Image
                   src={image}
-                  alt={typeof product.name === 'string' ? product.name : "Product"}
+                  alt={
+                    typeof product.name === "string" ? product.name : "Product"
+                  }
                   fill
                   className="object-cover"
                   quality={100}
@@ -90,16 +92,19 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                     <motion.button
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
-                      className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all duration-300 ${selectedImageIndex === index
-                        ? "ring-2 ring-primary shadow-lg scale-105"
-                        : "hover:ring-2 hover:ring-muted-foreground/50 hover:shadow-md"
-                        }`}
-                      whileHover={{ scale: selectedImageIndex === index ? 1.05 : 1.02 }}
+                      className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all duration-300 ${
+                        selectedImageIndex === index
+                          ? "ring-2 ring-primary shadow-lg scale-105"
+                          : "hover:ring-2 hover:ring-muted-foreground/50 hover:shadow-md"
+                      }`}
+                      whileHover={{
+                        scale: selectedImageIndex === index ? 1.05 : 1.02,
+                      }}
                       whileTap={{ scale: 0.98 }}
                     >
                       <Image
                         src={thumbnailImage}
-                        alt={`${typeof product.name === 'string' ? product.name : "Product"} view ${index + 1}`}
+                        alt={`${typeof product.name === "string" ? product.name : "Product"} view ${index + 1}`}
                         fill
                         className="object-cover"
                         quality={80}
@@ -126,7 +131,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
-                {typeof product.name === 'string' ? product.name : "Product"}
+                {typeof product.name === "string" ? product.name : "Product"}
               </motion.h1>
 
               <div className="flex justify-start">
@@ -137,7 +142,9 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                   transition={{ duration: 0.5, delay: 0.4 }}
                 >
                   {typeof product.price === "number"
-                    ? product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+                    ? product.price
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
                     : "0"}{" "}
                   F CFA
                 </motion.p>
@@ -157,10 +164,13 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                     {t(currentLanguage, "merchPage.productDetail.description")}
                   </h3>
                   {product.stock !== undefined && (
-                    <div className={`px-4 py-2 rounded-sm text-sm font-medium ${typeof product.stock === "number" && product.stock > 0
-                      ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                      : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                      }`}>
+                    <div
+                      className={`px-4 py-2 rounded-sm text-sm font-medium ${
+                        typeof product.stock === "number" && product.stock > 0
+                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                          : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                      }`}
+                    >
                       {typeof product.stock === "number" && product.stock > 0
                         ? `${product.stock} in stock`
                         : "Out of Stock"}
@@ -169,11 +179,12 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 </div>
                 <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
                   <p>
-                    {typeof product.description === 'string'
+                    {typeof product.description === "string"
                       ? product.description
-                      : (Array.isArray(product.description) && product.description[0]?.children?.[0]?.text)
+                      : Array.isArray(product.description) &&
+                          product.description[0]?.children?.[0]?.text
                         ? product.description[0].children[0].text
-                        : 'No description available'}
+                        : "No description available"}
                   </p>
                 </div>
               </motion.div>
@@ -230,9 +241,14 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                           {t(currentLanguage, "merchPage.productDetail.total")}
                         </span>
                         <span className="text-xl font-bold text-primary">
-                          {((typeof product.price === "number" ? product.price : 0) * quantity)
+                          {(
+                            (typeof product.price === "number"
+                              ? product.price
+                              : 0) * quantity
+                          )
                             .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")} F CFA
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+                          F CFA
                         </span>
                       </div>
                     </div>
@@ -263,12 +279,21 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                   }}
                 >
                   <Heart
-                    className={`mr-2 h-4 w-4 ${isInWishlist(product._id) ? "fill-red-500 text-red-500" : ""
-                      }`}
+                    className={`mr-2 h-4 w-4 ${
+                      isInWishlist(product._id)
+                        ? "fill-red-500 text-red-500"
+                        : ""
+                    }`}
                   />
                   {isInWishlist(product._id)
-                    ? t(currentLanguage, "merchPage.productDetail.removeFromWishlist") || "Remove from Wishlist"
-                    : t(currentLanguage, "merchPage.productDetail.addToWishlist")}
+                    ? t(
+                        currentLanguage,
+                        "merchPage.productDetail.removeFromWishlist",
+                      ) || "Remove from Wishlist"
+                    : t(
+                        currentLanguage,
+                        "merchPage.productDetail.addToWishlist",
+                      )}
                 </Button>
                 <Button
                   variant="outline"

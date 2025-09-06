@@ -25,7 +25,7 @@ const CartContainer = ({
 
 const CartItems = ({
   closeCart,
-  onProceedToCheckout
+  onProceedToCheckout,
 }: {
   closeCart: () => void;
   onProceedToCheckout: () => void;
@@ -114,7 +114,10 @@ export default function CartModal() {
     }
 
     // Only auto-open cart if items were added (not just quantity changes) and cart has items
-    if (serializedCart.current !== newSerializedCart && cart.totalQuantity > 0) {
+    if (
+      serializedCart.current !== newSerializedCart &&
+      cart.totalQuantity > 0
+    ) {
       serializedCart.current = newSerializedCart;
       // Open cart instantly when items are added
       setIsOpen(true);
@@ -176,7 +179,10 @@ export default function CartModal() {
     return showPurchaseForm ? (
       <CartPurchaseForm />
     ) : (
-      <CartItems closeCart={closeCart} onProceedToCheckout={() => setShowPurchaseForm(true)} />
+      <CartItems
+        closeCart={closeCart}
+        onProceedToCheckout={() => setShowPurchaseForm(true)}
+      />
     );
   };
 
@@ -270,7 +276,11 @@ export default function CartModal() {
   );
 }
 
-function CheckoutButton({ onProceedToCheckout }: { onProceedToCheckout: () => void }) {
+function CheckoutButton({
+  onProceedToCheckout,
+}: {
+  onProceedToCheckout: () => void;
+}) {
   const { pending } = useFormStatus();
   const { cart, isPending } = useCart();
 

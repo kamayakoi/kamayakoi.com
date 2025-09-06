@@ -15,10 +15,12 @@ interface ShowcaseEvent {
   };
   date?: string;
   time?: string;
-  location?: string | {
-    venueName?: string;
-    address?: string;
-  };
+  location?:
+    | string
+    | {
+        venueName?: string;
+        address?: string;
+      };
   flyer: {
     url: string;
   };
@@ -39,28 +41,29 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
     {
       day: "numeric",
       month: "short",
-    }
+    },
   );
 
   const mainImage = event.flyer?.url || "/placeholder.webp";
-  const hasValidImage = mainImage && mainImage.trim() !== "" && mainImage !== "/placeholder.webp";
+  const hasValidImage =
+    mainImage && mainImage.trim() !== "" && mainImage !== "/placeholder.webp";
 
   // Month color system - one color per month
   const getMonthColor = (date: Date) => {
     const month = date.getMonth();
     const colorMap: Record<number, { bg: string; text: string }> = {
-      0: { bg: "bg-red-600", text: "text-white" },     // January
-      1: { bg: "bg-amber-600", text: "text-white" },   // February
-      2: { bg: "bg-yellow-600", text: "text-white" },  // March
-      3: { bg: "bg-cyan-600", text: "text-white" },    // April
-      4: { bg: "bg-teal-600", text: "text-white" },    // May
-      5: { bg: "bg-sky-600", text: "text-white" },     // June
-      6: { bg: "bg-purple-600", text: "text-white" },  // July
-      7: { bg: "bg-pink-600", text: "text-white" },    // August
-      8: { bg: "bg-indigo-600", text: "text-white" },  // September
-      9: { bg: "bg-orange-600", text: "text-white" },  // October
+      0: { bg: "bg-red-600", text: "text-white" }, // January
+      1: { bg: "bg-amber-600", text: "text-white" }, // February
+      2: { bg: "bg-yellow-600", text: "text-white" }, // March
+      3: { bg: "bg-cyan-600", text: "text-white" }, // April
+      4: { bg: "bg-teal-600", text: "text-white" }, // May
+      5: { bg: "bg-sky-600", text: "text-white" }, // June
+      6: { bg: "bg-purple-600", text: "text-white" }, // July
+      7: { bg: "bg-pink-600", text: "text-white" }, // August
+      8: { bg: "bg-indigo-600", text: "text-white" }, // September
+      9: { bg: "bg-orange-600", text: "text-white" }, // October
       10: { bg: "bg-emerald-600", text: "text-white" }, // November
-      11: { bg: "bg-green-600", text: "text-white" },  // December
+      11: { bg: "bg-green-600", text: "text-white" }, // December
     };
     return colorMap[month] || { bg: "bg-blue-600", text: "text-white" };
   };
@@ -105,7 +108,9 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
         <div className="flex items-center justify-between pt-2">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {formattedDate && eventDate && (
-              <span className={`px-2 py-1 text-xs font-medium rounded-sm ${getMonthColor(eventDate).bg} ${getMonthColor(eventDate).text}`}>
+              <span
+                className={`px-2 py-1 text-xs font-medium rounded-sm ${getMonthColor(eventDate).bg} ${getMonthColor(eventDate).text}`}
+              >
                 {formattedDate}
               </span>
             )}

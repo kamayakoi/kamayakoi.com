@@ -46,7 +46,11 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
         <div
           onClick={handleWishlistToggle}
           className="absolute top-2 right-2 z-10 cursor-pointer p-1.5 rounded-sm bg-black/10 hover:bg-black/20 text-white/70 hover:text-white transition-all"
-          aria-label={isInWishlist(product._id) ? "Remove from wishlist" : "Add to wishlist"}
+          aria-label={
+            isInWishlist(product._id)
+              ? "Remove from wishlist"
+              : "Add to wishlist"
+          }
         >
           <Heart
             className={`h-6 w-6 ${isInWishlist(product._id) ? "fill-red-500 text-red-500" : ""}`}
@@ -97,7 +101,6 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
               : product.description?.[0]?.children?.[0]?.text || ''}
           </p>
         )} */}
-
 
         <div className="flex items-center justify-between pt-2">
           <span className="text-sm font-semibold">

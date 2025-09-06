@@ -260,7 +260,6 @@ export async function getBlogPostBySlug(slug: string) {
   return post;
 }
 
-
 // Get related posts (posts with same tags or categories)
 export async function getRelatedPosts(
   currentSlug: string,
@@ -347,7 +346,6 @@ export async function getRelatedPosts(
   );
 }
 
-
 export async function getStory() {
   return client.fetch(
     `*[_type == "story"][0]{
@@ -364,7 +362,8 @@ export async function getStory() {
 
 // Products (New Section)
 export async function getAllProducts() {
-  return client.fetch(`
+  return client.fetch(
+    `
     *[_type == "product"] | order(name asc) {
       _id,
       name,
@@ -401,7 +400,10 @@ export async function getAllProducts() {
         caption
       }
     }
-  `, {}, getCacheConfig(["products"]));
+  `,
+    {},
+    getCacheConfig(["products"]),
+  );
 }
 
 export async function getProductBySlug(slug: string) {
@@ -521,11 +523,12 @@ export interface HomepageAudioSettings {
 }
 
 // Fetch music tracks and audio settings from the singleton homepage document
-export const getHomepageMusicTracks = async (): Promise<HomepageAudioSettings> => {
-  try {
-    // Query the single document of type 'homepage'
-    // Select the music tracks with their audio files and cover images, plus audio settings
-    const query = `*[_type == "homepage"][0] {
+export const getHomepageMusicTracks =
+  async (): Promise<HomepageAudioSettings> => {
+    try {
+      // Query the single document of type 'homepage'
+      // Select the music tracks with their audio files and cover images, plus audio settings
+      const query = `*[_type == "homepage"][0] {
       audioPlayerEnabled,
       autoPlayMusic,
       "musicTracks": musicTracks[]{
@@ -536,40 +539,37 @@ export const getHomepageMusicTracks = async (): Promise<HomepageAudioSettings> =
       }
     }`;
 
-    const result = await client.fetch<{
-      audioPlayerEnabled?: boolean;
-      autoPlayMusic?: boolean;
-      musicTracks?: MusicTrack[];
-    }>(
-      query,
-      {},
-      getCacheConfig(["homepage", "music"]),
-    );
+      const result = await client.fetch<{
+        audioPlayerEnabled?: boolean;
+        autoPlayMusic?: boolean;
+        musicTracks?: MusicTrack[];
+      }>(query, {}, getCacheConfig(["homepage", "music"]));
 
-    // Handle case when no homepage document exists
-    if (!result) {
+      // Handle case when no homepage document exists
+      if (!result) {
+        return {
+          audioPlayerEnabled: true,
+          autoPlayMusic: false,
+          musicTracks: [],
+        };
+      }
+
+      return {
+        audioPlayerEnabled: result.audioPlayerEnabled ?? true,
+        autoPlayMusic: result.autoPlayMusic ?? false,
+        musicTracks:
+          result.musicTracks?.filter((track) => track.audioUrl) ?? [],
+      };
+    } catch (error) {
+      console.error("Error fetching homepage music tracks:", error);
+      // Return default values instead of throwing error to prevent app crash
       return {
         audioPlayerEnabled: true,
         autoPlayMusic: false,
         musicTracks: [],
       };
     }
-
-    return {
-      audioPlayerEnabled: result.audioPlayerEnabled ?? true,
-      autoPlayMusic: result.autoPlayMusic ?? false,
-      musicTracks: result.musicTracks?.filter((track) => track.audioUrl) ?? [],
-    };
-  } catch (error) {
-    console.error("Error fetching homepage music tracks:", error);
-    // Return default values instead of throwing error to prevent app crash
-    return {
-      audioPlayerEnabled: true,
-      autoPlayMusic: false,
-      musicTracks: [],
-    };
-  }
-};
+  };
 
 // ================================= Artists ================================
 
@@ -680,7 +680,6 @@ export interface HomepageHeroItem {
   videoUrl?: string;
   isActive: boolean;
 }
-
 
 // Interface for homepage data
 export interface HomepageData {

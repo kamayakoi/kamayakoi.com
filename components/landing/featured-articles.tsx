@@ -54,13 +54,15 @@ function ArticleCard({ article }: { article: FeaturedArticle }) {
   const mainImage = article.mainImage?.asset.url || "/placeholder.webp";
   const hasValidImage = mainImage && mainImage.trim() !== "";
 
-  const title = currentLanguage === "fr" && article.title_fr
-    ? article.title_fr
-    : article.title;
+  const title =
+    currentLanguage === "fr" && article.title_fr
+      ? article.title_fr
+      : article.title;
 
-  const excerpt = currentLanguage === "fr" && article.excerpt_fr
-    ? article.excerpt_fr
-    : article.excerpt;
+  const excerpt =
+    currentLanguage === "fr" && article.excerpt_fr
+      ? article.excerpt_fr
+      : article.excerpt;
 
   // Category color system
   const getCategoryColor = (color?: string) => {
@@ -79,7 +81,7 @@ function ArticleCard({ article }: { article: FeaturedArticle }) {
       green: { bg: "bg-green-600", text: "text-white" },
       blue: { bg: "bg-blue-600", text: "text-white" },
     };
-    return colorMap[color || 'teal'] || colorMap.teal;
+    return colorMap[color || "teal"] || colorMap.teal;
   };
 
   return (
@@ -134,14 +136,12 @@ function ArticleCard({ article }: { article: FeaturedArticle }) {
                 <span
                   className={`px-2 py-1 text-xs font-medium rounded-sm ${getCategoryColor(article.categories[0].color).bg} ${getCategoryColor(article.categories[0].color).text}`}
                 >
-                  {article.categories[0]?.title || 'Category'}
+                  {article.categories[0]?.title || "Category"}
                 </span>
                 {article.author && <span className="mx-1">·</span>}
               </>
             )}
-            {article.author && (
-              <span>{article.author.name}</span>
-            )}
+            {article.author && <span>{article.author.name}</span>}
           </div>
           <Link
             href={`/stories/${article.slug.current}`}
@@ -169,7 +169,9 @@ export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
           <div>
             <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
               {t(currentLanguage, "eventShowcase.articles.title")}
-              <span className="text-white/60 mx-2 align-middle hidden md:inline">·</span>
+              <span className="text-white/60 mx-2 align-middle hidden md:inline">
+                ·
+              </span>
               <span className="text-white/70 font-normal text-xl md:text-2xl block md:inline-block transform -translate-y-0.25">
                 {t(currentLanguage, "eventShowcase.articles.subtitle")}
               </span>
@@ -180,11 +182,17 @@ export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
         {hasArticles ? (
           <>
             {/* Articles Grid with Horizontal Scroll */}
-            <div className={`mb-12 ${articles.length > 4 ? 'overflow-x-auto pb-4' : ''}`}>
-              <div className={`grid gap-6 ${articles.length > 4 ? 'grid-cols-1 md:grid-cols-4 lg:grid-cols-10' : 'grid-cols-1 md:grid-cols-4'} ${articles.length > 4 ? 'w-max' : ''}`}>
-                {articles.slice(0, Math.min(articles.length, 9)).map((article: FeaturedArticle) => (
-                  <ArticleCard key={article._id} article={article} />
-                ))}
+            <div
+              className={`mb-12 ${articles.length > 4 ? "overflow-x-auto pb-4" : ""}`}
+            >
+              <div
+                className={`grid gap-6 ${articles.length > 4 ? "grid-cols-1 md:grid-cols-4 lg:grid-cols-10" : "grid-cols-1 md:grid-cols-4"} ${articles.length > 4 ? "w-max" : ""}`}
+              >
+                {articles
+                  .slice(0, Math.min(articles.length, 9))
+                  .map((article: FeaturedArticle) => (
+                    <ArticleCard key={article._id} article={article} />
+                  ))}
 
                 {/* Show "View More" card as 10th card when exactly 10 articles, or when more than 10 */}
                 {articles.length >= 10 && (
@@ -206,10 +214,12 @@ export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
                       </h3>
                       <p className="text-sm text-muted-foreground text-center leading-relaxed">
                         {articles.length > 10
-                          ? (currentLanguage === "fr"
-                            ? `${articles.length - 9} article${articles.length - 9 > 1 ? 's' : ''} de plus`
-                            : `${articles.length - 9} more article${articles.length - 9 > 1 ? 's' : ''}`)
-                          : (currentLanguage === "fr" ? "Tous les articles" : "All articles")}
+                          ? currentLanguage === "fr"
+                            ? `${articles.length - 9} article${articles.length - 9 > 1 ? "s" : ""} de plus`
+                            : `${articles.length - 9} more article${articles.length - 9 > 1 ? "s" : ""}`
+                          : currentLanguage === "fr"
+                            ? "Tous les articles"
+                            : "All articles"}
                       </p>
                     </div>
                   </Link>
@@ -224,7 +234,10 @@ export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
               {t(currentLanguage, "eventShowcase.articles.comingSoon.title")}
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400 mb-6">
-              {t(currentLanguage, "eventShowcase.articles.comingSoon.description")}
+              {t(
+                currentLanguage,
+                "eventShowcase.articles.comingSoon.description",
+              )}
             </p>
           </div>
         )}

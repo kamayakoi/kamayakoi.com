@@ -8,7 +8,10 @@ interface MusicWrapperProps {
   audioSettings: HomepageAudioSettings;
 }
 
-export default function MusicWrapper({ children, audioSettings }: MusicWrapperProps) {
+export default function MusicWrapper({
+  children,
+  audioSettings,
+}: MusicWrapperProps) {
   // Render children wrapped in MusicProvider with audio settings
   return (
     <MusicProvider

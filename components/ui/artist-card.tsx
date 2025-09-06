@@ -16,7 +16,8 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
   const getSocialPlatform = (url?: string) => {
     if (!url) return null;
     if (url.includes("instagram.com")) return { name: "Instagram" };
-    if (url.includes("twitter.com") || url.includes("x.com")) return { name: "Twitter" };
+    if (url.includes("twitter.com") || url.includes("x.com"))
+      return { name: "Twitter" };
     if (url.includes("soundcloud.com")) return { name: "SoundCloud" };
     if (url.includes("youtube.com")) return { name: "YouTube" };
     return { name: "Social" };
@@ -29,17 +30,47 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
 
     switch (role) {
       case "host":
-        return { label: "HOST", variant: "default" as const, className: "bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600" };
+        return {
+          label: "HOST",
+          variant: "default" as const,
+          className:
+            "bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600",
+        };
       case "mc":
-        return { label: "MC", variant: "default" as const, className: "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600" };
+        return {
+          label: "MC",
+          variant: "default" as const,
+          className:
+            "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600",
+        };
       case "producer":
-        return { label: "PRODUCER", variant: "default" as const, className: "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600" };
+        return {
+          label: "PRODUCER",
+          variant: "default" as const,
+          className:
+            "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600",
+        };
       case "dj":
-        return { label: "DJ", variant: "default" as const, className: "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600" };
+        return {
+          label: "DJ",
+          variant: "default" as const,
+          className:
+            "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600",
+        };
       case "resident":
-        return { label: "RESIDENT", variant: "default" as const, className: "bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600" };
+        return {
+          label: "RESIDENT",
+          variant: "default" as const,
+          className:
+            "bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600",
+        };
       case "artist":
-        return { label: "ARTIST", variant: "default" as const, className: "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600" };
+        return {
+          label: "ARTIST",
+          variant: "default" as const,
+          className:
+            "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600",
+        };
       default:
         return null;
     }

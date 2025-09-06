@@ -2,7 +2,15 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Play, Pause, Ticket, Volume2, VolumeX } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  Pause,
+  Ticket,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
 import { Button } from "@/components/ui/button";
@@ -108,75 +116,87 @@ export function HeroSection({
   // Convert Sanity hero items to ContentItem format
   const sanityContent: ContentItem[] = sanityHeroItems
     ? sanityHeroItems
-      .filter((item) => item.isActive)
-      .map((item) => ({
-        id: item._key,
-        type: item.type,
-        src: item.type === "image" && item.image?.asset?.url ? item.image.asset.url : "",
-        videoUrl:
-          item.type === "video"
-            ? (item.video?.asset?.url || item.videoUrl || "")
-            : undefined,
-        title: item.title,
-        description: item.description,
-        thumbnail:
-          item.type === "video" && item.image?.asset?.url
-            ? item.image.asset.url
-            : undefined,
-      }))
+        .filter((item) => item.isActive)
+        .map((item) => ({
+          id: item._key,
+          type: item.type,
+          src:
+            item.type === "image" && item.image?.asset?.url
+              ? item.image.asset.url
+              : "",
+          videoUrl:
+            item.type === "video"
+              ? item.video?.asset?.url || item.videoUrl || ""
+              : undefined,
+          title: item.title,
+          description: item.description,
+          thumbnail:
+            item.type === "video" && item.image?.asset?.url
+              ? item.image.asset.url
+              : undefined,
+        }))
     : [];
 
   // Convert featured events to ContentItem format
   const featuredEventItems: ContentItem[] = featuredEvents
     ? featuredEvents.map((event) => {
-      // Select description based on current language
-      const description = event.description
-        ? event.description[currentLanguage as keyof typeof event.description] || event.description.en || event.description.fr
-        : undefined;
+        // Select description based on current language
+        const description = event.description
+          ? event.description[
+              currentLanguage as keyof typeof event.description
+            ] ||
+            event.description.en ||
+            event.description.fr
+          : undefined;
 
-      return {
-        id: event._id,
-        type: "event",
-        src: event.flyer?.url || "",
-        title: event.title,
-        description: description,
-        slug: event.slug,
-        date: event.date,
-        publishedAt: event.date, // Use date as publishedAt for events
-        ticketsAvailable: event.ticketsAvailable,
-      };
-    })
+        return {
+          id: event._id,
+          type: "event",
+          src: event.flyer?.url || "",
+          title: event.title,
+          description: description,
+          slug: event.slug,
+          date: event.date,
+          publishedAt: event.date, // Use date as publishedAt for events
+          ticketsAvailable: event.ticketsAvailable,
+        };
+      })
     : [];
 
   // Convert highlighted content to ContentItem format
   const highlightedItems: ContentItem[] = highlightedContent
     ? highlightedContent.slice(0, 15).map((item) => {
-      // Ensure we have a valid src - prioritize image for display, videoUrl for videos
-      let src = "";
-      if (item.type === "video" && item.videoUrl) {
-        src = item.videoUrl;
-      } else if (item.image) {
-        src = item.image;
-      } else if (item.videoUrl) {
-        src = item.videoUrl;
-      }
+        // Ensure we have a valid src - prioritize image for display, videoUrl for videos
+        let src = "";
+        if (item.type === "video" && item.videoUrl) {
+          src = item.videoUrl;
+        } else if (item.image) {
+          src = item.image;
+        } else if (item.videoUrl) {
+          src = item.videoUrl;
+        }
 
-      return {
-        id: item._id,
-        type: item.type === "video" ? "video" : item.type === "event" ? "event" : "image", // Normalize type for hero display
-        src: src,
-        title: item.title,
-        description: item.description,
-        thumbnail: item.image,
-        slug: item.slug,
-        author: item.author,
-        artist: item.artist,
-        date: item.date,
-        publishedAt: item.publishedAt,
-        videoUrl: item.videoUrl,
-        ticketsAvailable: item.type === "event" ? true : undefined, // Assume tickets are available for events
-      };
-    })
+        return {
+          id: item._id,
+          type:
+            item.type === "video"
+              ? "video"
+              : item.type === "event"
+                ? "event"
+                : "image", // Normalize type for hero display
+          src: src,
+          title: item.title,
+          description: item.description,
+          thumbnail: item.image,
+          slug: item.slug,
+          author: item.author,
+          artist: item.artist,
+          date: item.date,
+          publishedAt: item.publishedAt,
+          videoUrl: item.videoUrl,
+          ticketsAvailable: item.type === "event" ? true : undefined, // Assume tickets are available for events
+        };
+      })
     : [];
 
   // Combine all content sources with priority: highlighted > events first + sanity > props > defaults
@@ -388,10 +408,13 @@ export function HeroSection({
 
             {/* Show description for all content, smaller for events */}
             {currentItem.description && (
-              <p className={`font-light tracking-wide text-white/90 mb-8 drop-shadow-md ${currentItem.type === "event"
-                ? "text-sm sm:text-base md:text-lg opacity-95"
-                : "text-lg sm:text-xl md:text-2xl"
-                }`}>
+              <p
+                className={`font-light tracking-wide text-white/90 mb-8 drop-shadow-md ${
+                  currentItem.type === "event"
+                    ? "text-sm sm:text-base md:text-lg opacity-95"
+                    : "text-lg sm:text-xl md:text-2xl"
+                }`}
+              >
                 {currentItem.description}
               </p>
             )}
@@ -429,11 +452,14 @@ export function HeroSection({
               {/* Show publishedAt for non-events only (events use date field) */}
               {currentItem.type !== "event" && currentItem.publishedAt && (
                 <p className="text-white/70 text-sm">
-                  {new Date(currentItem.publishedAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  {new Date(currentItem.publishedAt).toLocaleDateString(
+                    "en-US",
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    },
+                  )}
                 </p>
               )}
             </div>
@@ -441,21 +467,29 @@ export function HeroSection({
             {/* Action buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-start items-start">
               {/* Play/Pause button for videos */}
-              {(currentItem.type === "video" || currentItem.type === "media") && (
+              {(currentItem.type === "video" ||
+                currentItem.type === "media") && (
                 <button
                   onClick={togglePlayPause}
-                  className={`p-4 rounded-sm border-2 transition-all duration-300 ${showControls ? "opacity-100 scale-100" : "opacity-0 scale-95"
-                    } ${isPlaying
+                  className={`p-4 rounded-sm border-2 transition-all duration-300 ${
+                    showControls
+                      ? "opacity-100 scale-100"
+                      : "opacity-0 scale-95"
+                  } ${
+                    isPlaying
                       ? "bg-white/20 border-white text-white hover:bg-white/30"
                       : "bg-white border-white text-white hover:bg-white/90"
-                    }`}
+                  }`}
                   aria-label={
                     isPlaying
                       ? t(
-                        currentLanguage,
-                        "eventShowcase.hero.actions.pauseVideo",
-                      )
-                      : t(currentLanguage, "eventShowcase.hero.actions.playVideo")
+                          currentLanguage,
+                          "eventShowcase.hero.actions.pauseVideo",
+                        )
+                      : t(
+                          currentLanguage,
+                          "eventShowcase.hero.actions.playVideo",
+                        )
                   }
                 >
                   {isPlaying ? (
@@ -467,26 +501,33 @@ export function HeroSection({
               )}
 
               {/* Navigation buttons for non-event content with links */}
-              {(currentItem.slug || currentItem.videoUrl) && currentItem.type !== "event" && (
-                <button
-                  onClick={() => {
-                    if (currentItem.type === "article" && currentItem.slug) {
-                      window.location.href = `/stories/${currentItem.slug}`;
-                    } else if (
-                      currentItem.type === "media" &&
-                      currentItem.videoUrl
-                    ) {
-                      window.open(currentItem.videoUrl, "_blank");
-                    }
-                  }}
-                  className="px-6 py-3 bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 rounded-sm transition-all duration-300"
-                >
-                  {currentItem.type === "article" &&
-                    t(currentLanguage, "eventShowcase.hero.actions.readArticle")}
-                  {currentItem.type === "media" &&
-                    t(currentLanguage, "eventShowcase.hero.actions.watchMedia")}
-                </button>
-              )}
+              {(currentItem.slug || currentItem.videoUrl) &&
+                currentItem.type !== "event" && (
+                  <button
+                    onClick={() => {
+                      if (currentItem.type === "article" && currentItem.slug) {
+                        window.location.href = `/stories/${currentItem.slug}`;
+                      } else if (
+                        currentItem.type === "media" &&
+                        currentItem.videoUrl
+                      ) {
+                        window.open(currentItem.videoUrl, "_blank");
+                      }
+                    }}
+                    className="px-6 py-3 bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 rounded-sm transition-all duration-300"
+                  >
+                    {currentItem.type === "article" &&
+                      t(
+                        currentLanguage,
+                        "eventShowcase.hero.actions.readArticle",
+                      )}
+                    {currentItem.type === "media" &&
+                      t(
+                        currentLanguage,
+                        "eventShowcase.hero.actions.watchMedia",
+                      )}
+                  </button>
+                )}
             </div>
           </div>
         </div>
@@ -613,10 +654,11 @@ export function HeroSection({
                 console.log("Dot clicked:", index);
                 goToIndex(index);
               }}
-              className={`w-3 h-1.5 rounded-sm transition-all duration-200 cursor-pointer ${index === currentIndex
-                ? "bg-white scale-110"
-                : "bg-white/30 hover:bg-white/50"
-                }`}
+              className={`w-3 h-1.5 rounded-sm transition-all duration-200 cursor-pointer ${
+                index === currentIndex
+                  ? "bg-white scale-110"
+                  : "bg-white/30 hover:bg-white/50"
+              }`}
               aria-label={`Go to content ${index + 1}`}
             />
           ))}

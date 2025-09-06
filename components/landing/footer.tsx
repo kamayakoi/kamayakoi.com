@@ -32,10 +32,10 @@ function ContactForm({ onClose }: { onClose: () => void }) {
     try {
       // Construct proper FormData like newsletter subscription
       const contactData = new FormData();
-      contactData.append('email', formData.get('email') as string);
-      contactData.append('subject', 'New Contact Form Message');
-      contactData.append('message', formData.get('message') as string);
-      contactData.append('type', 'contact');
+      contactData.append("email", formData.get("email") as string);
+      contactData.append("subject", "New Contact Form Message");
+      contactData.append("message", formData.get("message") as string);
+      contactData.append("type", "contact");
 
       const result = await sendEmail(contactData);
 
@@ -111,7 +111,9 @@ function ContactForm({ onClose }: { onClose: () => void }) {
 export function Footer() {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isNewsletterFocused, setIsNewsletterFocused] = useState(false);
-  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [newsletterStatus, setNewsletterStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const { currentLanguage } = useTranslation();
 
   return (
@@ -310,42 +312,48 @@ export function Footer() {
               <motion.div
                 className="flex items-center"
                 animate={{
-                  width: isNewsletterFocused ? "180px" : "130px"
+                  width: isNewsletterFocused ? "180px" : "130px",
                 }}
                 transition={{
                   duration: 0.4,
                   ease: [0.4, 0.0, 0.2, 1],
-                  type: "tween"
+                  type: "tween",
                 }}
-                style={{ justifyContent: 'flex-end' }}
+                style={{ justifyContent: "flex-end" }}
               >
                 <motion.form
                   onSubmit={async (e) => {
                     e.preventDefault();
                     const formData = new FormData(e.target as HTMLFormElement);
-                    const email = formData.get('email') as string;
+                    const email = formData.get("email") as string;
 
                     if (!email) return;
 
-                    setNewsletterStatus('loading');
+                    setNewsletterStatus("loading");
 
                     const newsletterData = new FormData();
-                    newsletterData.append('email', email);
-                    newsletterData.append('subject', 'New Newsletter Subscription');
-                    newsletterData.append('message', `New person subscribed to newsletter: ${email}`);
-                    newsletterData.append('type', 'newsletter');
+                    newsletterData.append("email", email);
+                    newsletterData.append(
+                      "subject",
+                      "New Newsletter Subscription",
+                    );
+                    newsletterData.append(
+                      "message",
+                      `New person subscribed to newsletter: ${email}`,
+                    );
+                    newsletterData.append("type", "newsletter");
 
                     const result = await sendEmail(newsletterData);
                     if (result.success) {
-                      setNewsletterStatus('success');
+                      setNewsletterStatus("success");
                       (e.target as HTMLFormElement).reset();
                       setIsNewsletterFocused(false);
                       // Reset status after 3 seconds
-                      setTimeout(() => setNewsletterStatus('idle'), 3000);
+                      setTimeout(() => setNewsletterStatus("idle"), 3000);
                     } else {
-                      setNewsletterStatus('error');
+                      setNewsletterStatus("error");
                       // Reset status after 3 seconds
-                      setTimeout(() => setNewsletterStatus('idle'), 3000);
+                      setTimeout(() => setNewsletterStatus("idle"), 3000);
                     }
                   }}
                   className="flex"
@@ -353,15 +361,18 @@ export function Footer() {
                   <motion.input
                     type="email"
                     name="email"
-                    placeholder={t(currentLanguage, "footer.newsletter.placeholder")}
+                    placeholder={t(
+                      currentLanguage,
+                      "footer.newsletter.placeholder",
+                    )}
                     required
                     animate={{
-                      x: isNewsletterFocused ? -45 : 0
+                      x: isNewsletterFocused ? -45 : 0,
                     }}
                     transition={{
                       duration: 0.4,
                       ease: [0.4, 0.0, 0.2, 1],
-                      type: "tween"
+                      type: "tween",
                     }}
                     onFocus={() => setIsNewsletterFocused(true)}
                     onBlur={() => {
@@ -380,25 +391,27 @@ export function Footer() {
                     transition={{
                       duration: 0.4,
                       ease: [0.4, 0.0, 0.2, 1],
-                      type: "tween"
+                      type: "tween",
                     }}
                     style={{
-                      pointerEvents: isNewsletterFocused ? 'auto' : 'none'
+                      pointerEvents: isNewsletterFocused ? "auto" : "none",
                     }}
-                    className={`px-2 py-1 rounded-sm text-xs font-medium transition-colors h-6 -ml-8 flex items-center justify-center min-w-[50px] ${isNewsletterFocused ? '' : 'invisible'
-                      } ${newsletterStatus === 'success'
-                        ? 'bg-green-800 text-green-100'
-                        : newsletterStatus === 'error'
-                          ? 'bg-red-800 text-red-100'
-                          : 'bg-teal-800 hover:bg-teal-700 text-teal-100'
-                      }`}
-                    disabled={newsletterStatus === 'loading'}
+                    className={`px-2 py-1 rounded-sm text-xs font-medium transition-colors h-6 -ml-8 flex items-center justify-center min-w-[50px] ${
+                      isNewsletterFocused ? "" : "invisible"
+                    } ${
+                      newsletterStatus === "success"
+                        ? "bg-green-800 text-green-100"
+                        : newsletterStatus === "error"
+                          ? "bg-red-800 text-red-100"
+                          : "bg-teal-800 hover:bg-teal-700 text-teal-100"
+                    }`}
+                    disabled={newsletterStatus === "loading"}
                   >
-                    {newsletterStatus === 'loading' ? (
+                    {newsletterStatus === "loading" ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : newsletterStatus === 'success' ? (
+                    ) : newsletterStatus === "success" ? (
                       <Check className="w-4 h-4" />
-                    ) : newsletterStatus === 'error' ? (
+                    ) : newsletterStatus === "error" ? (
                       <X className="w-4 h-4" />
                     ) : (
                       t(currentLanguage, "footer.newsletter.sendButton")

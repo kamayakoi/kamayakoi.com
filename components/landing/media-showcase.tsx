@@ -32,7 +32,7 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
     const patterns = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
       /youtube\.com\/embed\/([^&\n?#]+)/,
-      /youtube\.com\/v\/([^&\n?#]+)/
+      /youtube\.com\/v\/([^&\n?#]+)/,
     ];
 
     for (const pattern of patterns) {
@@ -42,14 +42,17 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
     return null;
   };
 
-
   // Extract dynamic thumbnail for YouTube (SoundCloud uses Sanity thumbnail)
   const getDynamicThumbnail = useMemo(() => {
     // First priority: Sanity thumbnail
     if (mediaItem.thumbnail) return mediaItem.thumbnail;
 
     // Second priority: YouTube thumbnail extraction
-    if (mediaItem.type === "youtube" || mediaItem.url.includes("youtube.com") || mediaItem.url.includes("youtu.be")) {
+    if (
+      mediaItem.type === "youtube" ||
+      mediaItem.url.includes("youtube.com") ||
+      mediaItem.url.includes("youtu.be")
+    ) {
       const videoId = extractYouTubeId(mediaItem.url);
       if (videoId) {
         return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
@@ -60,7 +63,8 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
   }, [mediaItem.thumbnail, mediaItem.type, mediaItem.url]);
 
   const mainImage = getDynamicThumbnail || "/placeholder.webp";
-  const hasValidImage = mainImage && mainImage.trim() !== "" && mainImage !== "/placeholder.webp";
+  const hasValidImage =
+    mainImage && mainImage.trim() !== "" && mainImage !== "/placeholder.webp";
 
   const handleMediaClick = () => {
     window.open(mediaItem.url, "_blank");
@@ -76,7 +80,7 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
           tabIndex={0}
           aria-label={`Play ${mediaItem.title}`}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
+            if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
               handleMediaClick();
             }
@@ -187,8 +191,12 @@ export function MediaShowcase({ media }: MediaShowcaseProps) {
         {hasMedia ? (
           <>
             {/* Media Grid with Horizontal Scroll */}
-            <div className={`mb-12 ${media.length > 4 ? 'overflow-x-auto pb-4' : ''}`}>
-              <div className={`grid gap-6 ${media.length > 4 ? 'grid-cols-1 md:grid-cols-4 lg:grid-cols-10' : 'grid-cols-1 md:grid-cols-4'} ${media.length > 4 ? 'w-max' : ''}`}>
+            <div
+              className={`mb-12 ${media.length > 4 ? "overflow-x-auto pb-4" : ""}`}
+            >
+              <div
+                className={`grid gap-6 ${media.length > 4 ? "grid-cols-1 md:grid-cols-4 lg:grid-cols-10" : "grid-cols-1 md:grid-cols-4"} ${media.length > 4 ? "w-max" : ""}`}
+              >
                 {media.slice(0, Math.min(media.length, 25)).map((mediaItem) => (
                   <MediaCard key={mediaItem._id} mediaItem={mediaItem} />
                 ))}
@@ -213,10 +221,12 @@ export function MediaShowcase({ media }: MediaShowcaseProps) {
                       </h3>
                       <p className="text-sm text-muted-foreground text-center leading-relaxed">
                         {media.length > 25
-                          ? (currentLanguage === "fr"
-                            ? `${media.length - 25} média${media.length - 25 > 1 ? 's' : ''} de plus`
-                            : `${media.length - 25} more media`)
-                          : (currentLanguage === "fr" ? "Tous les médias" : "All media")}
+                          ? currentLanguage === "fr"
+                            ? `${media.length - 25} média${media.length - 25 > 1 ? "s" : ""} de plus`
+                            : `${media.length - 25} more media`
+                          : currentLanguage === "fr"
+                            ? "Tous les médias"
+                            : "All media"}
                       </p>
                     </div>
                   </Link>

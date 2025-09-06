@@ -5,7 +5,12 @@ import { EventShowcase } from "@/components/landing/event-showcase";
 import { FeaturedArticles } from "@/components/landing/featured-articles";
 import { MediaShowcase } from "@/components/landing/media-showcase";
 import { Footer } from "@/components/landing/footer";
-import { getHomepageContent, getLatestEvents, getLatestBlogPosts, getMedia } from "@/lib/sanity/queries";
+import {
+  getHomepageContent,
+  getLatestEvents,
+  getLatestBlogPosts,
+  getMedia,
+} from "@/lib/sanity/queries";
 
 // Use the general site metadata for the home page
 export const metadata: Metadata = {
@@ -19,7 +24,7 @@ export default async function Home() {
     getHomepageContent(),
     getLatestEvents(6),
     getLatestBlogPosts(6),
-    getMedia(10)
+    getMedia(10),
   ]);
 
   return (

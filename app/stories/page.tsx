@@ -8,7 +8,9 @@ import StoriesContentClient from "./stories-content-client";
 interface Story {
   _id: string;
   title: string;
-  slug: string;
+  slug: {
+    current: string;
+  };
   publishedAt: string;
   excerpt?: string;
   mainImage?: {
@@ -26,7 +28,9 @@ interface Story {
   categories?: {
     _id: string;
     title: string;
-    slug: string;
+    slug: {
+      current: string;
+    };
   }[];
 }
 

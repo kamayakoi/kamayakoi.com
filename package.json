@@ -30,7 +30,7 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@sanity/icons": "^3.7.4",
     "@sanity/vision": "^3.99.0",
-    "@supabase/supabase-js": "^2.56.1",
+    "@supabase/supabase-js": "^2.57.2",
     "@vercel/analytics": "^1.5.0",
     "EffectComposer": "link:three/examples/jsm/postprocessing/EffectComposer",
     "balloons-js": "^0.0.3",
@@ -45,7 +45,7 @@
     "imagemin": "^9.0.1",
     "imagemin-jpegtran": "^8.0.0",
     "ldrs": "^1.1.7",
-    "lenis": "^1.3.10",
+    "lenis": "^1.3.11",
     "lomi.cli": "^2.0.4",
     "lucide-react": "^0.485.0",
     "next": "15.2.4",
@@ -69,21 +69,21 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.178.0",
-    "tw-animate-css": "^1.3.7"
+    "tw-animate-css": "^1.3.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
-    "@tailwindcss/postcss": "^4.1.12",
+    "@tailwindcss/postcss": "^4.1.13",
     "@types/imagemin": "^9.0.1",
     "@types/imagemin-jpegtran": "^5.0.4",
-    "@types/node": "^20.19.11",
+    "@types/node": "^20.19.13",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
     "@types/three": "^0.178.1",
-    "eslint": "^9.34.0",
+    "eslint": "^9.35.0",
     "eslint-config-next": "15.2.4",
-    "tailwindcss": "^4.1.12",
-    "tsx": "^4.19.3",
+    "tailwindcss": "^4.1.13",
+    "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }
 }

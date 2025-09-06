@@ -2,9 +2,10 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Pause, Ticket, Volume2, VolumeX } from "lucide-react";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
+import { Button } from "@/components/ui/button";
 
 // Define content item interface
 interface ContentItem {
@@ -23,6 +24,7 @@ interface ContentItem {
   date?: string;
   publishedAt?: string;
   videoUrl?: string;
+  ticketsAvailable?: boolean;
 }
 
 // Props interface
@@ -43,6 +45,22 @@ interface HeroSectionProps {
     };
     videoUrl?: string;
     isActive: boolean;
+  }[];
+  featuredEvents?: {
+    _id: string;
+    title: string;
+    slug: string;
+    date: string;
+    time?: string;
+    location?: string;
+    description?: {
+      en?: string;
+      fr?: string;
+    };
+    flyer?: {
+      url: string;
+    };
+    ticketsAvailable?: boolean;
   }[];
   highlightedContent?: {
     _id: string;
@@ -65,14 +83,16 @@ interface HeroSectionProps {
 export function HeroSection({
   contentItems = [],
   sanityHeroItems,
+  featuredEvents,
   highlightedContent,
 }: HeroSectionProps) {
   const { currentLanguage } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [showControls, setShowControls] = useState(false);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Default content items (fallback)
@@ -88,61 +108,83 @@ export function HeroSection({
   // Convert Sanity hero items to ContentItem format
   const sanityContent: ContentItem[] = sanityHeroItems
     ? sanityHeroItems
-        .filter((item) => item.isActive)
-        .map((item) => ({
-          id: item._key,
-          type: item.type,
-          src:
-            item.type === "image" && item.image?.asset?.url
-              ? item.image.asset.url
-              : item.video?.asset?.url
-                ? item.video.asset.url
-                : item.videoUrl || "",
-          title: item.title,
-          description: item.description,
-          thumbnail:
-            item.type === "video" && item.image?.asset?.url
-              ? item.image.asset.url
-              : undefined,
-        }))
+      .filter((item) => item.isActive)
+      .map((item) => ({
+        id: item._key,
+        type: item.type,
+        src: item.type === "image" && item.image?.asset?.url ? item.image.asset.url : "",
+        videoUrl:
+          item.type === "video"
+            ? (item.video?.asset?.url || item.videoUrl || "")
+            : undefined,
+        title: item.title,
+        description: item.description,
+        thumbnail:
+          item.type === "video" && item.image?.asset?.url
+            ? item.image.asset.url
+            : undefined,
+      }))
+    : [];
+
+  // Convert featured events to ContentItem format
+  const featuredEventItems: ContentItem[] = featuredEvents
+    ? featuredEvents.map((event) => {
+      // Select description based on current language
+      const description = event.description
+        ? (event.description as any)[currentLanguage] || (event.description as any)['en'] || (event.description as any)['fr']
+        : undefined;
+
+      return {
+        id: event._id,
+        type: "event",
+        src: event.flyer?.url || "",
+        title: event.title,
+        description: description,
+        slug: event.slug,
+        date: event.date,
+        publishedAt: event.date, // Use date as publishedAt for events
+        ticketsAvailable: event.ticketsAvailable,
+      };
+    })
     : [];
 
   // Convert highlighted content to ContentItem format
   const highlightedItems: ContentItem[] = highlightedContent
     ? highlightedContent.slice(0, 15).map((item) => {
-        // Ensure we have a valid src - prioritize image for display, videoUrl for videos
-        let src = "";
-        if (item.type === "video" && item.videoUrl) {
-          src = item.videoUrl;
-        } else if (item.image) {
-          src = item.image;
-        } else if (item.videoUrl) {
-          src = item.videoUrl;
-        }
+      // Ensure we have a valid src - prioritize image for display, videoUrl for videos
+      let src = "";
+      if (item.type === "video" && item.videoUrl) {
+        src = item.videoUrl;
+      } else if (item.image) {
+        src = item.image;
+      } else if (item.videoUrl) {
+        src = item.videoUrl;
+      }
 
-        return {
-          id: item._id,
-          type: item.type === "video" ? "video" : "image", // Normalize type for hero display
-          src: src,
-          title: item.title,
-          description: item.description,
-          thumbnail: item.image,
-          slug: item.slug,
-          author: item.author,
-          artist: item.artist,
-          date: item.date,
-          publishedAt: item.publishedAt,
-          videoUrl: item.videoUrl,
-        };
-      })
+      return {
+        id: item._id,
+        type: item.type === "video" ? "video" : item.type === "event" ? "event" : "image", // Normalize type for hero display
+        src: src,
+        title: item.title,
+        description: item.description,
+        thumbnail: item.image,
+        slug: item.slug,
+        author: item.author,
+        artist: item.artist,
+        date: item.date,
+        publishedAt: item.publishedAt,
+        videoUrl: item.videoUrl,
+        ticketsAvailable: item.type === "event" ? true : undefined, // Assume tickets are available for events
+      };
+    })
     : [];
 
-  // Combine all content sources with priority: highlighted > sanity > props > defaults
+  // Combine all content sources with priority: highlighted > events first + sanity > props > defaults
   const content =
     highlightedItems.length > 0
       ? highlightedItems
-      : sanityContent.length > 0
-        ? sanityContent
+      : sanityContent.length > 0 || featuredEventItems.length > 0
+        ? [...featuredEventItems, ...sanityContent] // Events come first
         : contentItems.length > 0
           ? contentItems
           : defaultContent;
@@ -153,14 +195,29 @@ export function HeroSection({
   useEffect(() => {
     if (currentItem?.type === "video" && videoRef.current) {
       if (isPlaying) {
-        videoRef.current.play().catch(() => {
-          // Handle play error silently
+        videoRef.current.play().catch((error) => {
+          console.log("Video autoplay failed:", error);
+          // Handle play error silently - browser may block autoplay
         });
       } else {
         videoRef.current.pause();
       }
     }
   }, [currentItem, isPlaying]);
+
+  // Set isPlaying to true when switching to a video
+  useEffect(() => {
+    if (currentItem?.type === "video") {
+      setIsPlaying(true);
+    }
+  }, [currentIndex, currentItem]);
+
+  // Keep video muted state in sync
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
 
   // Handle mouse movement to show/hide controls and navigation
   useEffect(() => {
@@ -244,13 +301,18 @@ export function HeroSection({
     setIsPlaying(!isPlaying);
   };
 
+  const toggleSound = () => {
+    const video = videoRef.current;
+    if (video) {
+      video.muted = !video.muted;
+      setIsMuted(video.muted);
+    }
+  };
+
   const renderContent = () => {
     if (currentItem.type === "video" || currentItem.type === "media") {
       // Handle video content (both video type and media with videoUrl)
-      const videoSrc =
-        currentItem.type === "video"
-          ? currentItem.src
-          : currentItem.videoUrl || currentItem.src;
+      const videoSrc = currentItem.videoUrl || currentItem.src;
 
       if (
         videoSrc &&
@@ -275,9 +337,9 @@ export function HeroSection({
         return (
           <video
             ref={videoRef}
-            autoPlay={isPlaying}
+            autoPlay
             loop
-            muted
+            muted={isMuted}
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
             src={videoSrc}
@@ -311,114 +373,197 @@ export function HeroSection({
         {renderContent()}
 
         {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-black/50" />
       </div>
 
-      {/* Content Overlay */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen">
-        <div className="text-center px-4 md:px-8 max-w-4xl mx-auto">
-          {currentItem.title && (
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-6 tracking-tight text-white drop-shadow-lg">
-              {currentItem.title}
-            </h1>
-          )}
+      {/* Content Overlay - Hidden for videos when playing */}
+      {!(currentItem.type === "video" && isPlaying) && (
+        <div className="relative z-10 flex items-start justify-start min-h-screen pt-20 md:pt-32 pl-5 md:pl-20">
+          <div className="text-left px-4 md:px-8 max-w-2xl">
+            {currentItem.title && (
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-6 tracking-tight text-white drop-shadow-lg">
+                {currentItem.title}
+              </h1>
+            )}
 
-          {currentItem.description && (
-            <p className="text-lg sm:text-xl md:text-2xl font-light tracking-wide text-white/90 mb-8 drop-shadow-md">
-              {currentItem.description}
-            </p>
-          )}
-
-          {/* Additional info based on content type */}
-          <div className="mb-8 space-y-2">
-            {currentItem.author && (
-              <p className="text-white/70 text-sm">
-                By {currentItem.author.name}
+            {/* Show description for all content, smaller for events */}
+            {currentItem.description && (
+              <p className={`font-light tracking-wide text-white/90 mb-8 drop-shadow-md ${currentItem.type === "event"
+                ? "text-sm sm:text-base md:text-lg opacity-95"
+                : "text-lg sm:text-xl md:text-2xl"
+                }`}>
+                {currentItem.description}
               </p>
             )}
-            {currentItem.artist && (
-              <p className="text-white/70 text-sm">{currentItem.artist}</p>
-            )}
-            {currentItem.date && (
-              <p className="text-white/70 text-sm">
-                {new Date(currentItem.date).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
-            )}
-            {currentItem.publishedAt && (
-              <p className="text-white/70 text-sm">
-                {new Date(currentItem.publishedAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
-            )}
-          </div>
 
-          {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            {/* Play/Pause button for videos */}
-            {(currentItem.type === "video" || currentItem.type === "media") && (
-              <button
-                onClick={togglePlayPause}
-                className={`p-4 rounded-sm border-2 transition-all duration-300 ${
-                  showControls ? "opacity-100 scale-100" : "opacity-0 scale-95"
-                } ${
-                  isPlaying
-                    ? "bg-white/20 border-white text-white hover:bg-white/30"
-                    : "bg-white border-white text-white hover:bg-white/90"
-                }`}
-                aria-label={
-                  isPlaying
-                    ? t(
+            {/* Additional info based on content type */}
+            <div className="mb-8 space-y-2">
+              {currentItem.author && (
+                <p className="text-white/70 text-sm">
+                  By {currentItem.author.name}
+                </p>
+              )}
+              {currentItem.artist && (
+                <p className="text-white/70 text-sm">{currentItem.artist}</p>
+              )}
+              {/* Show date for events right after title, for others in additional info */}
+              {currentItem.type === "event" && currentItem.date && (
+                <p className="text-white/80 text-sm">
+                  {new Date(currentItem.date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              )}
+              {/* Show date for non-events in additional info section */}
+              {currentItem.type !== "event" && currentItem.date && (
+                <p className="text-white/70 text-sm">
+                  {new Date(currentItem.date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              )}
+              {/* Show publishedAt for non-events only (events use date field) */}
+              {currentItem.type !== "event" && currentItem.publishedAt && (
+                <p className="text-white/70 text-sm">
+                  {new Date(currentItem.publishedAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              )}
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-start items-start">
+              {/* Play/Pause button for videos */}
+              {(currentItem.type === "video" || currentItem.type === "media") && (
+                <button
+                  onClick={togglePlayPause}
+                  className={`p-4 rounded-sm border-2 transition-all duration-300 ${showControls ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                    } ${isPlaying
+                      ? "bg-white/20 border-white text-white hover:bg-white/30"
+                      : "bg-white border-white text-white hover:bg-white/90"
+                    }`}
+                  aria-label={
+                    isPlaying
+                      ? t(
                         currentLanguage,
                         "eventShowcase.hero.actions.pauseVideo",
                       )
-                    : t(currentLanguage, "eventShowcase.hero.actions.playVideo")
-                }
-              >
-                {isPlaying ? (
-                  <Pause className="w-6 h-6" />
-                ) : (
-                  <Play className="w-6 h-6 ml-1" />
-                )}
-              </button>
-            )}
-
-            {/* Navigation buttons for content with links */}
-            {((currentItem.type === "article" && currentItem.slug) ||
-              (currentItem.type === "event" && currentItem.slug) ||
-              currentItem.type === "media") && (
-              <button
-                onClick={() => {
-                  if (currentItem.type === "article" && currentItem.slug) {
-                    window.location.href = `/stories/${currentItem.slug}`;
-                  } else if (currentItem.type === "event" && currentItem.slug) {
-                    window.location.href = `/events/${currentItem.slug}`;
-                  } else if (
-                    currentItem.type === "media" &&
-                    currentItem.videoUrl
-                  ) {
-                    window.open(currentItem.videoUrl, "_blank");
+                      : t(currentLanguage, "eventShowcase.hero.actions.playVideo")
                   }
-                }}
-                className="px-6 py-3 bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 rounded-sm transition-all duration-300"
-              >
-                {currentItem.type === "article" &&
-                  t(currentLanguage, "eventShowcase.hero.actions.readArticle")}
-                {currentItem.type === "event" &&
-                  t(currentLanguage, "eventShowcase.hero.actions.viewEvent")}
-                {currentItem.type === "media" &&
-                  t(currentLanguage, "eventShowcase.hero.actions.watchMedia")}
-              </button>
-            )}
+                >
+                  {isPlaying ? (
+                    <Pause className="w-6 h-6" />
+                  ) : (
+                    <Play className="w-6 h-6 ml-1" />
+                  )}
+                </button>
+              )}
+
+              {/* Navigation buttons for non-event content with links */}
+              {(currentItem.slug || currentItem.videoUrl) && currentItem.type !== "event" && (
+                <button
+                  onClick={() => {
+                    if (currentItem.type === "article" && currentItem.slug) {
+                      window.location.href = `/stories/${currentItem.slug}`;
+                    } else if (
+                      currentItem.type === "media" &&
+                      currentItem.videoUrl
+                    ) {
+                      window.open(currentItem.videoUrl, "_blank");
+                    }
+                  }}
+                  className="px-6 py-3 bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 rounded-sm transition-all duration-300"
+                >
+                  {currentItem.type === "article" &&
+                    t(currentLanguage, "eventShowcase.hero.actions.readArticle")}
+                  {currentItem.type === "media" &&
+                    t(currentLanguage, "eventShowcase.hero.actions.watchMedia")}
+                </button>
+              )}
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Event Hover Overlay - Left side overlay for events */}
+      {currentItem.type === "event" && (
+        <>
+          {/* Hover overlay that covers the entire image */}
+          <div className="absolute inset-0 z-10 opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black/40">
+            {/* Event title and content on the left */}
+            <div className="absolute left-8 top-1/2 -translate-y-1/2 max-w-md">
+              {currentItem.title && (
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 tracking-tight text-white drop-shadow-lg">
+                  {currentItem.title}
+                </h1>
+              )}
+
+              {/* Event description removed for cleaner look */}
+
+              {/* Event action button */}
+              {currentItem.slug && (
+                <button
+                  onClick={() => {
+                    window.location.href = `/events/${currentItem.slug}`;
+                  }}
+                  className="px-6 py-3 bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 rounded-sm transition-all duration-300"
+                >
+                  {currentItem.ticketsAvailable !== false
+                    ? "Get Tickets"
+                    : "View Event"}
+                </button>
+              )}
+            </div>
+
+            {/* Get Tickets button on bottom right */}
+            {currentItem.slug && (
+              <div className="absolute bottom-8 right-8">
+                <button
+                  onClick={() => {
+                    window.location.href = `/events/${currentItem.slug}`;
+                  }}
+                  className="px-6 py-3 bg-white text-black hover:bg-white/90 rounded-sm font-semibold transition-all duration-300 shadow-lg"
+                >
+                  Get Your Tickets
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Get Tickets Button - Bottom Right */}
+      <div className="absolute bottom-2 md:bottom-8 right-4 md:right-8 -translate-y-12 md:translate-y-0 z-20">
+        <Button
+          aria-label="Get tickets"
+          onClick={() => {
+            window.location.href = `/events`;
+          }}
+          className="uppercase relative bg-teal-800 hover:scale-105 hover:!opacity-100 hover:!bg-teal-800 hover:!text-teal-200 hover:!border-teal-700 text-teal-200 border-teal-700 text-sm md:text-lg lg:text-xl px-4 py-3 md:px-6 md:py-4 lg:px-8 lg:py-6 transition-all duration-300"
+          size={"sm"}
+        >
+          <Ticket className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7 mr-2 md:mr-3" />
+          <span className="font-medium">Get Tickets</span>
+        </Button>
       </div>
+
+      {/* Sound Toggle Button - Bottom Left (only for videos) */}
+      {currentItem.type === "video" && (
+        <button
+          onClick={toggleSound}
+          className="absolute bottom-2 md:bottom-8 left-4 md:left-8 z-20 p-2 bg-black/10 hover:bg-black/30 rounded-sm text-white focus:outline-none transition-colors duration-200"
+          aria-label={isMuted ? "Unmute video" : "Mute video"}
+        >
+          {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+        </button>
+      )}
 
       {/* Navigation Controls */}
       <div className="absolute inset-0 flex items-center justify-between px-4 md:px-8 z-10">
@@ -468,11 +613,10 @@ export function HeroSection({
                 console.log("Dot clicked:", index);
                 goToIndex(index);
               }}
-              className={`w-3 h-1.5 rounded-sm transition-all duration-200 cursor-pointer ${
-                index === currentIndex
-                  ? "bg-white scale-110"
-                  : "bg-white/30 hover:bg-white/50"
-              }`}
+              className={`w-3 h-1.5 rounded-sm transition-all duration-200 cursor-pointer ${index === currentIndex
+                ? "bg-white scale-110"
+                : "bg-white/30 hover:bg-white/50"
+                }`}
               aria-label={`Go to content ${index + 1}`}
             />
           ))}

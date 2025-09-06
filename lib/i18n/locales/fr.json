@@ -498,26 +498,27 @@
     },
     "events": {
       "title": "Événements",
-      "subtitle": "Performances passées et temps forts",
-      "viewEvent": "VOIR L'ÉVÉNEMENT →",
+      "subtitle": "Découvrez les prochains événements",
+      "viewEvent": "Voir",
       "comingSoon": {
         "title": "Événements bientôt disponibles",
         "description": "Nous travaillons à vous apporter des événements et expériences inoubliables."
       }
     },
     "media": {
-      "title": "Vidéos",
-      "subtitle": "Découvrez nos meilleures mixs et vidéos",
-      "viewAll": "Voir toutes les vidéos",
+      "title": "DJ Sets",
+      "subtitle": "Découvrez nos meilleurs mixes et vidéos",
+      "play": "Jouer",
+      "viewAll": "Voir tous les médias",
       "comingSoon": {
-        "title": "Vidéos bientôt disponibles",
-        "description": "Nous travaillons à vous apporter des sons et vidéos incroyables. Restez à l'écoute !"
+        "title": "DJ Sets bientôt disponibles",
+        "description": "Nous travaillons à vous apporter des mixes et vidéos incroyables. Restez à l'écoute !"
       }
     },
     "articles": {
       "title": "Articles",
       "subtitle": "Découvrez les dernières nouvelles et histoires",
-      "readMore": "Lire la suite",
+      "readMore": "Lire",
       "viewAll": "Voir tous les articles",
       "comingSoon": {
         "title": "Articles bientôt disponibles",

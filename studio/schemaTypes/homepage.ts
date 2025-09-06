@@ -80,6 +80,19 @@ export default defineType({
         "Select an event to feature in the floating promo on the homepage. The event's flyer will be used as the image, and the promo will link to the event page.",
     }),
     defineField({
+      name: 'featuredEvents',
+      title: 'Featured Events for Hero Carousel',
+      type: 'array',
+      of: [
+        {
+          type: 'reference',
+          to: [{type: 'event'}],
+        },
+      ],
+      description: 'Select events to feature in the hero section carousel. These will appear alongside videos and images.',
+      validation: (Rule) => Rule.max(5),
+    }),
+    defineField({
       name: 'audioPlayerEnabled',
       title: 'Enable Audio Player',
       type: 'boolean',
@@ -198,17 +211,20 @@ export default defineType({
       firstTrack: 'musicTracks.0.title',
       promoEventTitle: 'promoEvent.title',
       heroItems: 'heroContent',
+      featuredEvents: 'featuredEvents',
     },
     prepare({
       title,
       firstTrack,
       promoEventTitle,
       heroItems,
+      featuredEvents,
     }) {
       let previewTitle = title || 'Homepage Settings'
 
       const counts = []
       if (heroItems?.length) counts.push(`${heroItems.length} hero`)
+      if (featuredEvents?.length) counts.push(`${featuredEvents.length} event`)
 
       if (counts.length > 0) {
         previewTitle += ` (${counts.join(', ')})`

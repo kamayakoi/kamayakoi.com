@@ -13,16 +13,19 @@ import { BackButton } from "./back-button.tsx";
 // Category color system
 const getCategoryColor = (color?: string) => {
   const colorMap: Record<string, { bg: string; text: string }> = {
-    red: { bg: "bg-red-900", text: "text-red-200" },
-    amber: { bg: "bg-amber-900", text: "text-amber-200" },
-    cyan: { bg: "bg-cyan-900", text: "text-cyan-200" },
-    teal: { bg: "bg-teal-900", text: "text-teal-200" },
-    purple: { bg: "bg-purple-900", text: "text-purple-200" },
-    pink: { bg: "bg-pink-900", text: "text-pink-200" },
-    sky: { bg: "bg-sky-900", text: "text-sky-200" },
-    yellow: { bg: "bg-yellow-900", text: "text-yellow-200" },
-    emerald: { bg: "bg-emerald-900", text: "text-emerald-200" },
-    blue: { bg: "bg-blue-900", text: "text-blue-200" },
+    red: { bg: "bg-red-600", text: "text-white" },
+    amber: { bg: "bg-amber-600", text: "text-white" },
+    yellow: { bg: "bg-yellow-600", text: "text-white" },
+    cyan: { bg: "bg-cyan-600", text: "text-white" },
+    teal: { bg: "bg-teal-600", text: "text-white" },
+    sky: { bg: "bg-sky-600", text: "text-white" },
+    purple: { bg: "bg-purple-600", text: "text-white" },
+    pink: { bg: "bg-pink-600", text: "text-white" },
+    indigo: { bg: "bg-indigo-600", text: "text-white" },
+    orange: { bg: "bg-orange-600", text: "text-white" },
+    emerald: { bg: "bg-emerald-600", text: "text-white" },
+    green: { bg: "bg-green-600", text: "text-white" },
+    blue: { bg: "bg-blue-600", text: "text-white" },
   };
   return colorMap[color || 'teal'] || colorMap.teal;
 };
@@ -111,13 +114,13 @@ async function StoryPage({ params }: PageProps) {
                               post.author.image?.asset?.url || "/placeholder.webp"
                             }
                             alt={post.author.name}
-                            width={40}
-                            height={40}
+                            width={30}
+                            height={30}
                             className="rounded-sm mr-3 object-cover"
                           />
                         )}
                         <span>
-                          By {post.author.name}
+                          {post.author.name}
                         </span>
                         {post.author.role && (
                           <span className="text-zinc-500 dark:text-zinc-400 ml-1">

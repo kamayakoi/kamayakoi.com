@@ -35,7 +35,7 @@ export const getAllEvents = async (): Promise<Event[]> => {
   const query = `*[_type == "event"] | order(date desc) {
     _id,
     title,
-    "slug": slug.current,
+    slug,
     date,
     time,
     location,
@@ -52,7 +52,7 @@ export async function getEventBySlug(slug: string, locale: string) {
       _id,
       title,
       subtitle,
-      "slug": slug.current,
+      slug,
       date,
       "dateFormatted": dateTime(date),
       "time": coalesce(time, "TBD"),
@@ -132,7 +132,7 @@ export async function getLatestBlogPosts(limit = 2) {
       _id,
       title,
       title_fr,
-      "slug": slug.current,
+      slug,
       publishedAt,
       excerpt,
       excerpt_fr,
@@ -144,7 +144,7 @@ export async function getLatestBlogPosts(limit = 2) {
         caption
       },
       "category": category,
-      "categories": categories[] {
+      "categories": categories[]->{
         _id,
         title,
         slug,
@@ -173,7 +173,7 @@ export async function getAllBlogPosts() {
       _id,
       title,
       title_fr,
-      "slug": slug.current,
+      slug,
       publishedAt,
       excerpt,
       excerpt_fr,
@@ -185,7 +185,7 @@ export async function getAllBlogPosts() {
         caption
       },
       "category": category,
-      "categories": categories[] {
+      "categories": categories[]->{
         _id,
         title,
         slug,
@@ -216,7 +216,7 @@ export async function getBlogPostBySlug(slug: string) {
       title_es,
       title_pt,
       title_zh,
-      "slug": slug.current,
+      slug,
       publishedAt,
       excerpt,
       excerpt_fr,
@@ -231,7 +231,7 @@ export async function getBlogPostBySlug(slug: string) {
         caption
       },
       "category": category,
-      "categories": categories[] {
+      "categories": categories[]->{
         _id,
         title,
         slug,
@@ -274,7 +274,7 @@ export async function getRelatedPosts(
         _id,
         title,
         title_fr,
-        "slug": slug.current,
+        slug,
         publishedAt,
         excerpt,
         excerpt_fr,
@@ -313,7 +313,7 @@ export async function getRelatedPosts(
       _id,
       title,
       title_fr,
-      "slug": slug.current,
+      slug,
       publishedAt,
       excerpt,
       excerpt_fr,
@@ -325,7 +325,7 @@ export async function getRelatedPosts(
         caption
       },
       "category": category,
-      "categories": categories[] {
+      "categories": categories[]->{
         _id,
         title,
         slug,
@@ -368,15 +368,14 @@ export async function getAllProducts() {
     *[_type == "product"] | order(name asc) {
       _id,
       name,
-      "slug": slug.current,
+      slug,
       productId,
       "mainImage": images[0].asset->url,
       "price": basePrice,
       "stock": baseStock,
       description,
       "categories": categories[]->{
-        title,
-        "slug": slug.current
+        title
       },
       tags,
       images[]{
@@ -400,7 +399,7 @@ export async function getProductBySlug(slug: string) {
     *[_type == "product" && slug.current == $slug][0] {
       _id,
       "name": name,
-      "slug": slug.current,
+      slug,
       productId,
       "mainImage": images[0].asset->url,
       description,
@@ -421,8 +420,7 @@ export async function getProductBySlug(slug: string) {
       variantOptions,
       variantInventory,
       "categories": categories[]->{
-        title,
-        "slug": slug.current
+        title
       },
       tags,
       requiresShipping,
@@ -466,7 +464,7 @@ export const getEventsForScroller = async (
   const query = `*[_type == "event"] | order(date desc) [0...$limit] {
     _id,
     title,
-    "slug": slug.current,
+    slug,
     "featuredImage": flyer.asset->url, // Alias flyer URL as featuredImage
     date, // Keep date for potential use in scroller UI
     description, // Fetch the description
@@ -484,7 +482,7 @@ export const getEventsForParallax = async (
   const query = `*[_type == "event"] | order(date desc) [0...$limit] {
     _id,
     title,
-    "slug": slug.current,
+    slug,
     "featuredImage": flyer.asset->url,
     "promoVideoUrl": promoVideo.asset->url,
     date,
@@ -585,7 +583,7 @@ export const getAllArtists = async (): Promise<ArtistData[]> => {
   const query = `*[_type == "artist"] | order(isResident desc, name asc) {
     _id,
     name,
-    "slug": slug.current,
+    slug,
     bio,
     description,
     "imageUrl": image.asset->url,
@@ -610,7 +608,7 @@ export const getArtistBySlug = async (
   const query = `*[_type == "artist" && slug.current == $slug][0] {
     _id,
     name,
-    "slug": slug.current,
+    slug,
     bio,
     description,
     "imageUrl": image.asset->url,
@@ -639,7 +637,7 @@ export const getHomepagePromoEvent =
   async (): Promise<HomepagePromoEventData | null> => {
     const query = `*[_type == "homepage"][0] {
     promoEvent->{
-      "slug": slug.current,
+      slug,
       "flyerUrl": flyer.asset->url,
       title
     }
@@ -676,6 +674,22 @@ export interface HomepageHeroItem {
 // Interface for homepage data
 export interface HomepageData {
   heroContent?: HomepageHeroItem[];
+  featuredEvents?: {
+    _id: string;
+    title: string;
+    slug: string;
+    date: string;
+    time?: string;
+    location?: string;
+    description?: {
+      en?: string;
+      fr?: string;
+    };
+    flyer?: {
+      url: string;
+    };
+    ticketsAvailable?: boolean;
+  }[];
 }
 
 // Fetch homepage content
@@ -696,6 +710,19 @@ export const getHomepageContent = async (): Promise<HomepageData | null> => {
       },
       videoUrl,
       isActive
+    },
+    featuredEvents[]->{
+      _id,
+      title,
+      slug,
+      date,
+      time,
+      location,
+      description,
+      "flyer": {
+        "url": flyer.asset->url
+      },
+      ticketsAvailable
     }
   }`;
 

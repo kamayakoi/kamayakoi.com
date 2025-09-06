@@ -45,6 +45,26 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
   const mainImage = event.flyer?.url || "/placeholder.webp";
   const hasValidImage = mainImage && mainImage.trim() !== "" && mainImage !== "/placeholder.webp";
 
+  // Month color system - one color per month
+  const getMonthColor = (date: Date) => {
+    const month = date.getMonth();
+    const colorMap: Record<number, { bg: string; text: string }> = {
+      0: { bg: "bg-red-600", text: "text-white" },     // January
+      1: { bg: "bg-amber-600", text: "text-white" },   // February
+      2: { bg: "bg-yellow-600", text: "text-white" },  // March
+      3: { bg: "bg-cyan-600", text: "text-white" },    // April
+      4: { bg: "bg-teal-600", text: "text-white" },    // May
+      5: { bg: "bg-sky-600", text: "text-white" },     // June
+      6: { bg: "bg-purple-600", text: "text-white" },  // July
+      7: { bg: "bg-pink-600", text: "text-white" },    // August
+      8: { bg: "bg-indigo-600", text: "text-white" },  // September
+      9: { bg: "bg-orange-600", text: "text-white" },  // October
+      10: { bg: "bg-emerald-600", text: "text-white" }, // November
+      11: { bg: "bg-green-600", text: "text-white" },  // December
+    };
+    return colorMap[month] || { bg: "bg-blue-600", text: "text-white" };
+  };
+
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0 mb-6">
       <div className="relative rounded-t-sm overflow-hidden">
@@ -54,24 +74,18 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
           aria-label={`View ${event.title}`}
           prefetch
         >
-          {hasValidImage ? (
-            <div className="aspect-square relative bg-muted overflow-hidden">
-              <Image
-                src={mainImage}
-                alt={event.title}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
-                quality={100}
-                placeholder="blur"
-                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+IRjWjBqO6O2mhP//Z"
-              />
-            </div>
-          ) : (
-            <div className="aspect-square bg-muted flex items-center justify-center">
-              <span className="text-muted-foreground text-sm">No Image</span>
-            </div>
-          )}
+          <div className="aspect-square relative bg-muted overflow-hidden">
+            <Image
+              src={hasValidImage ? mainImage : "/placeholder.webp"}
+              alt={event.title}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
+              quality={100}
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+IRjWjBqO6O2mhP//Z"
+            />
+          </div>
         </Link>
       </div>
 
@@ -90,8 +104,8 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
 
         <div className="flex items-center justify-between pt-2">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            {formattedDate && (
-              <span className="px-2 py-1 text-xs font-medium rounded-sm bg-blue-900 text-blue-200">
+            {formattedDate && eventDate && (
+              <span className={`px-2 py-1 text-xs font-medium rounded-sm ${getMonthColor(eventDate).bg} ${getMonthColor(eventDate).text}`}>
                 {formattedDate}
               </span>
             )}
@@ -100,7 +114,7 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
             href={`/events/${event.slug.current}`}
             className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium"
           >
-            View Event
+            {t(currentLanguage, "eventShowcase.events.viewEvent")}
           </Link>
         </div>
       </CardContent>
@@ -121,12 +135,10 @@ export function EventShowcase({ events }: EventShowcaseProps) {
           <div className="w-1 h-12 bg-white"></div>
           <div>
             <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-              {currentLanguage === "fr" ? "Événements" : "Events"}
-              <span className="text-white/60 mx-3">·</span>
-              <span className="text-white/70 font-normal text-xl md:text-2xl inline-block transform -translate-y-0.25">
-                {currentLanguage === "fr"
-                  ? "Découvrez les prochains événements"
-                  : "Discover upcoming events"}
+              {t(currentLanguage, "eventShowcase.events.title")}
+              <span className="text-white/60 mx-3 hidden md:inline">·</span>
+              <span className="text-white/70 font-normal text-xl md:text-2xl block md:inline-block transform -translate-y-0.25">
+                {t(currentLanguage, "eventShowcase.events.subtitle")}
               </span>
             </h2>
           </div>
@@ -135,7 +147,7 @@ export function EventShowcase({ events }: EventShowcaseProps) {
         {hasEvents ? (
           <>
             {/* Events Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
               {events.slice(0, 6).map((event: ShowcaseEvent) => (
                 <EventCard key={event._id} event={event} />
               ))}

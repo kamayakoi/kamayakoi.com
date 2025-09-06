@@ -19,7 +19,9 @@ interface Category {
 interface Story {
   _id: string;
   title: string;
-  slug: string;
+  slug: {
+    current: string;
+  };
   publishedAt: string;
   excerpt?: string;
   mainImage?: {
@@ -48,16 +50,19 @@ function StoryCard({ story }: { story: Story }) {
   // Category color system
   const getCategoryColor = (color?: string) => {
     const colorMap: Record<string, { bg: string; text: string }> = {
-      red: { bg: "bg-red-900", text: "text-red-200" },
-      yellow: { bg: "bg-yellow-900", text: "text-yellow-200" },
-      cyan: { bg: "bg-cyan-900", text: "text-cyan-200" },
-      teal: { bg: "bg-teal-900", text: "text-teal-200" },
-      purple: { bg: "bg-purple-900", text: "text-purple-200" },
-      pink: { bg: "bg-pink-900", text: "text-pink-200" },
-      indigo: { bg: "bg-indigo-900", text: "text-indigo-200" },
-      orange: { bg: "bg-orange-900", text: "text-orange-200" },
-      green: { bg: "bg-green-900", text: "text-green-200" },
-      blue: { bg: "bg-blue-900", text: "text-blue-200" },
+      red: { bg: "bg-red-600", text: "text-white" },
+      amber: { bg: "bg-amber-600", text: "text-white" },
+      yellow: { bg: "bg-yellow-600", text: "text-white" },
+      cyan: { bg: "bg-cyan-600", text: "text-white" },
+      teal: { bg: "bg-teal-600", text: "text-white" },
+      sky: { bg: "bg-sky-600", text: "text-white" },
+      purple: { bg: "bg-purple-600", text: "text-white" },
+      pink: { bg: "bg-pink-600", text: "text-white" },
+      indigo: { bg: "bg-indigo-600", text: "text-white" },
+      orange: { bg: "bg-orange-600", text: "text-white" },
+      emerald: { bg: "bg-emerald-600", text: "text-white" },
+      green: { bg: "bg-green-600", text: "text-white" },
+      blue: { bg: "bg-blue-600", text: "text-white" },
     };
     return colorMap[color || 'teal'] || colorMap.teal;
   };
@@ -66,7 +71,7 @@ function StoryCard({ story }: { story: Story }) {
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0 mb-6">
       <div className="relative rounded-t-sm overflow-hidden">
         <Link
-          href={`/stories/${story.slug}`}
+          href={`/stories/${story.slug.current}`}
           className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           aria-label={`Read ${story.title}`}
           prefetch
@@ -95,7 +100,7 @@ function StoryCard({ story }: { story: Story }) {
       </div>
 
       <CardContent className="pt-1 pb-4 px-4 space-y-1">
-        <Link href={`/stories/${story.slug}`} className="block">
+        <Link href={`/stories/${story.slug.current}`} className="block">
           <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2 break-words overflow-wrap-anywhere">
             {story.title}
           </h3>
@@ -124,7 +129,7 @@ function StoryCard({ story }: { story: Story }) {
             )}
           </div>
           <Link
-            href={`/stories/${story.slug}`}
+            href={`/stories/${story.slug.current}`}
             className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium"
           >
             Read

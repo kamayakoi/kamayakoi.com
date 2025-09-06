@@ -312,7 +312,7 @@
     "currency": "F CFA",
     "buttons": {
       "processing": "Processing...",
-      "completePurchase": "Complete Purchase"
+      "completePurchase": "Complete purchase"
     },
     "errors": {
       "nameRequired": "Name is required",
@@ -498,20 +498,21 @@
     },
     "events": {
       "title": "Events",
-      "subtitle": "Past performances and highlights",
-      "viewEvent": "VIEW EVENT →",
+      "subtitle": "Discover upcoming events",
+      "viewEvent": "View",
       "comingSoon": {
         "title": "Events coming soon",
         "description": "We're working on bringing you amazing events and experiences. Stay tuned!"
       }
     },
     "media": {
-      "title": "Media",
-      "subtitle": "Discover the best sounds and videos",
+      "title": "DJ Sets",
+      "subtitle": "Discover our best dj sets",
+      "play": "Play",
       "viewAll": "View all media",
       "comingSoon": {
-        "title": "Media coming soon",
-        "description": "We're working on bringing you amazing sounds and videos."
+        "title": "DJ Sets coming soon",
+        "description": "We're working on bringing you amazing dj sets."
       }
     },
     "articles": {
@@ -527,7 +528,7 @@
     "hero": {
       "contentTypes": {
         "article": "Article",
-        "media": "Media",
+        "media": "DJ Sets",
         "event": "Event",
         "video": "Video",
         "image": "Image"
@@ -535,7 +536,7 @@
       "actions": {
         "readArticle": "Read Article",
         "viewEvent": "View Event",
-        "watchMedia": "Watch Media",
+        "watchMedia": "Watch DJ Sets",
         "watchVideo": "Watch Video",
         "playVideo": "Play Video",
         "pauseVideo": "Pause Video"

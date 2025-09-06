@@ -65,16 +65,19 @@ function ArticleCard({ article }: { article: FeaturedArticle }) {
   // Category color system
   const getCategoryColor = (color?: string) => {
     const colorMap: Record<string, { bg: string; text: string }> = {
-      red: { bg: "bg-red-900", text: "text-red-200" },
-      yellow: { bg: "bg-yellow-900", text: "text-yellow-200" },
-      cyan: { bg: "bg-cyan-900", text: "text-cyan-200" },
-      teal: { bg: "bg-teal-900", text: "text-teal-200" },
-      purple: { bg: "bg-purple-900", text: "text-purple-200" },
-      pink: { bg: "bg-pink-900", text: "text-pink-200" },
-      indigo: { bg: "bg-indigo-900", text: "text-indigo-200" },
-      orange: { bg: "bg-orange-900", text: "text-orange-200" },
-      green: { bg: "bg-green-900", text: "text-green-200" },
-      blue: { bg: "bg-blue-900", text: "text-blue-200" },
+      red: { bg: "bg-red-600", text: "text-white" },
+      amber: { bg: "bg-amber-600", text: "text-white" },
+      yellow: { bg: "bg-yellow-600", text: "text-white" },
+      cyan: { bg: "bg-cyan-600", text: "text-white" },
+      teal: { bg: "bg-teal-600", text: "text-white" },
+      sky: { bg: "bg-sky-600", text: "text-white" },
+      purple: { bg: "bg-purple-600", text: "text-white" },
+      pink: { bg: "bg-pink-600", text: "text-white" },
+      indigo: { bg: "bg-indigo-600", text: "text-white" },
+      orange: { bg: "bg-orange-600", text: "text-white" },
+      emerald: { bg: "bg-emerald-600", text: "text-white" },
+      green: { bg: "bg-green-600", text: "text-white" },
+      blue: { bg: "bg-blue-600", text: "text-white" },
     };
     return colorMap[color || 'teal'] || colorMap.teal;
   };
@@ -131,7 +134,7 @@ function ArticleCard({ article }: { article: FeaturedArticle }) {
                 <span
                   className={`px-2 py-1 text-xs font-medium rounded-sm ${getCategoryColor(article.categories[0].color).bg} ${getCategoryColor(article.categories[0].color).text}`}
                 >
-                  {article.categories[0].title}
+                  {article.categories[0]?.title || 'Category'}
                 </span>
                 {article.author && <span className="mx-1">·</span>}
               </>
@@ -144,7 +147,7 @@ function ArticleCard({ article }: { article: FeaturedArticle }) {
             href={`/stories/${article.slug.current}`}
             className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium"
           >
-            Read
+            {t(currentLanguage, "eventShowcase.articles.readMore")}
           </Link>
         </div>
       </CardContent>
@@ -158,19 +161,17 @@ export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
   const hasArticles = articles && articles.length > 0;
 
   return (
-    <section className="pt-0 md:pt-0  md:px-8">
+    <section className="pt-0 md:pt-0 px-4 md:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="flex items-center gap-6 mb-12">
           <div className="w-1 h-12 bg-white"></div>
           <div>
             <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-              {currentLanguage === "fr" ? "Articles" : "Stories"}
-              <span className="text-white/60 mx-2 align-middle">·</span>
-              <span className="text-white/70 font-normal text-xl md:text-2xl inline-block transform -translate-y-0.25">
-                {currentLanguage === "fr"
-                  ? "Découvrez les dernières actus et insights"
-                  : "See the latest news and insights"}
+              {t(currentLanguage, "eventShowcase.articles.title")}
+              <span className="text-white/60 mx-2 align-middle hidden md:inline">·</span>
+              <span className="text-white/70 font-normal text-xl md:text-2xl block md:inline-block transform -translate-y-0.25">
+                {t(currentLanguage, "eventShowcase.articles.subtitle")}
               </span>
             </h2>
           </div>
@@ -180,7 +181,7 @@ export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
           <>
             {/* Articles Grid with Horizontal Scroll */}
             <div className={`mb-12 ${articles.length > 4 ? 'overflow-x-auto pb-4' : ''}`}>
-              <div className={`grid gap-6 ${articles.length > 4 ? 'grid-cols-2 md:grid-cols-4 lg:grid-cols-10' : 'grid-cols-2 md:grid-cols-4'} ${articles.length > 4 ? 'w-max' : ''}`}>
+              <div className={`grid gap-6 ${articles.length > 4 ? 'grid-cols-1 md:grid-cols-4 lg:grid-cols-10' : 'grid-cols-1 md:grid-cols-4'} ${articles.length > 4 ? 'w-max' : ''}`}>
                 {articles.slice(0, Math.min(articles.length, 9)).map((article: FeaturedArticle) => (
                   <ArticleCard key={article._id} article={article} />
                 ))}
@@ -201,7 +202,7 @@ export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
 
                     <div className="pt-1 pb-4 px-4 space-y-1">
                       <h3 className="font-medium text-base leading-tight text-center hover:text-primary transition-colors">
-                        {currentLanguage === "fr" ? "Voir Plus" : "View More"}
+                        {t(currentLanguage, "eventShowcase.articles.viewAll")}
                       </h3>
                       <p className="text-sm text-muted-foreground text-center leading-relaxed">
                         {articles.length > 10
@@ -223,10 +224,7 @@ export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
               {t(currentLanguage, "eventShowcase.articles.comingSoon.title")}
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400 mb-6">
-              {t(
-                currentLanguage,
-                "eventShowcase.articles.comingSoon.description",
-              )}
+              {t(currentLanguage, "eventShowcase.articles.comingSoon.description")}
             </p>
           </div>
         )}

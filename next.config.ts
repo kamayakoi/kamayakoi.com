@@ -16,6 +16,18 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/images/**", // Allows images from any Sanity project/dataset
       },
+      {
+        protocol: "https",
+        hostname: "img.youtube.com",
+        port: "",
+        pathname: "/vi/**", // Allow YouTube video thumbnails
+      },
+      {
+        protocol: "https",
+        hostname: "i1.sndcdn.com",
+        port: "",
+        pathname: "/artworks-**", // Allow SoundCloud artwork images
+      },
     ],
   },
 };

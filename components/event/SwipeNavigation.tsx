@@ -4,8 +4,8 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 interface SwipeNavigationProps {
-    previousEvent: { slug: string } | null;
-    nextEvent: { slug: string } | null;
+    previousEvent: { slug: string | { current: string } } | null;
+    nextEvent: { slug: string | { current: string } } | null;
 }
 
 export default function SwipeNavigation({
@@ -35,11 +35,13 @@ export default function SwipeNavigation({
             if (Math.abs(deltaX) > Math.abs(deltaY)) {
                 // Swipe left (next event)
                 if (deltaX > minSwipeDistance && nextEvent) {
-                    router.push(`/events/${nextEvent.slug}`);
+                    const slug = typeof nextEvent.slug === 'string' ? nextEvent.slug : nextEvent.slug.current;
+                    router.push(`/events/${slug}`);
                 }
                 // Swipe right (previous event)
                 else if (deltaX < -minSwipeDistance && previousEvent) {
-                    router.push(`/events/${previousEvent.slug}`);
+                    const slug = typeof previousEvent.slug === 'string' ? previousEvent.slug : previousEvent.slug.current;
+                    router.push(`/events/${slug}`);
                 }
             }
 

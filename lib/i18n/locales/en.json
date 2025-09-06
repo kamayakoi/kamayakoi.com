@@ -327,17 +327,19 @@
   },
   "paymentSuccess": {
     "title": "Payment successful!",
-    "description": "Your ticket purchase has been completed successfully.",
+    "description": "Your purchase has been completed successfully.",
     "orderId": "Order ID: {orderId}",
     "whatsNext": {
       "title": "What's next?",
-      "checkEmail": "Check your email for your e-ticket",
-      "presentTicket": "Present your e-ticket QR code at the event",
-      "arriveEarly": "Arrive early to avoid queues"
+      "checkEmail": "Check your email for your order details",
+      "presentTicket": "Present your e-ticket QR code at the event (if applicable)",
+      "arriveEarly": "Arrive early to avoid queues",
+      "trackOrder": "Track your order in your account"
     },
     "buttons": {
       "backToEvents": "Back to events",
-      "browseGallery": "Browse Gallery"
+      "browseGallery": "Browse archives",
+      "backToMerch": "Back to merch"
     },
     "support": "Need help? Contact our support team"
   },
@@ -347,13 +349,14 @@
     "orderId": "Order ID: {orderId}",
     "whatsNext": {
       "title": "What's next?",
-      "tryAgain": "You can try purchasing tickets again",
+      "tryAgain": "You can try again",
       "differentMethod": "Choose a different payment method",
       "contactSupport": "Contact support if you need help"
     },
     "buttons": {
       "backToEvents": "Back to events",
-      "browseGallery": "Browse Gallery"
+      "browseGallery": "Browse archives",
+      "backToMerch": "Back to merch"
     },
     "support": "Need help? Contact our support team"
   },

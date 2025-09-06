@@ -167,7 +167,7 @@ export default function StoriesContentClient({
 
           {/* Stories Grid */}
           {allStories.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-20">
               {allStories.slice(0, 8).map((story: Story) => (
                 <StoryCard key={story._id} story={story} />
               ))}

@@ -486,7 +486,7 @@ export const getEventsForParallax = async (
   const query = `*[_type == "event"] | order(date desc) [0...$limit] {
     _id,
     title,
-    slug,
+    "slug": slug.current,
     "featuredImage": flyer.asset->url,
     "promoVideoUrl": promoVideo.asset->url,
     date,
@@ -678,10 +678,13 @@ export interface HomepageData {
   featuredEvents?: {
     _id: string;
     title: string;
-    slug: string;
+    slug: { current: string };
     date: string;
     time?: string;
-    location?: string;
+    location?: string | {
+      venueName?: string;
+      address?: string;
+    };
     description?: {
       en?: string;
       fr?: string;

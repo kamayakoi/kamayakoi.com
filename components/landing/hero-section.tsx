@@ -400,7 +400,7 @@ export function HeroSection({
 
       {/* Content Overlay - Hidden for videos when playing */}
       {!(currentItem.type === "video" && isPlaying) && (
-        <div className="relative z-10 flex items-start justify-start min-h-screen pt-20 md:pt-32 pl-5 md:pl-20">
+        <div className="relative z-10 flex items-start justify-start min-h-screen pt-32 md:pt-40 pl-5 md:pl-20">
           <div className="text-left px-4 md:px-8 max-w-2xl">
             {currentItem.title && (
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-6 tracking-tight text-white drop-shadow-lg">
@@ -432,7 +432,7 @@ export function HeroSection({
               )}
               {/* Show date for events right after title, for others in additional info */}
               {currentItem.type === "event" && currentItem.date && (
-                <p className="text-white/80 text-sm">
+                <p className="hidden md:block text-white/80 text-sm">
                   {new Date(currentItem.date).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
@@ -546,23 +546,6 @@ export function HeroSection({
               )}
 
               {/* Event description removed for cleaner look */}
-
-              {/* Event action button */}
-              {currentItem.slug && (
-                <button
-                  onClick={() => {
-                    if (currentItem.slug) {
-                      const slug = typeof currentItem.slug === 'string' ? currentItem.slug : currentItem.slug.current;
-                      window.location.href = `/events/${slug}`;
-                    }
-                  }}
-                  className="px-8 py-4 md:px-6 md:py-3 bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 rounded-sm transition-all duration-300 text-lg md:text-base font-semibold"
-                >
-                  {currentItem.ticketsAvailable !== false
-                    ? "Get Tickets"
-                    : "View Event"}
-                </button>
-              )}
             </div>
 
             {/* Get Tickets button on bottom right */}
@@ -571,7 +554,8 @@ export function HeroSection({
                 <button
                   onClick={() => {
                     if (currentItem.slug) {
-                      const slug = typeof currentItem.slug === 'string' ? currentItem.slug : currentItem.slug.current;
+                      // Use the same approach as event-showcase.tsx
+                      const slug = (currentItem.slug as { current: string }).current;
                       window.location.href = `/events/${slug}`;
                     }
                   }}
@@ -590,12 +574,17 @@ export function HeroSection({
         <Button
           aria-label="Get tickets"
           onClick={() => {
-            window.location.href = `/events`;
+            if (currentItem.type === "event" && currentItem.slug) {
+              const slug = (currentItem.slug as { current: string }).current;
+              window.location.href = `/events/${slug}`;
+            } else {
+              window.location.href = `/events`;
+            }
           }}
-          className="uppercase relative bg-teal-800 hover:scale-105 hover:!opacity-100 hover:!bg-teal-800 hover:!text-teal-200 hover:!border-teal-700 text-teal-200 border-teal-700 text-sm md:text-lg lg:text-xl px-4 py-3 md:px-6 md:py-4 lg:px-8 lg:py-6 transition-all duration-300"
-          size={"sm"}
+          size={"lg"}
+          className="uppercase relative bg-teal-800 hover:scale-105 hover:!opacity-100 hover:!bg-teal-800 hover:!text-teal-200 hover:!border-teal-700 text-teal-200 border-teal-700 text-lg md:text-xl px-8 py-6 md:px-6 md:py-4 lg:px-8 lg:py-6 transition-all duration-300"
         >
-          <Ticket className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7 mr-2 md:mr-3" />
+          <Ticket className="h-7 w-7 md:h-6 md:w-6 lg:h-7 lg:w-7 mr-2 md:mr-3" />
           <span className="font-medium">Get Tickets</span>
         </Button>
       </div>

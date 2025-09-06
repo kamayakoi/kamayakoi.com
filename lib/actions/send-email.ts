@@ -48,13 +48,48 @@ export async function sendEmail(formData: FormData) {
       }
     }
 
-    // Handle regular contact form
+    // Handle contact form
     if (!message) {
       return { error: "Message is required" };
     }
 
-    // For regular contact messages, you can implement email sending here
-    return { success: "Message sent successfully" };
+    try {
+      // Send contact form email to kamayakoi@gmail.com
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "contact@kamayakoi.com",
+          to: "kamayakoi@gmail.com",
+          subject: subject || "New Contact Form Message",
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2>New Contact Form Message</h2>
+              <p><strong>From:</strong> ${email}</p>
+              <p><strong>Subject:</strong> ${subject || "Contact Form Message"}</p>
+              <p><strong>Timestamp:</strong> ${new Date().toLocaleString()}</p>
+              <hr>
+              <p><strong>Message:</strong></p>
+              <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                ${message.replace(/\n/g, '<br>')}
+              </div>
+            </div>
+          `,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send contact message");
+      }
+
+      return { success: "Message sent successfully!" };
+    } catch (error) {
+      console.error("Contact form error:", error);
+      return { error: "Failed to send message. Please try again." };
+    }
   } catch (error) {
     return {
       error: error instanceof Error ? error.message : "Failed to send email",

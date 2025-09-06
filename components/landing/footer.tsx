@@ -30,7 +30,14 @@ function ContactForm({ onClose }: { onClose: () => void }) {
   async function handleSubmit(formData: FormData) {
     setIsPending(true);
     try {
-      const result = await sendEmail(formData);
+      // Construct proper FormData like newsletter subscription
+      const contactData = new FormData();
+      contactData.append('email', formData.get('email') as string);
+      contactData.append('subject', 'New Contact Form Message');
+      contactData.append('message', formData.get('message') as string);
+      contactData.append('type', 'contact');
+
+      const result = await sendEmail(contactData);
 
       if (result.success) {
         toast(result.success);
@@ -60,7 +67,7 @@ function ContactForm({ onClose }: { onClose: () => void }) {
           name="email"
           placeholder={t(currentLanguage, "footer.contact.emailPlaceholder")}
           required
-          className="w-full bg-[#1a1a1a] rounded-sm p-4 text-base border border-gray-700 focus:ring-2 focus:ring-gray-400 placeholder:text-gray-400 text-white transition-colors focus:bg-[#1a1a1a]"
+          className="w-full bg-[#1a1a1a] rounded-sm p-4 text-base border border-gray-700 focus:ring-2 focus:ring-gray-400 placeholder:text-gray-400 text-white transition-colors focus:bg-[#1a1a1a] focus:border-gray-600"
         />
       </div>
 
@@ -77,7 +84,7 @@ function ContactForm({ onClose }: { onClose: () => void }) {
           placeholder={t(currentLanguage, "footer.contact.messagePlaceholder")}
           required
           rows={6}
-          className="w-full bg-[#1a1a1a] rounded-sm p-4 text-base border border-gray-700 focus:ring-2 focus:ring-gray-400 placeholder:text-gray-400 text-white transition-colors resize-none focus:bg-[#1a1a1a]"
+          className="w-full bg-[#1a1a1a] rounded-sm p-4 text-base border border-gray-700 focus:ring-2 focus:ring-gray-400 placeholder:text-gray-400 text-white transition-colors resize-none focus:bg-[#1a1a1a] focus:border-gray-600"
         />
       </div>
 
@@ -85,7 +92,7 @@ function ContactForm({ onClose }: { onClose: () => void }) {
         <button
           type="submit"
           disabled={isPending}
-          className="bg-gray-200 hover:bg-blue-300 text-black px-8 py-4 rounded-sm text-base font-medium inline-flex items-center justify-center gap-2 transition-all duration-300 ease-in-out disabled:opacity-50 disabled:hover:bg-blue-400 min-w-[180px] h-[60px] w-full sm:w-auto"
+          className="bg-teal-800 hover:bg-teal-700 text-teal-200 px-8 py-4 rounded-sm text-base font-medium inline-flex items-center justify-center gap-2 transition-all duration-300 ease-in-out disabled:opacity-50 disabled:hover:bg-teal-600 min-w-[180px] h-[60px] w-full sm:w-auto border border-teal-700"
         >
           {isPending ? (
             <Loader2 className="w-6 h-6 animate-spin" />

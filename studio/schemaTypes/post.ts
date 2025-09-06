@@ -127,12 +127,10 @@ export default {
           ],
           preview: {
             select: {url: 'url', caption: 'caption'},
-            prepare({url, caption}: {url: string; caption?: string}) {
-              return {
-                title: `Video: ${caption || url}`,
-                subtitle: url,
-              }
-            },
+            prepare: (value: any) => ({
+              title: `Video: ${value.caption || value.url}`,
+              subtitle: value.url,
+            }),
           },
         },
       ],

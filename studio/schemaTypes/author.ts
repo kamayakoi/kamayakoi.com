@@ -59,8 +59,6 @@ export default {
   ],
   preview: {
     select: {title: 'name', media: 'image'},
-    prepare({title, media}: {title: string; media: any}) {
-      return {title, media}
-    },
+    prepare: (value: any) => ({title: value.title, media: value.media}),
   },
 }

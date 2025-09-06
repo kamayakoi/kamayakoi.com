@@ -489,14 +489,14 @@ export default {
       venue: 'location.venueName',
       media: 'flyer',
     },
-    prepare({title, subtitle, date, venue, media}: {title: string; subtitle?: string; date: string; venue?: string; media: any}) {
-      const formattedDate = date ? new Date(date).toLocaleDateString() : 'No date'
-      const previewSubtitle = [subtitle, venue, formattedDate].filter(Boolean).join(' | ')
+    prepare: (value: any) => {
+      const formattedDate = value.date ? new Date(value.date).toLocaleDateString() : 'No date'
+      const previewSubtitle = [value.subtitle, value.venue, formattedDate].filter(Boolean).join(' | ')
 
       return {
-        title: title,
+        title: value.title,
         subtitle: previewSubtitle,
-        media: media,
+        media: value.media,
       }
     },
   },

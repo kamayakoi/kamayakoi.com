@@ -165,22 +165,10 @@ export default {
           ],
           preview: {
             select: {title: 'variantName', sku: 'sku', price: 'price', stock: 'stock'},
-            prepare({
-              title,
-              sku,
-              price,
-              stock,
-            }: {
-              title: string
-              sku: string
-              price?: number
-              stock: number
-            }) {
-              return {
-                title: `${title} (SKU: ${sku})`,
-                subtitle: `${price ? price + ' XOF' : 'Base Price'} - ${stock} in stock`,
-              }
-            },
+            prepare: (value: any) => ({
+              title: `${value.title} (SKU: ${value.sku})`,
+              subtitle: `${value.price ? value.price + ' XOF' : 'Base Price'} - ${value.stock} in stock`,
+            }),
           },
         },
       ],
@@ -259,31 +247,19 @@ export default {
       media: 'images.0.asset',
       manageVariants: 'manageVariants',
     },
-    prepare({
-      title,
-      price,
-      stock,
-      media,
-      manageVariants,
-    }: {
-      title: string
-      price: number
-      stock?: number
-      media: any
-      manageVariants: boolean
-    }) {
-      let subtitle = `${price} XOF`
-      if (manageVariants) {
+    prepare: (value: any) => {
+      let subtitle = `${value.price} XOF`
+      if (value.manageVariants) {
         subtitle += ' - Manages Variants'
-      } else if (stock !== undefined && stock !== null) {
-        subtitle += ` - ${stock} in stock`
+      } else if (value.stock !== undefined && value.stock !== null) {
+        subtitle += ` - ${value.stock} in stock`
       } else {
         subtitle += ` - Stock Undefined`
       }
       return {
-        title: title,
+        title: value.title,
         subtitle: subtitle,
-        media: media,
+        media: value.media,
       }
     },
   },

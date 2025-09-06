@@ -1,14 +1,22 @@
 "use client";
 
 import { MusicProvider } from "@/lib/contexts/MusicContext";
-import type { MusicTrack } from "@/lib/sanity/queries";
+import type { HomepageAudioSettings } from "@/lib/sanity/queries";
 
 interface MusicWrapperProps {
   children: React.ReactNode;
-  tracks: MusicTrack[];
+  audioSettings: HomepageAudioSettings;
 }
 
-export default function MusicWrapper({ children, tracks }: MusicWrapperProps) {
-  // Render children wrapped in MusicProvider, now with server-fetched tracks
-  return <MusicProvider tracks={tracks}>{children}</MusicProvider>;
+export default function MusicWrapper({ children, audioSettings }: MusicWrapperProps) {
+  // Render children wrapped in MusicProvider with audio settings
+  return (
+    <MusicProvider
+      tracks={audioSettings.musicTracks}
+      audioPlayerEnabled={audioSettings.audioPlayerEnabled}
+      autoPlayMusic={audioSettings.autoPlayMusic}
+    >
+      {children}
+    </MusicProvider>
+  );
 }

@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import {
-  getEventsForParallax,
-  type EventParallaxData,
-} from "@/lib/sanity/queries";
-import LoadingComponent from "@/components/ui/loader";
-import EventsContentClient from "@/app/events/events-content-client";
+import { redirect } from "next/navigation";
+import { getEventsForParallax } from "@/lib/sanity/queries";
 
 export const metadata: Metadata = {
   title: "Rendez-Vous Sauvage | Kamayakoi",
@@ -13,16 +8,14 @@ export const metadata: Metadata = {
     "Discover upcoming Kamayakoi events, shows, and performances. Experience unforgettable nights with our resident artists and special guests.",
 };
 
-async function EventsContent() {
-  const events: EventParallaxData[] = await getEventsForParallax(5);
-
-  return <EventsContentClient events={events} />;
-}
-
 export default async function EventsPage() {
-  return (
-    <Suspense fallback={<LoadingComponent />}>
-      <EventsContent />
-    </Suspense>
-  );
+  const events = await getEventsForParallax(5);
+
+  if (events && events.length > 0) {
+    // Redirect to the latest event (first in the array, assuming they're sorted by date)
+    redirect(`/events/${events[0].slug}`);
+  }
+
+  // If no events, redirect to home or show a message
+  redirect("/");
 }

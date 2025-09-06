@@ -80,6 +80,20 @@ export default defineType({
         "Select an event to feature in the floating promo on the homepage. The event's flyer will be used as the image, and the promo will link to the event page.",
     }),
     defineField({
+      name: 'audioPlayerEnabled',
+      title: 'Enable Audio Player',
+      type: 'boolean',
+      initialValue: true,
+      description: 'Show/hide the mini audio player in the header',
+    }),
+    defineField({
+      name: 'autoPlayMusic',
+      title: 'Auto-play Music on Page Load',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Automatically start playing music when visitors land on the site',
+    }),
+    defineField({
       name: 'heroContent',
       title: 'Hero Section Content',
       type: 'array',

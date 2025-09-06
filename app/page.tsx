@@ -6,17 +6,22 @@ import { EventShowcase } from "@/components/landing/event-showcase";
 import { FeaturedArticles } from "@/components/landing/featured-articles";
 import { MediaShowcase } from "@/components/landing/media-showcase";
 import { Footer } from "@/components/landing/footer";
-import { getHomepageContent } from "@/lib/sanity/queries";
+import { getHomepageContent, getLatestEvents, getLatestBlogPosts, getMedia } from "@/lib/sanity/queries";
 
 // Use the general site metadata for the home page
 export const metadata: Metadata = {
   title: "Kamayakoi",
-  description: "Rendez-vous sauvage pour électrons libres.",
+  description: "Abidjan Techno Gang",
 };
 
 export default async function Home() {
-  // Fetch homepage content from Sanity for hero section
-  const homepageData = await getHomepageContent();
+  // Fetch all homepage content server-side
+  const [homepageData, events, articles, media] = await Promise.all([
+    getHomepageContent(),
+    getLatestEvents(6),
+    getLatestBlogPosts(6),
+    getMedia(10)
+  ]);
 
   // Extract video URLs from homepage data for BackgroundVideo component
   const videoUrls =
@@ -44,9 +49,9 @@ export default async function Home() {
           sanityHeroItems={homepageData?.heroContent}
         />
       )}
-      <EventShowcase limit={6} />
-      <FeaturedArticles limit={6} />
-      <MediaShowcase limit={10} />
+      <EventShowcase events={events} />
+      <FeaturedArticles articles={articles} />
+      <MediaShowcase media={media} />
       <Footer />
     </div>
   );

@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
-import { getMedia } from "@/lib/sanity/queries";
 
 interface MediaItem {
   _id: string;
@@ -21,29 +20,12 @@ interface MediaItem {
 }
 
 interface MediaShowcaseProps {
-  limit?: number;
+  media: MediaItem[];
 }
 
-export function MediaShowcase({ limit = 10 }: MediaShowcaseProps = {}) {
+export function MediaShowcase({ media }: MediaShowcaseProps) {
   const { currentLanguage } = useTranslation();
-  const [media, setMedia] = useState<MediaItem[]>([]);
   const [playingMediaId, setPlayingMediaId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchMedia = async () => {
-      try {
-        const fetchedMedia = await getMedia(limit);
-        setMedia(fetchedMedia);
-      } catch (error) {
-        console.error('Error fetching media:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMedia();
-  }, [limit]);
 
   const hasMedia = media && media.length > 0;
 
@@ -66,7 +48,7 @@ export function MediaShowcase({ limit = 10 }: MediaShowcaseProps = {}) {
   };
 
   return (
-    <section className="py-16 md:py-20 px-4 md:px-8">
+    <section className="pb-16 -pt-20 md:-pt-20 px-4 md:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="flex items-center gap-6 mb-12">
@@ -83,11 +65,7 @@ export function MediaShowcase({ limit = 10 }: MediaShowcaseProps = {}) {
           </div>
         </div>
 
-        {loading ? (
-          <div className="text-center py-20">
-            <div className="text-white/70">Loading media...</div>
-          </div>
-        ) : hasMedia ? (
+        {hasMedia ? (
           <>
             {/* Media Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">

@@ -12,14 +12,14 @@ const getCacheConfig = (tags: string[]) => ({
 export async function getLatestEvents(limit = 3) {
   return client.fetch(
     `
-    *[_type == "event" && dateTime(date) >= dateTime(now())] | order(date asc) [0...$limit] {
+    *[_type == "event"] | order(date desc) [0...$limit] {
       _id,
       title,
       slug,
       date,
-      "date": dateTime(date),
-      "time": coalesce(time, "TBD"),
-      "location": coalesce(location, "TBD"),
+      time,
+      location,
+      "description": coalesce(description.en, description.fr),
       "flyer": {
         "url": flyer.asset->url
       },
@@ -391,7 +391,7 @@ export async function getAllProducts() {
         caption
       }
     }
-  `);
+  `, {}, getCacheConfig(["products"]));
 }
 
 export async function getProductBySlug(slug: string) {
@@ -504,12 +504,21 @@ export interface MusicTrack {
   coverImageUrl?: string;
 }
 
-// Fetch music tracks from the singleton homepage document
-export const getHomepageMusicTracks = async (): Promise<MusicTrack[]> => {
+// Interface for homepage audio settings
+export interface HomepageAudioSettings {
+  audioPlayerEnabled: boolean;
+  autoPlayMusic: boolean;
+  musicTracks: MusicTrack[];
+}
+
+// Fetch music tracks and audio settings from the singleton homepage document
+export const getHomepageMusicTracks = async (): Promise<HomepageAudioSettings> => {
   try {
     // Query the single document of type 'homepage'
-    // Select the music tracks with their audio files and cover images
+    // Select the music tracks with their audio files and cover images, plus audio settings
     const query = `*[_type == "homepage"][0] {
+      audioPlayerEnabled,
+      autoPlayMusic,
       "musicTracks": musicTracks[]{
         title,
         artist,
@@ -518,22 +527,38 @@ export const getHomepageMusicTracks = async (): Promise<MusicTrack[]> => {
       }
     }`;
 
-    const result = await client.fetch<{ musicTracks?: MusicTrack[] }>(
+    const result = await client.fetch<{
+      audioPlayerEnabled?: boolean;
+      autoPlayMusic?: boolean;
+      musicTracks?: MusicTrack[];
+    }>(
       query,
       {},
       getCacheConfig(["homepage", "music"]),
     );
 
-    // Handle case when no homepage document exists or no musicTracks field
-    if (!result || !result.musicTracks) {
-      return [];
+    // Handle case when no homepage document exists
+    if (!result) {
+      return {
+        audioPlayerEnabled: true,
+        autoPlayMusic: false,
+        musicTracks: [],
+      };
     }
 
-    return result.musicTracks.filter((track) => track.audioUrl) ?? [];
+    return {
+      audioPlayerEnabled: result.audioPlayerEnabled ?? true,
+      autoPlayMusic: result.autoPlayMusic ?? false,
+      musicTracks: result.musicTracks?.filter((track) => track.audioUrl) ?? [],
+    };
   } catch (error) {
     console.error("Error fetching homepage music tracks:", error);
-    // Return empty array instead of throwing error to prevent app crash
-    return [];
+    // Return default values instead of throwing error to prevent app crash
+    return {
+      audioPlayerEnabled: true,
+      autoPlayMusic: false,
+      musicTracks: [],
+    };
   }
 };
 

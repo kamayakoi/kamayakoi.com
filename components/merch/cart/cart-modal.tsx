@@ -84,7 +84,7 @@ const serializeCart = (cart: { lines: { id: string; quantity: number }[] }) => {
   return JSON.stringify(
     cart.lines.map((line) => ({
       merchandiseId: line.id,
-      quantity: line.quantity,
+      // Don't include quantity changes for auto-open logic
     })),
   );
 };
@@ -113,11 +113,14 @@ export default function CartModal() {
       return;
     }
 
-    // Only open cart if items were actually added/changed and cart has items
+    // Only auto-open cart if items were added (not just quantity changes) and cart has items
     if (serializedCart.current !== newSerializedCart && cart.totalQuantity > 0) {
       serializedCart.current = newSerializedCart;
       // Open cart instantly when items are added
       setIsOpen(true);
+    } else {
+      // Update the serialized cart reference even if we don't open
+      serializedCart.current = newSerializedCart;
     }
   }, [cart]);
 
@@ -235,6 +238,7 @@ export default function CartModal() {
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="fixed top-0 bottom-0 right-0 flex w-full md:w-[500px] p-4 z-[70] will-change-transform"
                   style={{ position: "fixed", top: 0, right: 0, bottom: 0 }}
+                  onClick={(e) => e.stopPropagation()} // Prevent event bubbling to cart button
                 >
                   <div className="flex flex-col py-6 w-full bg-[#1a1a1a] backdrop-blur-xl rounded-sm shadow-2xl">
                     <CartContainer className="flex justify-between items-center mb-8">

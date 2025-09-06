@@ -18,6 +18,7 @@ import { t } from "@/lib/i18n/translations";
 import CartModal from "@/components/merch/cart/cart-modal";
 import WishlistModal from "@/components/merch/wishlist/wishlist-modal";
 import MiniAudioPlayer from "@/components/landing/mini-audio-player";
+import { useMusic } from "@/lib/contexts/MusicContext";
 
 interface NavItem {
   nameKey: string;
@@ -30,6 +31,7 @@ export default function Header() {
   const [isScrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const { currentLanguage } = useTranslation();
+  const { audioPlayerEnabled } = useMusic();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,13 +60,15 @@ export default function Header() {
   return (
     <header className={`${styles.header} ${isScrolled ? styles.scrolled : ""}`}>
       {/* Mini Audio Player - positioned relative to header */}
-      <div className="absolute top-[14px] left-[19px] md:top-[12px] md:left-4 z-[60] pointer-events-auto">
-        <MiniAudioPlayer />
-      </div>
+      {audioPlayerEnabled && (
+        <div className="absolute top-[14px] left-[19px] md:top-[12px] md:left-4 z-[60] pointer-events-auto">
+          <MiniAudioPlayer />
+        </div>
+      )}
 
       <div className={styles.headerContent}>
         {/* Empty space for both mobile and desktop - adjusted for MiniAudioPlayer */}
-        <div className="flex items-center" style={{ width: "140px" }}></div>
+        <div className="flex items-center" style={{ width: audioPlayerEnabled ? "140px" : "20px" }}></div>
 
         <nav className="hidden md:flex items-center gap-6">
           {navItems.map((item: NavItem) => {

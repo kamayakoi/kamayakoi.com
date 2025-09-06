@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 const siteConfig = {
   name: "Kamayakoi",
-  description: "Rendez-vous sauvage pour électrons libres.",
+  description: "Abidjan Techno Gang",
   url: "https://kamayakoi.com",
   ogImage: "/banner.webp",
 };
@@ -77,7 +77,7 @@ export default async function RootLayout({
       <body
         className={`${geistMono.variable} font-sans flex flex-col min-h-screen`}
       >
-        <MusicWrapper tracks={musicTracks}>
+        <MusicWrapper audioSettings={musicTracks}>
           <TranslationProvider>
             <MediaProvider>
               <CartProvider>

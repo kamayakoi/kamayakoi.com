@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { CalendarDays, Clock, MapPin, Users, Check } from "lucide-react";
+import { CalendarDays, Clock, MapPin, Users, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import Header from "@/components/landing/header";
 import { Separator } from "@/components/ui/separator";
-import { getEventBySlug } from "@/lib/sanity/queries";
+import { getEventBySlug, getEventsForParallax } from "@/lib/sanity/queries";
 import { EventShareButton } from "@/components/event/event-share-button";
 import { Card } from "@/components/ui/card";
 import { t } from "@/lib/i18n/translations";
@@ -12,6 +12,8 @@ import LoadingComponent from "@/components/ui/loader";
 import { EventMediaDisplay } from "@/components/event/event-media-display";
 import { Footer } from "@/components/landing/footer";
 import ArtistCard from "@/components/event/ArtistCard";
+import Link from "next/link";
+import SwipeNavigation from "@/components/event/SwipeNavigation";
 
 // Define specific type for TicketType
 interface TicketTypeData {
@@ -217,6 +219,13 @@ async function EventPageContent({
   const currentLanguage = getPageLocale(params);
   const { slug } = params;
   const event: EventData | null = await getEventBySlug(slug, currentLanguage);
+
+  // Get all events for navigation
+  const allEvents = await getEventsForParallax(10); // Get more events for better navigation
+  const currentIndex = allEvents.findIndex(e => e.slug === slug);
+  const previousEvent = currentIndex > 0 ? allEvents[currentIndex - 1] : null;
+  const nextEvent = currentIndex < allEvents.length - 1 ? allEvents[currentIndex + 1] : null;
+
 
   if (!event) {
     notFound();
@@ -742,65 +751,65 @@ async function EventPageContent({
             {(event.location?.venueName ||
               event.location?.address ||
               event.venueDetails) && (
-              <div className="max-w-4xl mx-auto">
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-foreground mb-4">
-                    {t(currentLanguage, "eventSlugPage.venueSection.title")}
-                  </h2>
-                </div>
-                <div className="bg-card/30 backdrop-blur-sm rounded-sm p-8 border border-border/20 space-y-6">
-                  {event.location?.venueName && (
-                    <div>
-                      <h3 className="text-xl font-semibold text-foreground mb-2">
-                        {event.location.venueName}
-                      </h3>
-                      {event.location?.address && (
-                        <p className="text-muted-foreground mb-4">
-                          {event.location.address}
-                        </p>
-                      )}
-                    </div>
-                  )}
+                <div className="max-w-4xl mx-auto">
+                  <div className="text-center mb-8">
+                    <h2 className="text-3xl font-bold text-foreground mb-4">
+                      {t(currentLanguage, "eventSlugPage.venueSection.title")}
+                    </h2>
+                  </div>
+                  <div className="bg-card/30 backdrop-blur-sm rounded-sm p-8 border border-border/20 space-y-6">
+                    {event.location?.venueName && (
+                      <div>
+                        <h3 className="text-xl font-semibold text-foreground mb-2">
+                          {event.location.venueName}
+                        </h3>
+                        {event.location?.address && (
+                          <p className="text-muted-foreground mb-4">
+                            {event.location.address}
+                          </p>
+                        )}
+                      </div>
+                    )}
 
-                  {/* Embedded Map - Restored */}
-                  {mapEmbedSrc && (
-                    <div className="relative w-full h-[300px] bg-muted rounded-sm shadow-lg border border-border/20 overflow-hidden">
-                      <iframe
-                        src={mapEmbedSrc}
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0 }}
-                        allowFullScreen={false}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        title={(() => {
-                          const locationNameForMap =
-                            event.location?.venueName ||
-                            event.location?.address;
-                          return locationNameForMap
-                            ? t(
+                    {/* Embedded Map - Restored */}
+                    {mapEmbedSrc && (
+                      <div className="relative w-full h-[300px] bg-muted rounded-sm shadow-lg border border-border/20 overflow-hidden">
+                        <iframe
+                          src={mapEmbedSrc}
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen={false}
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                          title={(() => {
+                            const locationNameForMap =
+                              event.location?.venueName ||
+                              event.location?.address;
+                            return locationNameForMap
+                              ? t(
                                 currentLanguage,
                                 "eventSlugPage.venueSection.mapTitleNamed",
                                 { locationName: locationNameForMap },
                               )
-                            : t(
+                              : t(
                                 currentLanguage,
                                 "eventSlugPage.venueSection.mapTitleDefault",
                               );
-                        })()}
-                        className="absolute top-0 left-0 w-full h-full"
-                      ></iframe>
-                    </div>
-                  )}
+                          })()}
+                          className="absolute top-0 left-0 w-full h-full"
+                        ></iframe>
+                      </div>
+                    )}
 
-                  {event.venueDetails && (
-                    <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
-                      {renderFormattedText(event.venueDetails)}
-                    </div>
-                  )}
+                    {event.venueDetails && (
+                      <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
+                        {renderFormattedText(event.venueDetails)}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* Artists/Lineup Section */}
             {event.lineup && event.lineup.length > 0 && (
@@ -850,10 +859,70 @@ async function EventPageContent({
                 />
               </div>
             </div>
+
+            {/* Mobile Navigation Buttons - Only visible on mobile, hidden on desktop */}
+            <div className="md:hidden max-w-4xl mx-auto mt-6">
+              <div className="flex justify-between gap-4">
+                {previousEvent && (
+                  <Link
+                    href={`/events/${previousEvent.slug}`}
+                    className="flex-1 flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white rounded-sm py-4 px-6 font-medium transition-colors duration-200 shadow-lg"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                    Previous
+                  </Link>
+                )}
+                {nextEvent && (
+                  <Link
+                    href={`/events/${nextEvent.slug}`}
+                    className="flex-1 flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white rounded-sm py-4 px-6 font-medium transition-colors duration-200 shadow-lg"
+                  >
+                    Next
+                    <ChevronRight className="w-5 h-5" />
+                  </Link>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
       <Footer />
+
+      {/* Page-Turning Navigation Overlay */}
+      {nextEvent && (
+        <Link
+          href={`/events/${nextEvent.slug}`}
+          className="fixed top-0 right-0 w-1/3 h-full z-10 group cursor-pointer touch-manipulation"
+          title="Next event (swipe left)"
+        >
+          {/* Visual indicator - hidden on mobile, visible on desktop hover */}
+          <div className="absolute top-1/2 right-4 transform -translate-y-1/2 opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+            <div className="bg-teal-500/20 backdrop-blur-sm rounded-full p-3 border border-teal-400/30">
+              <ChevronRight className="w-6 h-6 text-teal-300" />
+            </div>
+          </div>
+        </Link>
+      )}
+
+      {/* Previous Page-Turning Navigation Overlay */}
+      {previousEvent && (
+        <Link
+          href={`/events/${previousEvent.slug}`}
+          className="fixed top-0 left-0 w-1/3 h-full z-10 group cursor-pointer touch-manipulation"
+          title="Previous event (swipe right)"
+        >
+          {/* Visual indicator - hidden on mobile, visible on desktop hover */}
+          <div className="absolute top-1/2 left-4 transform -translate-y-1/2 opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+            <div className="bg-teal-500/20 backdrop-blur-sm rounded-full p-3 border border-teal-400/30">
+              <ChevronLeft className="w-6 h-6 text-teal-300" />
+            </div>
+          </div>
+        </Link>
+      )}
+
+      {/* Swipe Navigation Component */}
+      <SwipeNavigation previousEvent={previousEvent} nextEvent={nextEvent} />
+
     </>
   );
 }

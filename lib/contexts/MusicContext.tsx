@@ -24,6 +24,9 @@ interface MusicContextType {
   volume: number;
   isMuted: boolean;
 
+  // Audio settings
+  audioPlayerEnabled: boolean;
+
   // Controls
   play: () => void;
   pause: () => void;
@@ -45,9 +48,16 @@ const MusicContext = createContext<MusicContextType | undefined>(undefined);
 interface MusicProviderProps {
   children: ReactNode;
   tracks: MusicTrack[];
+  audioPlayerEnabled?: boolean;
+  autoPlayMusic?: boolean;
 }
 
-export function MusicProvider({ children, tracks }: MusicProviderProps) {
+export function MusicProvider({
+  children,
+  tracks,
+  audioPlayerEnabled = true,
+  autoPlayMusic = false
+}: MusicProviderProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -274,6 +284,18 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
     }
   }, [volume]);
 
+  // Auto-play music on page load if enabled
+  useEffect(() => {
+    if (autoPlayMusic && tracks.length > 0 && hasUserInteracted && !isPlaying) {
+      console.log("🎵 Auto-playing music on page load");
+      // Small delay to ensure audio element is ready
+      const timer = setTimeout(() => {
+        play();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [autoPlayMusic, tracks.length, hasUserInteracted, isPlaying, play]);
+
   const value: MusicContextType = {
     tracks,
     currentTrackIndex,
@@ -283,6 +305,7 @@ export function MusicProvider({ children, tracks }: MusicProviderProps) {
     duration,
     volume,
     isMuted,
+    audioPlayerEnabled,
     play,
     pause,
     stop,

@@ -2,11 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Calendar, User } from "lucide-react";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
-import { useEffect, useState } from "react";
-import { getLatestBlogPosts } from "@/lib/sanity/queries";
+import { Card, CardContent } from "@/components/ui/card";
+
+interface Category {
+  _id: string;
+  title: string;
+  slug: string;
+  color?: string;
+}
 
 interface FeaturedArticle {
   _id: string;
@@ -18,12 +23,16 @@ interface FeaturedArticle {
   publishedAt: string;
   excerpt: string;
   excerpt_fr?: string;
-  image: {
+  mainImage?: {
     asset: {
       url: string;
+      metadata?: {
+        lqip?: string;
+      };
     };
+    alt?: string;
   };
-  author: {
+  author?: {
     _id: string;
     name: string;
     image?: {
@@ -33,152 +42,178 @@ interface FeaturedArticle {
     };
     bio?: string;
   };
+  categories?: Category[];
 }
 
 interface FeaturedArticlesProps {
-  limit?: number;
+  articles: FeaturedArticle[];
 }
 
-export function FeaturedArticles({ limit = 6 }: FeaturedArticlesProps = {}) {
+function ArticleCard({ article }: { article: FeaturedArticle }) {
   const { currentLanguage } = useTranslation();
-  const [articles, setArticles] = useState<FeaturedArticle[]>([]);
-  const [loading, setLoading] = useState(true);
+  const mainImage = article.mainImage?.asset.url || "/placeholder.webp";
+  const hasValidImage = mainImage && mainImage.trim() !== "";
 
-  useEffect(() => {
-    const fetchArticles = async () => {
-      try {
-        const fetchedArticles = await getLatestBlogPosts(limit);
-        setArticles(fetchedArticles);
-      } catch (error) {
-        console.error('Error fetching articles:', error);
-      } finally {
-        setLoading(false);
-      }
+  const title = currentLanguage === "fr" && article.title_fr
+    ? article.title_fr
+    : article.title;
+
+  const excerpt = currentLanguage === "fr" && article.excerpt_fr
+    ? article.excerpt_fr
+    : article.excerpt;
+
+  // Category color system
+  const getCategoryColor = (color?: string) => {
+    const colorMap: Record<string, { bg: string; text: string }> = {
+      red: { bg: "bg-red-900", text: "text-red-200" },
+      yellow: { bg: "bg-yellow-900", text: "text-yellow-200" },
+      cyan: { bg: "bg-cyan-900", text: "text-cyan-200" },
+      teal: { bg: "bg-teal-900", text: "text-teal-200" },
+      purple: { bg: "bg-purple-900", text: "text-purple-200" },
+      pink: { bg: "bg-pink-900", text: "text-pink-200" },
+      indigo: { bg: "bg-indigo-900", text: "text-indigo-200" },
+      orange: { bg: "bg-orange-900", text: "text-orange-200" },
+      green: { bg: "bg-green-900", text: "text-green-200" },
+      blue: { bg: "bg-blue-900", text: "text-blue-200" },
     };
-
-    fetchArticles();
-  }, [limit]);
-
-  const hasArticles = articles && articles.length > 0;
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString(
-      currentLanguage === "fr" ? "fr-FR" : "en-US",
-      {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      },
-    );
+    return colorMap[color || 'teal'] || colorMap.teal;
   };
 
   return (
-    <section className="py-16 md:py-20 px-4 md:px-8">
+    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0 mb-6">
+      <div className="relative rounded-t-sm overflow-hidden">
+        <Link
+          href={`/stories/${article.slug.current}`}
+          className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          aria-label={`Read ${title}`}
+          prefetch
+        >
+          {hasValidImage ? (
+            <div className="aspect-square relative bg-muted overflow-hidden">
+              <Image
+                src={mainImage}
+                alt={article.mainImage?.alt || title}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                quality={100}
+                placeholder={
+                  article.mainImage?.asset.metadata?.lqip ? "blur" : undefined
+                }
+                blurDataURL={article.mainImage?.asset.metadata?.lqip}
+              />
+            </div>
+          ) : (
+            <div className="aspect-square bg-muted flex items-center justify-center">
+              <span className="text-muted-foreground text-sm">No Image</span>
+            </div>
+          )}
+        </Link>
+      </div>
+
+      <CardContent className="pt-1 pb-4 px-4 space-y-1">
+        <Link href={`/stories/${article.slug.current}`} className="block">
+          <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2 break-words overflow-wrap-anywhere">
+            {title}
+          </h3>
+        </Link>
+
+        {excerpt && (
+          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed break-words overflow-wrap-anywhere">
+            {excerpt}
+          </p>
+        )}
+
+        <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            {article.categories && article.categories.length > 0 && (
+              <>
+                <span
+                  className={`px-2 py-1 text-xs font-medium rounded-sm ${getCategoryColor(article.categories[0].color).bg} ${getCategoryColor(article.categories[0].color).text}`}
+                >
+                  {article.categories[0].title}
+                </span>
+                {article.author && <span className="mx-1">·</span>}
+              </>
+            )}
+            {article.author && (
+              <span>{article.author.name}</span>
+            )}
+          </div>
+          <Link
+            href={`/stories/${article.slug.current}`}
+            className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium"
+          >
+            Read
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
+  const { currentLanguage } = useTranslation();
+
+  const hasArticles = articles && articles.length > 0;
+
+  return (
+    <section className="pt-0 md:pt-0  md:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="flex items-center gap-6 mb-12">
           <div className="w-1 h-12 bg-white"></div>
           <div>
-            <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-2">
-              {currentLanguage === "fr" ? "Articles" : "Articles"}
+            <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
+              {currentLanguage === "fr" ? "Articles" : "Stories"}
+              <span className="text-white/60 mx-2 align-middle">·</span>
+              <span className="text-white/70 font-normal text-xl md:text-2xl inline-block transform -translate-y-0.25">
+                {currentLanguage === "fr"
+                  ? "Découvrez les dernières actus et insights"
+                  : "See the latest news and insights"}
+              </span>
             </h2>
-            <p className="text-white/70 text-lg">
-              {currentLanguage === "fr"
-                ? "Découvrez les dernières actus et insights"
-                : "Discover the latest news and insights"}
-            </p>
           </div>
         </div>
 
-        {loading ? (
-          <div className="text-center py-20">
-            <div className="text-white/70">Loading articles...</div>
-          </div>
-        ) : hasArticles ? (
+        {hasArticles ? (
           <>
-            {/* Articles Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {articles.map((article) => {
-                const title =
-                  currentLanguage === "fr" && article.title_fr
-                    ? article.title_fr
-                    : article.title;
-                const excerpt =
-                  currentLanguage === "fr" && article.excerpt_fr
-                    ? article.excerpt_fr
-                    : article.excerpt;
+            {/* Articles Grid with Horizontal Scroll */}
+            <div className={`mb-12 ${articles.length > 4 ? 'overflow-x-auto pb-4' : ''}`}>
+              <div className={`grid gap-6 ${articles.length > 4 ? 'grid-cols-2 md:grid-cols-4 lg:grid-cols-10' : 'grid-cols-2 md:grid-cols-4'} ${articles.length > 4 ? 'w-max' : ''}`}>
+                {articles.slice(0, Math.min(articles.length, 9)).map((article: FeaturedArticle) => (
+                  <ArticleCard key={article._id} article={article} />
+                ))}
 
-                return (
-                  <article
-                    key={article._id}
-                    className="group bg-black/20 backdrop-blur-sm rounded-sm overflow-hidden hover:bg-black/30 transition-all duration-300"
+                {/* Show "View More" card as 10th card when exactly 10 articles, or when more than 10 */}
+                {articles.length >= 10 && (
+                  <Link
+                    href="/stories"
+                    className="group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0 mb-6 block"
                   >
-                    <Link href={`/stories/${article.slug.current}`} className="block">
-                      {/* Article Image */}
-                      <div className="relative aspect-[16/10] overflow-hidden">
-                        <Image
-                          src={article.image?.asset?.url || "/placeholder.webp"}
-                          alt={title}
-                          fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      </div>
-
-                      {/* Article Content */}
-                      <div className="p-6">
-                        {/* Meta Information */}
-                        <div className="flex items-center gap-4 mb-3 text-sm text-white/60">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            <span>{formatDate(article.publishedAt)}</span>
-                          </div>
-                          {article.author && (
-                            <div className="flex items-center gap-1">
-                              <User className="w-4 h-4" />
-                              <span>{article.author.name}</span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Title */}
-                        <h3 className="text-xl font-bold text-white mb-3 line-clamp-2 group-hover:text-white/90 transition-colors">
-                          {title}
-                        </h3>
-
-                        {/* Excerpt */}
-                        <p className="text-white/70 text-sm leading-relaxed line-clamp-3">
-                          {excerpt}
-                        </p>
-
-                        {/* Read More */}
-                        <div className="mt-4 flex items-center text-white font-medium text-sm group-hover:text-white/80 transition-colors">
-                          {currentLanguage === "fr"
-                            ? "Lire la suite"
-                            : "Read More"}
-                          <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
-                            →
-                          </span>
+                    <div className="relative rounded-t-sm overflow-hidden">
+                      <div className="aspect-square relative bg-gradient-to-br from-teal-900/20 to-teal-800/20 flex items-center justify-center">
+                        <div className="text-6xl text-teal-300/60 group-hover:text-teal-300/80 transition-colors duration-300">
+                          +
                         </div>
                       </div>
-                    </Link>
-                  </article>
-                );
-              })}
-            </div>
+                    </div>
 
-            {/* View All Articles Button */}
-            <div className="text-center mt-12">
-              <Link
-                href="/stories"
-                className="inline-flex items-center px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-sm transition-all duration-300 backdrop-blur-sm"
-              >
-                {currentLanguage === "fr"
-                  ? "Voir Tous les Articles"
-                  : "View All Articles"}
-                <span className="ml-2">→</span>
-              </Link>
+                    <div className="pt-1 pb-4 px-4 space-y-1">
+                      <h3 className="font-medium text-base leading-tight text-center hover:text-primary transition-colors">
+                        {currentLanguage === "fr" ? "Voir Plus" : "View More"}
+                      </h3>
+                      <p className="text-sm text-muted-foreground text-center leading-relaxed">
+                        {articles.length > 10
+                          ? (currentLanguage === "fr"
+                            ? `${articles.length - 9} article${articles.length - 9 > 1 ? 's' : ''} de plus`
+                            : `${articles.length - 9} more article${articles.length - 9 > 1 ? 's' : ''}`)
+                          : (currentLanguage === "fr" ? "Tous les articles" : "All articles")}
+                      </p>
+                    </div>
+                  </Link>
+                )}
+              </div>
             </div>
           </>
         ) : (

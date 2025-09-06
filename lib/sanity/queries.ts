@@ -367,7 +367,7 @@ export async function getAllProducts() {
     *[_type == "product"] | order(name asc) {
       _id,
       name,
-      slug,
+      "slug": slug.current,
       productId,
       "mainImage": images[0].asset->url,
       "price": basePrice,
@@ -403,7 +403,7 @@ export async function getProductBySlug(slug: string) {
     *[_type == "product" && slug.current == $slug][0] {
       _id,
       "name": name,
-      slug,
+      "slug": slug.current,
       productId,
       "mainImage": images[0].asset->url,
       description,

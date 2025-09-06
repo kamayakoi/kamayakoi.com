@@ -570,7 +570,7 @@ export function HeroSection({
       )}
 
       {/* Get Tickets Button - Bottom Right */}
-      <div className="absolute bottom-2 md:bottom-8 right-4 md:right-8 -translate-y-12 md:translate-y-0 z-20">
+      <div className="absolute bottom-16 md:bottom-8 right-4 md:right-8 z-20">
         <Button
           aria-label="Get tickets"
           onClick={() => {
@@ -582,9 +582,9 @@ export function HeroSection({
             }
           }}
           size={"lg"}
-          className="uppercase relative bg-teal-800 hover:scale-105 hover:!opacity-100 hover:!bg-teal-800 hover:!text-teal-200 hover:!border-teal-700 text-teal-200 border-teal-700 text-lg md:text-xl px-8 py-6 md:px-6 md:py-4 lg:px-8 lg:py-6 transition-all duration-300"
+          className="uppercase relative bg-teal-800 hover:scale-105 hover:!opacity-100 hover:!bg-teal-800 hover:!text-teal-200 hover:!border-teal-700 text-teal-200 border-teal-700 text-lg md:text-2xl px-8 py-6 md:px-10 md:py-8 lg:px-12 lg:py-8 transition-all duration-300"
         >
-          <Ticket className="h-7 w-7 md:h-6 md:w-6 lg:h-7 lg:w-7 mr-2 md:mr-3" />
+          <Ticket className="h-7 w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 mr-3 md:mr-4" />
           <span className="font-medium">Get Tickets</span>
         </Button>
       </div>

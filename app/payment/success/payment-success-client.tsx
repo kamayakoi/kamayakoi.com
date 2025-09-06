@@ -71,7 +71,7 @@ export function PaymentSuccessClient({
 
               <div className="flex flex-col gap-3">
                 <Button variant="outline" asChild className="w-full">
-                  <Link href="/gallery">
+                  <Link href="/archives">
                     {t(currentLanguage, "paymentSuccess.buttons.browseGallery")}
                   </Link>
                 </Button>

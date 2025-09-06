@@ -84,13 +84,6 @@ export default defineType({
       description: 'Music genre, video category, etc.',
     }),
     defineField({
-      name: 'isFeatured',
-      title: 'Featured',
-      type: 'boolean',
-      initialValue: false,
-      description: 'Feature this media item prominently',
-    }),
-    defineField({
       name: 'tags',
       title: 'Tags',
       type: 'array',

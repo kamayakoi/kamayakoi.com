@@ -51,7 +51,7 @@ export default function Header() {
     { nameKey: "header.nav.events", path: "/events" },
     { nameKey: "header.nav.room", path: "/artists" },
     { nameKey: "header.nav.blog", path: "/stories" },
-    { nameKey: "header.nav.gallery", path: "/gallery" },
+    { nameKey: "header.nav.gallery", path: "/archives" },
     { nameKey: "header.nav.shop", path: "/merch" },
   ];
 

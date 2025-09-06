@@ -3,25 +3,140 @@
 import Image from "next/image";
 import Link from "next/link";
 import Header from "@/components/landing/header";
+import { Footer } from "@/components/landing/footer";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
+import { Card, CardContent } from "@/components/ui/card";
 
-import AllStories, { Story, Category } from "@/components/blog/all-stories";
-import { Footer } from "@/components/landing/footer";
+interface Category {
+  _id: string;
+  title: string;
+  slug: string;
+  color?: string;
+}
+
+interface Story {
+  _id: string;
+  title: string;
+  slug: string;
+  publishedAt: string;
+  excerpt?: string;
+  mainImage?: {
+    asset: {
+      url: string;
+      metadata?: {
+        lqip?: string;
+      };
+    };
+    alt?: string;
+  };
+  author?: {
+    name: string;
+  };
+  categories?: Category[];
+}
 
 interface StoriesContentClientProps {
   allStories: Story[];
-  featuredStory: Story | null;
-  featuredStories: Story[];
-  remainingStories: Story[];
+}
+
+function StoryCard({ story }: { story: Story }) {
+  const mainImage = story.mainImage?.asset.url || "/placeholder.webp";
+  const hasValidImage = mainImage && mainImage.trim() !== "";
+
+  // Category color system
+  const getCategoryColor = (color?: string) => {
+    const colorMap: Record<string, { bg: string; text: string }> = {
+      red: { bg: "bg-red-900", text: "text-red-200" },
+      yellow: { bg: "bg-yellow-900", text: "text-yellow-200" },
+      cyan: { bg: "bg-cyan-900", text: "text-cyan-200" },
+      teal: { bg: "bg-teal-900", text: "text-teal-200" },
+      purple: { bg: "bg-purple-900", text: "text-purple-200" },
+      pink: { bg: "bg-pink-900", text: "text-pink-200" },
+      indigo: { bg: "bg-indigo-900", text: "text-indigo-200" },
+      orange: { bg: "bg-orange-900", text: "text-orange-200" },
+      green: { bg: "bg-green-900", text: "text-green-200" },
+      blue: { bg: "bg-blue-900", text: "text-blue-200" },
+    };
+    return colorMap[color || 'teal'] || colorMap.teal;
+  };
+
+  return (
+    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0 mb-6">
+      <div className="relative rounded-t-sm overflow-hidden">
+        <Link
+          href={`/stories/${story.slug}`}
+          className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          aria-label={`Read ${story.title}`}
+          prefetch
+        >
+          {hasValidImage ? (
+            <div className="aspect-square relative bg-muted overflow-hidden">
+              <Image
+                src={mainImage}
+                alt={story.mainImage?.alt || story.title}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                quality={100}
+                placeholder={
+                  story.mainImage?.asset.metadata?.lqip ? "blur" : undefined
+                }
+                blurDataURL={story.mainImage?.asset.metadata?.lqip}
+              />
+            </div>
+          ) : (
+            <div className="aspect-square bg-muted flex items-center justify-center">
+              <span className="text-muted-foreground text-sm">No Image</span>
+            </div>
+          )}
+        </Link>
+      </div>
+
+      <CardContent className="pt-1 pb-4 px-4 space-y-1">
+        <Link href={`/stories/${story.slug}`} className="block">
+          <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2 break-words overflow-wrap-anywhere">
+            {story.title}
+          </h3>
+        </Link>
+
+        {story.excerpt && (
+          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed break-words overflow-wrap-anywhere">
+            {story.excerpt}
+          </p>
+        )}
+
+        <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            {story.categories && story.categories.length > 0 && (
+              <>
+                <span
+                  className={`px-2 py-1 text-xs font-medium rounded-sm ${getCategoryColor(story.categories[0].color).bg} ${getCategoryColor(story.categories[0].color).text}`}
+                >
+                  {story.categories[0].title}
+                </span>
+                {story.author && <span className="mx-1">·</span>}
+              </>
+            )}
+            {story.author && (
+              <span>{story.author.name}</span>
+            )}
+          </div>
+          <Link
+            href={`/stories/${story.slug}`}
+            className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium"
+          >
+            Read
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function StoriesContentClient({
   allStories,
-  featuredStory,
-  featuredStories,
-  remainingStories,
 }: StoriesContentClientProps) {
   const { currentLanguage } = useTranslation();
 
@@ -45,160 +160,13 @@ export default function StoriesContentClient({
             </p>
           </div>
 
-          {/* Stories Section */}
+          {/* Stories Grid */}
           {allStories.length > 0 ? (
-            <>
-              {/* Featured Story */}
-              {featuredStory && (
-                <section className="py-8 md:py-8 -mb-16">
-                  <div className="grid grid-cols-1 gap-8">
-                    {/* Main Featured Story */}
-                    <div className="w-full">
-                      <article className="group cursor-pointer bg-[#1a1a1a] rounded-sm overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-zinc-800">
-                        <div className="relative h-96 md:h-[36rem] overflow-hidden">
-                          <Image
-                            src={
-                              featuredStory.mainImage?.asset.url ||
-                              "/placeholder.webp"
-                            }
-                            alt={
-                              featuredStory.mainImage?.alt ||
-                              featuredStory.title
-                            }
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-700"
-                            placeholder={
-                              featuredStory.mainImage?.asset.metadata?.lqip
-                                ? "blur"
-                                : undefined
-                            }
-                            blurDataURL={
-                              featuredStory.mainImage?.asset.metadata?.lqip
-                            }
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                          <div className="absolute top-4 left-4">
-                            <span className="px-3 py-1 bg-teal-600 text-teal-100 text-sm font-medium rounded-sm">
-                              Featured
-                            </span>
-                          </div>
-                        </div>
-                        <div className="p-6">
-                          <div className="flex justify-between items-start gap-4">
-                            <div className="flex-1">
-                              <h3 className="text-2xl md:text-3xl font-semibold text-white group-hover:text-primary transition-colors mb-2">
-                                {featuredStory.title}
-                              </h3>
-                              <div className="flex items-center gap-2 text-sm text-zinc-400">
-                                {featuredStory.author && (
-                                  <span>{featuredStory.author.name}</span>
-                                )}
-                                {featuredStory.author && (
-                                  <span className="mx-1">·</span>
-                                )}
-                                <span>
-                                  {new Date(
-                                    featuredStory.publishedAt,
-                                  ).toLocaleDateString("en-US", {
-                                    month: "short",
-                                    day: "numeric",
-                                    year: "numeric",
-                                  })}
-                                </span>
-                              </div>
-                            </div>
-                            <Link
-                              href={`/stories/${featuredStory.slug}`}
-                              className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors -translate-y-1 group-hover:translate-x-1 transform duration-300 shrink-0"
-                            >
-                              <span>→</span>
-                            </Link>
-                          </div>
-                        </div>
-                      </article>
-                    </div>
-                  </div>
-                </section>
-              )}
-
-              {/* Featured Stories */}
-              {featuredStories.length > 0 && (
-                <section className="py-16 md:py-20 -mb-24">
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Other Featured Stories */}
-                    {featuredStories.slice(0, 3).map((story: Story) => (
-                      <article
-                        key={story._id}
-                        className="group cursor-pointer bg-[#1a1a1a] rounded-sm overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-zinc-800"
-                      >
-                        <div className="relative h-48 overflow-hidden">
-                          <Image
-                            src={
-                              story.mainImage?.asset.url || "/placeholder.webp"
-                            }
-                            alt={story.mainImage?.alt || story.title}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-700"
-                            placeholder={
-                              story.mainImage?.asset.metadata?.lqip
-                                ? "blur"
-                                : undefined
-                            }
-                            blurDataURL={story.mainImage?.asset.metadata?.lqip}
-                          />
-                        </div>
-                        <div className="p-4">
-                          <div className="flex flex-wrap gap-1 mb-2">
-                            {story.categories
-                              ?.slice(0, 2)
-                              .map((category: Category, index: number) => (
-                                <span
-                                  key={index}
-                                  className="px-2 py-1 text-xs bg-zinc-800 text-zinc-400 rounded"
-                                >
-                                  {category.title}
-                                </span>
-                              ))}
-                          </div>
-
-                          <h4 className="font-semibold mb-2 text-white group-hover:text-primary transition-colors line-clamp-2">
-                            {story.title}
-                          </h4>
-
-                          <p className="text-sm text-zinc-400 mb-3 line-clamp-2">
-                            {story.excerpt}
-                          </p>
-
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-1 text-xs text-zinc-400">
-                              {story.author && <span>{story.author.name}</span>}
-                              {story.author && <span className="mx-1">·</span>}
-                              <span>
-                                {new Date(story.publishedAt).toLocaleDateString(
-                                  "en-US",
-                                  { month: "short", day: "numeric" },
-                                )}
-                              </span>
-                            </div>
-                            <Link
-                              href={`/stories/${story.slug}`}
-                              className="inline-flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
-                            >
-                              Read
-                            </Link>
-                          </div>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* All Stories */}
-              {remainingStories.length > 0 && (
-                <AllStories stories={remainingStories} heading="More Stories" />
-              )}
-            </>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">
+              {allStories.slice(0, 8).map((story: Story) => (
+                <StoryCard key={story._id} story={story} />
+              ))}
+            </div>
           ) : (
             <motion.div
               className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-sm p-8 mb-20"

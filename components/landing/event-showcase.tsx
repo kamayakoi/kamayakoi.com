@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
@@ -73,14 +72,8 @@ export function EventShowcase({ limit = 6 }: EventShowcaseProps = {}) {
             </div>
           ) : hasEvents ? (
             <>
-              {/* Header with arrow for carousel */}
-              <div className="flex items-center justify-between mb-4 mt-8">
-                <div></div> {/* Empty space for left side */}
-                <ChevronRight className="text-white/60 w-4 h-4 md:w-5 md:h-5" />
-              </div>
-
               <div className="max-w-full">
-                <div className="flex gap-6 overflow-x-auto pb-2 pt-8 mt-4 px-4 scrollbar-hide">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 mt-4 px-4">
                   {events.map((event) => {
                     const eventData = {
                       title: event.title,
@@ -107,7 +100,7 @@ export function EventShowcase({ limit = 6 }: EventShowcaseProps = {}) {
                         href={`/events/${eventData.slug}`}
                         className="block"
                       >
-                        <div className="relative overflow-hidden rounded-sm aspect-[3/5] bg-gray-800 flex-shrink-0 w-[330px] md:w-80 hover:scale-105 hover:shadow-2xl transition-all duration-300 cursor-pointer transform-gpu will-change-transform">
+                        <div className="relative overflow-hidden rounded-sm aspect-[3/5] bg-gray-800 hover:scale-105 hover:shadow-2xl transition-all duration-300 cursor-pointer transform-gpu will-change-transform">
                           <Image
                             src={eventData.image}
                             alt={eventData.title}

@@ -258,33 +258,33 @@ export const portableTextRenderers: Partial<PortableTextReactComponents> = {
   },
   block: {
     normal: ({ children }) => (
-      <p className="my-5 leading-relaxed text-base md:text-lg">{children}</p>
+      <p className="my-5 leading-relaxed text-base md:text-lg break-words overflow-wrap-anywhere">{children}</p>
     ),
     h1: ({ children }) => (
-      <h1 className="text-3xl md:text-4xl font-bold text-primary mt-10 mb-5 pb-2 border-b border-border">
+      <h1 className="text-3xl md:text-4xl font-bold text-primary mt-10 mb-5 pb-2 border-b border-border break-words overflow-wrap-anywhere">
         {children}
       </h1>
     ),
     h2: ({ children }) => (
-      <h2 className="text-2xl md:text-3xl font-semibold text-primary mt-8 mb-4 pb-1 border-b border-border">
+      <h2 className="text-2xl md:text-3xl font-semibold text-primary mt-8 mb-4 pb-1 border-b border-border break-words overflow-wrap-anywhere">
         {children}
       </h2>
     ),
     h3: ({ children }) => (
-      <h3 className="text-xl md:text-2xl font-semibold mt-7 mb-3">
+      <h3 className="text-xl md:text-2xl font-semibold mt-7 mb-3 break-words overflow-wrap-anywhere">
         {children}
       </h3>
     ),
     h4: ({ children }) => (
-      <h4 className="text-lg md:text-xl font-semibold mt-6 mb-2">{children}</h4>
+      <h4 className="text-lg md:text-xl font-semibold mt-6 mb-2 break-words overflow-wrap-anywhere">{children}</h4>
     ),
     blockquote: ({ children }) => (
-      <blockquote className="border-l-4 border-primary/80 pl-5 italic text-zinc-600 dark:text-zinc-300 my-6 py-3 bg-zinc-50 dark:bg-zinc-800/40 rounded-r-sm shadow">
+      <blockquote className="border-l-4 border-primary/80 pl-5 italic text-zinc-600 dark:text-zinc-300 my-6 py-3 bg-zinc-50 dark:bg-zinc-800/40 rounded-r-sm shadow break-words overflow-wrap-anywhere">
         {children}
       </blockquote>
     ),
     lead: ({ children }) => (
-      <p className="text-lg md:text-xl font-light text-zinc-700 dark:text-zinc-300 leading-relaxed my-6 tracking-wide">
+      <p className="text-lg md:text-xl font-light text-zinc-700 dark:text-zinc-300 leading-relaxed my-6 tracking-wide break-words overflow-wrap-anywhere">
         {children}
       </p>
     ),
@@ -308,13 +308,13 @@ export const portableTextRenderers: Partial<PortableTextReactComponents> = {
   },
   listItem: {
     bullet: ({ children }) => (
-      <li className="pl-1 leading-relaxed">{children}</li>
+      <li className="pl-1 leading-relaxed break-words overflow-wrap-anywhere">{children}</li>
     ),
     number: ({ children }) => (
-      <li className="pl-1 leading-relaxed">{children}</li>
+      <li className="pl-1 leading-relaxed break-words overflow-wrap-anywhere">{children}</li>
     ),
     customList: ({ children }) => (
-      <li className="relative pl-1 leading-relaxed before:content-['▸'] before:absolute before:left-[-1.2em] before:text-primary before:font-bold">
+      <li className="relative pl-1 leading-relaxed break-words overflow-wrap-anywhere before:content-['▸'] before:absolute before:left-[-1.2em] before:text-primary before:font-bold">
         {children}
       </li>
     ),

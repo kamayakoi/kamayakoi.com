@@ -24,7 +24,7 @@ interface CloudinaryError {
 }
 
 export async function GET() {
-  console.log("[API Route /api/gallery-images] Received GET request.");
+  console.log("[API Route /api/archives-images] Received GET request.");
   console.log(
     "[API Route] Cloudinary Folder Env:",
     process.env.CLOUDINARY_FOLDER,

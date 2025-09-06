@@ -138,12 +138,7 @@ export async function getLatestBlogPosts(limit = 2) {
       excerpt_fr,
       "tags": tags,
       "languages": languages,
-      "image": image {
-        asset->,
-        alt,
-        caption
-      },
-      "mainImage": image {
+      "mainImage": mainImage {
         asset->,
         alt,
         caption
@@ -152,7 +147,8 @@ export async function getLatestBlogPosts(limit = 2) {
       "categories": categories[] {
         _id,
         title,
-        slug
+        slug,
+        color
       },
       "author": author->{
         _id,
@@ -183,12 +179,7 @@ export async function getAllBlogPosts() {
       excerpt_fr,
       "tags": tags,
       "languages": languages,
-      "image": image {
-        asset->,
-        alt,
-        caption
-      },
-      "mainImage": image {
+      "mainImage": mainImage {
         asset->,
         alt,
         caption
@@ -197,7 +188,8 @@ export async function getAllBlogPosts() {
       "categories": categories[] {
         _id,
         title,
-        slug
+        slug,
+        color
       },
       "author": author->{
         _id,
@@ -233,12 +225,7 @@ export async function getBlogPostBySlug(slug: string) {
       excerpt_zh,
       "tags": tags,
       "languages": languages,
-      "image": image {
-        asset->,
-        alt,
-        caption
-      },
-      "mainImage": image {
+      "mainImage": mainImage {
         asset->,
         alt,
         caption
@@ -247,7 +234,8 @@ export async function getBlogPostBySlug(slug: string) {
       "categories": categories[] {
         _id,
         title,
-        slug
+        slug,
+        color
       },
       "author": author->{
         _id,
@@ -272,49 +260,6 @@ export async function getBlogPostBySlug(slug: string) {
   return post;
 }
 
-// Get featured post (latest featured post)
-export async function getFeaturedPost() {
-  return client.fetch(`
-    *[_type == "post"] | order(publishedAt desc)[0] {
-      _id,
-      title,
-      title_fr,
-      "slug": slug.current,
-      publishedAt,
-      excerpt,
-      excerpt_fr,
-      "tags": tags,
-      "languages": languages,
-      "image": image {
-        asset->,
-        alt,
-        caption
-      },
-      "mainImage": image {
-        asset->,
-        alt,
-        caption
-      },
-      "category": category,
-      "categories": categories[] {
-        _id,
-        title,
-        slug
-      },
-      "author": author->{
-        _id,
-        name,
-        "image": image{
-          asset->,
-          alt
-        },
-        bio,
-        role
-      },
-      body
-    }
-  `);
-}
 
 // Get related posts (posts with same tags or categories)
 export async function getRelatedPosts(
@@ -335,12 +280,7 @@ export async function getRelatedPosts(
         excerpt_fr,
         "tags": tags,
         "languages": languages,
-        "image": image {
-          asset->,
-          alt,
-          caption
-        },
-        "mainImage": image {
+        "mainImage": mainImage {
           asset->,
           alt,
           caption
@@ -379,12 +319,7 @@ export async function getRelatedPosts(
       excerpt_fr,
       "tags": tags,
       "languages": languages,
-      "image": image {
-        asset->,
-        alt,
-        caption
-      },
-      "mainImage": image {
+      "mainImage": mainImage {
         asset->,
         alt,
         caption
@@ -393,7 +328,8 @@ export async function getRelatedPosts(
       "categories": categories[] {
         _id,
         title,
-        slug
+        slug,
+        color
       },
       "author": author->{
         _id,
@@ -411,20 +347,6 @@ export async function getRelatedPosts(
   );
 }
 
-// Story
-export async function getFeaturedStory() {
-  return client.fetch(`
-    *[_type == "story" && featured == true][0] {
-      _id,
-      title,
-      subtitle,
-      "mainImage": {
-        "url": mainImage.asset->url
-      },
-      content
-    }
-  `);
-}
 
 export async function getStory() {
   return client.fetch(
@@ -779,7 +701,6 @@ export interface MediaItem {
   duration?: string;
   artist?: string;
   genre?: string;
-  isFeatured: boolean;
   tags?: string[];
   publishedAt?: string;
 }
@@ -796,7 +717,6 @@ export const getAllMedia = async (): Promise<MediaItem[]> => {
     duration,
     artist,
     genre,
-    isFeatured,
     tags,
     publishedAt
   }`;
@@ -804,9 +724,9 @@ export const getAllMedia = async (): Promise<MediaItem[]> => {
   return await client.fetch<MediaItem[]>(query, {}, getCacheConfig(["media"]));
 };
 
-// Fetch featured media items
-export const getFeaturedMedia = async (limit = 10): Promise<MediaItem[]> => {
-  const query = `*[_type == "media" && isFeatured == true] | order(publishedAt desc) [0...$limit] {
+// Fetch media items (chronological order)
+export const getMedia = async (limit = 10): Promise<MediaItem[]> => {
+  const query = `*[_type == "media"] | order(publishedAt desc, _createdAt desc) [0...$limit] {
     _id,
     title,
     type,
@@ -816,7 +736,6 @@ export const getFeaturedMedia = async (limit = 10): Promise<MediaItem[]> => {
     duration,
     artist,
     genre,
-    isFeatured,
     tags,
     publishedAt
   }`;
@@ -843,7 +762,6 @@ export const getMediaByType = async (
     duration,
     artist,
     genre,
-    isFeatured,
     tags,
     publishedAt
   }`;

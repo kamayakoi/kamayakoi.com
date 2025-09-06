@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
-import { getAllMedia } from "@/lib/sanity/queries";
+import { getMedia } from "@/lib/sanity/queries";
 
 interface MediaItem {
   _id: string;
@@ -16,7 +16,6 @@ interface MediaItem {
   duration?: string;
   artist?: string;
   genre?: string;
-  isFeatured: boolean;
   tags?: string[];
   publishedAt?: string;
 }
@@ -34,17 +33,8 @@ export function MediaShowcase({ limit = 10 }: MediaShowcaseProps = {}) {
   useEffect(() => {
     const fetchMedia = async () => {
       try {
-        const fetchedMedia = await getAllMedia();
-        // Sort by publishedAt desc and take the limit
-        const sortedMedia = fetchedMedia
-          .sort((a, b) => {
-            if (!a.publishedAt && !b.publishedAt) return 0;
-            if (!a.publishedAt) return 1;
-            if (!b.publishedAt) return -1;
-            return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
-          })
-          .slice(0, limit);
-        setMedia(sortedMedia);
+        const fetchedMedia = await getMedia(limit);
+        setMedia(fetchedMedia);
       } catch (error) {
         console.error('Error fetching media:', error);
       } finally {
@@ -99,85 +89,83 @@ export function MediaShowcase({ limit = 10 }: MediaShowcaseProps = {}) {
           </div>
         ) : hasMedia ? (
           <>
-            {/* Horizontal Scrolling Media */}
-            <div className="overflow-x-auto pb-4">
-              <div className="flex gap-6 min-w-max">
-                {media.map((mediaItem) => (
-                  <div
-                    key={mediaItem._id}
-                    className="flex-shrink-0 w-72 relative overflow-hidden rounded-sm bg-black/20 backdrop-blur-sm group cursor-pointer"
-                    onClick={() => {
-                      if (playingMediaId === mediaItem._id) {
-                        handleMediaPause();
-                      } else {
-                        handleMediaPlay(mediaItem._id);
-                      }
-                    }}
-                  >
-                    {/* Thumbnail or Placeholder */}
-                    <div className="aspect-[4/3] relative">
-                      {mediaItem.thumbnail ? (
-                        <Image
-                          src={mediaItem.thumbnail}
-                          alt={mediaItem.title}
-                          fill
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                          <div className="text-white/50 text-center">
-                            <div className="text-3xl mb-2">
-                              {mediaItem.type === "youtube"
-                                ? "📺"
-                                : mediaItem.type === "soundcloud"
-                                  ? "🎵"
-                                  : mediaItem.type === "audio_url"
-                                    ? "🎧"
-                                    : "🎬"}
-                            </div>
-                            <div className="text-xs uppercase tracking-wide">
-                              {mediaItem.type.replace("_", " ")}
-                            </div>
+            {/* Media Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {media.map((mediaItem) => (
+                <div
+                  key={mediaItem._id}
+                  className="relative overflow-hidden rounded-sm bg-black/20 backdrop-blur-sm group cursor-pointer"
+                  onClick={() => {
+                    if (playingMediaId === mediaItem._id) {
+                      handleMediaPause();
+                    } else {
+                      handleMediaPlay(mediaItem._id);
+                    }
+                  }}
+                >
+                  {/* Thumbnail or Placeholder */}
+                  <div className="aspect-[4/3] relative">
+                    {mediaItem.thumbnail ? (
+                      <Image
+                        src={mediaItem.thumbnail}
+                        alt={mediaItem.title}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <div className="text-white/50 text-center">
+                          <div className="text-3xl mb-2">
+                            {mediaItem.type === "youtube"
+                              ? "📺"
+                              : mediaItem.type === "soundcloud"
+                                ? "🎵"
+                                : mediaItem.type === "audio_url"
+                                  ? "🎧"
+                                  : "🎬"}
                           </div>
-                        </div>
-                      )}
-
-                      {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <div className="text-white text-center">
-                          <div className="text-lg font-bold mb-1">
-                            {mediaItem.title}
-                          </div>
-                          {mediaItem.artist && (
-                            <div className="text-sm text-white/80">
-                              {mediaItem.artist}
-                            </div>
-                          )}
-                          <div className="text-xs text-white/60 mt-2 uppercase tracking-wide">
-                            {currentLanguage === "fr"
-                              ? "Cliquer pour jouer"
-                              : "Click to Play"}
+                          <div className="text-xs uppercase tracking-wide">
+                            {mediaItem.type.replace("_", " ")}
                           </div>
                         </div>
                       </div>
-                    </div>
+                    )}
 
-                    {/* Media Info */}
-                    <div className="p-4">
-                      <h3 className="text-white font-semibold text-sm mb-2 line-clamp-2">
-                        {mediaItem.title}
-                      </h3>
-                      <div className="flex items-center justify-between text-xs text-white/60">
-                        <span>{mediaItem.genre || mediaItem.type}</span>
-                        {mediaItem.duration && (
-                          <span>{mediaItem.duration}</span>
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <div className="text-white text-center">
+                        <div className="text-lg font-bold mb-1">
+                          {mediaItem.title}
+                        </div>
+                        {mediaItem.artist && (
+                          <div className="text-sm text-white/80">
+                            {mediaItem.artist}
+                          </div>
                         )}
+                        <div className="text-xs text-white/60 mt-2 uppercase tracking-wide">
+                          {currentLanguage === "fr"
+                            ? "Cliquer pour jouer"
+                            : "Click to Play"}
+                        </div>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
+
+                  {/* Media Info */}
+                  <div className="p-4">
+                    <h3 className="text-white font-semibold text-sm mb-2 line-clamp-2">
+                      {mediaItem.title}
+                    </h3>
+                    <div className="flex items-center justify-between text-xs text-white/60">
+                      <span>{mediaItem.genre || mediaItem.type}</span>
+                      {mediaItem.duration && (
+                        <span>{mediaItem.duration}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </>
         ) : (

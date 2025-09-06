@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, Check, X } from "lucide-react";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { IG } from "@/components/icons/IG";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { FacebookIcon } from "@/components/icons/FacebookIcon";
@@ -102,6 +103,8 @@ function ContactForm({ onClose }: { onClose: () => void }) {
 
 export function Footer() {
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isNewsletterFocused, setIsNewsletterFocused] = useState(false);
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const { currentLanguage } = useTranslation();
 
   return (
@@ -227,7 +230,7 @@ export function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/gallery"
+                    href="/archives"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
                     {t(currentLanguage, "footer.navigation.archive")}
@@ -294,8 +297,109 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Desktop: Language Switcher, Mobile: Social Icons and Language Switcher */}
-          <div className="flex items-center gap-3 translate-x-0 md:translate-x-8">
+          {/* Desktop: Newsletter + Language Switcher, Mobile: Social Icons and Language Switcher */}
+          <div className="flex items-center gap-2 translate-x-0 md:translate-x-8">
+            <div className="hidden md:block">
+              <motion.div
+                className="flex items-center"
+                animate={{
+                  width: isNewsletterFocused ? "180px" : "130px"
+                }}
+                transition={{
+                  duration: 0.4,
+                  ease: [0.4, 0.0, 0.2, 1],
+                  type: "tween"
+                }}
+                style={{ justifyContent: 'flex-end' }}
+              >
+                <motion.form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target as HTMLFormElement);
+                    const email = formData.get('email') as string;
+
+                    if (!email) return;
+
+                    setNewsletterStatus('loading');
+
+                    const newsletterData = new FormData();
+                    newsletterData.append('email', email);
+                    newsletterData.append('subject', 'New Newsletter Subscription');
+                    newsletterData.append('message', `New person subscribed to newsletter: ${email}`);
+                    newsletterData.append('type', 'newsletter');
+
+                    const result = await sendEmail(newsletterData);
+                    if (result.success) {
+                      setNewsletterStatus('success');
+                      (e.target as HTMLFormElement).reset();
+                      setIsNewsletterFocused(false);
+                      // Reset status after 3 seconds
+                      setTimeout(() => setNewsletterStatus('idle'), 3000);
+                    } else {
+                      setNewsletterStatus('error');
+                      // Reset status after 3 seconds
+                      setTimeout(() => setNewsletterStatus('idle'), 3000);
+                    }
+                  }}
+                  className="flex"
+                >
+                  <motion.input
+                    type="email"
+                    name="email"
+                    placeholder={t(currentLanguage, "footer.newsletter.placeholder")}
+                    required
+                    animate={{
+                      x: isNewsletterFocused ? -45 : 0
+                    }}
+                    transition={{
+                      duration: 0.4,
+                      ease: [0.4, 0.0, 0.2, 1],
+                      type: "tween"
+                    }}
+                    onFocus={() => setIsNewsletterFocused(true)}
+                    onBlur={() => {
+                      // Longer delay to prevent flickering when clicking button
+                      setTimeout(() => setIsNewsletterFocused(false), 300);
+                    }}
+                    className="bg-transparent rounded-sm px-2 py-1 text-xs border border-gray-700 focus:ring-1 focus:ring-gray-400 placeholder:text-gray-400 text-white transition-colors focus:outline-none focus:bg-transparent h-6 w-38"
+                  />
+                  <motion.button
+                    type="submit"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{
+                      opacity: isNewsletterFocused ? 1 : 0,
+                      scale: isNewsletterFocused ? 1 : 0.8,
+                    }}
+                    transition={{
+                      duration: 0.4,
+                      ease: [0.4, 0.0, 0.2, 1],
+                      type: "tween"
+                    }}
+                    style={{
+                      pointerEvents: isNewsletterFocused ? 'auto' : 'none'
+                    }}
+                    className={`px-2 py-1 rounded-sm text-xs font-medium transition-colors h-6 -ml-8 flex items-center justify-center min-w-[50px] ${isNewsletterFocused ? '' : 'invisible'
+                      } ${newsletterStatus === 'success'
+                        ? 'bg-green-800 text-green-100'
+                        : newsletterStatus === 'error'
+                          ? 'bg-red-800 text-red-100'
+                          : 'bg-teal-800 hover:bg-teal-700 text-teal-100'
+                      }`}
+                    disabled={newsletterStatus === 'loading'}
+                  >
+                    {newsletterStatus === 'loading' ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : newsletterStatus === 'success' ? (
+                      <Check className="w-4 h-4" />
+                    ) : newsletterStatus === 'error' ? (
+                      <X className="w-4 h-4" />
+                    ) : (
+                      t(currentLanguage, "footer.newsletter.sendButton")
+                    )}
+                  </motion.button>
+                </motion.form>
+              </motion.div>
+            </div>
             <div className="hidden md:block">
               <LanguageSwitcher />
             </div>

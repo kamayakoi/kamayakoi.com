@@ -78,7 +78,7 @@ export function PaymentCancelClient({ purchaseId }: PaymentCancelClientProps) {
                 </Button>
 
                 <Button variant="outline" asChild className="w-full">
-                  <Link href="/gallery">
+                  <Link href="/archives">
                     {t(currentLanguage, "paymentCancel.buttons.browseGallery")}
                   </Link>
                 </Button>

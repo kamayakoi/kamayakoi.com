@@ -14,6 +14,10 @@
       "sendButton": "Send Message",
       "sendError": "Failed to send email"
     },
+    "newsletter": {
+      "placeholder": "Subscribe to newsletter",
+      "sendButton": "Send"
+    },
     "sections": {
       "explore": "EXPLORE",
       "connect": "CONNECT",
@@ -450,9 +454,14 @@
       "copyLink": "Copy link"
     }
   },
+  "archivesPage": {
+    "title": "Archives",
+    "description": "Explore our collection of memories, moments, and visual stories that capture the essence of Kamayakoi's journey.",
+    "noImages": "No images available."
+  },
   "merchPage": {
     "title": "Merch",
-    "subtitle": "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products crafted for the wild at heart.",
+    "subtitle": "Shop exclusive Kamayakoi merch, apparel, and collectibles. Support the movement with our unique designs and products crafted for the wild at heart.",
     "breadcrumb": "Shop",
     "loading": "Loading...",
     "comingSoon": {

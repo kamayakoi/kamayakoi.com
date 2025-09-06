@@ -137,12 +137,5 @@ export default {
         },
       ],
     },
-    {
-      name: 'isFeatured',
-      title: 'Featured post?',
-      type: 'boolean',
-      initialValue: false,
-      description: 'Feature this post on the homepage or blog landing page.',
-    },
   ],
 }

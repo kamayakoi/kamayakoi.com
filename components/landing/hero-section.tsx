@@ -131,7 +131,7 @@ export function HeroSection({
     ? featuredEvents.map((event) => {
       // Select description based on current language
       const description = event.description
-        ? (event.description as any)[currentLanguage] || (event.description as any)['en'] || (event.description as any)['fr']
+        ? event.description[currentLanguage as keyof typeof event.description] || event.description.en || event.description.fr
         : undefined;
 
       return {

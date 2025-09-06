@@ -8,10 +8,10 @@ export async function triggerRevalidation(options?: {
   paths?: string[];
 }) {
   try {
-    const response = await fetch('/api/revalidate', {
-      method: 'POST',
+    const response = await fetch("/api/revalidate", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(options || {}),
     });
@@ -21,17 +21,19 @@ export async function triggerRevalidation(options?: {
     }
 
     const result = await response.json();
-    console.log('Revalidation successful:', result);
+    console.log("Revalidation successful:", result);
     return result;
   } catch (error) {
-    console.error('Revalidation failed:', error);
+    console.error("Revalidation failed:", error);
     throw error;
   }
 }
 
 // Quick revalidation functions for common content types
-export const revalidateEvents = () => triggerRevalidation({ tags: ['events'] });
-export const revalidatePosts = () => triggerRevalidation({ tags: ['posts'] });
-export const revalidateProducts = () => triggerRevalidation({ tags: ['products'] });
-export const revalidateHomepage = () => triggerRevalidation({ tags: ['homepage'] });
+export const revalidateEvents = () => triggerRevalidation({ tags: ["events"] });
+export const revalidatePosts = () => triggerRevalidation({ tags: ["posts"] });
+export const revalidateProducts = () =>
+  triggerRevalidation({ tags: ["products"] });
+export const revalidateHomepage = () =>
+  triggerRevalidation({ tags: ["homepage"] });
 export const revalidateAll = () => triggerRevalidation();

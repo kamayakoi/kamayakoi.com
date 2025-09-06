@@ -213,7 +213,6 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
     getVideoState,
   ]);
 
-
   const handleImageClick = (slug: string, index: number) => {
     // Defer saving video state until after render cycle
     setTimeout(() => {
@@ -291,7 +290,6 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
       }
     }
   };
-
 
   if (displayEvents.length === 0) {
     return (
@@ -416,7 +414,6 @@ export default function ParallaxGallery({ events }: ParallaxGalleryProps) {
                     )}
                   </div>
                 )}
-
               </div>
             </section>
           );

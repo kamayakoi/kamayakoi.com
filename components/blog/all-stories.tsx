@@ -124,15 +124,19 @@ const AllStories = ({ stories, heading = "All Stories" }: AllStoriesProps) => {
               <div className="p-5 flex flex-col flex-grow">
                 <div className="flex-grow flex flex-col">
                   <div className="flex items-center mb-1">
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      {format(new Date(story.publishedAt), "MMM d, yyyy")}
-                    </p>
+                    <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
+                      {story.author && <span>{story.author.name}</span>}
+                      {story.author && <span className="mx-1">·</span>}
+                      <span>
+                        {format(new Date(story.publishedAt), "MMM d, yyyy")}
+                      </span>
+                    </div>
                   </div>
 
                   <h3 className="font-semibold text-lg mb-3 leading-tight text-zinc-900 dark:text-white group-hover:text-primary transition-colors min-h-fit">
                     {story.title}
                   </h3>
-                  <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4 overflow-hidden line-clamp-2 pr-4 max-w-[90%]">
+                  <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4 overflow-hidden line-clamp-2">
                     {story.excerpt}
                   </p>
                 </div>
@@ -144,7 +148,7 @@ const AllStories = ({ stories, heading = "All Stories" }: AllStoriesProps) => {
                   )}
 
                   <div className="flex items-center text-primary text-sm font-normal">
-                    Read more
+                    Read more →
                   </div>
                 </div>
               </div>

@@ -36,14 +36,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Revalidation completed",
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error("Error in manual revalidation:", error);
-    return NextResponse.json(
-      { error: "Revalidation failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Revalidation failed" }, { status: 500 });
   }
 }

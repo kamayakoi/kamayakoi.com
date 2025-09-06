@@ -12,7 +12,12 @@ interface MediaCard {
   genres: string[];
   image: string;
   isLarge?: boolean;
-  type?: "youtube" | "soundcloud" | "soundcloud_playlist" | "audio_url" | "video_url";
+  type?:
+    | "youtube"
+    | "soundcloud"
+    | "soundcloud_playlist"
+    | "audio_url"
+    | "video_url";
   url?: string;
   artist?: string;
 }
@@ -41,9 +46,12 @@ const getMediaIcon = (type?: string) => {
 };
 
 // Helper function to handle card clicks
-const handleCardClick = (card: MediaCard, onCardClick?: (card: MediaCard) => void) => {
+const handleCardClick = (
+  card: MediaCard,
+  onCardClick?: (card: MediaCard) => void,
+) => {
   if (card.url) {
-    window.open(card.url, '_blank', 'noopener,noreferrer');
+    window.open(card.url, "_blank", "noopener,noreferrer");
   } else if (onCardClick) {
     onCardClick(card);
   }
@@ -70,9 +78,10 @@ export default function HorizontalMediaCards({
             className={`
               relative flex-shrink-0 rounded-sm overflow-hidden cursor-pointer
               transition-all duration-300 hover:scale-[1.02] hover:shadow-xl
-              ${card.isLarge || index === 0
-                ? "w-[450px] md:w-[600px] h-60 md:h-64"
-                : "w-[420px] md:w-[520px] h-60 md:h-64"
+              ${
+                card.isLarge || index === 0
+                  ? "w-[450px] md:w-[600px] h-60 md:h-64"
+                  : "w-[420px] md:w-[520px] h-60 md:h-64"
               }
             `}
             onClick={() => handleCardClick(card, onCardClick)}

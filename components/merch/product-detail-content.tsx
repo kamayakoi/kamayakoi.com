@@ -67,10 +67,14 @@ function ProductDetail({ product }: ProductDetailContentProps) {
 
   // Ensure we have a valid image URL (not empty string)
   let hasValidImage = false;
-  if (typeof selectedImage === 'string' && selectedImage) {
-    hasValidImage = (selectedImage as string).trim() !== '';
-  } else if (selectedImage && typeof selectedImage === 'object' && selectedImage.url) {
-    hasValidImage = (selectedImage.url as string).trim() !== '';
+  if (typeof selectedImage === "string" && selectedImage) {
+    hasValidImage = (selectedImage as string).trim() !== "";
+  } else if (
+    selectedImage &&
+    typeof selectedImage === "object" &&
+    selectedImage.url
+  ) {
+    hasValidImage = (selectedImage.url as string).trim() !== "";
   }
 
   const handleAddToCart = async () => {
@@ -140,15 +144,17 @@ function ProductDetail({ product }: ProductDetailContentProps) {
             {allImages.length > 1 && (
               <div className="grid grid-cols-4 gap-2">
                 {allImages.slice(0, 4).map((image, index) => {
-                  const hasValidThumbnail = image.url && image.url.trim() !== '';
+                  const hasValidThumbnail =
+                    image.url && image.url.trim() !== "";
                   return hasValidThumbnail ? (
                     <button
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
-                      className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all ${selectedImageIndex === index
-                        ? "ring-2 ring-primary"
-                        : "hover:ring-2 hover:ring-muted-foreground/50"
-                        }`}
+                      className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all ${
+                        selectedImageIndex === index
+                          ? "ring-2 ring-primary"
+                          : "hover:ring-2 hover:ring-muted-foreground/50"
+                      }`}
                     >
                       <Image
                         src={image.url}
@@ -180,7 +186,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
-                {product.name || 'Product'}
+                {product.name || "Product"}
               </motion.h1>
               <motion.p
                 className="text-2xl font-semibold text-primary"
@@ -188,7 +194,10 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
               >
-                {typeof product.price === 'number' ? product.price.toLocaleString() : '0'} F CFA
+                {typeof product.price === "number"
+                  ? product.price.toLocaleString()
+                  : "0"}{" "}
+                F CFA
               </motion.p>
               {product.stock !== undefined && (
                 <motion.p
@@ -197,7 +206,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5, delay: 0.5 }}
                 >
-                  {typeof product.stock === 'number' && product.stock > 0
+                  {typeof product.stock === "number" && product.stock > 0
                     ? `${product.stock} ${t(currentLanguage, "merchPage.productDetail.inStock")}`
                     : t(currentLanguage, "merchPage.productDetail.outOfStock")}
                 </motion.p>
@@ -297,7 +306,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
               <div className="text-sm text-muted-foreground space-y-1">
                 <p>
                   {t(currentLanguage, "merchPage.productDetail.productId")}{" "}
-                  {product.productId || product._id || 'N/A'}
+                  {product.productId || product._id || "N/A"}
                 </p>
                 <p>{t(currentLanguage, "merchPage.productDetail.category")}</p>
                 <p>{t(currentLanguage, "merchPage.productDetail.shipping")}</p>

@@ -69,14 +69,15 @@ export default async function Home() {
     })) || [];
 
   // Extract video URLs from homepage data for BackgroundVideo component
-  const videoUrls = homepageData?.heroContent
-    ?.filter((item) => item.isActive && item.type === 'video')
-    ?.map((item) => {
-      if (item.video?.asset?.url) return item.video.asset.url;
-      if (item.videoUrl) return item.videoUrl;
-      return null;
-    })
-    ?.filter((url): url is string => url !== null) || [];
+  const videoUrls =
+    homepageData?.heroContent
+      ?.filter((item) => item.isActive && item.type === "video")
+      ?.map((item) => {
+        if (item.video?.asset?.url) return item.video.asset.url;
+        if (item.videoUrl) return item.videoUrl;
+        return null;
+      })
+      ?.filter((url): url is string => url !== null) || [];
 
   return (
     <div className="min-h-screen bg-background text-foreground relative">

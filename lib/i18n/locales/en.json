@@ -402,7 +402,7 @@
   },
   "storyPage": {
     "backToStories": "Back to stories",
-    "byAuthor": "By {authorName}",
+    "byAuthor": "{authorName}",
     "relatedStories": "RELATED STORIES",
     "readMore": "Read",
     "noRelatedStories": "No related stories found.",

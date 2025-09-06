@@ -44,6 +44,9 @@ export async function generateStaticParams() {
   const products = await getAllProducts();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return products.map((product: any) => ({
-    slug: typeof product.slug === "string" ? product.slug : product.slug?.current || '',
+    slug:
+      typeof product.slug === "string"
+        ? product.slug
+        : product.slug?.current || "",
   }));
 }

@@ -55,9 +55,11 @@ export function CartItemCard({ item }: CartItemCardProps) {
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-start mb-1">
           <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-sm truncate text-white">{product.name}</h3>
+            <h3 className="font-medium text-sm truncate text-white">
+              {product.name}
+            </h3>
             <p className="text-xs text-white/70">
-              {product.price.toLocaleString('fr-FR')} F CFA
+              {product.price.toLocaleString("fr-FR")} F CFA
             </p>
           </div>
           <Button
@@ -98,7 +100,7 @@ export function CartItemCard({ item }: CartItemCardProps) {
           </div>
 
           <div className="text-sm font-medium text-white">
-            {(product.price * quantity).toLocaleString('fr-FR')} F CFA
+            {(product.price * quantity).toLocaleString("fr-FR")} F CFA
           </div>
         </div>
       </div>

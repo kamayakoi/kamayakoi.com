@@ -472,9 +472,9 @@ export default function AdminPage() {
                 Admin panel
               </h1>
               <p className="text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-3xl">
-                Manage purchases, track email dispatch status, and oversee ticket
-                sales for Kamayakoi events. Monitor customer interactions and
-                ensure smooth operations.
+                Manage purchases, track email dispatch status, and oversee
+                ticket sales for Kamayakoi events. Monitor customer interactions
+                and ensure smooth operations.
               </p>
             </div>
             <Button
@@ -492,7 +492,10 @@ export default function AdminPage() {
         <div className="mb-12">
           <div className="flex flex-col gap-6">
             <div className="flex-1">
-              <Label htmlFor="search" className="text-zinc-200 font-medium text-sm uppercase tracking-wider mb-4 block">
+              <Label
+                htmlFor="search"
+                className="text-zinc-200 font-medium text-sm uppercase tracking-wider mb-4 block"
+              >
                 Search Purchases
               </Label>
               <div className="flex gap-3 items-center">
@@ -539,7 +542,10 @@ export default function AdminPage() {
           <CardHeader className="pb-6">
             <div className="mb-2">
               <CardTitle className="text-white text-2xl font-semibold">
-                Purchases{filteredPurchases.length > 0 ? ` (${filteredPurchases.length})` : ''}
+                Purchases
+                {filteredPurchases.length > 0
+                  ? ` (${filteredPurchases.length})`
+                  : ""}
               </CardTitle>
             </div>
             <CardDescription className="text-zinc-300 text-base leading-relaxed">
@@ -560,7 +566,8 @@ export default function AdminPage() {
                   No purchases found
                 </h2>
                 <p className="text-zinc-400 mb-6">
-                  Try adjusting your search or check back later for new purchases.
+                  Try adjusting your search or check back later for new
+                  purchases.
                 </p>
               </motion.div>
             ) : (
@@ -802,8 +809,8 @@ export default function AdminPage() {
             <DialogHeader>
               <DialogTitle className="text-gray-100">
                 {selectedPurchase &&
-                  (selectedPurchase.email_dispatch_status === "NOT_INITIATED" ||
-                    selectedPurchase.email_dispatch_attempts === 0)
+                (selectedPurchase.email_dispatch_status === "NOT_INITIATED" ||
+                  selectedPurchase.email_dispatch_attempts === 0)
                   ? "Send Ticket Email"
                   : "Resend Ticket Email"}
               </DialogTitle>
@@ -891,7 +898,7 @@ export default function AdminPage() {
                       <>
                         {selectedPurchase.email_dispatch_status ===
                           "NOT_INITIATED" ||
-                          selectedPurchase.email_dispatch_attempts === 0 ? (
+                        selectedPurchase.email_dispatch_attempts === 0 ? (
                           <>
                             <Send className="h-4 w-4 mr-2" />
                             Send Email

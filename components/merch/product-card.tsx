@@ -46,9 +46,12 @@ interface SanityProduct {
 
 function ProductCardContent({ product }: { product: SanityProduct }) {
   const { addItem } = useCart();
-  const slug = typeof product.slug === 'string' ? product.slug : product.slug?.current || '';
+  const slug =
+    typeof product.slug === "string"
+      ? product.slug
+      : product.slug?.current || "";
   const mainImage = product.mainImage || product.images?.[0]?.url;
-  const hasValidImage = mainImage && mainImage.trim() !== '';
+  const hasValidImage = mainImage && mainImage.trim() !== "";
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -60,7 +63,6 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
   const formatPrice = (price: number): string => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
   };
-
 
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0 mb-6">
@@ -92,7 +94,6 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
             </div>
           )}
         </Link>
-
       </div>
 
       <CardContent className="p-4 space-y-3 px-4">
@@ -130,7 +131,11 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
           </span>
           <Suspense
             fallback={
-              <Button size="sm" disabled className="rounded-sm px-4 py-2 text-xs font-medium bg-teal-800 text-teal-200">
+              <Button
+                size="sm"
+                disabled
+                className="rounded-sm px-4 py-2 text-xs font-medium bg-teal-800 text-teal-200"
+              >
                 ...
               </Button>
             }

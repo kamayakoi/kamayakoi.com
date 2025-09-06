@@ -33,7 +33,7 @@ const CartItems = ({ closeCart }: { closeCart: () => void }) => {
       <CartContainer className="flex justify-between items-center px-2 text-sm text-muted-foreground mb-4">
         <span className="font-medium">Products</span>
         <span className="bg-muted/50 px-2 py-1 rounded-sm text-xs">
-          {cart.lines.length} item{cart.lines.length !== 1 ? 's' : ''}
+          {cart.lines.length} item{cart.lines.length !== 1 ? "s" : ""}
         </span>
       </CartContainer>
       <div className="relative flex-1 min-h-0 py-4 overflow-x-hidden">
@@ -62,7 +62,8 @@ const CartItems = ({ closeCart }: { closeCart: () => void }) => {
             <div className="flex justify-between items-center py-2">
               <p className="text-lg font-bold text-foreground">Total</p>
               <p className="text-xl font-bold text-primary">
-                {Number(cart.cost.totalAmount.amount).toLocaleString('fr-FR')} F CFA
+                {Number(cart.cost.totalAmount.amount).toLocaleString("fr-FR")} F
+                CFA
               </p>
             </div>
           </CartContainer>
@@ -181,62 +182,71 @@ export default function CartModal() {
       >
         <ShoppingCart className="h-4 w-4" />
         {cart.totalQuantity > 0 && (
-          <span className="absolute -top-1 -right-1 bg-teal-600 text-teal-100 text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium border border-teal-500">
+          <span className="absolute -top-1 -right-1 bg-teal-600 text-teal-100 text-xs rounded-sm h-5 w-5 flex items-center justify-center font-medium border border-teal-500">
             {cart.totalQuantity}
           </span>
         )}
       </Button>
 
       {/* Render modal at document body level using portal */}
-      {isMounted && createPortal(
-        <AnimatePresence>
-          {isOpen && (
-            <>
-              {/* Backdrop */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="fixed inset-0 z-[60] bg-foreground/30 will-change-auto"
-                onClick={closeCart}
-                aria-hidden="true"
-                style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-              />
+      {isMounted &&
+        createPortal(
+          <AnimatePresence>
+            {isOpen && (
+              <>
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="fixed inset-0 z-[60] bg-foreground/30 will-change-auto"
+                  onClick={closeCart}
+                  aria-hidden="true"
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                  }}
+                />
 
-              {/* Panel */}
-              <motion.div
-                initial={{ x: "100%" }}
-                animate={{ x: 0 }}
-                exit={{ x: "100%" }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="fixed top-0 bottom-0 right-0 flex w-full md:w-[500px] p-4 z-[70] will-change-transform"
-                style={{ position: 'fixed', top: 0, right: 0, bottom: 0 }}
-              >
-                <div className="flex flex-col py-6 w-full bg-[#1a1a1a] backdrop-blur-xl rounded-sm shadow-2xl">
-                  <CartContainer className="flex justify-between items-center mb-8">
-                    <div>
-                      <h2 className="text-3xl font-bold text-foreground">Cart</h2>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="hover:bg-muted/50"
-                      aria-label="Close cart"
-                      onClick={closeCart}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </CartContainer>
+                {/* Panel */}
+                <motion.div
+                  initial={{ x: "100%" }}
+                  animate={{ x: 0 }}
+                  exit={{ x: "100%" }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="fixed top-0 bottom-0 right-0 flex w-full md:w-[500px] p-4 z-[70] will-change-transform"
+                  style={{ position: "fixed", top: 0, right: 0, bottom: 0 }}
+                >
+                  <div className="flex flex-col py-6 w-full bg-[#1a1a1a] backdrop-blur-xl rounded-sm shadow-2xl">
+                    <CartContainer className="flex justify-between items-center mb-8">
+                      <div>
+                        <h2 className="text-3xl font-bold text-foreground">
+                          Cart
+                        </h2>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="hover:bg-muted/50"
+                        aria-label="Close cart"
+                        onClick={closeCart}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </CartContainer>
 
-                  {renderCartContent()}
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+                    {renderCartContent()}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
     </>
   );
 }

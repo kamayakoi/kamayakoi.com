@@ -73,15 +73,20 @@ export default function MerchContentClient({
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
     const filtered = products.filter((product) => {
-      const descriptionText = typeof product.description === 'string'
-        ? product.description
-        : product.description?.[0]?.children?.[0]?.text || '';
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      const descriptionText =
+        typeof product.description === "string"
+          ? product.description
+          : product.description?.[0]?.children?.[0]?.text || "";
+      const matchesSearch =
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         descriptionText.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === "all" ||
-        product.categories?.some(cat => cat.slug?.current === selectedCategory);
-      const matchesTag = selectedTag === "all" ||
-        product.tags?.includes(selectedTag);
+      const matchesCategory =
+        selectedCategory === "all" ||
+        product.categories?.some(
+          (cat) => cat.slug?.current === selectedCategory,
+        );
+      const matchesTag =
+        selectedTag === "all" || product.tags?.includes(selectedTag);
 
       return matchesSearch && matchesCategory && matchesTag;
     });
@@ -92,8 +97,8 @@ export default function MerchContentClient({
   // Get unique categories and tags from products
   const availableCategories = useMemo(() => {
     const cats = new Set<string>();
-    products.forEach(product => {
-      product.categories?.forEach(cat => {
+    products.forEach((product) => {
+      product.categories?.forEach((cat) => {
         if (cat.slug?.current) {
           cats.add(cat.slug.current);
         }
@@ -104,8 +109,8 @@ export default function MerchContentClient({
 
   const availableTags = useMemo(() => {
     const tags = new Set<string>();
-    products.forEach(product => {
-      product.tags?.forEach(tag => tags.add(tag));
+    products.forEach((product) => {
+      product.tags?.forEach((tag) => tags.add(tag));
     });
     return Array.from(tags);
   }, [products]);
@@ -144,7 +149,6 @@ export default function MerchContentClient({
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             <div className="mb-6">
-
               {/* Search and Filters */}
               <div className="flex items-center gap-4 flex-wrap">
                 <div className="relative w-48">
@@ -157,7 +161,10 @@ export default function MerchContentClient({
                   />
                 </div>
 
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <Select
+                  value={selectedCategory}
+                  onValueChange={setSelectedCategory}
+                >
                   <SelectTrigger className="w-48 rounded-sm bg-background h-10">
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
@@ -215,12 +222,16 @@ export default function MerchContentClient({
               transition={{ duration: 0.5 }}
             >
               <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
-                {searchQuery || selectedCategory !== "all" || selectedTag !== "all"
+                {searchQuery ||
+                selectedCategory !== "all" ||
+                selectedTag !== "all"
                   ? "No products found"
                   : t(currentLanguage, "merchPage.comingSoon.title")}
               </h2>
               <p className="text-zinc-600 dark:text-zinc-400 mb-6">
-                {searchQuery || selectedCategory !== "all" || selectedTag !== "all"
+                {searchQuery ||
+                selectedCategory !== "all" ||
+                selectedTag !== "all"
                   ? "Try adjusting your filters or search terms."
                   : t(currentLanguage, "merchPage.comingSoon.description")}
               </p>

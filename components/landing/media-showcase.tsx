@@ -138,7 +138,9 @@ export function MediaShowcase({ media }: MediaShowcaseProps) {
                       </h3>
                       <div className="flex items-center justify-between text-xs text-white/60">
                         <span>{mediaItem.genre || mediaItem.type}</span>
-                        {mediaItem.duration && <span>{mediaItem.duration}</span>}
+                        {mediaItem.duration && (
+                          <span>{mediaItem.duration}</span>
+                        )}
                       </div>
                     </div>
                   </div>

@@ -89,14 +89,12 @@ export default function StoriesContentClient({
                               <h3 className="text-2xl md:text-3xl font-semibold text-white group-hover:text-primary transition-colors mb-2">
                                 {featuredStory.title}
                               </h3>
-                              {featuredStory.excerpt && (
-                                <p className="text-zinc-400 mb-4 line-clamp-2 pr-6 max-w-[85%]">
-                                  {featuredStory.excerpt}
-                                </p>
-                              )}
-                              <div className="flex items-center gap-4 text-sm text-zinc-400">
+                              <div className="flex items-center gap-2 text-sm text-zinc-400">
                                 {featuredStory.author && (
-                                  <span>By {featuredStory.author.name}</span>
+                                  <span>{featuredStory.author.name}</span>
+                                )}
+                                {featuredStory.author && (
+                                  <span className="mx-1">·</span>
                                 )}
                                 <span>
                                   {new Date(
@@ -172,12 +170,16 @@ export default function StoriesContentClient({
                           </p>
 
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-zinc-400">
-                              {new Date(story.publishedAt).toLocaleDateString(
-                                "en-US",
-                                { month: "short", day: "numeric" },
-                              )}
-                            </span>
+                            <div className="flex items-center gap-1 text-xs text-zinc-400">
+                              {story.author && <span>{story.author.name}</span>}
+                              {story.author && <span className="mx-1">·</span>}
+                              <span>
+                                {new Date(story.publishedAt).toLocaleDateString(
+                                  "en-US",
+                                  { month: "short", day: "numeric" },
+                                )}
+                              </span>
+                            </div>
                             <Link
                               href={`/stories/${story.slug}`}
                               className="inline-flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"

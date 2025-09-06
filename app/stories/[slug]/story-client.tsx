@@ -211,7 +211,9 @@ export default function StoryClient({ post, slug }: StoryClientProps) {
                   <div className="flex items-center mr-6 mb-2">
                     {post.author.image && (
                       <Image
-                        src={post.author.image?.asset?.url || "/placeholder.webp"}
+                        src={
+                          post.author.image?.asset?.url || "/placeholder.webp"
+                        }
                         alt={post.author.name}
                         width={16}
                         height={16}

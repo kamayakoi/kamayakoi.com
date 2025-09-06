@@ -13,7 +13,7 @@ interface BackgroundVideoProps {
 export default function BackgroundVideo({
   videoUrls,
   height = "min-h-screen",
-  className = ""
+  className = "",
 }: BackgroundVideoProps) {
   // State to manage sound, default to muted
   const [isMuted, setIsMuted] = useState(false);
@@ -77,7 +77,9 @@ export default function BackgroundVideo({
   // We'll use a wrapper div to conditionally render the blurred background
 
   return (
-    <div className={`relative w-full overflow-hidden flex items-center justify-center ${height} ${className}`}>
+    <div
+      className={`relative w-full overflow-hidden flex items-center justify-center ${height} ${className}`}
+    >
       {/* Blurred background for portrait on desktop only */}
       <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
         {isPortrait && (

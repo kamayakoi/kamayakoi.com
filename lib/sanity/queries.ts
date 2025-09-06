@@ -3,7 +3,7 @@ import { client } from "./client";
 // Helper function to get cache configuration based on environment
 const getCacheConfig = (tags: string[]) => ({
   next: {
-    revalidate: process.env.NODE_ENV === 'production' ? 900 : 0, // No cache in development, 15 minutes in production
+    revalidate: process.env.NODE_ENV === "production" ? 900 : 0, // No cache in development, 15 minutes in production
     tags,
   },
 });
@@ -168,8 +168,8 @@ export async function getLatestBlogPosts(limit = 2) {
   `,
     { limit },
     getCacheConfig(["posts"]),
-    );
-  }
+  );
+}
 
 export async function getAllBlogPosts() {
   return client.fetch(`
@@ -1051,11 +1051,7 @@ export const getAllMedia = async (): Promise<MediaItem[]> => {
     publishedAt
   }`;
 
-  return await client.fetch<MediaItem[]>(
-    query,
-    {},
-    getCacheConfig(["media"]),
-  );
+  return await client.fetch<MediaItem[]>(query, {}, getCacheConfig(["media"]));
 };
 
 // Fetch featured media items

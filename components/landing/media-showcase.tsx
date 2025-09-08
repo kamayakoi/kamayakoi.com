@@ -128,20 +128,22 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
         </div>
       </div>
 
-      <CardContent className="pt-1 pb-4 px-4 space-y-1">
-        <div className="cursor-pointer" onClick={handleMediaClick}>
-          <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2 break-words overflow-wrap-anywhere">
-            {mediaItem.title}
-          </h3>
+      <CardContent className="pt-1 pb-4 px-4 flex flex-col min-h-[120px]">
+        <div className="flex-1 space-y-1">
+          <div className="cursor-pointer" onClick={handleMediaClick}>
+            <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2 break-words overflow-wrap-anywhere">
+              {mediaItem.title}
+            </h3>
+          </div>
+
+          {mediaItem.description && (
+            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed break-words overflow-wrap-anywhere">
+              {mediaItem.description}
+            </p>
+          )}
         </div>
 
-        {mediaItem.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed break-words overflow-wrap-anywhere">
-            {mediaItem.description}
-          </p>
-        )}
-
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {mediaItem.artist && (
               <span className="px-2 py-1 text-xs font-medium rounded-sm bg-teal-900 text-teal-200">
@@ -181,7 +183,7 @@ export function MediaShowcase({ media }: MediaShowcaseProps) {
             <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
               {t(currentLanguage, "eventShowcase.media.title")}
               <span className="text-white/60 mx-3 hidden md:inline">·</span>
-              <span className="text-white/70 font-normal text-xl md:text-2xl block md:inline-block transform -translate-y-0.25">
+              <span className="text-white/70 font-normal text-xl md:text-2xl block md:inline-block transform -translate-y-[5px]">
                 {t(currentLanguage, "eventShowcase.media.subtitle")}
               </span>
             </h2>

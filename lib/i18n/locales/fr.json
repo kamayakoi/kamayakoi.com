@@ -15,7 +15,7 @@
       "sendError": "Échec de l'envoi de l'e-mail"
     },
     "newsletter": {
-      "placeholder": "Aboone toi à Kamayakoi",
+      "placeholder": "Abonne-toi à Kamayakoi",
       "sendButton": "Envoyer"
     },
     "sections": {
@@ -460,7 +460,8 @@
   "archivesPage": {
     "title": "Archives",
     "description": "Explorez notre collection de souvenirs, moments et histoires visuelles qui capturent l'experience Kamayakoi.",
-    "noImages": "Aucune image disponible."
+    "noImages": "Aucune image disponible.",
+    "untagged": "Unclassified"
   },
   "merchPage": {
     "title": "Merch",

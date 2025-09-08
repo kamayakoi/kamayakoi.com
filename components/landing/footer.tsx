@@ -197,7 +197,7 @@ export function Footer() {
               <ul className="space-y-3">
                 <li>
                   <Link
-                    href="/"
+                    href="/events"
                     className="text-white/70 hover:text-white transition-colors text-sm font-bold"
                   >
                     {t(currentLanguage, "footer.navigation.events")}
@@ -396,15 +396,13 @@ export function Footer() {
                     style={{
                       pointerEvents: isNewsletterFocused ? "auto" : "none",
                     }}
-                    className={`px-2 py-1 rounded-sm text-xs font-medium transition-colors h-6 -ml-8 flex items-center justify-center min-w-[50px] ${
-                      isNewsletterFocused ? "" : "invisible"
-                    } ${
-                      newsletterStatus === "success"
+                    className={`px-2 py-1 rounded-sm text-xs font-medium transition-colors h-6 -ml-8 flex items-center justify-center min-w-[50px] ${isNewsletterFocused ? "" : "invisible"
+                      } ${newsletterStatus === "success"
                         ? "bg-green-800 text-green-100"
                         : newsletterStatus === "error"
                           ? "bg-red-800 text-red-100"
                           : "bg-teal-800 hover:bg-teal-700 text-teal-100"
-                    }`}
+                      }`}
                     disabled={newsletterStatus === "loading"}
                   >
                     {newsletterStatus === "loading" ? (

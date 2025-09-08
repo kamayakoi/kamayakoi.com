@@ -36,8 +36,8 @@ export default async function Home() {
         featuredEvents={homepageData?.featuredEvents}
       />
       <EventShowcase events={events} />
-      <FeaturedArticles articles={articles} />
       <MediaShowcase media={media} />
+      <FeaturedArticles articles={articles} />
       <Footer />
     </div>
   );

@@ -116,20 +116,22 @@ function ArticleCard({ article }: { article: FeaturedArticle }) {
         </Link>
       </div>
 
-      <CardContent className="pt-1 pb-4 px-4 space-y-1">
-        <Link href={`/stories/${article.slug.current}`} className="block">
-          <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2 break-words overflow-wrap-anywhere">
-            {title}
-          </h3>
-        </Link>
+      <CardContent className="pt-1 pb-4 px-4 flex flex-col min-h-[120px]">
+        <div className="flex-1 space-y-1">
+          <Link href={`/stories/${article.slug.current}`} className="block">
+            <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2 break-words overflow-wrap-anywhere">
+              {title}
+            </h3>
+          </Link>
 
-        {excerpt && (
-          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed break-words overflow-wrap-anywhere">
-            {excerpt}
-          </p>
-        )}
+          {excerpt && (
+            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed break-words overflow-wrap-anywhere">
+              {excerpt}
+            </p>
+          )}
+        </div>
 
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {article.categories && article.categories.length > 0 && (
               <>

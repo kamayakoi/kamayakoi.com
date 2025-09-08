@@ -81,10 +81,10 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
 
   return (
     <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 rounded-sm border-border/40 bg-card p-0 mb-6">
-      <div className="flex flex-col md:flex-row">
+      <div className="flex flex-col md:flex-row md:min-h-[400px]">
         {/* Image Section */}
         <div className="relative overflow-hidden md:w-1/3">
-          <div className="aspect-square relative bg-muted overflow-hidden">
+          <div className="relative bg-muted overflow-hidden h-full min-h-[300px]">
             <Image
               src={artist.imageUrl || "/placeholder.webp"}
               alt={artist.name}

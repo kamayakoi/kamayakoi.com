@@ -17,7 +17,7 @@ export default function ArchivesClientComponent() {
   const [zoomedImageId, setZoomedImageId] = useState<number | null>(null); // State for zoomed image ID
   const [isFurtherZoomed, setIsFurtherZoomed] = useState(false); // State for secondary zoom
 
-  // Memoize filtered image lists
+  // Memoize filtered and grouped image lists
   const taggedImages = useMemo(
     () => images.filter((img) => img.tags && img.tags.length > 0),
     [images],
@@ -26,6 +26,21 @@ export default function ArchivesClientComponent() {
     () => images.filter((img) => !img.tags || img.tags.length === 0),
     [images],
   );
+
+  // Group tagged images by their first tag
+  const imagesByTag = useMemo(() => {
+    const groups: { [key: string]: ImageProps[] } = {};
+    taggedImages.forEach((img) => {
+      if (img.tags && img.tags.length > 0) {
+        const tag = img.tags[0];
+        if (!groups[tag]) {
+          groups[tag] = [];
+        }
+        groups[tag].push(img);
+      }
+    });
+    return groups;
+  }, [taggedImages]);
 
   // Fetch images from the API route
   useEffect(() => {
@@ -166,27 +181,32 @@ export default function ArchivesClientComponent() {
             </motion.div>
           )}
 
-          {/* Tagged Images Section */}
-          {taggedImages.length > 0 && (
-            <section className="mb-12">
+          {/* Tagged Images Sections by Category */}
+          {Object.entries(imagesByTag).map(([tag, tagImages]) => (
+            <section key={tag} className="mb-16">
+              {/* Section Title */}
+              <h2 className="text-2xl sm:text-3xl md:text-4xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-8 text-left capitalize">
+                {tag}
+              </h2>
+
+              {/* Images Grid */}
               <div className="columns-1 gap-4 sm:columns-2 xl:columns-3 2xl:columns-4">
-                {taggedImages.map(
-                  ({ id, public_id, format, width, height, tags }, index) => {
+                {tagImages.map(
+                  ({ id, public_id, format, width, height }, index) => {
                     const numericWidth = parseInt(width, 10);
                     const numericHeight = parseInt(height, 10);
-                    // console.log(`Tagged Image ${public_id} tags:`, tags);
                     return (
                       <div
                         key={`tagged-${id}`}
                         onClick={() => setZoomedImageId(id)}
                         className={`
-                                        relative 
+                                        relative
                                         mb-5 block w-full cursor-zoom-in
                                         after:content after:pointer-events-none after:absolute after:inset-0 after:rounded-sm after:shadow-highlight
                                     `}
                       >
                         <Image
-                          alt="Archives photo - Highlight"
+                          alt={`Archives photo - ${tag}`}
                           className="transform rounded-sm brightness-90 transition will-change-auto group-hover:brightness-110"
                           style={{ transform: "translate3d(0, 0, 0)" }}
                           src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_scale,w_720,f_auto,q_auto/${public_id}.${format}`}
@@ -196,24 +216,24 @@ export default function ArchivesClientComponent() {
                                           (max-width: 1280px) 50vw,
                                           (max-width: 1536px) 33vw,
                                           25vw"
-                          priority={index < 3} // Priority for first few tagged images
+                          priority={index < 3} // Priority for first few images in each section
                         />
-                        {tags && tags.length > 0 && (
-                          <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-sm shadow-lg z-10">
-                            {tags[0]}
-                          </div>
-                        )}
                       </div>
                     );
                   },
                 )}
               </div>
             </section>
-          )}
+          ))}
 
           {/* Untagged Images Section */}
           {untaggedImages.length > 0 && (
-            <section>
+            <section className="mb-16">
+              {/* Section Title */}
+              <h2 className="text-2xl sm:text-3xl md:text-4xl tracking-tighter font-regular text-zinc-800 dark:text-white -mt-16 mb-8 text-left">
+                {t(currentLanguage, "archivesPage.untagged")}
+              </h2>
+
               <div className="columns-1 gap-4 sm:columns-2 xl:columns-3 2xl:columns-4">
                 {untaggedImages.map(
                   ({ id, public_id, format, width, height }, index) => {
@@ -317,12 +337,6 @@ export default function ArchivesClientComponent() {
                     height={baseHeight}
                     sizes={imageSizes}
                   />
-                  {/* Tag is now relative to this scaling wrapper */}
-                  {zoomedImage.tags && zoomedImage.tags.length > 0 && (
-                    <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-sm shadow-lg z-10">
-                      {zoomedImage.tags[0]}
-                    </div>
-                  )}
                 </div>
               </div>
             );

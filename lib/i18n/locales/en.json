@@ -460,7 +460,8 @@
   "archivesPage": {
     "title": "Archives",
     "description": "Explore our collection of memories, moments, and visual stories that capture the essence of Kamayakoi's journey.",
-    "noImages": "No images available."
+    "noImages": "No images available.",
+    "untagged": "Unclassified"
   },
   "merchPage": {
     "title": "Merch",

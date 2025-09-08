@@ -16,11 +16,11 @@ interface ShowcaseEvent {
   date?: string;
   time?: string;
   location?:
-    | string
-    | {
-        venueName?: string;
-        address?: string;
-      };
+  | string
+  | {
+    venueName?: string;
+    address?: string;
+  };
   flyer: {
     url: string;
   };
@@ -92,20 +92,22 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
         </Link>
       </div>
 
-      <CardContent className="pt-1 pb-4 px-4 space-y-1">
-        <Link href={`/events/${event.slug.current}`} className="block">
-          <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2 break-words overflow-wrap-anywhere">
-            {event.title}
-          </h3>
-        </Link>
+      <CardContent className="pt-1 pb-4 px-4 flex flex-col min-h-[120px]">
+        <div className="flex-1 space-y-1">
+          <Link href={`/events/${event.slug.current}`} className="block">
+            <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2 break-words overflow-wrap-anywhere">
+              {event.title}
+            </h3>
+          </Link>
 
-        {event.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed break-words overflow-wrap-anywhere">
-            {event.description}
-          </p>
-        )}
+          {event.description && (
+            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed break-words overflow-wrap-anywhere">
+              {event.description}
+            </p>
+          )}
+        </div>
 
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {formattedDate && eventDate && (
               <span
@@ -142,7 +144,7 @@ export function EventShowcase({ events }: EventShowcaseProps) {
             <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
               {t(currentLanguage, "eventShowcase.events.title")}
               <span className="text-white/60 mx-3 hidden md:inline">·</span>
-              <span className="text-white/70 font-normal text-xl md:text-2xl block md:inline-block transform -translate-y-0.25">
+              <span className="text-white/70 font-normal text-xl md:text-2xl block md:inline-block transform -translate-y-[5px]">
                 {t(currentLanguage, "eventShowcase.events.subtitle")}
               </span>
             </h2>

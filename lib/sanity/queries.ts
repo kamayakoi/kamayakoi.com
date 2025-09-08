@@ -375,7 +375,8 @@ export async function getAllProducts() {
       description,
       "categories": categories[]->{
         _id,
-        title
+        title,
+        "slug": slug.current
       },
       tags,
       images[]{
@@ -424,7 +425,8 @@ export async function getProductBySlug(slug: string) {
       variantOptions,
       variantInventory,
       "categories": categories[]->{
-        title
+        title,
+        "slug": slug.current
       },
       tags,
       requiresShipping,

@@ -27,13 +27,48 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
     default: siteConfig.name,
-    template: `%s`,
+    template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  keywords: [
+    "techno",
+    "electronic music",
+    "Abidjan",
+    "Côte d'Ivoire",
+    "underground music",
+    "techno collective",
+    "African techno",
+    "electronic music events",
+    "Abidjan nightlife",
+    "techno parties",
+    "music collective"
+  ],
+  authors: [{ name: "Kamayakoi" }],
+  creator: "Kamayakoi",
+  publisher: "Kamayakoi",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   icons: {
     icon: "/favicon.ico",
     shortcut: "/icon.png",
     apple: "/icon.png",
+  },
+  manifest: "/manifest.json",
+  robots: {
+    index: true,
+    follow: true,
+    nocache: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
   openGraph: {
     title: siteConfig.name,
@@ -45,7 +80,7 @@ export const metadata: Metadata = {
         url: siteConfig.ogImage,
         width: 1200,
         height: 630,
-        alt: siteConfig.name,
+        alt: `${siteConfig.name} - ${siteConfig.description}`,
         type: "image/webp",
       },
     ],
@@ -60,9 +95,10 @@ export const metadata: Metadata = {
     creator: "@kamayakoi",
     site: "https://www.kamayakoi.com",
   },
-  // Optional: Add robots and manifest info if needed
-  // robots: { index: true, follow: true },
-  // manifest: "/site.webmanifest",
+  alternates: {
+    canonical: siteConfig.url,
+  },
+  category: "music",
 };
 
 export default async function RootLayout({

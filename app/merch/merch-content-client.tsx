@@ -35,18 +35,24 @@ export default function MerchContentClient({
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
     const filtered = products.filter((product) => {
-      const descriptionText =
-        typeof product.description === "string"
-          ? product.description
-          : product.description?.[0]?.children?.[0]?.text || "";
+      // Handle search query - check product name and description
+      const productName = product.name?.toLowerCase() || "";
+      const productDescription = typeof product.description === 'string' ? product.description.toLowerCase() : "";
+      const trimmedSearch = searchQuery.trim().toLowerCase();
       const matchesSearch =
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        descriptionText.toLowerCase().includes(searchQuery.toLowerCase());
+        !trimmedSearch ||
+        productName.includes(trimmedSearch) ||
+        productDescription.includes(trimmedSearch);
+
+      // Handle category filter
       const matchesCategory =
         selectedCategory === "all" ||
         product.categories?.some((cat) => cat.slug === selectedCategory);
+
+      // Handle tag filter
       const matchesTag =
-        selectedTag === "all" || product.tags?.includes(selectedTag);
+        selectedTag === "all" ||
+        product.tags?.some((tag) => tag?.toLowerCase() === selectedTag);
 
       return matchesSearch && matchesCategory && matchesTag;
     });
@@ -59,20 +65,24 @@ export default function MerchContentClient({
     const cats = new Set<string>();
     products.forEach((product) => {
       product.categories?.forEach((cat) => {
-        if (cat.slug) {
+        if (cat.slug && typeof cat.slug === 'string') {
           cats.add(cat.slug);
         }
       });
     });
-    return Array.from(cats);
+    return Array.from(cats).sort();
   }, [products]);
 
   const availableTags = useMemo(() => {
     const tags = new Set<string>();
     products.forEach((product) => {
-      product.tags?.forEach((tag) => tags.add(tag));
+      product.tags?.forEach((tag) => {
+        if (tag && typeof tag === 'string') {
+          tags.add(tag.toLowerCase());
+        }
+      });
     });
-    return Array.from(tags);
+    return Array.from(tags).sort();
   }, [products]);
 
   return (
@@ -116,7 +126,7 @@ export default function MerchContentClient({
                   <Input
                     placeholder="Search products..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => setSearchQuery(e.target.value.trim())}
                     className="pl-10 rounded-sm bg-background h-10 border border-border"
                   />
                 </div>
@@ -183,15 +193,15 @@ export default function MerchContentClient({
             >
               <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
                 {searchQuery ||
-                selectedCategory !== "all" ||
-                selectedTag !== "all"
+                  selectedCategory !== "all" ||
+                  selectedTag !== "all"
                   ? "No products found"
                   : t(currentLanguage, "merchPage.comingSoon.title")}
               </h2>
               <p className="text-zinc-600 dark:text-zinc-400 mb-6">
                 {searchQuery ||
-                selectedCategory !== "all" ||
-                selectedTag !== "all"
+                  selectedCategory !== "all" ||
+                  selectedTag !== "all"
                   ? "Try adjusting your filters or search terms."
                   : t(currentLanguage, "merchPage.comingSoon.description")}
               </p>

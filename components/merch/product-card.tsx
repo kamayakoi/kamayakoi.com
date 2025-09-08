@@ -86,21 +86,23 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
         </Link>
       </div>
 
-      <CardContent className="pt-1 pb-4 px-4 space-y-1">
-        <Link href={`/merch/${slug}`} className="block">
-          <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2">
-            {product.name}
-          </h3>
-        </Link>
+      <CardContent className="pt-1 pb-4 px-4 flex flex-col min-h-[100px]">
+        <div className="flex-1 space-y-1">
+          <Link href={`/merch/${slug}`} className="block">
+            <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2">
+              {product.name}
+            </h3>
+          </Link>
 
-        {/* Description hidden - uncomment below if needed */}
-        {/* {product.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {typeof product.description === 'string'
-              ? product.description
-              : product.description?.[0]?.children?.[0]?.text || ''}
-          </p>
-        )} */}
+          {/* Description hidden - uncomment below if needed */}
+          {/* {product.description && (
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {typeof product.description === 'string'
+                ? product.description
+                : product.description?.[0]?.children?.[0]?.text || ''}
+            </p>
+          )} */}
+        </div>
 
         <div className="flex items-center justify-between pt-2">
           <span className="text-sm font-semibold">

@@ -56,7 +56,6 @@ export const metadata: Metadata = {
     shortcut: "/icon.png",
     apple: "/icon.png",
   },
-  manifest: "/manifest.json",
   robots: {
     index: true,
     follow: true,

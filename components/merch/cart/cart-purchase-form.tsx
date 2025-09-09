@@ -81,7 +81,7 @@ export default function CartPurchaseForm() {
         userPhone: userPhone.trim(),
         currencyCode: "XOF",
         successUrlPath: "/payment/success",
-        cancelUrlPath: "/payment/cancel",
+        cancelUrlPath: "/payment/error",
         allowCouponCode: true,
         allowQuantity: false,
       };
@@ -95,7 +95,7 @@ export default function CartPurchaseForm() {
         console.error("Function error:", functionError);
         setError(
           functionError.message ||
-            t(currentLanguage, "cartPurchaseForm.errors.checkoutFailed"),
+          t(currentLanguage, "cartPurchaseForm.errors.checkoutFailed"),
         );
         return;
       }
@@ -130,11 +130,11 @@ export default function CartPurchaseForm() {
         <span className="bg-muted/50 px-2 py-1 rounded-sm text-xs">
           {cart?.lines.length === 1
             ? t(currentLanguage, "cartPurchaseForm.itemCount", {
-                count: cart?.lines.length || 0,
-              })
+              count: cart?.lines.length || 0,
+            })
             : t(currentLanguage, "cartPurchaseForm.itemCountPlural", {
-                count: cart?.lines.length || 0,
-              })}
+              count: cart?.lines.length || 0,
+            })}
         </span>
       </CartContainer>
 

@@ -258,7 +258,7 @@ export default function PurchaseFormModal({
       userPhone: userPhone || undefined, // Send phone number properly formatted
       currencyCode: "XOF", // Assuming XOF, make dynamic if needed
       successUrlPath: "/payment/success", // Or from config
-      cancelUrlPath: "/payment/cancel", // Or from config
+      cancelUrlPath: "/payment/error", // Or from config
       productId: item.productId,
       allowCouponCode: true, // Enable coupon codes by default
       allowQuantity: shouldAllowQuantity,

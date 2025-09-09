@@ -32,7 +32,7 @@ export function EventMediaDisplay({
 
   // State to manage which media to show
   const [showVideo, setShowVideo] = useState(!!promoVideoUrl);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
 
   // Load saved video state on mount
   useEffect(() => {

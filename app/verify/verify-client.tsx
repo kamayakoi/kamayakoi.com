@@ -325,8 +325,8 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
   const getTicketStatus = () => {
     if (error) {
       return {
-        bgColor: "bg-red-50/50 dark:bg-red-900/10",
-        borderColor: "border-red-200 dark:border-red-800",
+        bgColor: "bg-red-50/30 dark:bg-red-900/20",
+        borderColor: "border-red-300 dark:border-red-700",
         textColor: "text-red-800 dark:text-red-200",
         icon: <XCircle className="h-8 w-8 text-red-600 dark:text-red-400" />,
         badgeVariant: "destructive" as const,
@@ -340,8 +340,8 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
       const remaining = ticketData.total_quantity - ticketData.use_count;
       if (remaining <= 0) {
         return {
-          bgColor: "bg-orange-50/50 dark:bg-orange-900/10",
-          borderColor: "border-orange-200 dark:border-orange-800",
+          bgColor: "bg-orange-50/30 dark:bg-orange-900/20",
+          borderColor: "border-orange-300 dark:border-orange-700",
           textColor: "text-orange-800 dark:text-orange-200",
           icon: (
             <AlertCircle className="h-8 w-8 text-orange-600 dark:text-orange-400" />
@@ -354,8 +354,8 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
     } else if (ticketData?.is_used) {
       // This is an individual ticket that has been used
       return {
-        bgColor: "bg-orange-50/50 dark:bg-orange-900/10",
-        borderColor: "border-orange-200 dark:border-orange-800",
+        bgColor: "bg-orange-50/30 dark:bg-orange-900/20",
+        borderColor: "border-orange-300 dark:border-orange-700",
         textColor: "text-orange-800 dark:text-orange-200",
         icon: (
           <AlertCircle className="h-8 w-8 text-orange-600 dark:text-orange-400" />
@@ -368,8 +368,8 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
 
     if (ticketData) {
       return {
-        bgColor: "bg-green-50/50 dark:bg-green-900/10",
-        borderColor: "border-green-200 dark:border-green-800",
+        bgColor: "bg-green-50/30 dark:bg-green-900/20",
+        borderColor: "border-green-300 dark:border-green-700",
         textColor: "text-green-800 dark:text-green-200",
         icon: (
           <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
@@ -389,7 +389,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
       <>
         <div className="min-h-screen bg-background flex flex-col justify-center py-12 px-4">
           <div className="max-w-md mx-auto">
-            <Card className="border-blue-200 bg-blue-50/50 dark:bg-blue-900/10 dark:border-blue-800">
+            <Card className="border border-blue-300 dark:border-blue-700 bg-blue-50/30 dark:bg-blue-900/20 rounded-sm">
               <CardHeader className="text-center pb-4">
                 <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-sm flex items-center justify-center mb-4">
                   <QrCode className="w-8 h-8 text-blue-600 dark:text-blue-400" />
@@ -408,7 +408,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                   </p>
                 </div>
 
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-sm p-4">
+                <div className="bg-blue-50/30 dark:bg-blue-900/20 border border-blue-300 dark:border-blue-700 rounded-sm p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Ticket className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     <h3 className="font-semibold text-blue-800 dark:text-blue-200">
@@ -472,7 +472,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
       <>
         <div className="min-h-screen bg-background flex flex-col justify-center py-12 px-4">
           <div className="max-w-md mx-auto">
-            <Card className="border-amber-200 bg-amber-50/50 dark:bg-amber-900/10 dark:border-amber-800">
+            <Card className="border border-amber-300 dark:border-amber-700 bg-amber-50/30 dark:bg-amber-900/20 rounded-sm">
               <CardHeader className="text-center pb-4">
                 <div className="mx-auto w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-sm flex items-center justify-center mb-4">
                   <Shield className="w-8 h-8 text-amber-600 dark:text-amber-400" />
@@ -508,7 +508,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                     value={pin}
                     onChange={(e) => setPin(e.target.value)}
                     maxLength={4}
-                    className="text-center text-2xl tracking-widest h-12"
+                    className="text-center text-2xl tracking-widest h-12 rounded-sm bg-background border border-border"
                     disabled={isLoading}
                   />
                   <Button
@@ -538,7 +538,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                 </form>
 
                 {error && (
-                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-sm p-4">
+                  <div className="bg-red-50/30 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-sm p-4">
                     <div className="text-center text-red-600 dark:text-red-400 text-sm">
                       {error}
                     </div>
@@ -565,7 +565,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
         <div className="max-w-md mx-auto space-y-6">
           {/* Loading State */}
           {isLoading && !ticketData && (
-            <Card>
+            <Card className="rounded-sm">
               <CardContent className="pt-6 text-center">
                 <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
                 <p>
@@ -581,7 +581,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
           {/* Status Header with Customer Name and Ticket Type */}
           {status && (
             <Card
-              className={`border-2 ${status.borderColor} ${status.bgColor}`}
+              className={`border-2 ${status.borderColor} ${status.bgColor} rounded-sm`}
             >
               <CardContent className="pt-6 text-center">
                 <div className="flex flex-col items-center space-y-4">
@@ -609,7 +609,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                         <p className="text-sm text-gray-400">
                           {/* Differentiate between individual and legacy ticket display */}
                           {ticketData.use_count !== undefined &&
-                          ticketData.total_quantity ? (
+                            ticketData.total_quantity ? (
                             <span>
                               {ticketData.use_count} /{" "}
                               {ticketData.total_quantity}{" "}
@@ -623,13 +623,13 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                               {ticketData.quantity}{" "}
                               {ticketData.quantity > 1
                                 ? t(
-                                    currentLanguage,
-                                    "ticketVerification.quantity.people",
-                                  )
+                                  currentLanguage,
+                                  "ticketVerification.quantity.people",
+                                )
                                 : t(
-                                    currentLanguage,
-                                    "ticketVerification.quantity.person",
-                                  )}
+                                  currentLanguage,
+                                  "ticketVerification.quantity.person",
+                                )}
                             </span>
                           )}
                         </p>
@@ -645,15 +645,15 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                     <div className="text-center mt-3">
                       <p className="text-orange-800 dark:text-orange-200 font-medium">
                         {ticketData.use_count !== undefined &&
-                        ticketData.total_quantity
+                          ticketData.total_quantity
                           ? t(
-                              currentLanguage,
-                              "ticketVerification.warnings.fullyUsed",
-                            )
+                            currentLanguage,
+                            "ticketVerification.warnings.fullyUsed",
+                          )
                           : t(
-                              currentLanguage,
-                              "ticketVerification.warnings.alreadyUsed",
-                            )}
+                            currentLanguage,
+                            "ticketVerification.warnings.alreadyUsed",
+                          )}
                       </p>
                       <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">
                         {t(
@@ -680,13 +680,13 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                             people:
                               ticketData?.quantity && ticketData.quantity > 1
                                 ? t(
-                                    currentLanguage,
-                                    "ticketVerification.quantity.people",
-                                  )
+                                  currentLanguage,
+                                  "ticketVerification.quantity.people",
+                                )
                                 : t(
-                                    currentLanguage,
-                                    "ticketVerification.quantity.person",
-                                  ),
+                                  currentLanguage,
+                                  "ticketVerification.quantity.person",
+                                ),
                           },
                         )}
                       </p>
@@ -699,7 +699,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
 
           {/* Detailed Ticket Information */}
           {ticketData && (
-            <Card>
+            <Card className="rounded-sm">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Ticket className="h-5 w-5" />
@@ -708,7 +708,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Ticket Type Details */}
-                <div className="bg-gray-800/50 rounded-sm p-3 border">
+                <div className="bg-muted/50 rounded-sm p-3 border border-border">
                   <div className="flex items-center gap-2 mb-2">
                     <Tag className="h-4 w-4 text-gray-400" />
                     <span className="text-sm font-medium text-gray-400">
@@ -814,7 +814,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
 
           {/* Automatic Admission Status */}
           {ticketData && !ticketData.is_used && isLoading && (
-            <Card className="border-2 border-blue-200 bg-blue-50/50 dark:bg-blue-900/10 dark:border-blue-800">
+            <Card className="border-2 border-blue-300 dark:border-blue-700 bg-blue-50/30 dark:bg-blue-900/20 rounded-sm">
               <CardContent className="pt-6 text-center">
                 <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-blue-600 dark:text-blue-400" />
                 <p className="text-blue-700 dark:text-blue-300 font-medium">

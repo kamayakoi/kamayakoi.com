@@ -35,8 +35,8 @@ jobs:
           echo "⏰ Current time: $(date)"
 
           # Call the Edge Function to update expired payments
-          # Note: Supabase Edge Functions authenticate via environment variables, not Authorization headers
           RESPONSE=$(curl -s -X POST "https://ndrbkzfpbnitxkkwmsdf.supabase.co/functions/v1/update-expired-payments" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
             -H "Content-Type: application/json")
 
           echo "📊 Update Response: $RESPONSE"
@@ -69,8 +69,6 @@ jobs:
         run: |
           echo "🚨 Expired payments update job failed! Check the logs above for details."
           echo "💡 This might indicate:"
-          echo "   - Missing SUPABASE_SERVICE_ROLE_KEY secret in GitHub repository"
-          echo "   - Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variables in Supabase Edge Function"
           echo "   - Network issues with Supabase"
           echo "   - Database connectivity problems"
           echo "   - Edge function deployment issues"

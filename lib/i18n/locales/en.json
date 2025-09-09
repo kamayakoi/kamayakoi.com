@@ -276,7 +276,7 @@
       "email": "noe@gmail.com",
       "phone": "+221771234567"
     },
-    "totalPrice": "Total:",
+    "totalPrice": "Total",
     "buttons": {
       "cancel": "Cancel",
       "pay": "Purchase",
@@ -291,6 +291,16 @@
       "lomiUrlMissing": "Payment URL not received. Please try again.",
       "submitError": "An error occurred. Please try again."
     }
+  },
+  "cartModal": {
+    "products": "Products",
+    "yourCartIsEmpty": "Your cart is empty",
+    "startShopping": "Start shopping to get started →",
+    "shipping": "Shipping",
+    "calculatedAtCheckout": "Calculated at checkout",
+    "total": "Total",
+    "cart": "Cart",
+    "proceedToCheckout": "Proceed to checkout"
   },
   "cartPurchaseForm": {
     "title": "Checkout",

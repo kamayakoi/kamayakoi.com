@@ -379,7 +379,7 @@ export function Footer() {
                       // Longer delay to prevent flickering when clicking button
                       setTimeout(() => setIsNewsletterFocused(false), 300);
                     }}
-                    className="bg-transparent rounded-sm px-2 py-1 text-xs border border-gray-700 focus:ring-1 focus:ring-gray-400 placeholder:text-gray-400 text-white transition-colors focus:outline-none focus:bg-transparent h-6 w-38"
+                    className="bg-transparent rounded-sm px-2 py-1 text-xs border border-gray-700 focus:ring-1 focus:ring-gray-400 placeholder:text-gray-400 text-white transition-colors focus:outline-none focus:bg-transparent h-6 w-39"
                   />
                   <motion.button
                     type="submit"

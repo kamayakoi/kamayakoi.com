@@ -733,7 +733,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                       ID: {ticketData.ticket_type_id}
                     </p>
                     <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
-                      Total: {ticketData.total_amount.toLocaleString()}{" "}
+                      Total {ticketData.total_amount.toLocaleString()}{" "}
                       {ticketData.currency_code}
                     </p>
                   </div>

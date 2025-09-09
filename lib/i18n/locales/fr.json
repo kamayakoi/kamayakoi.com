@@ -210,7 +210,7 @@
       "noItemsListed": "Aucun billet ou pack n'est actuellement listé pour cet événement.",
       "title": "Billets",
       "buyNow": "Acheter",
-      "getETicket": "Obtenir E-ticket",
+      "getETicket": "Obtenir un ticket",
       "currencySuffix": " FCFA",
       "selectAndJoin": "Sélectionnez vos billets et rejoignez l'expérience"
     },
@@ -260,13 +260,13 @@
     "noDetails": "Aucun détail supplémentaire disponible."
   },
   "purchaseModal": {
-    "title": "Purchase Tickets",
-    "description": "Complete your order details",
-    "includesTickets": "Inclut {count} ticket(s)",
-    "ticketsGenerated": "Tickets à générer",
+    "title": "Acheter un billet",
+    "description": "Complétez les détails de votre commande",
+    "includesTickets": "Inclut {count} billet(s)",
+    "ticketsGenerated": "Billets à générer",
     "labels": {
       "quantity": "Quantité",
-      "name": "Name",
+      "name": "Nom",
       "email": "Email",
       "phone": "Téléphone",
       "optional": "Optionnel"
@@ -276,7 +276,7 @@
       "email": "noe@gmail.com",
       "phone": "+2250771234567"
     },
-    "totalPrice": "Total:",
+    "totalPrice": "Total",
     "buttons": {
       "cancel": "Annuler",
       "pay": "Acheter",
@@ -291,6 +291,16 @@
       "lomiUrlMissing": "URL de paiement non reçue. Veuillez réessayer.",
       "submitError": "Une erreur est survenue. Veuillez réessayer."
     }
+  },
+  "cartModal": {
+    "products": "Produits",
+    "yourCartIsEmpty": "Votre panier est vide",
+    "startShopping": "Commencer les achats pour commencer →",
+    "shipping": "Livraison",
+    "calculatedAtCheckout": "Calculée à la caisse",
+    "total": "Total",
+    "cart": "Panier",
+    "proceedToCheckout": "Procéder au paiement"
   },
   "cartPurchaseForm": {
     "title": "Paiement",

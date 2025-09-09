@@ -408,7 +408,7 @@ export default function PurchaseFormModal({
                       )}
                       {item.isBundle && (
                         <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-sm">
-                          {item.ticketsIncluded || 1} tickets
+                          {item.ticketsIncluded || 1} {item.ticketsIncluded === 1 ? 'billet' : 'billets'}
                         </span>
                       )}
                     </p>

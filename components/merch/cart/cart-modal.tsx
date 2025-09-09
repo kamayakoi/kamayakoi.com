@@ -12,6 +12,8 @@ import Link from "next/link";
 import { cn } from "@/lib/actions/utils";
 import { createPortal } from "react-dom";
 import CartPurchaseForm from "./cart-purchase-form";
+import { useTranslation } from "@/lib/contexts/TranslationContext";
+import { t } from "@/lib/i18n/translations";
 
 const CartContainer = ({
   children,
@@ -31,15 +33,16 @@ const CartItems = ({
   onProceedToCheckout: () => void;
 }) => {
   const { cart } = useCart();
+  const { currentLanguage } = useTranslation();
 
   if (!cart) return <></>;
 
   return (
     <div className="flex flex-col justify-between h-full overflow-hidden">
       <CartContainer className="flex justify-between items-center px-2 text-sm text-muted-foreground mb-4">
-        <span className="font-medium">Products</span>
+        <span className="font-medium">{t(currentLanguage, "cartModal.products")}</span>
         <span className="bg-muted/50 px-2 py-1 rounded-sm text-xs">
-          {cart.lines.length} item{cart.lines.length !== 1 ? "s" : ""}
+          {cart.lines.length} {t(currentLanguage, cart.lines.length !== 1 ? "cartPurchaseForm.itemCountPlural" : "cartPurchaseForm.itemCount", { count: cart.lines.length })}
         </span>
       </CartContainer>
       <div className="relative flex-1 min-h-0 py-4 overflow-x-hidden">
@@ -62,11 +65,11 @@ const CartItems = ({
         <div className="py-3 text-sm shrink-0">
           <CartContainer className="space-y-2">
             <div className="flex justify-between items-center py-3">
-              <p className="font-medium text-foreground">Shipping</p>
-              <p className="text-muted-foreground">Calculated at checkout</p>
+              <p className="font-medium text-foreground">{t(currentLanguage, "cartModal.shipping")}</p>
+              <p className="text-muted-foreground">{t(currentLanguage, "cartModal.calculatedAtCheckout")}</p>
             </div>
             <div className="flex justify-between items-center py-2">
-              <p className="text-lg font-bold text-foreground">Total</p>
+              <p className="text-lg font-bold text-foreground">{t(currentLanguage, "cartModal.total")}</p>
               <p className="text-xl font-bold text-primary">
                 {Number(cart.cost.totalAmount.amount).toLocaleString("fr-FR")} F
                 CFA
@@ -91,6 +94,7 @@ const serializeCart = (cart: { lines: { id: string; quantity: number }[] }) => {
 
 export default function CartModal() {
   const { cart } = useCart();
+  const { currentLanguage } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
@@ -164,10 +168,10 @@ export default function CartModal() {
               </div>
               <div className="flex flex-col flex-1 gap-2">
                 <span className="text-xl font-bold text-foreground">
-                  Your cart is empty
+                  {t(currentLanguage, "cartModal.yourCartIsEmpty")}
                 </span>
                 <p className="text-muted-foreground hover:text-primary transition-colors">
-                  Start shopping to get started →
+                  {t(currentLanguage, "cartModal.startShopping")}
                 </p>
               </div>
             </div>
@@ -250,7 +254,7 @@ export default function CartModal() {
                     <CartContainer className="flex justify-between items-center mb-8">
                       <div>
                         <h2 className="text-3xl font-bold text-foreground">
-                          Cart
+                          {t(currentLanguage, "cartModal.cart")}
                         </h2>
                       </div>
                       <Button
@@ -283,6 +287,7 @@ function CheckoutButton({
 }) {
   const { pending } = useFormStatus();
   const { cart, isPending } = useCart();
+  const { currentLanguage } = useTranslation();
 
   const isLoading = pending;
   const isDisabled = !cart || cart.lines.length === 0 || isPending;
@@ -308,7 +313,7 @@ function CheckoutButton({
             {isLoading ? (
               <Loader />
             ) : (
-              <span className="font-semibold">Proceed to checkout</span>
+              <span className="font-semibold">{t(currentLanguage, "cartModal.proceedToCheckout")}</span>
             )}
           </motion.div>
         </AnimatePresence>

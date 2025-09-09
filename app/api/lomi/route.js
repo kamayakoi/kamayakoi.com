@@ -38,12 +38,12 @@ export async function POST(request) {
   );
 
   // --- Environment Variables (moved inside function) ---
-  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const lomiWebhookSecret = process.env.LOMI_WEBHOOK_SECRET;
 
   console.log("🔧 Environment check:");
-  console.log(`  - SUPABASE_URL: ${supabaseUrl ? "✅ Set" : "❌ Missing"}`);
+  console.log(`  - NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? "✅ Set" : "❌ Missing"}`);
   console.log(
     `  - SUPABASE_SERVICE_ROLE_KEY: ${supabaseServiceKey ? "✅ Set" : "❌ Missing"}`,
   );
@@ -54,7 +54,7 @@ export async function POST(request) {
   // Check for required environment variables
   if (!supabaseUrl || !supabaseServiceKey || !lomiWebhookSecret) {
     console.error(
-      "Events Webhook: Missing critical environment variables. Check SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, LOMI_WEBHOOK_SECRET.",
+      "Events Webhook: Missing critical environment variables. Check NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, LOMI_WEBHOOK_SECRET.",
     );
     return new Response(
       JSON.stringify({ error: "Missing required environment variables" }),

@@ -60,7 +60,7 @@
     "introduction": {
       "title": "Introduction",
       "p1": "Bienvenue chez Kamayakoi (\"Kamayakoi\", \"nous\", \"notre\"). Né à Abidjan en mars 2022, Kamayakoi est un collectif de DJs à l'avant-garde d'une scène musicale alternative mêlant Hip-Hop & Musique Électronique. Ces Termes et Conditions (\"Termes\") régissent votre utilisation de notre site web (par exemple, kamayakoi.com, le cas échéant), de nos services (y compris la promotion et l'organisation d'événements), et votre participation à nos soirées et autres événements.",
-      "p2": "Le terme \"Kamayakoi\" lui-même, issu du Nouchi (argot ivoirien), signifie énergie, entêtement et amour de la fête – des qualités que nous canalisons pour créer des expériences uniques et libératrices. En accédant à nos services, en achetant des billets ou en participant à nos événements, vous acceptez d'être lié par ces Termes. Si vous êtes en désaccord avec une partie de ces Termes, vous ne pouvez pas accéder à nos services ni participer à nos événements."
+      "p2": "Le terme \"Kamayakoi\" lui-même, issu du Nouchi (argot ivoirien), signifie énergie, entêtement et amour de la fête – des qualités que nous canalisons pour créer des expériences uniques et libératrices. En accédant à nos services, en achetant des tickets ou en participant à nos événements, vous acceptez d'être lié par ces Termes. Si vous êtes en désaccord avec une partie de ces Termes, vous ne pouvez pas accéder à nos services ni participer à nos événements."
     },
     "mission": {
       "title": "Notre Mission",
@@ -76,9 +76,9 @@
       "p2": "Lors de l'inscription pour recevoir des informations, des newsletters ou (le cas échéant) pour des préventes d'événements, vous devez fournir des informations exactes et à jour."
     },
     "tickets": {
-      "title": "Billets d'événement",
-      "p1": "Toutes les ventes de billets pour les événements de Kamayakoi sont soumises à disponibilité et à toutes conditions spécifiques communiquées au moment de l'achat (par exemple, restrictions d'âge, exigences d'entrée spécifiques pour des lieux uniques).",
-      "p2": "Les billets sont généralement non remboursables et non transférables, sauf si requis par la loi applicable ou explicitement indiqué par nous pour un événement particulier. Nous nous réservons le droit d'annuler ou de reporter des événements ; dans ce cas, notre politique de remboursement ou d'échange sera communiquée aux détenteurs de billets.",
+      "title": "Tickets d'événement",
+      "p1": "Toutes les ventes de tickets pour les événements de Kamayakoi sont soumises à disponibilité et à toutes conditions spécifiques communiquées au moment de l'achat (par exemple, restrictions d'âge, exigences d'entrée spécifiques pour des lieux uniques).",
+      "p2": "Les tickets sont généralement non remboursables et non transférables, sauf si requis par la loi applicable ou explicitement indiqué par nous pour un événement particulier. Nous nous réservons le droit d'annuler ou de reporter des événements ; dans ce cas, notre politique de remboursement ou d'échange sera communiquée aux détenteurs de tickets.",
       "p3": "Nous nous réservons le droit de refuser l'admission ou d'expulser toute personne dont la conduite est jugée désordonnée, qui ne respecte pas ces Termes, les règles spécifiques de l'événement ou nos valeurs fondamentales, ou qui présente un risque pour la sécurité ou le plaisir des autres. Aucun remboursement ne sera offert dans de telles circonstances."
     },
     "ip": {
@@ -124,20 +124,20 @@
     "lastUpdated": "Dernière mise à jour : {date}",
     "introduction": {
       "title": "Introduction",
-      "p1": "Kamayakoi (\"nous\", \"notre\", \"nos\") s'engage à protéger votre confidentialité. Cette Politique de Confidentialité explique comment nous collectons, utilisons, divulguons et protégeons vos informations lorsque vous visitez notre site web, achetez des billets ou assistez à nos événements.",
+      "p1": "Kamayakoi (\"nous\", \"notre\", \"nos\") s'engage à protéger votre confidentialité. Cette Politique de Confidentialité explique comment nous collectons, utilisons, divulguons et protégeons vos informations lorsque vous visitez notre site web, achetez des tickets ou assistez à nos événements.",
       "p2": "Veuillez lire attentivement cette politique de confidentialité. Si vous n'acceptez pas les termes de cette politique, veuillez ne pas accéder à nos services."
     },
     "dataCollection": {
       "title": "Informations que nous collectons",
       "p1": "Nous pouvons collecter des informations vous concernant de diverses manières. Les informations que nous pouvons collecter incluent :",
-      "listItem1": "Données Personnelles : Nom, adresse e-mail, numéro de téléphone et autres informations de contact lorsque vous achetez des billets ou vous abonnez à nos mises à jour.",
+      "listItem1": "Données Personnelles : Nom, adresse e-mail, numéro de téléphone et autres informations de contact lorsque vous achetez des tickets ou vous abonnez à nos mises à jour.",
       "listItem2": "Informations d'Événement : Photos et vidéos prises lors de nos événements qui peuvent inclure votre image.",
       "listItem3": "Données d'Utilisation : Informations sur la façon dont vous accédez et utilisez notre site web, y compris votre adresse IP, type de navigateur et informations sur l'appareil."
     },
     "dataUse": {
       "title": "Comment nous utilisons vos informations",
       "p1": "Nous utilisons les informations que nous collectons pour :",
-      "listItem1": "Traiter les achats de billets et vous envoyer les détails de confirmation",
+      "listItem1": "Traiter les achats de tickets et vous envoyer les détails de confirmation",
       "listItem2": "Communiquer avec vous concernant les événements, mises à jour et activités promotionnelles",
       "listItem3": "Améliorer nos services et créer de meilleures expériences d'événements",
       "listItem4": "Respecter les obligations légales et prévenir les activités frauduleuses"
@@ -207,12 +207,12 @@
     },
     "tickets": {
       "salesClosedGlobal": "La billetterie pour cet événement est actuellement fermée.",
-      "noItemsListed": "Aucun billet ou pack n'est actuellement listé pour cet événement.",
-      "title": "Billets",
+      "noItemsListed": "Aucun ticket ou pack n'est actuellement listé pour cet événement.",
+      "title": "Tckets",
       "buyNow": "Acheter",
       "getETicket": "Obtenir un ticket",
       "currencySuffix": " FCFA",
-      "selectAndJoin": "Sélectionnez vos billets et rejoignez l'expérience"
+      "selectAndJoin": "Sélectionnez vos tickets et rejoignez l'expérience"
     },
     "bundles": {
       "title": "Packs"
@@ -260,13 +260,13 @@
     "noDetails": "Aucun détail supplémentaire disponible."
   },
   "purchaseModal": {
-    "title": "Acheter un billet",
+    "title": "Acheter des tickets",
     "description": "Complétez les détails de votre commande",
     "only": "Seulement",
     "available": "disponible",
     "availablePlural": "disponibles",
-    "includesTickets": "Inclut {count} billet(s)",
-    "ticketsGenerated": "Billets à générer",
+    "includesTickets": "Inclut {count} ticket(s)",
+    "ticketsGenerated": "Tickets à générer",
     "labels": {
       "quantity": "Quantité",
       "name": "Nom",

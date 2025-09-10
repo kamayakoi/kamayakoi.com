@@ -208,7 +208,7 @@
     "tickets": {
       "salesClosedGlobal": "La billetterie pour cet événement est actuellement fermée.",
       "noItemsListed": "Aucun ticket ou pack n'est actuellement listé pour cet événement.",
-      "title": "Tckets",
+      "title": "Tickets",
       "buyNow": "Acheter",
       "getETicket": "Obtenir un ticket",
       "currencySuffix": " FCFA",

@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     "electronic music events",
     "Abidjan nightlife",
     "techno parties",
-    "music collective"
+    "music collective",
   ],
   authors: [{ name: "Kamayakoi" }],
   creator: "Kamayakoi",

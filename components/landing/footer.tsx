@@ -55,10 +55,7 @@ function ContactForm({ onClose }: { onClose: () => void }) {
   return (
     <form action={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium"
-        >
+        <label htmlFor="email" className="block text-sm font-medium">
           {t(currentLanguage, "footer.contact.emailLabel")}
         </label>
         <input
@@ -72,10 +69,7 @@ function ContactForm({ onClose }: { onClose: () => void }) {
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="message"
-          className="block text-sm font-medium"
-        >
+        <label htmlFor="message" className="block text-sm font-medium">
           {t(currentLanguage, "footer.contact.messageLabel")}
         </label>
         <textarea
@@ -255,7 +249,9 @@ export function Footer() {
                     <DialogContent className="sm:max-w-[425px] p-4 rounded-sm border border-border/40 bg-background backdrop-blur-sm">
                       <DialogHeader>
                         <DialogTitle className="flex items-center">
-                          <span>{t(currentLanguage, "footer.contact.title")}</span>
+                          <span>
+                            {t(currentLanguage, "footer.contact.title")}
+                          </span>
                         </DialogTitle>
                       </DialogHeader>
                       <ContactForm onClose={() => setIsContactOpen(false)} />
@@ -396,13 +392,15 @@ export function Footer() {
                     style={{
                       pointerEvents: isNewsletterFocused ? "auto" : "none",
                     }}
-                    className={`px-2 py-1 rounded-sm text-xs font-medium transition-colors h-6 -ml-8 flex items-center justify-center min-w-[50px] ${isNewsletterFocused ? "" : "invisible"
-                      } ${newsletterStatus === "success"
+                    className={`px-2 py-1 rounded-sm text-xs font-medium transition-colors h-6 -ml-8 flex items-center justify-center min-w-[50px] ${
+                      isNewsletterFocused ? "" : "invisible"
+                    } ${
+                      newsletterStatus === "success"
                         ? "bg-green-800 text-green-100"
                         : newsletterStatus === "error"
                           ? "bg-red-800 text-red-100"
                           : "bg-teal-800 hover:bg-teal-700 text-teal-100"
-                      }`}
+                    }`}
                     disabled={newsletterStatus === "loading"}
                   >
                     {newsletterStatus === "loading" ? (

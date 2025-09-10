@@ -16,11 +16,11 @@ interface ShowcaseEvent {
   date?: string;
   time?: string;
   location?:
-  | string
-  | {
-    venueName?: string;
-    address?: string;
-  };
+    | string
+    | {
+        venueName?: string;
+        address?: string;
+      };
   flyer: {
     url: string;
   };

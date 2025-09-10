@@ -43,7 +43,9 @@ export async function POST(request) {
   const lomiWebhookSecret = process.env.LOMI_WEBHOOK_SECRET;
 
   console.log("🔧 Environment check:");
-  console.log(`  - NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? "✅ Set" : "❌ Missing"}`);
+  console.log(
+    `  - NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? "✅ Set" : "❌ Missing"}`,
+  );
   console.log(
     `  - SUPABASE_SERVICE_ROLE_KEY: ${supabaseServiceKey ? "✅ Set" : "❌ Missing"}`,
   );

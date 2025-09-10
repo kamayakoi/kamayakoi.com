@@ -37,7 +37,10 @@ export default function MerchContentClient({
     const filtered = products.filter((product) => {
       // Handle search query - check product name and description
       const productName = product.name?.toLowerCase() || "";
-      const productDescription = typeof product.description === 'string' ? product.description.toLowerCase() : "";
+      const productDescription =
+        typeof product.description === "string"
+          ? product.description.toLowerCase()
+          : "";
       const trimmedSearch = searchQuery.trim().toLowerCase();
       const matchesSearch =
         !trimmedSearch ||
@@ -65,7 +68,7 @@ export default function MerchContentClient({
     const cats = new Set<string>();
     products.forEach((product) => {
       product.categories?.forEach((cat) => {
-        if (cat.slug && typeof cat.slug === 'string') {
+        if (cat.slug && typeof cat.slug === "string") {
           cats.add(cat.slug);
         }
       });
@@ -77,7 +80,7 @@ export default function MerchContentClient({
     const tags = new Set<string>();
     products.forEach((product) => {
       product.tags?.forEach((tag) => {
-        if (tag && typeof tag === 'string') {
+        if (tag && typeof tag === "string") {
           tags.add(tag.toLowerCase());
         }
       });
@@ -193,15 +196,15 @@ export default function MerchContentClient({
             >
               <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
                 {searchQuery ||
-                  selectedCategory !== "all" ||
-                  selectedTag !== "all"
+                selectedCategory !== "all" ||
+                selectedTag !== "all"
                   ? "No products found"
                   : t(currentLanguage, "merchPage.comingSoon.title")}
               </h2>
               <p className="text-zinc-600 dark:text-zinc-400 mb-6">
                 {searchQuery ||
-                  selectedCategory !== "all" ||
-                  selectedTag !== "all"
+                selectedCategory !== "all" ||
+                selectedTag !== "all"
                   ? "Try adjusting your filters or search terms."
                   : t(currentLanguage, "merchPage.comingSoon.description")}
               </p>

@@ -1,33 +1,35 @@
 "use client";
 
 import { useTranslation } from "@/lib/contexts/TranslationContext";
-import CheckoutButton, { CheckoutItemData } from "@/components/event/CheckoutButton";
+import CheckoutButton, {
+  CheckoutItemData,
+} from "@/components/event/CheckoutButton";
 
 interface CheckoutButtonWrapperProps {
-    item: CheckoutItemData;
-    eventDetails: {
-        id: string;
-        title: string;
-        dateText?: string;
-        timeText?: string;
-        venueName?: string;
-    };
-    globallyTicketsOnSale: boolean;
+  item: CheckoutItemData;
+  eventDetails: {
+    id: string;
+    title: string;
+    dateText?: string;
+    timeText?: string;
+    venueName?: string;
+  };
+  globallyTicketsOnSale: boolean;
 }
 
 export default function CheckoutButtonWrapper({
-    item,
-    eventDetails,
-    globallyTicketsOnSale,
+  item,
+  eventDetails,
+  globallyTicketsOnSale,
 }: CheckoutButtonWrapperProps) {
-    const { currentLanguage } = useTranslation();
+  const { currentLanguage } = useTranslation();
 
-    return (
-        <CheckoutButton
-            item={item}
-            eventDetails={eventDetails}
-            globallyTicketsOnSale={globallyTicketsOnSale}
-            currentLanguage={currentLanguage}
-        />
-    );
+  return (
+    <CheckoutButton
+      item={item}
+      eventDetails={eventDetails}
+      globallyTicketsOnSale={globallyTicketsOnSale}
+      currentLanguage={currentLanguage}
+    />
+  );
 }

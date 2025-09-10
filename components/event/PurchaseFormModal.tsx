@@ -283,7 +283,7 @@ export default function PurchaseFormModal({
         console.error("Supabase function error:", functionError);
         setError(
           functionError.message ||
-          t(currentLanguage, "purchaseModal.errors.functionError"),
+            t(currentLanguage, "purchaseModal.errors.functionError"),
         );
         setIsLoading(false);
         return;
@@ -296,7 +296,7 @@ export default function PurchaseFormModal({
         console.error("Lomi checkout URL not found in response:", data);
         setError(
           data.error ||
-          t(currentLanguage, "purchaseModal.errors.lomiUrlMissing"),
+            t(currentLanguage, "purchaseModal.errors.lomiUrlMissing"),
         );
       }
     } catch (e: unknown) {
@@ -413,14 +413,25 @@ export default function PurchaseFormModal({
                       <div className="flex flex-col items-end gap-1">
                         {item.isBundle && (
                           <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-sm">
-                            {item.ticketsIncluded || 1} {item.ticketsIncluded === 1 ? 'billet' : 'billets'}
+                            {item.ticketsIncluded || 1}{" "}
+                            {item.ticketsIncluded === 1 ? "billet" : "billets"}
                           </span>
                         )}
-                        {!item.isBundle && item.stock !== null && item.stock !== undefined && item.stock > 0 && (
-                          <span className="text-xs bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-sm">
-                            {t(currentLanguage, "purchaseModal.only")} {item.stock} {item.stock === 1 ? t(currentLanguage, "purchaseModal.available") : t(currentLanguage, "purchaseModal.availablePlural")}
-                          </span>
-                        )}
+                        {!item.isBundle &&
+                          item.stock !== null &&
+                          item.stock !== undefined &&
+                          item.stock > 0 && (
+                            <span className="text-xs bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-sm">
+                              {t(currentLanguage, "purchaseModal.only")}{" "}
+                              {item.stock}{" "}
+                              {item.stock === 1
+                                ? t(currentLanguage, "purchaseModal.available")
+                                : t(
+                                    currentLanguage,
+                                    "purchaseModal.availablePlural",
+                                  )}
+                            </span>
+                          )}
                       </div>
                     </div>
                   </div>

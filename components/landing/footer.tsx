@@ -53,11 +53,11 @@ function ContactForm({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <form action={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
+    <form action={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
         <label
           htmlFor="email"
-          className="block text-lg text-gray-300 font-medium"
+          className="block text-sm font-medium"
         >
           {t(currentLanguage, "footer.contact.emailLabel")}
         </label>
@@ -67,14 +67,14 @@ function ContactForm({ onClose }: { onClose: () => void }) {
           name="email"
           placeholder={t(currentLanguage, "footer.contact.emailPlaceholder")}
           required
-          className="w-full bg-[#1a1a1a] rounded-sm p-4 text-base border border-gray-700 focus:ring-2 focus:ring-gray-400 placeholder:text-gray-400 text-white transition-colors focus:bg-[#1a1a1a] focus:border-gray-600"
+          className="w-full bg-background rounded-sm px-3 py-2 text-sm border border-input focus:ring-2 focus:ring-ring placeholder:text-muted-foreground transition-colors"
         />
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-2">
         <label
           htmlFor="message"
-          className="block text-lg text-gray-300 font-medium"
+          className="block text-sm font-medium"
         >
           {t(currentLanguage, "footer.contact.messageLabel")}
         </label>
@@ -83,23 +83,23 @@ function ContactForm({ onClose }: { onClose: () => void }) {
           name="message"
           placeholder={t(currentLanguage, "footer.contact.messagePlaceholder")}
           required
-          rows={6}
-          className="w-full bg-[#1a1a1a] rounded-sm p-4 text-base border border-gray-700 focus:ring-2 focus:ring-gray-400 placeholder:text-gray-400 text-white transition-colors resize-none focus:bg-[#1a1a1a] focus:border-gray-600"
+          rows={4}
+          className="w-full bg-background rounded-sm px-3 py-2 text-sm border border-input focus:ring-2 focus:ring-ring placeholder:text-muted-foreground transition-colors resize-none"
         />
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-end space-y-4 sm:space-y-0">
+      <div className="flex justify-end pt-2">
         <button
           type="submit"
           disabled={isPending}
-          className="bg-teal-800 hover:bg-teal-700 text-teal-200 px-8 py-4 rounded-sm text-base font-medium inline-flex items-center justify-center gap-2 transition-all duration-300 ease-in-out disabled:opacity-50 disabled:hover:bg-teal-600 min-w-[180px] h-[60px] w-full sm:w-auto border border-teal-700"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-sm text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors disabled:opacity-50 min-w-[120px]"
         >
           {isPending ? (
-            <Loader2 className="w-6 h-6 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             <>
               <span>{t(currentLanguage, "footer.contact.sendButton")}</span>
-              <ArrowRight className="w-6 h-6" />
+              <ArrowRight className="w-4 h-4" />
             </>
           )}
         </button>
@@ -252,10 +252,10 @@ export function Footer() {
                         {t(currentLanguage, "footer.navigation.contact")}
                       </button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[600px] bg-[#1a1a1a] border-gray-600 rounded-sm p-6 md:p-11">
+                    <DialogContent className="sm:max-w-[425px] p-4 rounded-sm border border-border/40 bg-background backdrop-blur-sm">
                       <DialogHeader>
-                        <DialogTitle className="text-3xl font-normal text-white text-center mb-8">
-                          {t(currentLanguage, "footer.contact.title")}
+                        <DialogTitle className="flex items-center">
+                          <span>{t(currentLanguage, "footer.contact.title")}</span>
                         </DialogTitle>
                       </DialogHeader>
                       <ContactForm onClose={() => setIsContactOpen(false)} />

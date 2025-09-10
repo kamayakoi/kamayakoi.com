@@ -399,19 +399,30 @@ export default function PurchaseFormModal({
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Item Details */}
                   <div className="bg-muted/30 p-3 rounded-sm">
-                    <h4 className="font-medium text-sm">{item.name}</h4>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {formatPrice(item.price)}
-                      {t(
-                        currentLanguage,
-                        "eventSlugPage.tickets.currencySuffix",
-                      )}
-                      {item.isBundle && (
-                        <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-sm">
-                          {item.ticketsIncluded || 1} {item.ticketsIncluded === 1 ? 'billet' : 'billets'}
-                        </span>
-                      )}
-                    </p>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="font-medium text-sm">{item.name}</h4>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {formatPrice(item.price)}
+                          {t(
+                            currentLanguage,
+                            "eventSlugPage.tickets.currencySuffix",
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        {item.isBundle && (
+                          <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-sm">
+                            {item.ticketsIncluded || 1} {item.ticketsIncluded === 1 ? 'billet' : 'billets'}
+                          </span>
+                        )}
+                        {!item.isBundle && item.stock !== null && item.stock !== undefined && item.stock > 0 && (
+                          <span className="text-xs bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-sm">
+                            {t(currentLanguage, "purchaseModal.only")} {item.stock} {item.stock === 1 ? 'disponible' : 'disponibles'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Name Field */}

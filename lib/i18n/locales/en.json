@@ -262,6 +262,7 @@
   "purchaseModal": {
     "title": "Purchase tickets",
     "description": "Complete your order details",
+    "only": "Only",
     "includesTickets": "Includes {count} ticket(s)",
     "ticketsGenerated": "Tickets to be generated",
     "labels": {

@@ -399,9 +399,16 @@ export function HeroSection({
       <div className="absolute inset-0">
         {renderContent()}
 
-        {/* Overlay for better text readability - only for non-video content */}
-        {currentItem.type !== "video" && (
-          <div className="absolute inset-0 bg-black/40" />
+        {/* Overlay for better text readability */}
+        {currentItem.type === "video" ? (
+          // No overlay for videos
+          null
+        ) : currentItem.type === "event" ? (
+          // Very minimal overlay for events
+          <div className="absolute inset-0 bg-black/60" />
+        ) : (
+          // Very minimal overlay for other content
+          <div className="absolute inset-0 bg-black/20" />
         )}
       </div>
 

@@ -449,28 +449,34 @@ export function HeroSection({
               {/* Show date for events right after title, for others in additional info */}
               {currentItem.type === "event" && currentItem.date && (
                 <p className="hidden md:block text-white/80 text-sm">
-                  {new Date(currentItem.date).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  {new Date(currentItem.date).toLocaleDateString(
+                    currentLanguage === "fr" ? "fr-FR" : "en-US",
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }
+                  )}
                 </p>
               )}
               {/* Show date for non-events in additional info section */}
               {currentItem.type !== "event" && currentItem.date && (
                 <p className="text-white/70 text-sm">
-                  {new Date(currentItem.date).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  {new Date(currentItem.date).toLocaleDateString(
+                    currentLanguage === "fr" ? "fr-FR" : "en-US",
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }
+                  )}
                 </p>
               )}
               {/* Show publishedAt for non-events only (events use date field) */}
               {currentItem.type !== "event" && currentItem.publishedAt && (
                 <p className="text-white/70 text-sm">
                   {new Date(currentItem.publishedAt).toLocaleDateString(
-                    "en-US",
+                    currentLanguage === "fr" ? "fr-FR" : "en-US",
                     {
                       year: "numeric",
                       month: "long",

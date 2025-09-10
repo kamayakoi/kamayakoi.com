@@ -263,6 +263,8 @@
     "title": "Acheter un billet",
     "description": "Complétez les détails de votre commande",
     "only": "Seulement",
+    "available": "disponible",
+    "availablePlural": "disponibles",
     "includesTickets": "Inclut {count} billet(s)",
     "ticketsGenerated": "Billets à générer",
     "labels": {

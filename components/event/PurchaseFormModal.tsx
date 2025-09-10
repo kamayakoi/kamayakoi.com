@@ -418,7 +418,7 @@ export default function PurchaseFormModal({
                         )}
                         {!item.isBundle && item.stock !== null && item.stock !== undefined && item.stock > 0 && (
                           <span className="text-xs bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-sm">
-                            {t(currentLanguage, "purchaseModal.only")} {item.stock} {item.stock === 1 ? 'disponible' : 'disponibles'}
+                            {t(currentLanguage, "purchaseModal.only")} {item.stock} {item.stock === 1 ? t(currentLanguage, "purchaseModal.available") : t(currentLanguage, "purchaseModal.availablePlural")}
                           </span>
                         )}
                       </div>

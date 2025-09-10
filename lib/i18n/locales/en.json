@@ -263,6 +263,8 @@
     "title": "Purchase tickets",
     "description": "Complete your order details",
     "only": "Only",
+    "available": "available",
+    "availablePlural": "available",
     "includesTickets": "Includes {count} ticket(s)",
     "ticketsGenerated": "Tickets to be generated",
     "labels": {

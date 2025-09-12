@@ -35,7 +35,7 @@ interface Story {
 }
 
 export const metadata: Metadata = {
-  title: "Stories | Kamayakoi",
+  title: "Stories",
   description:
     "Discover inspiring stories, insights, and narratives from our community",
 };

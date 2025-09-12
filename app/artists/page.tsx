@@ -5,7 +5,7 @@ import LoadingComponent from "@/components/ui/loader";
 import ArtistsContentClient from "@/app/artists/artists-content-client";
 
 export const metadata: Metadata = {
-  title: "Artists | Kamayakoi",
+  title: "Artists",
   description: "Meet the talented artists and creators of Kamayakoi.",
 };
 

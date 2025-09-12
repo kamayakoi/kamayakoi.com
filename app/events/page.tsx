@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getEventsForParallax } from "@/lib/sanity/queries";
 
 export const metadata: Metadata = {
-  title: "Rendez-Vous Sauvage | Kamayakoi",
+  title: "RENDEZ-VOUS SAUVAGE",
   description:
     "Discover upcoming Kamayakoi events, shows, and performances. Experience unforgettable nights with our resident artists and special guests.",
 };

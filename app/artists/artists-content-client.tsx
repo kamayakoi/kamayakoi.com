@@ -5,6 +5,8 @@ import { type ArtistData } from "@/lib/sanity/queries";
 import Header from "@/components/landing/header";
 import { Footer } from "@/components/landing/footer";
 import ArtistCard from "@/components/ui/artist-card";
+import { useTranslation } from "@/lib/contexts/TranslationContext";
+import { t } from "@/lib/i18n/translations";
 
 interface ArtistsContentClientProps {
   artists: ArtistData[];
@@ -13,6 +15,8 @@ interface ArtistsContentClientProps {
 export default function ArtistsContentClient({
   artists,
 }: ArtistsContentClientProps) {
+  const { currentLanguage } = useTranslation();
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -27,7 +31,7 @@ export default function ArtistsContentClient({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              Artists
+              {t(currentLanguage, "artistsPage.title")}
             </motion.h1>
             <motion.p
               className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-3xl"
@@ -35,9 +39,7 @@ export default function ArtistsContentClient({
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              Meet the talented artists, DJs, and creators who bring Kamayakoi
-              to life. From resident artists to guest performers, discover the
-              creative minds behind our unique sound and vision.
+              {t(currentLanguage, "artistsPage.subtitle")}
             </motion.p>
           </div>
 
@@ -69,11 +71,10 @@ export default function ArtistsContentClient({
               transition={{ duration: 0.5 }}
             >
               <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
-                Artists Coming Soon
+                {t(currentLanguage, "artistsPage.comingSoon.title")}
               </h2>
               <p className="text-zinc-600 dark:text-zinc-400 mb-6">
-                We&apos;re working on bringing you amazing artists and creators.
-                Stay tuned!
+                {t(currentLanguage, "artistsPage.comingSoon.description")}
               </p>
             </motion.div>
           )}

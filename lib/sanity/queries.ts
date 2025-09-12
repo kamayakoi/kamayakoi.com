@@ -84,7 +84,6 @@ export async function getEventBySlug(slug: string, locale: string) {
       lineup[]->{
         _id,
         name,
-        bio,
         description,
         "image": image.asset->url,
         "videoUrl": video.asset->url,
@@ -571,8 +570,10 @@ export interface ArtistData {
   _id: string;
   name: string;
   slug: string;
-  bio?: string;
-  description?: string;
+  description?: {
+    en?: string;
+    fr?: string;
+  };
   imageUrl?: string;
   videoUrl?: string;
   videoCaption?: string;
@@ -588,7 +589,6 @@ export const getAllArtists = async (): Promise<ArtistData[]> => {
     _id,
     name,
     slug,
-    bio,
     description,
     "imageUrl": image.asset->url,
     "videoUrl": video.asset->url,
@@ -613,7 +613,6 @@ export const getArtistBySlug = async (
     _id,
     name,
     slug,
-    bio,
     description,
     "imageUrl": image.asset->url,
     "videoUrl": video.asset->url,

@@ -46,6 +46,7 @@ interface StoriesContentClientProps {
 }
 
 function StoryCard({ story }: { story: Story }) {
+  const { currentLanguage } = useTranslation();
   const mainImage = story.mainImage?.asset.url || "/placeholder.webp";
   const hasValidImage = mainImage && mainImage.trim() !== "";
 
@@ -95,7 +96,7 @@ function StoryCard({ story }: { story: Story }) {
             </div>
           ) : (
             <div className="aspect-square bg-muted flex items-center justify-center">
-              <span className="text-muted-foreground text-sm">No Image</span>
+              <span className="text-muted-foreground text-sm">{t(currentLanguage, "storiesPage.noImage")}</span>
             </div>
           )}
         </Link>
@@ -134,7 +135,7 @@ function StoryCard({ story }: { story: Story }) {
             href={`/stories/${story.slug.current}`}
             className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium"
           >
-            Read
+            {t(currentLanguage, "storiesPage.readMore")}
           </Link>
         </div>
       </CardContent>
@@ -158,12 +159,10 @@ export default function StoriesContentClient({
           {/* Hero Section */}
           <div className="relative pt-24 md:pt-32 mb-6">
             <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-white mb-6">
-              Stories
+              {t(currentLanguage, "storiesPage.title")}
             </h1>
             <p className="text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-3xl">
-              Discover inspiring stories, insights, and narratives from our
-              community. Each story captures the essence of Kamayakoi&apos;s
-              journey and the people who make it special.
+              {t(currentLanguage, "storiesPage.subtitle")}
             </p>
           </div>
 

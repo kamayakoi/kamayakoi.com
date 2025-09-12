@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/lib/contexts/TranslationContext";
+import { t } from "@/lib/i18n/translations";
 
 // Move loading sequence outside component to avoid dependency issues
 const loadingSequence = [0, 18, 12, 35, 28, 58, 52, 78, 71, 95, 88, 100];
 
 export default function LoadingComponent() {
   const [fillWidth, setFillWidth] = useState(0);
+  const { currentLanguage } = useTranslation();
 
   useEffect(() => {
     let stepIndex = 0;
@@ -31,7 +34,7 @@ export default function LoadingComponent() {
             fontFamily: "Arial Black, sans-serif",
           }}
         >
-          LOADING
+          {t(currentLanguage, "loading.text")}
         </h1>
 
         {/* Filled text (bright magenta) */}
@@ -48,7 +51,7 @@ export default function LoadingComponent() {
               color: "#5EEAD4",
             }}
           >
-            LOADING
+            {t(currentLanguage, "loading.text")}
           </h1>
         </div>
       </div>

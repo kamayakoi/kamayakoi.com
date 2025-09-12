@@ -6,12 +6,16 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { ArtistData } from "@/lib/sanity/queries";
+import { useTranslation } from "@/lib/contexts/TranslationContext";
 
 interface ArtistCardProps {
   artist: ArtistData;
 }
 
 const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
+  const { currentLanguage } = useTranslation();
+
+
   // Extract social platform from URL or use generic social if handle exists
   const getSocialPlatform = (url?: string) => {
     if (!url) return null;
@@ -31,7 +35,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
     switch (role) {
       case "host":
         return {
-          label: "HOST",
+          label: currentLanguage === "fr" ? "ANIMATEUR" : "HOST",
           variant: "default" as const,
           className:
             "bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600",
@@ -45,7 +49,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
         };
       case "producer":
         return {
-          label: "PRODUCER",
+          label: currentLanguage === "fr" ? "PRODUCTEUR" : "PRODUCER",
           variant: "default" as const,
           className:
             "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600",
@@ -59,14 +63,14 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
         };
       case "resident":
         return {
-          label: "RESIDENT",
+          label: currentLanguage === "fr" ? "RÉSIDENT" : "RESIDENT",
           variant: "default" as const,
           className:
             "bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600",
         };
       case "artist":
         return {
-          label: "ARTIST",
+          label: currentLanguage === "fr" ? "ARTISTE" : "ARTIST",
           variant: "default" as const,
           className:
             "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600",
@@ -87,7 +91,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
           <div className="relative bg-muted overflow-hidden h-full min-h-[300px]">
             <Image
               src={artist.imageUrl || "/placeholder.webp"}
-              alt={artist.name}
+              alt={artist.name || ""}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
@@ -101,7 +105,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
           {/* Artist name overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <h2 className="text-xl font-bold text-white drop-shadow-lg mb-2">
-              {artist.name}
+              {artist.name || ""}
             </h2>
 
             {/* Role badge */}
@@ -122,7 +126,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
                 <span className="relative flex h-2 w-2 mr-1.5">
                   <span className="relative inline-flex rounded-sm h-2 w-2 bg-green-500"></span>
                 </span>
-                Resident
+                {currentLanguage === "fr" ? "Résident" : "Resident"}
               </div>
             </div>
           )}
@@ -138,15 +142,13 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
                   href={artist.socialLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-lg font-semibold text-primary hover:text-primary/80 transition-colors"
+                  className="text-lg font-semibold text-primary hover:text-primary/80 transition-colors"
                 >
-                  <span className="font-bold">@</span>
-                  {artist.socialHandle || "social"}
+                  @{artist.socialHandle?.toLowerCase() || "social"}
                 </Link>
               ) : (
-                <div className="inline-flex items-center gap-2 text-lg font-semibold text-muted-foreground">
-                  <span className="font-bold">@</span>
-                  {artist.socialHandle}
+                <div className="text-lg font-semibold text-muted-foreground">
+                  @{artist.socialHandle?.toLowerCase()}
                 </div>
               )}
               {socialPlatform && (
@@ -157,11 +159,11 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
             </div>
           )}
 
-          {/* Bio Section */}
-          {artist.bio && (
+          {/* Description Section */}
+          {artist.description && (
             <div className="mb-4 flex-1">
               <div className="text-muted-foreground leading-relaxed">
-                {artist.bio.split("\n").map((line, index) => {
+                {(artist.description[currentLanguage as keyof typeof artist.description] || artist.description.en || artist.description.fr || "").split("\n").map((line: string, index: number) => {
                   const trimmedLine = line.trim();
                   if (trimmedLine === "") {
                     return <br key={index} />;

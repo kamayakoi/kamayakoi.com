@@ -117,7 +117,7 @@
     }
   },
   "privacyPage": {
-    "pageTitle": "Privacy policy",
+    "pageTitle": "Privacy Policy",
     "pageDescription": "Learn how Kamayakoi protects and manages your personal information in accordance with our privacy practices.",
     "title": "Privacy Policy",
     "subtitle": "Your privacy is important to us. This policy explains how we collect, use, and protect your information.",
@@ -453,6 +453,12 @@
       }
     }
   },
+  "storiesPage": {
+    "title": "Stories",
+    "subtitle": "Discover inspiring stories, insights, and narratives from our community. Each story captures the essence of Kamayakoi's journey and the people who make it special.",
+    "noImage": "No Image",
+    "readMore": "Read"
+  },
   "storyPage": {
     "backToStories": "Back to stories",
     "byAuthor": "{authorName}",
@@ -503,7 +509,7 @@
       "shipping": "Shipping: Free shipping on orders over 50,000 F CFA"
     },
     "metadata": {
-      "title": "Merch | Kamayakoi",
+      "title": "Merch",
       "description": "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products."
     }
   },
@@ -558,6 +564,21 @@
         "playVideo": "Play Video",
         "pauseVideo": "Pause Video"
       }
+    }
+  },
+  "loading": {
+    "text": "LOADING"
+  },
+  "heroSection": {
+    "getYourTickets": "Get Tickets",
+    "getTickets": "Get Tickets"
+  },
+  "artistsPage": {
+    "title": "Artists",
+    "subtitle": "Meet the talented artists, DJs, and creators who bring Kamayakoi to life. From resident artists to guest performers, discover the creative minds behind our unique sound and vision.",
+    "comingSoon": {
+      "title": "Artists coming soon",
+      "description": "We're working on bringing you amazing artists and creators. Stay tuned!"
     }
   },
   "cardCarousel": {

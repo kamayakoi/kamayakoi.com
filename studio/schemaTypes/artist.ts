@@ -25,11 +25,6 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'bio',
-      title: 'Short Bio',
-      type: 'text',
-    }),
-    defineField({
       name: 'image',
       title: 'Image',
       type: 'image',
@@ -55,11 +50,11 @@ export default defineType({
       type: 'string',
       options: {
         list: [
-          {title: 'Artist', value: 'artist'},
+          {title: 'Artist / Artiste', value: 'artist'},
           {title: 'Resident', value: 'resident'},
-          {title: 'Host', value: 'host'},
+          {title: 'Host / Animateur', value: 'host'},
           {title: 'MC', value: 'mc'},
-          {title: 'Producer', value: 'producer'},
+          {title: 'Producer / Producteur', value: 'producer'},
           {title: 'DJ', value: 'dj'},
         ],
         layout: 'dropdown',
@@ -76,10 +71,23 @@ export default defineType({
     }),
     defineField({
       name: 'description',
-      title: 'Full Description',
-      type: 'text',
+      title: 'Description',
+      type: 'object',
       description: 'Longer description/biography of the artist for detailed display',
-      rows: 8,
+      fields: [
+        {
+          name: 'en',
+          title: 'English',
+          type: 'text',
+          rows: 8,
+        },
+        {
+          name: 'fr',
+          title: 'Français',
+          type: 'text',
+          rows: 8,
+        },
+      ],
     }),
     defineField({
       name: 'video',

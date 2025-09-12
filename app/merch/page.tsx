@@ -5,7 +5,7 @@ import LoadingComponent from "@/components/ui/loader";
 import MerchContentClient from "./merch-content-client";
 
 export const metadata: Metadata = {
-  title: "Merch | Kamayakoi",
+  title: "Merch",
   description:
     "Shop exclusive Kamayakoi merchandise, apparel, and collectibles. Support the movement with our unique designs and products.",
 };

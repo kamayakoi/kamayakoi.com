@@ -1,12 +1,13 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Header from "@/components/landing/header";
 import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
 import { Footer } from "@/components/landing/footer";
 
-const today = new Date();
-const formattedDate = today.toLocaleDateString("en-US", {
+const lastUpdatedDate = new Date("2025-09-04");
+const formattedDate = lastUpdatedDate.toLocaleDateString("fr-FR", {
   year: "numeric",
   month: "long",
   day: "numeric",
@@ -20,15 +21,25 @@ export default function TermsClientPage() {
       <Header />
       <main className="flex-grow container mx-auto px-4 sm:px-6 py-12 md:py-16">
         <article className="max-w-4xl mx-auto">
-          {/* Header Section */}
-          <div className="mb-8 mt-8 md:mb-12 md:mt-12">
-            <h1 className="text-4xl font-bold text-primary mb-4 md:text-5xl">
+          {/* Hero Section */}
+          <div className="relative pt-24 md:pt-32 mb-12">
+            <motion.h1
+              className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
               {t(currentLanguage, "termsPage.title")}
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-4 max-w-2xl">
+            </motion.h1>
+            <motion.p
+              className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-3xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               {t(currentLanguage, "termsPage.subtitle")}
-            </p>
-            <p className="text-sm text-muted-foreground text-right">
+            </motion.p>
+            <p className="text-sm text-muted-foreground text-right mt-4">
               {t(currentLanguage, "termsPage.lastUpdated", {
                 date: formattedDate,
               })}

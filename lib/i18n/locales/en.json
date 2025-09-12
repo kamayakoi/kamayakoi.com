@@ -460,7 +460,9 @@
     "readMore": "Read"
   },
   "storyPage": {
+    "backButton": "Back",
     "backToStories": "Back to stories",
+    "notFoundTitle": "Story Not Found",
     "byAuthor": "{authorName}",
     "relatedStories": "RELATED STORIES",
     "readMore": "Read",
@@ -469,6 +471,10 @@
     "noStories": {
       "title": "Stories coming soon",
       "description": "We're working on bringing you amazing stories and narratives. Stay tuned for exclusive Kamayakoi content!"
+    },
+    "placeholderContent": {
+      "excerpt": "This is placeholder content for the story. In a real implementation, this would be rich text content from your CMS.",
+      "fallback": "This is placeholder content for the story. In a real implementation, this would be rich text content from your CMS."
     },
     "share": {
       "onFacebook": "Share on Facebook",
@@ -487,6 +493,12 @@
     "subtitle": "Shop exclusive Kamayakoi merch, apparel, and collectibles. Support the movement with our unique designs and products crafted for the wild at heart.",
     "breadcrumb": "Shop",
     "loading": "Loading...",
+    "searchPlaceholder": "Search products...",
+    "categoryFilter": "Categories",
+    "tagPlaceholder": "Tag",
+    "tagFilter": "Tags",
+    "noProductsFound": "No products found",
+    "noProductsFoundDescription": "Try adjusting your filters or search terms.",
     "comingSoon": {
       "title": "Merch coming soon",
       "description": "We're working on bringing you amazing merchandise and collectibles. Stay tuned for exclusive Kamayakoi gear!"

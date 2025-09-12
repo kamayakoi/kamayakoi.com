@@ -9,10 +9,16 @@ export default defineType({
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
+      title: 'Title (English)',
       type: 'string',
       validation: (Rule) => Rule.required(),
-      description: 'Display title for this media item',
+      description: 'Display title for this media item in English',
+    }),
+    defineField({
+      name: 'title_fr',
+      title: 'Title (French)',
+      type: 'string',
+      description: 'Display title for this media item in French',
     }),
     defineField({
       name: 'type',
@@ -39,10 +45,17 @@ export default defineType({
     }),
     defineField({
       name: 'description',
-      title: 'Description',
+      title: 'Description (English)',
       type: 'text',
       rows: 3,
-      description: 'Optional description or caption for this media',
+      description: 'Optional description or caption for this media in English',
+    }),
+    defineField({
+      name: 'description_fr',
+      title: 'Description (French)',
+      type: 'text',
+      rows: 3,
+      description: 'Optional description or caption for this media in French',
     }),
     defineField({
       name: 'thumbnail',

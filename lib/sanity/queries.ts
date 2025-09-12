@@ -19,7 +19,7 @@ export async function getLatestEvents(limit = 3) {
       date,
       time,
       location,
-      "description": coalesce(description.en, description.fr),
+      description,
       "flyer": {
         "url": flyer.asset->url
       },
@@ -748,6 +748,7 @@ export const getHomepageContent = async (): Promise<HomepageData | null> => {
 export interface MediaItem {
   _id: string;
   title: string;
+  title_fr?: string;
   type:
     | "youtube"
     | "soundcloud"
@@ -756,6 +757,7 @@ export interface MediaItem {
     | "video_url";
   url: string;
   description?: string;
+  description_fr?: string;
   thumbnail?: string;
   duration?: string;
   artist?: string;
@@ -769,9 +771,11 @@ export const getAllMedia = async (): Promise<MediaItem[]> => {
   const query = `*[_type == "media"] | order(publishedAt desc, _createdAt desc) {
     _id,
     title,
+    title_fr,
     type,
     url,
     description,
+    description_fr,
     "thumbnail": thumbnail.asset->url,
     duration,
     artist,
@@ -788,9 +792,11 @@ export const getMedia = async (limit = 10): Promise<MediaItem[]> => {
   const query = `*[_type == "media"] | order(publishedAt desc, _createdAt desc) [0...$limit] {
     _id,
     title,
+    title_fr,
     type,
     url,
     description,
+    description_fr,
     "thumbnail": thumbnail.asset->url,
     duration,
     artist,
@@ -814,9 +820,11 @@ export const getMediaByType = async (
   const query = `*[_type == "media" && type == $type] | order(publishedAt desc) [0...$limit] {
     _id,
     title,
+    title_fr,
     type,
     url,
     description,
+    description_fr,
     "thumbnail": thumbnail.asset->url,
     duration,
     artist,

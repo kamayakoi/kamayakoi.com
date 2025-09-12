@@ -86,7 +86,7 @@ function ContactForm({ onClose }: { onClose: () => void }) {
         <button
           type="submit"
           disabled={isPending}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-sm text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors disabled:opacity-50 min-w-[120px]"
+          className="bg-teal-800 hover:bg-teal-700 text-teal-200 px-4 py-2 rounded-sm text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors disabled:opacity-50 min-w-[120px]"
         >
           {isPending ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -392,15 +392,13 @@ export function Footer() {
                     style={{
                       pointerEvents: isNewsletterFocused ? "auto" : "none",
                     }}
-                    className={`px-2 py-1 rounded-sm text-xs font-medium transition-colors h-6 -ml-8 flex items-center justify-center min-w-[50px] ${
-                      isNewsletterFocused ? "" : "invisible"
-                    } ${
-                      newsletterStatus === "success"
+                    className={`px-2 py-1 rounded-sm text-xs font-medium transition-colors h-6 -ml-8 flex items-center justify-center min-w-[50px] ${isNewsletterFocused ? "" : "invisible"
+                      } ${newsletterStatus === "success"
                         ? "bg-green-800 text-green-100"
                         : newsletterStatus === "error"
                           ? "bg-red-800 text-red-100"
                           : "bg-teal-800 hover:bg-teal-700 text-teal-100"
-                    }`}
+                      }`}
                     disabled={newsletterStatus === "loading"}
                   >
                     {newsletterStatus === "loading" ? (

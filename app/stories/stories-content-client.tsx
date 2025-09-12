@@ -21,11 +21,13 @@ interface Category {
 interface Story {
   _id: string;
   title: string;
+  title_fr?: string;
   slug: {
     current: string;
   };
   publishedAt: string;
   excerpt?: string;
+  excerpt_fr?: string;
   mainImage?: {
     asset: {
       url: string;
@@ -49,6 +51,10 @@ function StoryCard({ story }: { story: Story }) {
   const { currentLanguage } = useTranslation();
   const mainImage = story.mainImage?.asset.url || "/placeholder.webp";
   const hasValidImage = mainImage && mainImage.trim() !== "";
+
+  // Select content based on language
+  const title = currentLanguage === 'fr' && story.title_fr ? story.title_fr : story.title;
+  const excerpt = currentLanguage === 'fr' && story.excerpt_fr ? story.excerpt_fr : story.excerpt;
 
   // Category color system
   const getCategoryColor = (color?: string) => {
@@ -76,14 +82,14 @@ function StoryCard({ story }: { story: Story }) {
         <Link
           href={`/stories/${story.slug.current}`}
           className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          aria-label={`Read ${story.title}`}
+          aria-label={`Read ${title}`}
           prefetch
         >
           {hasValidImage ? (
             <div className="aspect-square relative bg-muted overflow-hidden">
               <Image
                 src={mainImage}
-                alt={story.mainImage?.alt || story.title}
+                alt={story.mainImage?.alt || title}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
@@ -106,13 +112,13 @@ function StoryCard({ story }: { story: Story }) {
         <div className="flex-1 space-y-1">
           <Link href={`/stories/${story.slug.current}`} className="block">
             <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2 break-words overflow-wrap-anywhere">
-              {story.title}
+              {title}
             </h3>
           </Link>
 
-          {story.excerpt && (
+          {excerpt && (
             <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed break-words overflow-wrap-anywhere">
-              {story.excerpt}
+              {excerpt}
             </p>
           )}
         </div>

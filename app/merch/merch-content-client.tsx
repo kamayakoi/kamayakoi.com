@@ -127,7 +127,7 @@ export default function MerchContentClient({
                 <div className="relative w-full sm:w-48">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
-                    placeholder="Search products..."
+                    placeholder={t(currentLanguage, "merchPage.searchPlaceholder")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value.trim())}
                     className="pl-10 rounded-sm bg-background h-10 border border-border"
@@ -142,7 +142,7 @@ export default function MerchContentClient({
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Categories</SelectItem>
+                    <SelectItem value="all">{t(currentLanguage, "merchPage.categoryFilter")}</SelectItem>
                     {availableCategories.map((category) => (
                       <SelectItem key={category} value={category}>
                         {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -153,10 +153,10 @@ export default function MerchContentClient({
 
                 <Select value={selectedTag} onValueChange={setSelectedTag}>
                   <SelectTrigger className="w-full sm:w-48 rounded-sm bg-background h-10 border border-border">
-                    <SelectValue placeholder="Tag" />
+                    <SelectValue placeholder={t(currentLanguage, "merchPage.tagPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Tags</SelectItem>
+                    <SelectItem value="all">{t(currentLanguage, "merchPage.tagFilter")}</SelectItem>
                     {availableTags.map((tag) => (
                       <SelectItem key={tag} value={tag}>
                         {tag.charAt(0).toUpperCase() + tag.slice(1)}
@@ -196,16 +196,16 @@ export default function MerchContentClient({
             >
               <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
                 {searchQuery ||
-                selectedCategory !== "all" ||
-                selectedTag !== "all"
-                  ? "No products found"
+                  selectedCategory !== "all" ||
+                  selectedTag !== "all"
+                  ? t(currentLanguage, "merchPage.noProductsFound")
                   : t(currentLanguage, "merchPage.comingSoon.title")}
               </h2>
               <p className="text-zinc-600 dark:text-zinc-400 mb-6">
                 {searchQuery ||
-                selectedCategory !== "all" ||
-                selectedTag !== "all"
-                  ? "Try adjusting your filters or search terms."
+                  selectedCategory !== "all" ||
+                  selectedTag !== "all"
+                  ? t(currentLanguage, "merchPage.noProductsFoundDescription")
                   : t(currentLanguage, "merchPage.comingSoon.description")}
               </p>
             </motion.div>

@@ -10,9 +10,11 @@ import { Card, CardContent } from "@/components/ui/card";
 interface MediaItem {
   _id: string;
   title: string;
+  title_fr?: string;
   type: string;
   url: string;
   description?: string;
+  description_fr?: string;
   thumbnail?: string;
   duration?: string;
   artist?: string;
@@ -27,6 +29,17 @@ interface MediaShowcaseProps {
 
 function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
   const { currentLanguage } = useTranslation();
+
+  // Get the localized title and description
+  const localizedTitle =
+    currentLanguage === "fr" && mediaItem.title_fr
+      ? mediaItem.title_fr
+      : mediaItem.title;
+
+  const localizedDescription =
+    currentLanguage === "fr" && mediaItem.description_fr
+      ? mediaItem.description_fr
+      : mediaItem.description;
 
   const extractYouTubeId = (url: string): string | null => {
     const patterns = [
@@ -78,7 +91,7 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
           onClick={handleMediaClick}
           role="button"
           tabIndex={0}
-          aria-label={`Play ${mediaItem.title}`}
+          aria-label={`Play ${localizedTitle}`}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
@@ -90,7 +103,7 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
             <div className="aspect-square relative bg-muted overflow-hidden">
               <Image
                 src={mainImage}
-                alt={mediaItem.title}
+                alt={localizedTitle}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
@@ -109,7 +122,7 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
             <div className="aspect-square relative bg-muted overflow-hidden">
               <Image
                 src="/placeholder.webp"
-                alt={mediaItem.title}
+                alt={localizedTitle}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
@@ -132,13 +145,13 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
         <div className="flex-1 space-y-1">
           <div className="cursor-pointer" onClick={handleMediaClick}>
             <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2 break-words overflow-wrap-anywhere">
-              {mediaItem.title}
+              {localizedTitle}
             </h3>
           </div>
 
-          {mediaItem.description && (
+          {localizedDescription && (
             <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed break-words overflow-wrap-anywhere">
-              {mediaItem.description}
+              {localizedDescription}
             </p>
           )}
         </div>

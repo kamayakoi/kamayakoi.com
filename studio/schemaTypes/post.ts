@@ -63,7 +63,12 @@ export default {
     },
     {
       name: 'excerpt',
-      title: 'Excerpt',
+      title: 'Excerpt (English)',
+      type: 'text',
+    },
+    {
+      name: 'excerpt_fr',
+      title: 'Excerpt (French)',
       type: 'text',
     },
     {
@@ -82,7 +87,62 @@ export default {
     },
     {
       name: 'body',
-      title: 'Body',
+      title: 'Body (English)',
+      type: 'array',
+      of: [
+        {
+          type: 'block',
+        },
+        {
+          type: 'image',
+          options: {hotspot: true},
+          fields: [
+            {
+              name: 'alt',
+              title: 'Alt',
+              type: 'string',
+              options: {isHighlighted: true},
+              validation: (Rule: Rule) => Rule.required(),
+            },
+            {
+              name: 'caption',
+              title: 'Caption',
+              type: 'string',
+              options: {isHighlighted: true},
+            },
+          ],
+        },
+        {
+          name: 'videoEmbed',
+          title: 'Video embed',
+          type: 'object',
+          fields: [
+            {
+              name: 'url',
+              title: 'Video URL',
+              type: 'url',
+              description: 'URL from YouTube, Vimeo, etc.',
+              validation: (Rule: Rule) => Rule.required(),
+            },
+            {
+              name: 'caption',
+              title: 'Caption',
+              type: 'string',
+            },
+          ],
+          preview: {
+            select: {url: 'url', caption: 'caption'},
+            prepare: (value: any) => ({
+              title: `Video: ${value.caption || value.url}`,
+              subtitle: value.url,
+            }),
+          },
+        },
+      ],
+    },
+    {
+      name: 'body_fr',
+      title: 'Body (French)',
       type: 'array',
       of: [
         {

@@ -25,7 +25,10 @@ interface ShowcaseEvent {
     url: string;
   };
   ticketsAvailable: boolean;
-  description?: string;
+  description?: {
+    en?: string;
+    fr?: string;
+  };
 }
 
 interface EventShowcaseProps {
@@ -43,6 +46,17 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
       month: "short",
     },
   );
+
+  // Get the description in the current language, fallback to English
+  const getLocalizedDescription = () => {
+    if (!event.description) return null;
+    return event.description[currentLanguage as keyof typeof event.description] ||
+      event.description.en ||
+      event.description.fr ||
+      null;
+  };
+
+  const localizedDescription = getLocalizedDescription();
 
   const mainImage = event.flyer?.url || "/placeholder.webp";
   const hasValidImage =
@@ -100,9 +114,9 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
             </h3>
           </Link>
 
-          {event.description && (
+          {localizedDescription && (
             <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed break-words overflow-wrap-anywhere">
-              {event.description}
+              {localizedDescription}
             </p>
           )}
         </div>

@@ -460,7 +460,9 @@
     "readMore": "Lire"
   },
   "storyPage": {
+    "backButton": "Retour",
     "backToStories": "Retour aux stories",
+    "notFoundTitle": "Story introuvable",
     "byAuthor": "{authorName}",
     "relatedStories": "STORIES CONNEXES",
     "readMore": "Lire",
@@ -469,6 +471,10 @@
     "noStories": {
       "title": "Stories bientôt disponibles",
       "description": "Nous travaillons à vous apporter des histoires et récits incroyables. Restez à l'écoute pour du contenu exclusif Kamayakoi !"
+    },
+    "placeholderContent": {
+      "excerpt": "Ceci est un contenu d'exemple pour l'histoire. Dans une implémentation réelle, il s'agirait de contenu texte enrichi provenant de votre CMS.",
+      "fallback": "Ceci est un contenu d'exemple pour l'histoire. Dans une implémentation réelle, il s'agirait de contenu texte enrichi provenant de votre CMS."
     },
     "share": {
       "onFacebook": "Partager sur Facebook",
@@ -487,6 +493,12 @@
     "subtitle": "Achetez des produits dérivés exclusifs Kamayakoi, des vêtements et des objets de collection. Soutenez le mouvement avec nos designs uniques et produits conçus pour les cœurs sauvages.",
     "breadcrumb": "Boutique",
     "loading": "Chargement...",
+    "searchPlaceholder": "Rechercher...",
+    "categoryFilter": "Catégories",
+    "tagPlaceholder": "Tag",
+    "tagFilter": "Tags",
+    "noProductsFound": "Aucun produit trouvé",
+    "noProductsFoundDescription": "Essayez d'ajuster vos filtres ou termes de recherche.",
     "comingSoon": {
       "title": "Merch bientôt disponible",
       "description": "Nous travaillons à vous apporter des produits dérivés et objets de collection incroyables. Restez à l'écoute pour l'équipement exclusif Kamayakoi !"

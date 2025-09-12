@@ -158,7 +158,9 @@ export async function getLatestBlogPosts(limit = 2) {
         },
         bio,
         role
-      }
+      },
+      body,
+      body_fr
     }
   `,
     { limit },
@@ -200,7 +202,8 @@ export async function getAllBlogPosts() {
         bio,
         role
       },
-      body
+      body,
+      body_fr
     }
   `);
 }

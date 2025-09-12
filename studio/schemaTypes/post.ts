@@ -7,9 +7,14 @@ export default {
   fields: [
     {
       name: 'title',
-      title: 'Title',
+      title: 'Title (English)',
       type: 'string',
       validation: (Rule: Rule) => Rule.required(),
+    },
+    {
+      name: 'title_fr',
+      title: 'Title (French)',
+      type: 'string',
     },
     {
       name: 'slug',

@@ -8,11 +8,13 @@ import StoriesContentClient from "./stories-content-client";
 interface Story {
   _id: string;
   title: string;
+  title_fr?: string;
   slug: {
     current: string;
   };
   publishedAt: string;
   excerpt?: string;
+  excerpt_fr?: string;
   mainImage?: {
     asset: {
       url: string;
@@ -31,6 +33,7 @@ interface Story {
     slug: {
       current: string;
     };
+    color?: string;
   }[];
 }
 

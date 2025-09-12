@@ -6,6 +6,21 @@ import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
 import { Card, CardContent } from "@/components/ui/card";
 
+// Define a simple type for PortableText content
+type PortableTextBlock = Array<{
+  _type: string;
+  children?: Array<{
+    _type: string;
+    text: string;
+    marks?: string[];
+  }>;
+  markDefs?: Array<{
+    _type: string;
+    _key: string;
+    [key: string]: unknown;
+  }>;
+}>;
+
 interface Category {
   _id: string;
   title: string;
@@ -23,6 +38,8 @@ interface FeaturedArticle {
   publishedAt: string;
   excerpt: string;
   excerpt_fr?: string;
+  body?: PortableTextBlock[];
+  body_fr?: PortableTextBlock[];
   mainImage?: {
     asset: {
       url: string;
@@ -54,13 +71,14 @@ function ArticleCard({ article }: { article: FeaturedArticle }) {
   const mainImage = article.mainImage?.asset.url || "/placeholder.webp";
   const hasValidImage = mainImage && mainImage.trim() !== "";
 
+  // Select content based on language - handle empty strings properly
   const title =
-    currentLanguage === "fr" && article.title_fr
+    currentLanguage === "fr" && article.title_fr && article.title_fr.trim() !== ""
       ? article.title_fr
       : article.title;
 
   const excerpt =
-    currentLanguage === "fr" && article.excerpt_fr
+    currentLanguage === "fr" && article.excerpt_fr && article.excerpt_fr.trim() !== ""
       ? article.excerpt_fr
       : article.excerpt;
 

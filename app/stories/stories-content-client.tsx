@@ -9,6 +9,21 @@ import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
 import { Card, CardContent } from "@/components/ui/card";
 
+// Define a simple type for PortableText content
+type PortableTextBlock = Array<{
+  _type: string;
+  children?: Array<{
+    _type: string;
+    text: string;
+    marks?: string[];
+  }>;
+  markDefs?: Array<{
+    _type: string;
+    _key: string;
+    [key: string]: unknown;
+  }>;
+}>;
+
 interface Category {
   _id: string;
   title: string;
@@ -28,6 +43,8 @@ interface Story {
   publishedAt: string;
   excerpt?: string;
   excerpt_fr?: string;
+  body?: PortableTextBlock[];
+  body_fr?: PortableTextBlock[];
   mainImage?: {
     asset: {
       url: string;
@@ -52,9 +69,9 @@ function StoryCard({ story }: { story: Story }) {
   const mainImage = story.mainImage?.asset.url || "/placeholder.webp";
   const hasValidImage = mainImage && mainImage.trim() !== "";
 
-  // Select content based on language
-  const title = currentLanguage === 'fr' && story.title_fr ? story.title_fr : story.title;
-  const excerpt = currentLanguage === 'fr' && story.excerpt_fr ? story.excerpt_fr : story.excerpt;
+  // Select content based on language - handle empty strings properly
+  const title = currentLanguage === 'fr' && story.title_fr && story.title_fr.trim() !== '' ? story.title_fr : story.title;
+  const excerpt = currentLanguage === 'fr' && story.excerpt_fr && story.excerpt_fr.trim() !== '' ? story.excerpt_fr : story.excerpt;
 
   // Category color system
   const getCategoryColor = (color?: string) => {

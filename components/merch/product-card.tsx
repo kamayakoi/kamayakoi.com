@@ -15,7 +15,7 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
     typeof product.slug === "string"
       ? product.slug
       : product.slug?.current || "";
-  const mainImage = product.mainImage || product.images?.[0]?.url;
+  const mainImage = product.mainImage || product.images?.[0]?.asset?.url;
   const hasValidImage = mainImage && mainImage.trim() !== "";
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -73,9 +73,11 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
                 className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
                 quality={100}
                 placeholder={
-                  product.images?.[0]?.metadata?.lqip ? "blur" : undefined
+                  product.images?.[0]?.asset?.metadata?.lqip
+                    ? "blur"
+                    : undefined
                 }
-                blurDataURL={product.images?.[0]?.metadata?.lqip}
+                blurDataURL={product.images?.[0]?.asset?.metadata?.lqip}
               />
             </div>
           ) : (

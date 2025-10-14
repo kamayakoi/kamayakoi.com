@@ -23,7 +23,7 @@ const CartContainer = ({
 };
 
 export default function CartPurchaseForm() {
-  const { cart } = useCart();
+  const { cart, shippingSettings } = useCart();
   const { currentLanguage } = useTranslation();
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
@@ -72,6 +72,8 @@ export default function CartPurchaseForm() {
         productId: line.product.productId,
         title: line.product.name,
         price: line.product.price,
+        shippingFee:
+          line.product.shippingFee ?? shippingSettings.defaultShippingCost,
       }));
 
       const payload = {
@@ -210,7 +212,10 @@ export default function CartPurchaseForm() {
                 {t(currentLanguage, "cartPurchaseForm.shipping")}
               </p>
               <p className="text-muted-foreground">
-                {t(currentLanguage, "cartPurchaseForm.shippingCalculated")}
+                {cart?.cost.shippingAmount &&
+                Number(cart.cost.shippingAmount.amount) > 0
+                  ? `${Number(cart.cost.shippingAmount.amount).toLocaleString("fr-FR")} F CFA`
+                  : t(currentLanguage, "cartPurchaseForm.shippingCalculated")}
               </p>
             </div>
             <div className="flex justify-between items-center py-2">

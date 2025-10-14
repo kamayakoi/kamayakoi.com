@@ -17,6 +17,15 @@ export default defineType({
       readOnly: true, // Make title read-only for singleton
     }),
     defineField({
+      name: 'defaultShippingCost',
+      title: 'Default shipping cost (F CFA)',
+      type: 'number',
+      description:
+        'Set the default shipping cost for products that do not have a specific shipping fee linked ot the product. Leave at 0 if shipping is free or if the product got a product ID and a shipping fee linked to it.',
+      initialValue: 3000,
+      validation: (Rule) => Rule.min(0),
+    }),
+    defineField({
       name: 'musicTracks',
       title: 'Music Tracks',
       type: 'array',

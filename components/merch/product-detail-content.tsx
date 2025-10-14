@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { PlusIcon, MinusIcon, Heart, Share2 } from "lucide-react";
@@ -10,6 +9,54 @@ import { useTranslation } from "@/lib/contexts/TranslationContext";
 import { t } from "@/lib/i18n/translations";
 import { useWishlist } from "./wishlist/wishlist-context";
 import { SanityProduct } from "./types";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel";
+import { useState } from "react";
+
+interface ProductImageCarouselProps {
+  images: Array<{ url: string }>;
+  productName: string;
+}
+
+function ProductImageCarousel({
+  images,
+  productName,
+}: ProductImageCarouselProps) {
+  const [, setApi] = useState<CarouselApi>();
+
+  return (
+    <>
+      <Carousel setApi={setApi} className="w-full">
+        <CarouselContent>
+          {images.map((image, index) => (
+            <CarouselItem key={index}>
+              <div className="flex-1 min-h-[650px] relative overflow-hidden rounded-sm bg-muted shadow-2xl">
+                <Image
+                  src={image.url}
+                  alt={
+                    typeof productName === "string" ? productName : "Product"
+                  }
+                  fill
+                  className="object-cover"
+                  quality={100}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent"></div>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 rounded-sm" />
+        <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 rounded-sm" />
+      </Carousel>
+    </>
+  );
+}
 
 interface ProductDetailContentProps {
   product: SanityProduct;
@@ -18,14 +65,17 @@ interface ProductDetailContentProps {
 function ProductDetail({ product }: ProductDetailContentProps) {
   const { currentLanguage } = useTranslation();
   const [quantity, setQuantity] = useState(1);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
   const { addItem } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   const allImages = product.images || [];
-  const mainImage = product.mainImage || allImages[0]?.url;
-  const selectedImage = allImages[selectedImageIndex]?.url || mainImage;
-  const image = selectedImage;
+  const carouselImages = allImages
+    .map((image) => image.asset?.url)
+    .filter((url): url is string => !!url)
+    .map((url) => ({ url }));
+
+  const mainImage = product.mainImage || carouselImages[0]?.url;
 
   const handleAddToCart = () => {
     addItem(product);
@@ -62,10 +112,15 @@ function ProductDetail({ product }: ProductDetailContentProps) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {image ? (
-              <div className="flex-1 min-h-[350px] relative overflow-hidden rounded-sm bg-muted shadow-2xl">
+            {carouselImages.length > 0 ? (
+              <ProductImageCarousel
+                images={carouselImages}
+                productName={product.name}
+              />
+            ) : mainImage ? (
+              <div className="flex-1 min-h-[650px] relative overflow-hidden rounded-sm bg-muted shadow-2xl">
                 <Image
-                  src={image}
+                  src={mainImage}
                   alt={
                     typeof product.name === "string" ? product.name : "Product"
                   }
@@ -76,49 +131,17 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent"></div>
               </div>
             ) : (
-              <div className="flex-1 min-h-[400px] relative overflow-hidden rounded-sm bg-muted flex items-center justify-center shadow-2xl">
+              <div className="flex-1 min-h-[650px] relative overflow-hidden rounded-sm bg-muted flex items-center justify-center shadow-2xl">
                 <span className="text-muted-foreground">
                   {t(currentLanguage, "merchPage.productDetail.noImage")}
                 </span>
-              </div>
-            )}
-
-            {/* Additional Images Gallery */}
-            {allImages.length > 1 && (
-              <div className="grid grid-cols-4 gap-2 flex-shrink-0">
-                {allImages.slice(0, 4).map((imageData, index) => {
-                  const thumbnailImage = imageData.url;
-                  return thumbnailImage ? (
-                    <motion.button
-                      key={index}
-                      onClick={() => setSelectedImageIndex(index)}
-                      className={`aspect-square relative overflow-hidden rounded-sm bg-muted transition-all duration-300 ${
-                        selectedImageIndex === index
-                          ? "ring-2 ring-primary shadow-lg scale-105"
-                          : "hover:ring-2 hover:ring-muted-foreground/50 hover:shadow-md"
-                      }`}
-                      whileHover={{
-                        scale: selectedImageIndex === index ? 1.05 : 1.02,
-                      }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <Image
-                        src={thumbnailImage}
-                        alt={`${typeof product.name === "string" ? product.name : "Product"} view ${index + 1}`}
-                        fill
-                        className="object-cover"
-                        quality={80}
-                      />
-                    </motion.button>
-                  ) : null;
-                })}
               </div>
             )}
           </motion.div>
 
           {/* Product Information */}
           <motion.div
-            className="space-y-8 min-h-[350px] flex flex-col mt-0"
+            className="space-y-8 min-h-[650px] flex flex-col mt-0"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -269,7 +292,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
               <div className="flex gap-3">
                 <Button
                   variant="outline"
-                  className="flex-1 h-12 rounded-sm border-border/40 hover:bg-card/50"
+                  className="flex-1 h-12 rounded-sm border-border/40 hover:bg-card/50 hover:border-border"
                   onClick={() => {
                     if (isInWishlist(product._id)) {
                       removeFromWishlist(product._id);
@@ -297,7 +320,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 </Button>
                 <Button
                   variant="outline"
-                  className="flex-1 h-12 rounded-sm border-border/40 hover:bg-card/50"
+                  className="flex-1 h-12 rounded-sm border-border/40 hover:bg-card/50 hover:border-border"
                   onClick={handleShare}
                 >
                   <Share2 className="mr-2 h-4 w-4" />

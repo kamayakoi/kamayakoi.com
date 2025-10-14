@@ -20,19 +20,24 @@ export interface SanityProduct {
   price: number;
   stock?: number;
   description?: string | PortableTextBlock[];
+  shippingFee?: number;
   categories?: Array<{
     title: string;
     slug: string;
   }>;
   tags?: string[];
   images?: Array<{
-    url: string;
-    metadata?: {
-      dimensions?: {
-        width: number;
-        height: number;
+    asset: {
+      url: string;
+      metadata?: {
+        dimensions?: {
+          width: number;
+          height: number;
+        };
+        lqip?: string;
       };
-      lqip?: string;
     };
+    alt?: string;
+    caption?: string;
   }>;
 }

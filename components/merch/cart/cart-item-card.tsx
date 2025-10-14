@@ -16,7 +16,8 @@ export function CartItemCard({ item }: CartItemCardProps) {
   const [isPending, startTransition] = useTransition();
 
   const { id, quantity, product } = item;
-  const image = product.mainImage || product.images?.[0]?.url;
+  const image = product.mainImage || product.images?.[0]?.asset?.url;
+  const hasValidImage = image && image.trim() !== "";
   // const imageWidth = product.images?.[0]?.metadata?.dimensions?.width || 400;
   // const imageHeight = product.images?.[0]?.metadata?.dimensions?.height || 600;
 
@@ -36,7 +37,7 @@ export function CartItemCard({ item }: CartItemCardProps) {
     <div className="flex gap-8 p-3 bg-[#1a1a1a]/50 hover:bg-[#1a1a1a]/70 rounded-sm transition-colors items-stretch">
       {/* Product Image */}
       <div className="flex-shrink-0 w-16">
-        {image ? (
+        {hasValidImage ? (
           <div className="h-full aspect-square relative overflow-hidden rounded-sm bg-muted">
             <Image
               src={image}

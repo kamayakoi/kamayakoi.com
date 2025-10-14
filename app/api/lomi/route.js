@@ -139,8 +139,19 @@ export async function POST(request) {
       JSON.stringify(eventPayload, null, 2),
     );
 
-    // Assuming Lomi sends metadata.internal_purchase_id as set in create-lomi-checkout-session
+    const isMerchPurchase = eventData.metadata?.is_cart_checkout === true;
+
+    // Handle single ticket purchase ID and multiple merchandise purchase IDs
     const purchaseId = eventData.metadata?.internal_purchase_id;
+    const purchaseIdsRaw = eventData.metadata?.internal_purchase_ids;
+
+    let purchaseIds = [];
+    if (purchaseIdsRaw) {
+      purchaseIds = purchaseIdsRaw.split(",");
+    } else if (purchaseId) {
+      purchaseIds = [purchaseId];
+    }
+
     const lomiTransactionId = eventData.transaction_id || eventData.id; // Transaction ID
 
     // For checkout.completed events, eventData.id is the checkout session ID
@@ -157,14 +168,14 @@ export async function POST(request) {
     const amount = eventData.amount || eventData.gross_amount; // Amount from Lomi
     const currency = eventData.currency_code;
 
-    if (!purchaseId) {
+    if (purchaseIds.length === 0) {
       console.error(
-        "Events Webhook Error: Missing internal_purchase_id in Lomi webhook metadata.",
+        "Events Webhook Error: Missing internal_purchase_id(s) in Lomi webhook metadata.",
         { lomiEventData: eventData },
       );
       return new Response(
         JSON.stringify({
-          error: "Missing internal_purchase_id in Lomi webhook metadata.",
+          error: "Missing internal_purchase_id(s) in Lomi webhook metadata.",
         }),
         {
           status: 400,
@@ -208,130 +219,164 @@ export async function POST(request) {
       );
     }
 
-    // 1. Record Payment Outcome
-    const { error: rpcError } = await supabase.rpc(
-      "record_event_lomi_payment",
-      {
-        p_purchase_id: purchaseId,
-        p_lomi_payment_id: lomiTransactionId,
-        p_lomi_checkout_session_id: lomiCheckoutSessionId,
-        p_payment_status: paymentStatusForDb,
-        p_lomi_event_payload: eventPayload,
-        p_amount_paid: amount, // Lomi sends amount in smallest unit (e.g. cents) if applicable, XOF is base.
-        p_currency_paid: currency,
-      },
-    );
-
-    if (rpcError) {
-      console.error(
-        "Events Webhook Error: Failed to call record_event_lomi_payment RPC:",
-        rpcError,
-      );
-      // Potentially retry or alert, but respond to Lomi to avoid Lomi retries for DB issues.
-      return new Response(
-        JSON.stringify({ error: "Failed to process payment update in DB." }),
+    // 1. Record Payment Outcome for each purchase
+    for (const pId of purchaseIds) {
+      const { error: rpcError } = await supabase.rpc(
+        "record_event_lomi_payment",
         {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
+          p_purchase_id: pId,
+          p_lomi_payment_id: lomiTransactionId,
+          p_lomi_checkout_session_id: lomiCheckoutSessionId,
+          p_payment_status: paymentStatusForDb,
+          p_lomi_event_payload: eventPayload,
+          p_amount_paid: amount, // This is the total amount for the whole cart
+          p_currency_paid: currency,
         },
       );
+
+      if (rpcError) {
+        console.error(
+          `Events Webhook Error: Failed to call record_event_lomi_payment RPC for purchase ${pId}:`,
+          rpcError,
+        );
+        // Log error but continue to ensure we attempt to process all purchase records
+      } else {
+        console.log(
+          `Events Webhook: Payment for purchase ${pId} (status: ${paymentStatusForDb}) processed.`,
+        );
+      }
     }
-    console.log(
-      `Events Webhook: Payment for purchase ${purchaseId} (status: ${paymentStatusForDb}) processed.`,
-    );
 
     // Only proceed to email dispatch if payment was successful
     if (paymentStatusForDb === "paid") {
-      // 2. Prepare for Email Dispatch
-      const { error: prepError } = await supabase.rpc(
-        "prepare_purchase_for_email_dispatch",
-        {
-          p_purchase_id: purchaseId,
-        },
-      );
-
-      if (prepError) {
-        console.error(
-          `Events Webhook Warning: Failed to prepare purchase ${purchaseId} for email dispatch:`,
-          prepError,
-        );
-        // Log and continue, as payment is recorded. Email might need manual retry or investigation.
-      } else {
+      if (isMerchPurchase) {
+        // --- MERCHANDISE EMAIL ---
         console.log(
-          `Events Webhook: Purchase ${purchaseId} prepared for email dispatch.`,
-        );
-
-        // 3. Trigger Send Ticket Email Function via direct HTTP call
-        console.log(
-          `📧 Events Webhook: Triggering send-ticket-email for ${purchaseId} via HTTP call`,
+          `🛒 Events Webhook: Triggering send-merch-receipt-email for purchases ${purchaseIds.join(", ")}`,
         );
         try {
-          const functionUrl = `${supabaseUrl}/functions/v1/send-ticket-email`;
-
+          const functionUrl = `${supabaseUrl}/functions/v1/send-merch-receipt-email`;
           const emailResponse = await fetch(functionUrl, {
             method: "POST",
             headers: {
               Authorization: `Bearer ${supabaseServiceKey}`,
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ purchase_id: purchaseId }),
+            body: JSON.stringify({ purchase_ids: purchaseIds }),
           });
 
           const emailResult = await emailResponse.text();
 
           if (!emailResponse.ok) {
             console.error(
-              `❌ Events Webhook: Error triggering send-ticket-email for ${purchaseId}:`,
-              {
-                status: emailResponse.status,
-                statusText: emailResponse.statusText,
-                response: emailResult,
-              },
+              `❌ Events Webhook: Error triggering send-merch-receipt-email:`,
+              { status: emailResponse.status, body: emailResult },
             );
-
-            // Try to update purchase status to indicate email dispatch failed
-            try {
-              await supabase.rpc("update_email_dispatch_status", {
-                p_purchase_id: purchaseId,
-                p_email_dispatch_status: "DISPATCH_FAILED",
-                p_email_dispatch_error: `HTTP call failed: ${emailResponse.status} - ${emailResult}`,
-              });
-            } catch (updateError) {
-              console.error(
-                `❌ Failed to update email dispatch status after HTTP error:`,
-                updateError,
-              );
-            }
           } else {
             console.log(
-              `✅ Events Webhook: Successfully triggered send-ticket-email for ${purchaseId}:`,
+              `✅ Events Webhook: Successfully triggered send-merch-receipt-email:`,
               emailResult,
             );
           }
         } catch (functionError) {
           console.error(
-            `❌ Events Webhook: Exception calling send-ticket-email for ${purchaseId}:`,
+            `❌ Events Webhook: Exception calling send-merch-receipt-email:`,
             functionError,
           );
-          // Log additional context about the error
-          console.error(`❌ Function Error Details:`, {
-            name: functionError.name,
-            message: functionError.message,
-            stack: functionError.stack,
-          });
+        }
+      } else {
+        // --- TICKET EMAIL (existing logic) ---
+        // 2. Prepare for Email Dispatch
+        const { error: prepError } = await supabase.rpc(
+          "prepare_purchase_for_email_dispatch",
+          {
+            p_purchase_id: purchaseIds[0], // Ticket logic assumes one ID
+          },
+        );
 
-          // Try to update purchase status to indicate email dispatch failed
+        if (prepError) {
+          console.error(
+            `Events Webhook Warning: Failed to prepare purchase ${purchaseIds[0]} for email dispatch:`,
+            prepError,
+          );
+          // Log and continue, as payment is recorded. Email might need manual retry or investigation.
+        } else {
+          console.log(
+            `Events Webhook: Purchase ${purchaseIds[0]} prepared for email dispatch.`,
+          );
+
+          // 3. Trigger Send Ticket Email Function via direct HTTP call
+          console.log(
+            `📧 Events Webhook: Triggering send-ticket-email for ${purchaseIds[0]} via HTTP call`,
+          );
           try {
-            await supabase.rpc("update_email_dispatch_status", {
-              p_purchase_id: purchaseId,
-              p_email_dispatch_status: "DISPATCH_FAILED",
-              p_email_dispatch_error: `Function invocation error: ${functionError.message}`,
+            const functionUrl = `${supabaseUrl}/functions/v1/send-ticket-email`;
+
+            const emailResponse = await fetch(functionUrl, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${supabaseServiceKey}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ purchase_id: purchaseIds[0] }),
             });
-          } catch (updateError) {
+
+            const emailResult = await emailResponse.text();
+
+            if (!emailResponse.ok) {
+              console.error(
+                `❌ Events Webhook: Error triggering send-ticket-email for ${purchaseIds[0]}:`,
+                {
+                  status: emailResponse.status,
+                  statusText: emailResponse.statusText,
+                  response: emailResult,
+                },
+              );
+
+              // Try to update purchase status to indicate email dispatch failed
+              try {
+                await supabase.rpc("update_email_dispatch_status", {
+                  p_purchase_id: purchaseIds[0],
+                  p_email_dispatch_status: "DISPATCH_FAILED",
+                  p_email_dispatch_error: `HTTP call failed: ${emailResponse.status} - ${emailResult}`,
+                });
+              } catch (updateError) {
+                console.error(
+                  `❌ Failed to update email dispatch status after HTTP error:`,
+                  updateError,
+                );
+              }
+            } else {
+              console.log(
+                `✅ Events Webhook: Successfully triggered send-ticket-email for ${purchaseIds[0]}:`,
+                emailResult,
+              );
+            }
+          } catch (functionError) {
             console.error(
-              `❌ Failed to update email dispatch status after function error:`,
-              updateError,
+              `❌ Events Webhook: Exception calling send-ticket-email for ${purchaseIds[0]}:`,
+              functionError,
             );
+            // Log additional context about the error
+            console.error(`❌ Function Error Details:`, {
+              name: functionError.name,
+              message: functionError.message,
+              stack: functionError.stack,
+            });
+
+            // Try to update purchase status to indicate email dispatch failed
+            try {
+              await supabase.rpc("update_email_dispatch_status", {
+                p_purchase_id: purchaseIds[0],
+                p_email_dispatch_status: "DISPATCH_FAILED",
+                p_email_dispatch_error: `Function invocation error: ${functionError.message}`,
+              });
+            } catch (updateError) {
+              console.error(
+                `❌ Failed to update email dispatch status after function error:`,
+                updateError,
+              );
+            }
           }
         }
       }

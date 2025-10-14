@@ -78,7 +78,10 @@ const CartItems = ({
                 {t(currentLanguage, "cartModal.shipping")}
               </p>
               <p className="text-muted-foreground">
-                {t(currentLanguage, "cartModal.calculatedAtCheckout")}
+                {cart.cost.shippingAmount &&
+                Number(cart.cost.shippingAmount.amount) > 0
+                  ? `${Number(cart.cost.shippingAmount.amount).toLocaleString("fr-FR")} F CFA`
+                  : t(currentLanguage, "cartModal.calculatedAtCheckout")}
               </p>
             </div>
             <div className="flex justify-between items-center py-2">

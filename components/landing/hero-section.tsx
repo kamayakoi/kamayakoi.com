@@ -64,11 +64,11 @@ interface HeroSectionProps {
     date: string;
     time?: string;
     location?:
-    | string
-    | {
-      venueName?: string;
-      address?: string;
-    };
+      | string
+      | {
+          venueName?: string;
+          address?: string;
+        };
     description?: {
       en?: string;
       fr?: string;
@@ -126,87 +126,87 @@ export function HeroSection({
   // Convert Sanity hero items to ContentItem format
   const sanityContent: ContentItem[] = sanityHeroItems
     ? sanityHeroItems
-      .filter((item) => item.isActive)
-      .map((item) => ({
-        id: item._key,
-        type: item.type,
-        src:
-          item.type === "image" && item.image?.asset?.url
-            ? item.image.asset.url
-            : "",
-        videoUrl:
-          item.type === "video"
-            ? item.video?.asset?.url || item.videoUrl || ""
-            : undefined,
-        title: item.title,
-        description: item.description,
-        thumbnail:
-          item.type === "video" && item.image?.asset?.url
-            ? item.image.asset.url
-            : undefined,
-      }))
+        .filter((item) => item.isActive)
+        .map((item) => ({
+          id: item._key,
+          type: item.type,
+          src:
+            item.type === "image" && item.image?.asset?.url
+              ? item.image.asset.url
+              : "",
+          videoUrl:
+            item.type === "video"
+              ? item.video?.asset?.url || item.videoUrl || ""
+              : undefined,
+          title: item.title,
+          description: item.description,
+          thumbnail:
+            item.type === "video" && item.image?.asset?.url
+              ? item.image.asset.url
+              : undefined,
+        }))
     : [];
 
   // Convert featured events to ContentItem format
   const featuredEventItems: ContentItem[] = featuredEvents
     ? featuredEvents.map((event) => {
-      // Select description based on current language
-      const description = event.description
-        ? event.description[
-        currentLanguage as keyof typeof event.description
-        ] ||
-        event.description.en ||
-        event.description.fr
-        : undefined;
+        // Select description based on current language
+        const description = event.description
+          ? event.description[
+              currentLanguage as keyof typeof event.description
+            ] ||
+            event.description.en ||
+            event.description.fr
+          : undefined;
 
-      return {
-        id: event._id,
-        type: "event",
-        src: event.flyer?.url || "",
-        title: event.title,
-        description: description,
-        slug: event.slug,
-        date: event.date,
-        publishedAt: event.date, // Use date as publishedAt for events
-        ticketsAvailable: event.ticketsAvailable,
-      };
-    })
+        return {
+          id: event._id,
+          type: "event",
+          src: event.flyer?.url || "",
+          title: event.title,
+          description: description,
+          slug: event.slug,
+          date: event.date,
+          publishedAt: event.date, // Use date as publishedAt for events
+          ticketsAvailable: event.ticketsAvailable,
+        };
+      })
     : [];
 
   // Convert highlighted content to ContentItem format
   const highlightedItems: ContentItem[] = highlightedContent
     ? highlightedContent.slice(0, 15).map((item) => {
-      // Ensure we have a valid src - prioritize image for display, videoUrl for videos
-      let src = "";
-      if (item.type === "video" && item.videoUrl) {
-        src = item.videoUrl;
-      } else if (item.image) {
-        src = item.image;
-      } else if (item.videoUrl) {
-        src = item.videoUrl;
-      }
+        // Ensure we have a valid src - prioritize image for display, videoUrl for videos
+        let src = "";
+        if (item.type === "video" && item.videoUrl) {
+          src = item.videoUrl;
+        } else if (item.image) {
+          src = item.image;
+        } else if (item.videoUrl) {
+          src = item.videoUrl;
+        }
 
-      return {
-        id: item._id,
-        type:
-          item.type === "video"
-            ? "video"
-            : item.type === "event"
-              ? "event"
-              : "image", // Normalize type for hero display
-        src: src,
-        title: item.title,
-        description: item.description,
-        thumbnail: item.image,
-        slug: item.slug,
-        author: item.author,
-        artist: item.artist,
-        date: item.date,
-        publishedAt: item.publishedAt,
-        videoUrl: item.videoUrl,
-        ticketsAvailable: item.type === "event" ? true : undefined, // Assume tickets are available for events
-      };
-    })
+        return {
+          id: item._id,
+          type:
+            item.type === "video"
+              ? "video"
+              : item.type === "event"
+                ? "event"
+                : "image", // Normalize type for hero display
+          src: src,
+          title: item.title,
+          description: item.description,
+          thumbnail: item.image,
+          slug: item.slug,
+          author: item.author,
+          artist: item.artist,
+          date: item.date,
+          publishedAt: item.publishedAt,
+          videoUrl: item.videoUrl,
+          ticketsAvailable: item.type === "event" ? true : undefined, // Assume tickets are available for events
+        };
+      })
     : [];
 
   // Combine all content sources with priority: highlighted > events first + sanity > props > defaults
@@ -417,14 +417,13 @@ export function HeroSection({
         {renderContent()}
 
         {/* Overlay for better text readability */}
-        {currentItem.type === "video" ? // No overlay for videos
-          null : currentItem.type === "event" ? (
-            // Darker overlay for events
-            <div className="absolute inset-0 bg-black/75" />
-          ) : (
-            // Very minimal overlay for other content
-            <div className="absolute inset-0 bg-black/20" />
-          )}
+        {currentItem.type === "video" ? null : currentItem.type === "event" ? ( // No overlay for videos
+          // Darker overlay for events
+          <div className="absolute inset-0 bg-black/75" />
+        ) : (
+          // Very minimal overlay for other content
+          <div className="absolute inset-0 bg-black/20" />
+        )}
       </div>
 
       {/* Content Overlay - Hidden for videos when playing */}
@@ -440,14 +439,15 @@ export function HeroSection({
             {/* Show description for all content, smaller for events */}
             {currentItem.description && (
               <p
-                className={`font-medium tracking-wide text-white/90 mb-8 drop-shadow-md ${currentItem.type === "event"
-                  ? "text-base sm:text-lg md:text-xl opacity-95"
-                  : "text-xl sm:text-2xl md:text-3xl"
-                  }`}
+                className={`font-medium tracking-wide text-white/90 mb-8 drop-shadow-md ${
+                  currentItem.type === "event"
+                    ? "text-base sm:text-lg md:text-xl opacity-95"
+                    : "text-xl sm:text-2xl md:text-3xl"
+                }`}
               >
                 {currentItem.type === "event"
                   ? currentItem.description.split(".")[0] +
-                  (currentItem.description.includes(".") ? "." : "")
+                    (currentItem.description.includes(".") ? "." : "")
                   : currentItem.description}
               </p>
             )}
@@ -508,34 +508,36 @@ export function HeroSection({
               {/* Play/Pause button for videos */}
               {(currentItem.type === "video" ||
                 currentItem.type === "media") && (
-                  <button
-                    onClick={togglePlayPause}
-                    className={`p-4 rounded-sm border-2 transition-all duration-300 ${showControls
+                <button
+                  onClick={togglePlayPause}
+                  className={`p-4 rounded-sm border-2 transition-all duration-300 ${
+                    showControls
                       ? "opacity-100 scale-100"
                       : "opacity-0 scale-95"
-                      } ${isPlaying
-                        ? "bg-white/20 border-white text-white hover:bg-white/30"
-                        : "bg-white border-white text-white hover:bg-white/90"
-                      }`}
-                    aria-label={
-                      isPlaying
-                        ? t(
+                  } ${
+                    isPlaying
+                      ? "bg-white/20 border-white text-white hover:bg-white/30"
+                      : "bg-white border-white text-white hover:bg-white/90"
+                  }`}
+                  aria-label={
+                    isPlaying
+                      ? t(
                           currentLanguage,
                           "eventShowcase.hero.actions.pauseVideo",
                         )
-                        : t(
+                      : t(
                           currentLanguage,
                           "eventShowcase.hero.actions.playVideo",
                         )
-                    }
-                  >
-                    {isPlaying ? (
-                      <Pause className="w-6 h-6" />
-                    ) : (
-                      <Play className="w-6 h-6 ml-1" />
-                    )}
-                  </button>
-                )}
+                  }
+                >
+                  {isPlaying ? (
+                    <Pause className="w-6 h-6" />
+                  ) : (
+                    <Play className="w-6 h-6 ml-1" />
+                  )}
+                </button>
+              )}
 
               {/* Navigation buttons for non-event content with links */}
               {(currentItem.slug || currentItem.videoUrl) &&
@@ -647,7 +649,8 @@ export function HeroSection({
               <button
                 onClick={() => {
                   if (currentItem.type === "event" && currentItem.slug) {
-                    const slug = (currentItem.slug as { current: string }).current;
+                    const slug = (currentItem.slug as { current: string })
+                      .current;
                     window.location.href = `/events/${slug}`;
                   } else {
                     window.location.href = `/events`;
@@ -657,7 +660,9 @@ export function HeroSection({
                 aria-label="Get tickets"
               >
                 <Ticket className="h-5 w-5 md:h-6 md:w-6 mr-2 md:mr-3" />
-                <span className="font-medium">{t(currentLanguage, "heroSection.getTickets")}</span>
+                <span className="font-medium">
+                  {t(currentLanguage, "heroSection.getTickets")}
+                </span>
               </button>
             </div>
           </div>
@@ -723,10 +728,11 @@ export function HeroSection({
                 console.log("Dot clicked:", index);
                 goToIndex(index);
               }}
-              className={`w-3 h-1.5 rounded-sm transition-all duration-200 cursor-pointer ${index === currentIndex
-                ? "bg-white scale-110"
-                : "bg-white/30 hover:bg-white/50"
-                }`}
+              className={`w-3 h-1.5 rounded-sm transition-all duration-200 cursor-pointer ${
+                index === currentIndex
+                  ? "bg-white scale-110"
+                  : "bg-white/30 hover:bg-white/50"
+              }`}
               aria-label={`Go to content ${index + 1}`}
             />
           ))}

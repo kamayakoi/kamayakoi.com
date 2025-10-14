@@ -238,6 +238,16 @@ export default {
         {name: 'height', title: 'Height', type: 'number'},
       ],
     },
+    {
+      name: 'shippingFee',
+      title: 'Shipping fee (F CFA)',
+      type: 'number',
+      group: 'shipping',
+      description:
+        'Optional: Set a specific shipping fee for this product. If not set, the default shipping cost will be used.',
+      hidden: ({document}: {document: {requiresShipping?: boolean}}) => !document?.requiresShipping,
+      validation: (Rule: Rule) => Rule.min(0),
+    },
   ],
   preview: {
     select: {

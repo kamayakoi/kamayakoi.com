@@ -36,16 +36,20 @@ export function PaymentCancelClient({ purchaseId }: PaymentCancelClientProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="text-center text-muted-foreground">
-                  <p>{t(currentLanguage, "paymentCancel.description")}</p>
-                  {purchaseId && (
-                    <p className="text-sm mt-2 font-mono bg-muted/50 p-2 rounded-sm">
-                      {t(currentLanguage, "paymentCancel.orderId", {
-                        orderId: purchaseId,
-                      })}
-                    </p>
-                  )}
-                </div>
+                <Card className="bg-card/50 backdrop-blur-sm border-border">
+                  <CardContent className="p-4">
+                    <div className="text-center text-muted-foreground">
+                      <p>{t(currentLanguage, "paymentCancel.description")}</p>
+                      {purchaseId && (
+                        <p className="text-sm mt-2 font-mono bg-muted/50 p-2 rounded-sm">
+                          {t(currentLanguage, "paymentCancel.orderId", {
+                            orderId: purchaseId,
+                          })}
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
 
                 <div className="bg-orange-900/20 border border-orange-800 rounded-sm p-4">
                   <div className="flex items-center gap-2 mb-2">

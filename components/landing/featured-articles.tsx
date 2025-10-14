@@ -73,12 +73,16 @@ function ArticleCard({ article }: { article: FeaturedArticle }) {
 
   // Select content based on language - handle empty strings properly
   const title =
-    currentLanguage === "fr" && article.title_fr && article.title_fr.trim() !== ""
+    currentLanguage === "fr" &&
+    article.title_fr &&
+    article.title_fr.trim() !== ""
       ? article.title_fr
       : article.title;
 
   const excerpt =
-    currentLanguage === "fr" && article.excerpt_fr && article.excerpt_fr.trim() !== ""
+    currentLanguage === "fr" &&
+    article.excerpt_fr &&
+    article.excerpt_fr.trim() !== ""
       ? article.excerpt_fr
       : article.excerpt;
 

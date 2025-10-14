@@ -16,11 +16,11 @@ interface ShowcaseEvent {
   date?: string;
   time?: string;
   location?:
-  | string
-  | {
-    venueName?: string;
-    address?: string;
-  };
+    | string
+    | {
+        venueName?: string;
+        address?: string;
+      };
   flyer: {
     url: string;
   };
@@ -50,10 +50,12 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
   // Get the description in the current language, fallback to English
   const getLocalizedDescription = () => {
     if (!event.description) return null;
-    return event.description[currentLanguage as keyof typeof event.description] ||
+    return (
+      event.description[currentLanguage as keyof typeof event.description] ||
       event.description.en ||
       event.description.fr ||
-      null;
+      null
+    );
   };
 
   const localizedDescription = getLocalizedDescription();

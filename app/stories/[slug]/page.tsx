@@ -131,9 +131,18 @@ function StoryPage({ params }: PageProps) {
   }
 
   // Select content based on language - handle empty strings properly
-  const title = currentLanguage === 'fr' && post.title_fr && post.title_fr.trim() !== '' ? post.title_fr : post.title;
-  const excerpt = currentLanguage === 'fr' && post.excerpt_fr && post.excerpt_fr.trim() !== '' ? post.excerpt_fr : post.excerpt;
-  const body = currentLanguage === 'fr' && post.body_fr && post.body_fr.length > 0 ? post.body_fr : post.body;
+  const title =
+    currentLanguage === "fr" && post.title_fr && post.title_fr.trim() !== ""
+      ? post.title_fr
+      : post.title;
+  const excerpt =
+    currentLanguage === "fr" && post.excerpt_fr && post.excerpt_fr.trim() !== ""
+      ? post.excerpt_fr
+      : post.excerpt;
+  const body =
+    currentLanguage === "fr" && post.body_fr && post.body_fr.length > 0
+      ? post.body_fr
+      : post.body;
 
   return (
     <div className="min-h-screen">
@@ -179,14 +188,13 @@ function StoryPage({ params }: PageProps) {
                       {post.author.image && (
                         <Image
                           src={
-                            post.author.image?.asset?.url ||
-                            "/placeholder.webp"
+                            post.author.image?.asset?.url || "/placeholder.webp"
                           }
                           alt={post.author.name}
                           width={48}
                           height={48}
                           className="rounded-sm mr-3 object-cover"
-                          style={{ objectFit: 'fill' }}
+                          style={{ objectFit: "fill" }}
                         />
                       )}
                       <span className="mr-2">·</span>
@@ -204,9 +212,7 @@ function StoryPage({ params }: PageProps) {
                   <div className="rounded-sm overflow-hidden mb-6 shadow-md">
                     <div className="aspect-[16/9] md:aspect-[16/9] relative">
                       <Image
-                        src={
-                          post.mainImage?.asset?.url || "/placeholder.webp"
-                        }
+                        src={post.mainImage?.asset?.url || "/placeholder.webp"}
                         alt={post.mainImage.alt || title}
                         fill
                         priority
@@ -240,13 +246,19 @@ function StoryPage({ params }: PageProps) {
                       {excerpt}
                     </p>
                     <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed break-words overflow-wrap-anywhere">
-                      {t(currentLanguage, "storyPage.placeholderContent.excerpt")}
+                      {t(
+                        currentLanguage,
+                        "storyPage.placeholderContent.excerpt",
+                      )}
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-6">
                     <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed break-words overflow-wrap-anywhere">
-                      {t(currentLanguage, "storyPage.placeholderContent.fallback")}
+                      {t(
+                        currentLanguage,
+                        "storyPage.placeholderContent.fallback",
+                      )}
                     </p>
                   </div>
                 )}
@@ -263,4 +275,3 @@ function StoryPage({ params }: PageProps) {
 }
 
 export default StoryPage;
-

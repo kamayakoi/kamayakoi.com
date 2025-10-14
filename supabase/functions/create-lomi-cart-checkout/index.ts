@@ -33,6 +33,7 @@ interface CartItem {
   productId?: string;
   title: string;
   price: number;
+  shippingFee?: number;
 }
 
 interface RequestPayload {
@@ -175,10 +176,15 @@ serve(async (req: Request) => {
     const currencyCode = payload.currencyCode || "XOF";
     let totalAmount = 0;
     const purchaseIds: string[] = [];
+    let totalShippingCost = 0;
 
     for (const item of payload.cartItems) {
       const itemTotal = item.price * item.quantity;
-      totalAmount += itemTotal;
+      const itemShippingFee = item.shippingFee || 0;
+      const itemTotalShipping = itemShippingFee * item.quantity;
+
+      totalAmount += itemTotal + itemTotalShipping;
+      totalShippingCost += itemTotalShipping;
 
       console.log(`Creating purchase record for ${item.title}`);
       const { data: purchaseId, error: purchaseError } = await supabase.rpc(
@@ -192,6 +198,7 @@ serve(async (req: Request) => {
           p_total_amount: itemTotal,
           p_merchandise_id: item.merchandiseId,
           p_currency_code: currencyCode,
+          p_shipping_fee: itemTotalShipping, // Pass total shipping for this line item
         },
       );
 
@@ -199,7 +206,9 @@ serve(async (req: Request) => {
         console.error("Error creating purchase record:", purchaseError);
         return new Response(
           JSON.stringify({
-            error: `Error creating purchase record: ${purchaseError?.message || "No purchase ID returned"}`,
+            error: `Error creating purchase record: ${
+              purchaseError?.message || "No purchase ID returned"
+            }`,
           }),
           {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -213,7 +222,9 @@ serve(async (req: Request) => {
     }
 
     console.log(
-      `Created ${purchaseIds.length} purchase records, total amount: ${totalAmount}`,
+      `Created ${
+        purchaseIds.length
+      } purchase records, total amount: ${totalAmount} (including ${totalShippingCost} shipping)`,
     );
 
     // --- Prepare lomi. Payload ---
@@ -258,12 +269,13 @@ serve(async (req: Request) => {
       allow_quantity:
         payload.allowQuantity !== undefined ? payload.allowQuantity : false,
       metadata: {
-        internal_purchase_id: purchaseIds[0], // Use first purchase ID for webhook compatibility
+        internal_purchase_ids: purchaseIds.join(","), // Use plural and join as string
         customer_id: customerId,
         app_source: "kamayakoi_merch_app",
         is_cart_checkout: true,
         is_product_based: isProductBased,
         item_count: payload.cartItems.length,
+        total_shipping_cost: totalShippingCost,
       },
       expiration_minutes: 30,
     };

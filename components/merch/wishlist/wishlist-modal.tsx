@@ -134,7 +134,8 @@ export default function WishlistModal() {
                                 <div className="flex gap-8 items-stretch">
                                   {/* Product Image */}
                                   <div className="flex-shrink-0 w-16">
-                                    {item.product.mainImage ? (
+                                    {item.product.mainImage &&
+                                    item.product.mainImage.trim() !== "" ? (
                                       <div className="h-full aspect-square relative overflow-hidden rounded-sm bg-muted">
                                         <Image
                                           src={item.product.mainImage}

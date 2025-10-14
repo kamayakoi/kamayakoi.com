@@ -70,8 +70,16 @@ function StoryCard({ story }: { story: Story }) {
   const hasValidImage = mainImage && mainImage.trim() !== "";
 
   // Select content based on language - handle empty strings properly
-  const title = currentLanguage === 'fr' && story.title_fr && story.title_fr.trim() !== '' ? story.title_fr : story.title;
-  const excerpt = currentLanguage === 'fr' && story.excerpt_fr && story.excerpt_fr.trim() !== '' ? story.excerpt_fr : story.excerpt;
+  const title =
+    currentLanguage === "fr" && story.title_fr && story.title_fr.trim() !== ""
+      ? story.title_fr
+      : story.title;
+  const excerpt =
+    currentLanguage === "fr" &&
+    story.excerpt_fr &&
+    story.excerpt_fr.trim() !== ""
+      ? story.excerpt_fr
+      : story.excerpt;
 
   // Category color system
   const getCategoryColor = (color?: string) => {
@@ -119,7 +127,9 @@ function StoryCard({ story }: { story: Story }) {
             </div>
           ) : (
             <div className="aspect-square bg-muted flex items-center justify-center">
-              <span className="text-muted-foreground text-sm">{t(currentLanguage, "storiesPage.noImage")}</span>
+              <span className="text-muted-foreground text-sm">
+                {t(currentLanguage, "storiesPage.noImage")}
+              </span>
             </div>
           )}
         </Link>

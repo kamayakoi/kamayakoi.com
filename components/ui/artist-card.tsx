@@ -15,7 +15,6 @@ interface ArtistCardProps {
 const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
   const { currentLanguage } = useTranslation();
 
-
   // Extract social platform from URL or use generic social if handle exists
   const getSocialPlatform = (url?: string) => {
     if (!url) return null;
@@ -163,17 +162,26 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
           {artist.description && (
             <div className="mb-4 flex-1">
               <div className="text-muted-foreground leading-relaxed">
-                {(artist.description[currentLanguage as keyof typeof artist.description] || artist.description.en || artist.description.fr || "").split("\n").map((line: string, index: number) => {
-                  const trimmedLine = line.trim();
-                  if (trimmedLine === "") {
-                    return <br key={index} />;
-                  }
-                  return (
-                    <p key={index} className="mb-3 last:mb-0">
-                      {trimmedLine}
-                    </p>
-                  );
-                })}
+                {(
+                  artist.description[
+                    currentLanguage as keyof typeof artist.description
+                  ] ||
+                  artist.description.en ||
+                  artist.description.fr ||
+                  ""
+                )
+                  .split("\n")
+                  .map((line: string, index: number) => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine === "") {
+                      return <br key={index} />;
+                    }
+                    return (
+                      <p key={index} className="mb-3 last:mb-0">
+                        {trimmedLine}
+                      </p>
+                    );
+                  })}
               </div>
             </div>
           )}

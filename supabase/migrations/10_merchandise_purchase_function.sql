@@ -2,7 +2,8 @@
 ALTER TABLE public.purchases
 ADD COLUMN IF NOT EXISTS merchandise_id TEXT,
 ADD COLUMN IF NOT EXISTS product_id TEXT,
-ADD COLUMN IF NOT EXISTS product_title TEXT;
+ADD COLUMN IF NOT EXISTS product_title TEXT,
+ADD COLUMN IF NOT EXISTS shipping_fee NUMERIC DEFAULT 0;
 
 -- Make event-related columns nullable for merchandise purchases
 ALTER TABLE public.purchases
@@ -24,7 +25,8 @@ CREATE OR REPLACE FUNCTION public.create_merch_purchase(
     p_price_per_item NUMERIC,
     p_total_amount NUMERIC,
     p_merchandise_id TEXT,
-    p_currency_code TEXT DEFAULT 'XOF'
+    p_currency_code TEXT DEFAULT 'XOF',
+    p_shipping_fee NUMERIC DEFAULT 0
 )
 RETURNS UUID
 LANGUAGE plpgsql
@@ -47,7 +49,8 @@ BEGIN
         merchandise_id,
         product_id,
         product_title,
-        status
+        status,
+        shipping_fee
     )
     VALUES (
         p_customer_id,
@@ -62,7 +65,8 @@ BEGIN
         p_merchandise_id,
         p_product_id,
         p_product_title,
-        'pending_payment'
+        'pending_payment',
+        p_shipping_fee
     )
     RETURNING id INTO purchase_id;
 
@@ -71,8 +75,53 @@ END;
 $$;
 
 -- Grant execute permissions to service_role
-GRANT EXECUTE ON FUNCTION public.create_merch_purchase(UUID, TEXT, TEXT, INTEGER, NUMERIC, NUMERIC, TEXT, TEXT) TO service_role;
+GRANT EXECUTE ON FUNCTION public.create_merch_purchase(UUID, TEXT, TEXT, INTEGER, NUMERIC, NUMERIC, TEXT, TEXT, NUMERIC) TO service_role;
 
 -- Add comments
-COMMENT ON FUNCTION public.create_merch_purchase(UUID, TEXT, TEXT, INTEGER, NUMERIC, NUMERIC, TEXT, TEXT)
+COMMENT ON FUNCTION public.create_merch_purchase(UUID, TEXT, TEXT, INTEGER, NUMERIC, NUMERIC, TEXT, TEXT, NUMERIC)
 IS 'Creates a new merchandise purchase record with pending_payment status. Returns purchase ID.';
+
+
+-- Function to get merchandise purchase details for email dispatch
+CREATE OR REPLACE FUNCTION public.get_merch_purchase_for_email_dispatch(
+    p_purchase_ids UUID[]
+)
+RETURNS TABLE (
+    customer_name TEXT,
+    customer_email TEXT,
+    items JSON,
+    total_amount NUMERIC,
+    shipping_fee NUMERIC
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        c.name AS customer_name,
+        c.email AS customer_email,
+        json_agg(
+            json_build_object(
+                'product_title', p.product_title,
+                'quantity', p.quantity,
+                'total_amount', p.total_amount
+            )
+        ) AS items,
+        SUM(p.total_amount + p.shipping_fee) AS total_amount,
+        SUM(p.shipping_fee) AS shipping_fee
+    FROM
+        public.purchases p
+    JOIN
+        public.customers c ON p.customer_id = c.id
+    WHERE
+        p.id = ANY(p_purchase_ids)
+    GROUP BY
+        c.name, c.email;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_merch_purchase_for_email_dispatch(UUID[]) TO service_role;
+
+COMMENT ON FUNCTION public.get_merch_purchase_for_email_dispatch(UUID[])
+IS 'Retrieves details for one or more merchandise purchases to be used in a confirmation email.';

@@ -25,7 +25,7 @@ BEGIN
   
   -- Update pending payments that are older than 2 hours to failed status
   WITH updated_purchases AS (
-    UPDATE purchases 
+    UPDATE public.purchases 
     SET 
       status = 'payment_failed',
       updated_at = NOW()
@@ -66,7 +66,7 @@ SELECT
   COUNT(*) as count,
   MIN(created_at) as oldest_payment,
   MAX(created_at) as newest_payment
-FROM purchases
+FROM public.purchases
 GROUP BY status
 ORDER BY count DESC;
 

@@ -243,9 +243,16 @@ serve(async (req: Request) => {
       // Check if all items with productIds have the same productId
       const uniqueProductIds = [...new Set(productIds)];
       if (uniqueProductIds.length === 1 && payload.cartItems.length === 1) {
-        // Single item with productId - use product-based checkout
-        isProductBased = true;
-        singleProductId = uniqueProductIds[0];
+        // Check if there's a shipping fee - if so, we must use amount-based
+        // because product-based checkout won't include the shipping cost
+        const hasShippingFee = totalShippingCost > 0;
+        
+        if (!hasShippingFee) {
+          // Single item with productId and no shipping - use product-based checkout
+          isProductBased = true;
+          singleProductId = uniqueProductIds[0];
+        }
+        // If there's a shipping fee, fall through to amount-based checkout
       }
       // For multiple items or mixed productIds, fall back to amount-based
     }

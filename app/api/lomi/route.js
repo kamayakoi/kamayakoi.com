@@ -154,16 +154,29 @@ export async function POST(request) {
 
     const lomiTransactionId = eventData.transaction_id || eventData.id; // Transaction ID
 
-    // For checkout.completed events, eventData.id is the checkout session ID
-    // For payment.succeeded events, we need to get checkout session ID from metadata.linkId
-    let lomiCheckoutSessionId;
-    if (lomiEventType === "CHECKOUT_COMPLETED") {
-      lomiCheckoutSessionId = eventData.id; // Checkout session ID for checkout events
-    } else {
-      lomiCheckoutSessionId = eventData.metadata?.linkId || eventData.id; // Get from metadata for payment events
-    }
-    const amount = eventData.amount || eventData.gross_amount; // Amount from Lomi
-    const currency = eventData.currency_code;
+    // checkout_session_id is sent directly on eventData from lomi, also available in metadata
+    // For PAYMENT_SUCCEEDED events from lomi, checkout_session_id is a direct field
+    const lomiCheckoutSessionId = String(
+      eventData.checkout_session_id ||
+      eventData.metadata?.checkout_session_id ||
+      eventData.metadata?.linkId ||
+      eventData.id ||
+      ''
+    );
+
+    // Debug logging for RPC params
+    console.log('Events Webhook: RPC params debug:', {
+      lomiCheckoutSessionId,
+      checkoutSessionIdSource: eventData.checkout_session_id ? 'direct' :
+        eventData.metadata?.checkout_session_id ? 'metadata.checkout_session_id' :
+          eventData.metadata?.linkId ? 'metadata.linkId' : 'eventData.id',
+    });
+
+    // Amount: lomi sends gross_amount from the transactions table
+    const amount = parseFloat(eventData.gross_amount || eventData.amount || eventData.net_amount || '0');
+
+    // Currency: lomi sends currency_code from the transactions table
+    const currency = eventData.currency_code || eventData.currency || 'XOF';
 
     if (purchaseIds.length === 0) {
       console.error(

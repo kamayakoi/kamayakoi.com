@@ -157,10 +157,7 @@ export async function POST(request) {
     // For checkout.completed events, eventData.id is the checkout session ID
     // For payment.succeeded events, we need to get checkout session ID from metadata.linkId
     let lomiCheckoutSessionId;
-    if (
-      lomiEventType === "checkout.completed" ||
-      lomiEventType === "CHECKOUT_COMPLETED"
-    ) {
+    if (lomiEventType === "CHECKOUT_COMPLETED") {
       lomiCheckoutSessionId = eventData.id; // Checkout session ID for checkout events
     } else {
       lomiCheckoutSessionId = eventData.metadata?.linkId || eventData.id; // Get from metadata for payment events
@@ -185,22 +182,13 @@ export async function POST(request) {
     }
 
     let paymentStatusForDb = "unknown";
-    if (
-      lomiEventType === "checkout.completed" ||
-      lomiEventType === "CHECKOUT_COMPLETED"
-    ) {
+    if (lomiEventType === "CHECKOUT_COMPLETED") {
       // Check if checkout_session.status is 'paid' or similar if Lomi provides it.
       // For now, assuming completion means payment for simplicity, adjust if Lomi has distinct paid status on checkout object.
       paymentStatusForDb = "paid"; // Or derive from eventData.status if available
-    } else if (
-      lomiEventType === "payment.succeeded" ||
-      lomiEventType === "PAYMENT_SUCCEEDED"
-    ) {
+    } else if (lomiEventType === "PAYMENT_SUCCEEDED") {
       paymentStatusForDb = "paid";
-    } else if (
-      lomiEventType === "payment.failed" ||
-      lomiEventType === "PAYMENT_FAILED"
-    ) {
+    } else if (lomiEventType === "PAYMENT_FAILED") {
       paymentStatusForDb = "payment_failed";
     } else {
       console.log(

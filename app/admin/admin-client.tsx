@@ -34,9 +34,6 @@ import {
     Filter,
     QrCode,
     UserPlus,
-    ScanLine,
-    ShieldCheck,
-    ShieldAlert,
 } from "lucide-react";
 import {
     Tabs,
@@ -89,6 +86,8 @@ interface ScanLog {
     ticket_identifier: string;
     event_id: string;
     event_title: string;
+    customer_name: string;
+    customer_email: string;
     attempt_timestamp: string;
     success: boolean;
     error_code: string | null;
@@ -156,10 +155,6 @@ export default function AdminClient() {
     // Scanner Tab State
     const [activeTab, setActiveTab] = useState("purchases");
     const [scanLogs, setScanLogs] = useState<ScanLog[]>([]);
-    const [manualTicketCode, setManualTicketCode] = useState("");
-    const [verifyResult, setVerifyResult] = useState<VerificationResult | null>(null);
-    const [verifyLoading, setVerifyLoading] = useState(false);
-    const [verifyError, setVerifyError] = useState("");
 
     // Helper function to format relative time
     const formatRelativeTime = (timestamp: string | null) => {
@@ -422,72 +417,6 @@ export default function AdminClient() {
         }
     };
 
-    const handleManualVerify = async () => {
-        if (!manualTicketCode.trim()) {
-            toast.error("Please enter a ticket code");
-            return;
-        }
-
-        setVerifyLoading(true);
-        setVerifyError("");
-        setVerifyResult(null);
-
-        try {
-            const { data, error } = await supabase.rpc("verify_ticket", {
-                p_ticket_identifier: manualTicketCode.trim(),
-            });
-
-            if (error) {
-                setVerifyError(error.message);
-                // Even on error, reload logs to show the failed attempt
-                loadScanLogs();
-            } else if (data && data.length > 0) {
-                setVerifyResult(data[0]);
-                // Reload logs
-                loadScanLogs();
-            } else {
-                setVerifyError("Ticket not found");
-                loadScanLogs();
-            }
-        } catch (error) {
-            setVerifyError(error instanceof Error ? error.message : "Verification failed");
-        } finally {
-            setVerifyLoading(false);
-        }
-    };
-
-    const handleMarkUsed = async () => {
-        if (!manualTicketCode.trim()) return;
-
-        setVerifyLoading(true);
-        try {
-            const { data, error } = await supabase.rpc("mark_ticket_used", {
-                p_ticket_identifier: manualTicketCode.trim(),
-                p_verified_by: "Admin Panel",
-            });
-
-            if (error) {
-                toast.error("Failed to mark used");
-                setVerifyError(error.message);
-            } else {
-                if (data === "SUCCESS") {
-                    toast.success("Ticket marked as used!");
-                    // Refresh status
-                    handleManualVerify();
-                } else if (data === "ALREADY_USED") {
-                    toast.warning("Ticket already used");
-                    handleManualVerify();
-                } else {
-                    toast.error(`Error: ${data}`);
-                }
-            }
-        } catch (error) {
-            toast.error("Failed to mark used");
-            console.error(error);
-        } finally {
-            setVerifyLoading(false);
-        }
-    };
 
     const searchPurchases = async () => {
         if (!searchQuery.trim()) {
@@ -836,7 +765,7 @@ export default function AdminClient() {
 
                     {/* Invite Guest Button */}
                     {selectedEvent && (
-                        <div className="mt-4">
+                        <div className="mt-4 flex justify-end">
                             <Button
                                 onClick={() => setIsInviteDialogOpen(true)}
                                 className="rounded-sm bg-purple-600 hover:bg-purple-700 text-white w-full sm:w-auto"
@@ -860,7 +789,7 @@ export default function AdminClient() {
                             value="scans"
                             className="data-[state=active]:bg-slate-800 data-[state=active]:text-white text-slate-400"
                         >
-                            Scanner & Logs
+                            Logs
                         </TabsTrigger>
                     </TabsList>
 
@@ -1074,94 +1003,14 @@ export default function AdminClient() {
                     </TabsContent>
 
                     <TabsContent value="scans" className="space-y-6">
-                        {/* Manual Verification */}
-                        <Card className="rounded-sm border-slate-700 bg-card/30 backdrop-blur-sm">
-                            <CardHeader>
-                                <CardTitle className="text-xl text-gray-100 flex items-center gap-2">
-                                    <ScanLine className="h-5 w-5 text-blue-400" />
-                                    Manual Ticket Verification
-                                </CardTitle>
-                                <CardDescription className="text-gray-400">
-                                    Manually verify a ticket by entering its code details.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex gap-4">
-                                    <Input
-                                        placeholder="Enter Ticket ID / QR Code"
-                                        value={manualTicketCode}
-                                        onChange={(e) => setManualTicketCode(e.target.value)}
-                                        className="bg-slate-900/50 border-slate-700 text-white font-mono"
-                                    />
-                                    <Button
-                                        onClick={handleManualVerify}
-                                        disabled={verifyLoading}
-                                        className="bg-blue-600 hover:bg-blue-700 text-white min-w-[100px]"
-                                    >
-                                        {verifyLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : "Verify"}
-                                    </Button>
-                                </div>
-
-                                {verifyError && (
-                                    <div className="p-4 rounded-md bg-red-900/20 border border-red-800 text-red-200 flex items-center gap-2">
-                                        <ShieldAlert className="h-5 w-5 shrink-0" />
-                                        <span>{verifyError}</span>
-                                    </div>
-                                )}
-
-                                {verifyResult && (
-                                    <div className={`p-4 rounded-md border ${verifyResult.status === 'used' || verifyResult.is_used
-                                        ? 'bg-yellow-900/20 border-yellow-800'
-                                        : 'bg-green-900/20 border-green-800'
-                                        }`}>
-                                        <div className="flex justify-between items-start">
-                                            <div className="space-y-2">
-                                                <div className="flex items-center gap-2">
-                                                    <Badge variant="outline" className="border-slate-600 text-slate-300">
-                                                        {verifyResult.ticket_name}
-                                                    </Badge>
-                                                    <Badge className={
-                                                        verifyResult.status === 'used' || verifyResult.is_used
-                                                            ? 'bg-yellow-600'
-                                                            : 'bg-green-600'
-                                                    }>
-                                                        {verifyResult.status === 'used' || verifyResult.is_used ? 'ALREADY USED' : 'VALID'}
-                                                    </Badge>
-                                                </div>
-                                                <h3 className="text-lg font-bold text-white">{verifyResult.customer_name}</h3>
-                                                <p className="text-slate-400">{verifyResult.event_title}</p>
-                                                <p className="text-xs text-slate-500 font-mono">{verifyResult.ticket_identifier || manualTicketCode}</p>
-
-                                                {verifyResult.used_at && (
-                                                    <p className="text-sm text-yellow-500 mt-2">
-                                                        Scanned at: {new Date(verifyResult.used_at).toLocaleString()}
-                                                    </p>
-                                                )}
-                                            </div>
-
-                                            {(!verifyResult.is_used && (!verifyResult.use_count || verifyResult.use_count < verifyResult.quantity)) && (
-                                                <Button
-                                                    onClick={handleMarkUsed}
-                                                    className="bg-green-600 hover:bg-green-700 text-white h-full py-6 text-lg"
-                                                >
-                                                    Mark as Used
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-
                         {/* Scan Logs */}
                         <Card className="rounded-sm border-slate-700 bg-card/30 backdrop-blur-sm">
                             <CardHeader>
-                                <CardTitle className="text-xl text-gray-100 flex items-center gap-2">
-                                    <ShieldCheck className="h-5 w-5 text-purple-400" />
+                                <CardTitle className="text-xl text-gray-100">
                                     Scan History
                                 </CardTitle>
                                 <CardDescription className="text-gray-400">
-                                    Recent verification attempts helps identify issues with scanning.
+                                    Recent verification attempts help identify issues with scanning.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -1171,6 +1020,7 @@ export default function AdminClient() {
                                             <tr>
                                                 <th className="px-4 py-3">Time</th>
                                                 <th className="px-4 py-3">Status</th>
+                                                <th className="px-4 py-3">Customer</th>
                                                 <th className="px-4 py-3">Event</th>
                                                 <th className="px-4 py-3">Details</th>
                                             </tr>
@@ -1178,7 +1028,7 @@ export default function AdminClient() {
                                         <tbody className="divide-y divide-slate-800">
                                             {scanLogs.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={4} className="px-4 py-8 text-center text-slate-500">
+                                                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
                                                         No scan logs found
                                                     </td>
                                                 </tr>
@@ -1193,14 +1043,22 @@ export default function AdminClient() {
                                                         </td>
                                                         <td className="px-4 py-3">
                                                             {log.success ? (
-                                                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-900/30 text-green-400 ring-1 ring-inset ring-green-900/50">
+                                                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-900/30 text-green-400">
                                                                     SUCCESS
                                                                 </span>
                                                             ) : (
-                                                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-900/30 text-red-400 ring-1 ring-inset ring-red-900/50">
+                                                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-900/30 text-red-400">
                                                                     FAILED
                                                                 </span>
                                                             )}
+                                                        </td>
+                                                        <td className="px-4 py-3 text-slate-300">
+                                                            <div className="truncate max-w-[150px]" title={log.customer_name}>
+                                                                {log.customer_name || "Unknown"}
+                                                            </div>
+                                                            <div className="text-xs text-slate-500 truncate">
+                                                                {log.customer_email}
+                                                            </div>
                                                         </td>
                                                         <td className="px-4 py-3 text-slate-300">
                                                             <div className="truncate max-w-[150px]" title={log.event_title}>
@@ -1208,12 +1066,13 @@ export default function AdminClient() {
                                                             </div>
                                                         </td>
                                                         <td className="px-4 py-3 text-slate-300">
-                                                            <div className="font-mono text-xs text-slate-500 truncate max-w-[100px]">
-                                                                {log.ticket_identifier}
-                                                            </div>
-                                                            {log.error_message && (
-                                                                <div className="text-red-400 text-xs mt-1">
+                                                            {log.error_message ? (
+                                                                <div className="text-red-400 text-xs">
                                                                     {log.error_message}
+                                                                </div>
+                                                            ) : (
+                                                                <div className="text-slate-500 text-xs">
+                                                                    Verified successfully
                                                                 </div>
                                                             )}
                                                         </td>
@@ -1346,8 +1205,7 @@ export default function AdminClient() {
                 <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
                     <DialogContent className="rounded-sm border-slate-700 bg-card/90 backdrop-blur-sm shadow-2xl max-w-[95vw] sm:max-w-lg">
                         <DialogHeader>
-                            <DialogTitle className="text-gray-100 text-base sm:text-lg flex items-center gap-2">
-                                <UserPlus className="h-5 w-5 text-purple-400" />
+                            <DialogTitle className="text-gray-100 text-base sm:text-lg">
                                 Invite Guest
                             </DialogTitle>
                             <DialogDescription className="text-gray-300 text-xs sm:text-sm">

@@ -12,6 +12,8 @@ RETURNS TABLE(
     ticket_identifier TEXT,
     event_id TEXT,
     event_title TEXT,
+    customer_name TEXT,
+    customer_email TEXT,
     attempt_timestamp TIMESTAMPTZ,
     success BOOLEAN,
     error_code TEXT,
@@ -28,11 +30,15 @@ BEGIN
         va.ticket_identifier,
         va.event_id,
         va.event_title,
+        COALESCE(c.name, 'Unknown Customer') as customer_name,
+        COALESCE(c.email, '') as customer_email,
         va.attempt_timestamp,
         va.success,
         va.error_code,
         va.error_message
     FROM public.verification_attempts va
+    LEFT JOIN public.purchases p ON va.ticket_identifier = p.unique_ticket_identifier
+    LEFT JOIN public.customers c ON p.customer_id = c.id
     WHERE (p_event_id IS NULL OR va.event_id = p_event_id)
     ORDER BY va.attempt_timestamp DESC
     LIMIT p_limit

@@ -75,15 +75,7 @@ interface EventInfo {
     last_purchase_date: string;
 }
 
-interface VerificationError {
-    id: string;
-    ticket_identifier: string;
-    event_id: string;
-    event_title: string;
-    attempt_timestamp: string;
-    error_code: string;
-    error_message: string;
-}
+
 
 export default function AdminClient() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -104,7 +96,6 @@ export default function AdminClient() {
     // Event filtering state
     const [events, setEvents] = useState<EventInfo[]>([]);
     const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
-    const [verificationErrors, setVerificationErrors] = useState<VerificationError[]>([]);
 
     // New: Status filter (defaults to 'paid' only)
     const [statusFilter, setStatusFilter] = useState<string>("paid");
@@ -191,8 +182,8 @@ export default function AdminClient() {
         if (authStatus === "true") {
             setIsAuthenticated(true);
             loadEvents();
+            loadEvents();
             loadPurchases();
-            loadVerificationErrors();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -201,7 +192,6 @@ export default function AdminClient() {
     useEffect(() => {
         if (isAuthenticated) {
             loadPurchases();
-            loadVerificationErrors();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedEvent, statusFilter, isAuthenticated]);
@@ -223,7 +213,6 @@ export default function AdminClient() {
                 localStorage.setItem("admin_authenticated", "true");
                 loadEvents();
                 loadPurchases();
-                loadVerificationErrors();
             } else {
                 setAuthError("Invalid PIN. Please try again.");
             }
@@ -284,21 +273,7 @@ export default function AdminClient() {
         }
     };
 
-    const loadVerificationErrors = async () => {
-        try {
-            const { data, error } = await supabase.rpc("get_recent_verification_errors", {
-                p_limit: 20,
-                p_event_id: selectedEvent,
-            });
-            if (error) {
-                console.error("Error loading verification errors:", error);
-            } else {
-                setVerificationErrors(data || []);
-            }
-        } catch (error) {
-            console.error("Error loading verification errors:", error);
-        }
-    };
+
 
     const handleInviteGuest = async () => {
         if (!selectedEvent || !inviteGuestEmail.trim() || !inviteGuestName.trim()) {
@@ -730,45 +705,6 @@ export default function AdminClient() {
                         </div>
                     )}
                 </div>
-
-                {/* Verification Errors - Mobile Optimized */}
-                {verificationErrors.length > 0 && (
-                    <Card className="rounded-sm border-red-700 bg-red-900/20 mb-6 sm:mb-8">
-                        <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-6">
-                            <CardTitle className="text-red-100 text-base sm:text-lg flex items-center gap-2">
-                                <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5" />
-                                Recent Errors ({verificationErrors.length})
-                            </CardTitle>
-                            <CardDescription className="text-red-200 text-xs sm:text-sm">
-                                Failed ticket scans
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="p-3 sm:p-6 pt-0">
-                            <div className="space-y-2 max-h-48 sm:max-h-60 overflow-y-auto">
-                                {verificationErrors.slice(0, 5).map((error) => (
-                                    <div key={error.id} className="bg-card/30 backdrop-blur-sm p-2 sm:p-3 rounded-sm border border-red-700/50">
-                                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                                            <div className="flex-1 min-w-0">
-                                                <div className="text-xs sm:text-sm font-medium text-gray-100 truncate">
-                                                    {error.event_title || "Unknown Event"}
-                                                </div>
-                                                <div className="text-xs text-red-300 font-mono mt-1 truncate">
-                                                    {error.ticket_identifier.substring(0, 8)}...
-                                                </div>
-                                                <div className="text-xs text-gray-400 mt-1">
-                                                    {error.error_code}
-                                                </div>
-                                            </div>
-                                            <div className="text-xs text-gray-500 whitespace-nowrap">
-                                                {formatRelativeTime(error.attempt_timestamp)}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
 
                 {/* Filters and Search - Mobile Optimized */}
                 <div className="mb-6 sm:mb-12">

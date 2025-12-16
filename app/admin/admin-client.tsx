@@ -94,29 +94,6 @@ interface ScanLog {
     error_message: string | null;
 }
 
-interface VerificationResult {
-    purchase_id: string;
-    customer_name: string;
-    customer_email: string;
-    customer_phone: string | null;
-    event_id: string;
-    event_title: string;
-    event_date_text: string | null;
-    event_time_text: string | null;
-    event_venue_name: string | null;
-    ticket_type_id: string | null;
-    ticket_name: string;
-    quantity: number;
-    price_per_ticket: number;
-    total_amount: number;
-    currency_code: string;
-    status: string;
-    is_used: boolean;
-    used_at: string | null;
-    verified_by: string | null;
-    use_count: number;
-    ticket_identifier?: string;
-}
 
 
 

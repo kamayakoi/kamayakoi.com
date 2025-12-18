@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import type { ArtistData } from "@/lib/sanity/queries";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import type { ArtistData } from '@/lib/sanity/queries';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
 
 interface ArtistCardProps {
   artist: ArtistData;
@@ -18,12 +18,12 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
   // Extract social platform from URL or use generic social if handle exists
   const getSocialPlatform = (url?: string) => {
     if (!url) return null;
-    if (url.includes("instagram.com")) return { name: "Instagram" };
-    if (url.includes("twitter.com") || url.includes("x.com"))
-      return { name: "Twitter" };
-    if (url.includes("soundcloud.com")) return { name: "SoundCloud" };
-    if (url.includes("youtube.com")) return { name: "YouTube" };
-    return { name: "Social" };
+    if (url.includes('instagram.com')) return { name: 'Instagram' };
+    if (url.includes('twitter.com') || url.includes('x.com'))
+      return { name: 'Twitter' };
+    if (url.includes('soundcloud.com')) return { name: 'SoundCloud' };
+    if (url.includes('youtube.com')) return { name: 'YouTube' };
+    return { name: 'Social' };
   };
 
   // Get role badge info
@@ -32,47 +32,47 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
     if (isResident) return null;
 
     switch (role) {
-      case "host":
+      case 'host':
         return {
-          label: currentLanguage === "fr" ? "ANIMATEUR" : "HOST",
-          variant: "default" as const,
+          label: currentLanguage === 'fr' ? 'ANIMATEUR' : 'HOST',
+          variant: 'default' as const,
           className:
-            "bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600",
+            'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600',
         };
-      case "mc":
+      case 'mc':
         return {
-          label: "MC",
-          variant: "default" as const,
+          label: 'MC',
+          variant: 'default' as const,
           className:
-            "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600",
+            'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
         };
-      case "producer":
+      case 'producer':
         return {
-          label: currentLanguage === "fr" ? "PRODUCTEUR" : "PRODUCER",
-          variant: "default" as const,
+          label: currentLanguage === 'fr' ? 'PRODUCTEUR' : 'PRODUCER',
+          variant: 'default' as const,
           className:
-            "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600",
+            'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600',
         };
-      case "dj":
+      case 'dj':
         return {
-          label: "DJ",
-          variant: "default" as const,
+          label: 'DJ',
+          variant: 'default' as const,
           className:
-            "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600",
+            'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600',
         };
-      case "resident":
+      case 'resident':
         return {
-          label: currentLanguage === "fr" ? "RÉSIDENT" : "RESIDENT",
-          variant: "default" as const,
+          label: currentLanguage === 'fr' ? 'RÉSIDENT' : 'RESIDENT',
+          variant: 'default' as const,
           className:
-            "bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600",
+            'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600',
         };
-      case "artist":
+      case 'artist':
         return {
-          label: currentLanguage === "fr" ? "ARTISTE" : "ARTIST",
-          variant: "default" as const,
+          label: currentLanguage === 'fr' ? 'ARTISTE' : 'ARTIST',
+          variant: 'default' as const,
           className:
-            "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600",
+            'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600',
         };
       default:
         return null;
@@ -89,8 +89,8 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
         <div className="relative overflow-hidden md:w-1/3">
           <div className="relative bg-muted overflow-hidden h-full min-h-[300px]">
             <Image
-              src={artist.imageUrl || "/placeholder.webp"}
-              alt={artist.name || ""}
+              src={artist.imageUrl || '/placeholder.webp'}
+              alt={artist.name || ''}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
@@ -104,7 +104,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
           {/* Artist name overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <h2 className="text-xl font-bold text-white drop-shadow-lg mb-2">
-              {artist.name || ""}
+              {artist.name || ''}
             </h2>
 
             {/* Role badge */}
@@ -125,7 +125,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
                 <span className="relative flex h-2 w-2 mr-1.5">
                   <span className="relative inline-flex rounded-sm h-2 w-2 bg-green-500"></span>
                 </span>
-                {currentLanguage === "fr" ? "Résident" : "Resident"}
+                {currentLanguage === 'fr' ? 'Résident' : 'Resident'}
               </div>
             </div>
           )}
@@ -143,7 +143,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
                   rel="noopener noreferrer"
                   className="text-lg font-semibold text-primary hover:text-primary/80 transition-colors"
                 >
-                  @{artist.socialHandle?.toLowerCase() || "social"}
+                  @{artist.socialHandle?.toLowerCase() || 'social'}
                 </Link>
               ) : (
                 <div className="text-lg font-semibold text-muted-foreground">
@@ -168,12 +168,12 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
                   ] ||
                   artist.description.en ||
                   artist.description.fr ||
-                  ""
+                  ''
                 )
-                  .split("\n")
+                  .split('\n')
                   .map((line: string, index: number) => {
                     const trimmedLine = line.trim();
-                    if (trimmedLine === "") {
+                    if (trimmedLine === '') {
                       return <br key={index} />;
                     }
                     return (

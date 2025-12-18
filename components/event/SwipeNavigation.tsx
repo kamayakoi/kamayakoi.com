@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface SwipeNavigationProps {
   previousEvent: { slug: string } | null;
@@ -47,14 +47,14 @@ export default function SwipeNavigation({
       touchStartY.current = null;
     };
 
-    document.addEventListener("touchstart", handleTouchStart, {
+    document.addEventListener('touchstart', handleTouchStart, {
       passive: true,
     });
-    document.addEventListener("touchend", handleTouchEnd, { passive: true });
+    document.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
-      document.removeEventListener("touchstart", handleTouchStart);
-      document.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchend', handleTouchEnd);
     };
   }, [router, nextEvent, previousEvent]);
 

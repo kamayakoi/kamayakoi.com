@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
+import { useEffect, useState } from 'react';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
 
 // Move loading sequence outside component to avoid dependency issues
 const loadingSequence = [0, 18, 12, 35, 28, 58, 52, 78, 71, 95, 88, 100];
@@ -30,11 +30,11 @@ export default function LoadingComponent() {
           className="text-2xl md:text-3xl lg:text-4xl font-black text-muted-foreground"
           style={{
             fontWeight: 900,
-            letterSpacing: "0.0em",
-            fontFamily: "Arial Black, sans-serif",
+            letterSpacing: '0.0em',
+            fontFamily: 'Arial Black, sans-serif',
           }}
         >
-          {t(currentLanguage, "loading.text")}
+          {t(currentLanguage, 'loading.text')}
         </h1>
 
         {/* Filled text (bright magenta) */}
@@ -46,12 +46,12 @@ export default function LoadingComponent() {
             className="text-2xl md:text-3xl lg:text-4xl font-black whitespace-nowrap"
             style={{
               fontWeight: 900,
-              letterSpacing: "0.0em",
-              fontFamily: "Arial Black, sans-serif",
-              color: "#5EEAD4",
+              letterSpacing: '0.0em',
+              fontFamily: 'Arial Black, sans-serif',
+              color: '#5EEAD4',
             }}
           >
-            {t(currentLanguage, "loading.text")}
+            {t(currentLanguage, 'loading.text')}
           </h1>
         </div>
       </div>

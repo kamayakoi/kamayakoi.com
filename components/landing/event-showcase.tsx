@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
-import { Card, CardContent } from "@/components/ui/card";
+import Image from 'next/image';
+import Link from 'next/link';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
+import { Card, CardContent } from '@/components/ui/card';
 
 // Props interface
 interface ShowcaseEvent {
@@ -40,11 +40,11 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
 
   const eventDate = event.date ? new Date(event.date) : null;
   const formattedDate = eventDate?.toLocaleDateString(
-    currentLanguage === "fr" ? "fr-FR" : "en-US",
+    currentLanguage === 'fr' ? 'fr-FR' : 'en-US',
     {
-      day: "numeric",
-      month: "short",
-    },
+      day: 'numeric',
+      month: 'short',
+    }
   );
 
   // Get the description in the current language, fallback to English
@@ -60,28 +60,28 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
 
   const localizedDescription = getLocalizedDescription();
 
-  const mainImage = event.flyer?.url || "/placeholder.webp";
+  const mainImage = event.flyer?.url || '/placeholder.webp';
   const hasValidImage =
-    mainImage && mainImage.trim() !== "" && mainImage !== "/placeholder.webp";
+    mainImage && mainImage.trim() !== '' && mainImage !== '/placeholder.webp';
 
   // Month color system - one color per month
   const getMonthColor = (date: Date) => {
     const month = date.getMonth();
     const colorMap: Record<number, { bg: string; text: string }> = {
-      0: { bg: "bg-red-600", text: "text-white" }, // January
-      1: { bg: "bg-amber-600", text: "text-white" }, // February
-      2: { bg: "bg-yellow-600", text: "text-white" }, // March
-      3: { bg: "bg-cyan-600", text: "text-white" }, // April
-      4: { bg: "bg-teal-600", text: "text-white" }, // May
-      5: { bg: "bg-sky-600", text: "text-white" }, // June
-      6: { bg: "bg-purple-600", text: "text-white" }, // July
-      7: { bg: "bg-pink-600", text: "text-white" }, // August
-      8: { bg: "bg-indigo-600", text: "text-white" }, // September
-      9: { bg: "bg-orange-600", text: "text-white" }, // October
-      10: { bg: "bg-emerald-600", text: "text-white" }, // November
-      11: { bg: "bg-green-600", text: "text-white" }, // December
+      0: { bg: 'bg-red-600', text: 'text-white' }, // January
+      1: { bg: 'bg-amber-600', text: 'text-white' }, // February
+      2: { bg: 'bg-yellow-600', text: 'text-white' }, // March
+      3: { bg: 'bg-cyan-600', text: 'text-white' }, // April
+      4: { bg: 'bg-teal-600', text: 'text-white' }, // May
+      5: { bg: 'bg-sky-600', text: 'text-white' }, // June
+      6: { bg: 'bg-purple-600', text: 'text-white' }, // July
+      7: { bg: 'bg-pink-600', text: 'text-white' }, // August
+      8: { bg: 'bg-indigo-600', text: 'text-white' }, // September
+      9: { bg: 'bg-orange-600', text: 'text-white' }, // October
+      10: { bg: 'bg-emerald-600', text: 'text-white' }, // November
+      11: { bg: 'bg-green-600', text: 'text-white' }, // December
     };
-    return colorMap[month] || { bg: "bg-blue-600", text: "text-white" };
+    return colorMap[month] || { bg: 'bg-blue-600', text: 'text-white' };
   };
 
   return (
@@ -95,7 +95,7 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
         >
           <div className="aspect-square relative bg-muted overflow-hidden">
             <Image
-              src={hasValidImage ? mainImage : "/placeholder.webp"}
+              src={hasValidImage ? mainImage : '/placeholder.webp'}
               alt={event.title}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -137,7 +137,7 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
             href={`/events/${event.slug.current}`}
             className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium"
           >
-            {t(currentLanguage, "eventShowcase.events.viewEvent")}
+            {t(currentLanguage, 'eventShowcase.events.viewEvent')}
           </Link>
         </div>
       </CardContent>
@@ -158,10 +158,10 @@ export function EventShowcase({ events }: EventShowcaseProps) {
           <div className="w-1 h-12 bg-white"></div>
           <div>
             <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-              {t(currentLanguage, "eventShowcase.events.title")}
+              {t(currentLanguage, 'eventShowcase.events.title')}
               <span className="text-white/60 mx-3 hidden md:inline">·</span>
               <span className="text-white/70 font-normal text-xl md:text-2xl block md:inline-block transform -translate-y-[5px]">
-                {t(currentLanguage, "eventShowcase.events.subtitle")}
+                {t(currentLanguage, 'eventShowcase.events.subtitle')}
               </span>
             </h2>
           </div>
@@ -180,12 +180,12 @@ export function EventShowcase({ events }: EventShowcaseProps) {
           /* Coming Soon Message - using translations */
           <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-sm p-8 mb-20">
             <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
-              {t(currentLanguage, "eventShowcase.events.comingSoon.title")}
+              {t(currentLanguage, 'eventShowcase.events.comingSoon.title')}
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400 mb-6">
               {t(
                 currentLanguage,
-                "eventShowcase.events.comingSoon.description",
+                'eventShowcase.events.comingSoon.description'
               )}
             </p>
           </div>

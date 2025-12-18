@@ -1,5 +1,5 @@
-import cloudinary from "./cloudinary";
-import type { ImageProps } from "./types";
+import cloudinary from './cloudinary';
+import type { ImageProps } from './types';
 
 // Define interfaces for the search results
 interface SearchResource extends ImageProps {
@@ -24,7 +24,7 @@ export default async function getResults(): Promise<
   if (!cachedResults) {
     const fetchedResults = await cloudinary.v2.search
       .expression(`folder:${process.env.CLOUDINARY_FOLDER}/*`)
-      .sort_by("public_id", "desc")
+      .sort_by('public_id', 'desc')
       .max_results(400)
       .execute();
 

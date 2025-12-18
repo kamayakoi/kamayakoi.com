@@ -1,16 +1,16 @@
 // Removed "use client"
 
 // Keep only necessary imports for the page structure and metadata
-import Header from "@/components/landing/header";
-import { Footer } from "@/components/landing/footer";
-import { Metadata } from "next";
-import ArchivesClientComponent from "./archives-client"; // Import the new client component
+import Header from '@/components/landing/header';
+import { Footer } from '@/components/landing/footer';
+import { Metadata } from 'next';
+import ArchivesClientComponent from './archives-client'; // Import the new client component
 
 // Metadata export remains here (this is now a Server Component)
 export const metadata: Metadata = {
-  title: "Archives",
+  title: 'Archives',
   description:
-    "Explore our archives of events, performances, and behind-the-scenes moments.",
+    'Explore our archives of events, performances, and behind-the-scenes moments.',
 };
 
 // This is now a simple Server Component

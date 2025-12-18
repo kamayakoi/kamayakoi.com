@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { ChevronDown, Phone } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import * as RPNInput from "react-phone-number-input";
-import flags from "react-phone-number-input/flags";
-import { cn } from "@/lib/actions/utils";
+import { ChevronDown, Phone } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import * as RPNInput from 'react-phone-number-input';
+import flags from 'react-phone-number-input/flags';
+import { cn } from '@/lib/actions/utils';
 
 interface PhoneNumberInputProps {
   value: string;
@@ -16,7 +16,7 @@ interface PhoneNumberInputProps {
 export default function PhoneNumberInput({
   value,
   onChange,
-  placeholder = "Phone number",
+  placeholder = 'Phone number',
   className,
 }: PhoneNumberInputProps) {
   const [defaultCountry, setDefaultCountry] = useState<RPNInput.Country>();
@@ -24,7 +24,7 @@ export default function PhoneNumberInput({
 
   useEffect(() => {
     // First check if we have a cached country code in localStorage
-    const cachedCountryCode = localStorage.getItem("user_country_code");
+    const cachedCountryCode = localStorage.getItem('user_country_code');
     if (cachedCountryCode) {
       setDefaultCountry(cachedCountryCode as RPNInput.Country);
       return;
@@ -32,46 +32,46 @@ export default function PhoneNumberInput({
 
     // Add a timeout for the fetch to avoid long waits
     const timeoutPromise = new Promise<null>((_, reject) =>
-      setTimeout(() => reject(new Error("Request timed out")), 2000),
+      setTimeout(() => reject(new Error('Request timed out')), 2000)
     );
 
     // Try to get user's country using ipapi.co
     Promise.race([
-      fetch("https://ipapi.co/json/", {
-        mode: "cors",
+      fetch('https://ipapi.co/json/', {
+        mode: 'cors',
         headers: {
-          Accept: "application/json",
+          Accept: 'application/json',
         },
-      }).then((response) => {
+      }).then(response => {
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error('Network response was not ok');
         }
         return response.json();
       }),
       timeoutPromise,
     ])
-      .then((data) => {
+      .then(data => {
         if (data && data.country_code) {
           // Cache the result in localStorage for future use
-          localStorage.setItem("user_country_code", data.country_code);
+          localStorage.setItem('user_country_code', data.country_code);
           setDefaultCountry(data.country_code as RPNInput.Country);
         } else {
-          throw new Error("Invalid data received");
+          throw new Error('Invalid data received');
         }
       })
       .catch(() => {
         // If ipapi.co fails, try a fallback to CI (Côte d'Ivoire)
-        setDefaultCountry("CI");
-        localStorage.setItem("user_country_code", "CI");
+        setDefaultCountry('CI');
+        localStorage.setItem('user_country_code', 'CI');
       });
   }, []);
 
   return (
-    <div className={cn("w-full relative", className)}>
+    <div className={cn('w-full relative', className)}>
       <div
         className={cn(
-          "flex w-full rounded-sm border border-input bg-transparent shadow-xs transition-[color,box-shadow]",
-          isFocused && "border-ring ring-ring/50 ring-[3px]",
+          'flex w-full rounded-sm border border-input bg-transparent shadow-xs transition-[color,box-shadow]',
+          isFocused && 'border-ring ring-ring/50 ring-[3px]'
         )}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
@@ -102,11 +102,11 @@ const PhoneInput = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         ref={ref}
         className={cn(
-          "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30",
-          "flex h-11 w-full min-w-0 bg-transparent px-3 py-1 text-base outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium",
-          "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
-          "border-0 shadow-none rounded-l-sm rounded-r-sm",
-          className,
+          'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30',
+          'flex h-11 w-full min-w-0 bg-transparent px-3 py-1 text-base outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium',
+          'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
+          'border-0 shadow-none rounded-l-sm rounded-r-sm',
+          className
         )}
         {...props}
         autoComplete="off"
@@ -114,10 +114,10 @@ const PhoneInput = React.forwardRef<HTMLInputElement, InputProps>(
         data-form-type="other"
       />
     );
-  },
+  }
 );
 
-PhoneInput.displayName = "PhoneInput";
+PhoneInput.displayName = 'PhoneInput';
 
 type CountrySelectProps = {
   disabled?: boolean;
@@ -139,10 +139,10 @@ const CountrySelect = ({
   return (
     <div
       className={cn(
-        "PhoneInputCountry relative inline-flex items-center self-stretch bg-transparent text-foreground outline-none",
-        "flex h-11 min-w-0 px-3 py-1 border-0 shadow-none rounded-l-sm rounded-r-sm",
-        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30",
-        disabled && "pointer-events-none cursor-not-allowed opacity-50",
+        'PhoneInputCountry relative inline-flex items-center self-stretch bg-transparent text-foreground outline-none',
+        'flex h-11 min-w-0 px-3 py-1 border-0 shadow-none rounded-l-sm rounded-r-sm',
+        'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30',
+        disabled && 'pointer-events-none cursor-not-allowed opacity-50'
       )}
     >
       <div className="inline-flex items-center gap-1.5" aria-hidden="true">
@@ -153,7 +153,7 @@ const CountrySelect = ({
       </div>
       <select
         disabled={disabled}
-        value={value || ""}
+        value={value || ''}
         onChange={handleSelect}
         className="absolute inset-0 text-sm opacity-0 outline-none cursor-pointer"
         aria-label="Select country"
@@ -163,10 +163,10 @@ const CountrySelect = ({
           Select country
         </option>
         {options
-          .filter((x) => x.value)
-          .map((option) => (
-            <option key={option.value || "empty"} value={option.value}>
-              {option.label}{" "}
+          .filter(x => x.value)
+          .map(option => (
+            <option key={option.value || 'empty'} value={option.value}>
+              {option.label}{' '}
               {option.value &&
                 `+${RPNInput.getCountryCallingCode(option.value)}`}
             </option>

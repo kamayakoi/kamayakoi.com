@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Plus, Minus, ShoppingCart } from "lucide-react";
+import { useState } from 'react';
+import { Plus, Minus, ShoppingCart } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 type TicketType = {
   id: string;
@@ -42,14 +42,14 @@ export default function TicketSelector({ event }: { event: EventProps }) {
   >({});
 
   const handleTicketChange = (id: string, count: number, max: number) => {
-    setSelectedTickets((prev) => ({
+    setSelectedTickets(prev => ({
       ...prev,
       [id]: Math.max(0, Math.min(count, max)),
     }));
   };
 
   const handleBundleChange = (id: string, count: number, max: number) => {
-    setSelectedBundles((prev) => ({
+    setSelectedBundles(prev => ({
       ...prev,
       [id]: Math.max(0, Math.min(count, max)),
     }));
@@ -59,12 +59,12 @@ export default function TicketSelector({ event }: { event: EventProps }) {
     let total = 0;
 
     // Add ticket prices
-    event.ticketTypes.forEach((ticket) => {
+    event.ticketTypes.forEach(ticket => {
       total += (selectedTickets[ticket.id] || 0) * ticket.price;
     });
 
     // Add bundle prices
-    event.bundles.forEach((bundle) => {
+    event.bundles.forEach(bundle => {
       total += (selectedBundles[bundle.id] || 0) * bundle.price;
     });
 
@@ -74,13 +74,13 @@ export default function TicketSelector({ event }: { event: EventProps }) {
   // Helper function for formatting price
   const formatPrice = (price: number): string => {
     // Use non-breaking space (\u00A0) for thousands separator
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0');
   };
 
   const hasSelections = () => {
     return (
-      Object.values(selectedTickets).some((count) => count > 0) ||
-      Object.values(selectedBundles).some((count) => count > 0)
+      Object.values(selectedTickets).some(count => count > 0) ||
+      Object.values(selectedBundles).some(count => count > 0)
     );
   };
 
@@ -90,7 +90,7 @@ export default function TicketSelector({ event }: { event: EventProps }) {
       <div className="space-y-4 mb-6">
         <h3 className="font-medium">Tickets</h3>
 
-        {event.ticketTypes.map((ticket) => (
+        {event.ticketTypes.map(ticket => (
           <Card key={ticket.id}>
             <CardContent className="p-4">
               <div className="flex justify-between items-center">
@@ -112,7 +112,7 @@ export default function TicketSelector({ event }: { event: EventProps }) {
                       handleTicketChange(
                         ticket.id,
                         (selectedTickets[ticket.id] || 0) - 1,
-                        ticket.maxPerOrder,
+                        ticket.maxPerOrder
                       )
                     }
                     disabled={!selectedTickets[ticket.id]}
@@ -131,7 +131,7 @@ export default function TicketSelector({ event }: { event: EventProps }) {
                       handleTicketChange(
                         ticket.id,
                         (selectedTickets[ticket.id] || 0) + 1,
-                        ticket.maxPerOrder,
+                        ticket.maxPerOrder
                       )
                     }
                     disabled={
@@ -153,7 +153,7 @@ export default function TicketSelector({ event }: { event: EventProps }) {
         <div className="space-y-4 mb-6">
           <h3 className="font-medium">Bundles</h3>
 
-          {event.bundles.map((bundle) => (
+          {event.bundles.map(bundle => (
             <Card key={bundle.id}>
               <CardContent className="p-4">
                 <div className="flex justify-between items-start">
@@ -183,7 +183,7 @@ export default function TicketSelector({ event }: { event: EventProps }) {
                         handleBundleChange(
                           bundle.id,
                           (selectedBundles[bundle.id] || 0) - 1,
-                          bundle.maxPerOrder,
+                          bundle.maxPerOrder
                         )
                       }
                       disabled={!selectedBundles[bundle.id]}
@@ -202,7 +202,7 @@ export default function TicketSelector({ event }: { event: EventProps }) {
                         handleBundleChange(
                           bundle.id,
                           (selectedBundles[bundle.id] || 0) + 1,
-                          bundle.maxPerOrder,
+                          bundle.maxPerOrder
                         )
                       }
                       disabled={
@@ -231,7 +231,7 @@ export default function TicketSelector({ event }: { event: EventProps }) {
             <div className="space-y-2 mb-4">
               {Object.entries(selectedTickets).map(([id, count]) => {
                 if (count === 0) return null;
-                const ticket = event.ticketTypes.find((t) => t.id === id);
+                const ticket = event.ticketTypes.find(t => t.id === id);
                 if (!ticket) return null;
 
                 return (
@@ -246,7 +246,7 @@ export default function TicketSelector({ event }: { event: EventProps }) {
 
               {Object.entries(selectedBundles).map(([id, count]) => {
                 if (count === 0) return null;
-                const bundle = event.bundles.find((b) => b.id === id);
+                const bundle = event.bundles.find(b => b.id === id);
                 if (!bundle) return null;
 
                 return (

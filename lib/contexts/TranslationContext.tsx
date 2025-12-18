@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useState, useEffect } from "react";
-import type { Language } from "@/lib/i18n/config";
-import { languages } from "@/lib/i18n/config";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import type { Language } from '@/lib/i18n/config';
+import { languages } from '@/lib/i18n/config';
 import {
   getLocalStorageItem,
   setLocalStorageItem,
-} from "@/lib/utils/localStorage";
+} from '@/lib/utils/localStorage';
 
 interface TranslationContextType {
   currentLanguage: Language;
@@ -14,7 +14,7 @@ interface TranslationContextType {
 }
 
 const TranslationContext = createContext<TranslationContextType>({
-  currentLanguage: "en",
+  currentLanguage: 'en',
   setLanguage: () => {},
 });
 
@@ -24,23 +24,20 @@ export function TranslationProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [currentLanguage, setCurrentLanguage] = useState<Language>("en");
+  const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
 
   useEffect(() => {
     // Try to get language from localStorage
-    const savedLanguage = getLocalStorageItem("jumbo.language");
+    const savedLanguage = getLocalStorageItem('jumbo.language');
 
-    if (
-      savedLanguage &&
-      languages.some((lang) => lang.code === savedLanguage)
-    ) {
+    if (savedLanguage && languages.some(lang => lang.code === savedLanguage)) {
       setCurrentLanguage(savedLanguage as Language);
     } else {
       // Try to detect browser language
-      if (typeof navigator !== "undefined") {
-        const browserLang = navigator.language.split("-")[0];
+      if (typeof navigator !== 'undefined') {
+        const browserLang = navigator.language.split('-')[0];
 
-        if (languages.some((lang) => lang.code === browserLang)) {
+        if (languages.some(lang => lang.code === browserLang)) {
           setCurrentLanguage(browserLang as Language);
         }
       }
@@ -49,7 +46,7 @@ export function TranslationProvider({
 
   const setLanguage = (lang: Language) => {
     setCurrentLanguage(lang);
-    setLocalStorageItem("jumbo.language", lang);
+    setLocalStorageItem('jumbo.language', lang);
   };
 
   return (
@@ -64,7 +61,7 @@ export function useTranslation() {
   const context = useContext(TranslationContext);
 
   if (context === undefined) {
-    throw new Error("useTranslation must be used within a TranslationProvider");
+    throw new Error('useTranslation must be used within a TranslationProvider');
   }
 
   return context;

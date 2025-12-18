@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
-import { useCart } from "./cart-context";
-import { supabase } from "@/lib/supabase/client";
-import PhoneNumberInput from "@/components/ui/phone-number-input";
-import { cn } from "@/lib/actions/utils";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
+import { useCart } from './cart-context';
+import { supabase } from '@/lib/supabase/client';
+import PhoneNumberInput from '@/components/ui/phone-number-input';
+import { cn } from '@/lib/actions/utils';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
 
 const CartContainer = ({
   children,
@@ -19,15 +19,15 @@ const CartContainer = ({
   children: React.ReactNode;
   className?: string;
 }) => {
-  return <div className={cn("px-3 md:px-4", className)}>{children}</div>;
+  return <div className={cn('px-3 md:px-4', className)}>{children}</div>;
 };
 
 export default function CartPurchaseForm() {
   const { cart, shippingSettings } = useCart();
   const { currentLanguage } = useTranslation();
-  const [userName, setUserName] = useState("");
-  const [userEmail, setUserEmail] = useState("");
-  const [userPhone, setUserPhone] = useState("");
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [userPhone, setUserPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,24 +41,24 @@ export default function CartPurchaseForm() {
     setError(null);
 
     if (!userName.trim()) {
-      setError(t(currentLanguage, "cartPurchaseForm.errors.nameRequired"));
+      setError(t(currentLanguage, 'cartPurchaseForm.errors.nameRequired'));
       return;
     }
     if (!userEmail.trim()) {
-      setError(t(currentLanguage, "cartPurchaseForm.errors.emailRequired"));
+      setError(t(currentLanguage, 'cartPurchaseForm.errors.emailRequired'));
       return;
     }
     if (!validateEmail(userEmail)) {
-      setError(t(currentLanguage, "cartPurchaseForm.errors.emailInvalid"));
+      setError(t(currentLanguage, 'cartPurchaseForm.errors.emailInvalid'));
       return;
     }
     if (!userPhone.trim()) {
-      setError(t(currentLanguage, "cartPurchaseForm.errors.phoneRequired"));
+      setError(t(currentLanguage, 'cartPurchaseForm.errors.phoneRequired'));
       return;
     }
 
     if (!cart || cart.lines.length === 0) {
-      setError(t(currentLanguage, "cartPurchaseForm.errors.cartEmpty"));
+      setError(t(currentLanguage, 'cartPurchaseForm.errors.cartEmpty'));
       return;
     }
 
@@ -66,7 +66,7 @@ export default function CartPurchaseForm() {
 
     try {
       // Prepare cart items for the API
-      const cartItems = cart.lines.map((line) => ({
+      const cartItems = cart.lines.map(line => ({
         merchandiseId: line.id,
         quantity: line.quantity,
         productId: line.product.productId,
@@ -81,23 +81,23 @@ export default function CartPurchaseForm() {
         userName: userName.trim(),
         userEmail: userEmail.trim(),
         userPhone: userPhone.trim(),
-        currencyCode: "XOF",
-        successUrlPath: "/payment/success",
-        cancelUrlPath: "/payment/error",
+        currencyCode: 'XOF',
+        successUrlPath: '/payment/success',
+        cancelUrlPath: '/payment/error',
         allowCouponCode: true,
         allowQuantity: false,
       };
 
       const { data, error: functionError } = await supabase.functions.invoke(
-        "create-lomi-cart-checkout",
-        { body: payload },
+        'create-lomi-cart-checkout',
+        { body: payload }
       );
 
       if (functionError) {
-        console.error("Function error:", functionError);
+        console.error('Function error:', functionError);
         setError(
           functionError.message ||
-            t(currentLanguage, "cartPurchaseForm.errors.checkoutFailed"),
+            t(currentLanguage, 'cartPurchaseForm.errors.checkoutFailed')
         );
         return;
       }
@@ -106,35 +106,35 @@ export default function CartPurchaseForm() {
         window.location.href = data.checkout_url;
       } else {
         setError(
-          t(currentLanguage, "cartPurchaseForm.errors.checkoutUrlFailed"),
+          t(currentLanguage, 'cartPurchaseForm.errors.checkoutUrlFailed')
         );
       }
     } catch (e: unknown) {
-      console.error("Checkout error:", e);
+      console.error('Checkout error:', e);
       const message =
         e instanceof Error
           ? e.message
-          : t(currentLanguage, "cartPurchaseForm.errors.unexpectedError");
+          : t(currentLanguage, 'cartPurchaseForm.errors.unexpectedError');
       setError(message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const totalAmount = cart?.cost.totalAmount.amount || "0";
+  const totalAmount = cart?.cost.totalAmount.amount || '0';
 
   return (
     <div className="flex flex-col justify-between h-full overflow-hidden">
       <CartContainer className="flex justify-between items-center px-2 text-sm text-muted-foreground mb-4">
         <span className="font-medium">
-          {t(currentLanguage, "cartPurchaseForm.title")}
+          {t(currentLanguage, 'cartPurchaseForm.title')}
         </span>
         <span className="bg-muted/50 px-2 py-1 rounded-sm text-xs">
           {cart?.lines.length === 1
-            ? t(currentLanguage, "cartPurchaseForm.itemCount", {
+            ? t(currentLanguage, 'cartPurchaseForm.itemCount', {
                 count: cart?.lines.length || 0,
               })
-            : t(currentLanguage, "cartPurchaseForm.itemCountPlural", {
+            : t(currentLanguage, 'cartPurchaseForm.itemCountPlural', {
                 count: cart?.lines.length || 0,
               })}
         </span>
@@ -145,16 +145,16 @@ export default function CartPurchaseForm() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-6">
               <Label htmlFor="name" className="text-sm font-medium">
-                {t(currentLanguage, "cartPurchaseForm.labels.name")} *
+                {t(currentLanguage, 'cartPurchaseForm.labels.name')} *
               </Label>
               <Input
                 id="name"
                 value={userName}
-                onChange={(e) => setUserName(e.target.value)}
+                onChange={e => setUserName(e.target.value)}
                 className="rounded-sm mt-2"
                 placeholder={t(
                   currentLanguage,
-                  "cartPurchaseForm.placeholders.name",
+                  'cartPurchaseForm.placeholders.name'
                 )}
                 required
               />
@@ -162,17 +162,17 @@ export default function CartPurchaseForm() {
 
             <div className="space-y-6">
               <Label htmlFor="email" className="text-sm font-medium">
-                {t(currentLanguage, "cartPurchaseForm.labels.email")} *
+                {t(currentLanguage, 'cartPurchaseForm.labels.email')} *
               </Label>
               <Input
                 id="email"
                 type="email"
                 value={userEmail}
-                onChange={(e) => setUserEmail(e.target.value)}
+                onChange={e => setUserEmail(e.target.value)}
                 className="rounded-sm mt-2"
                 placeholder={t(
                   currentLanguage,
-                  "cartPurchaseForm.placeholders.email",
+                  'cartPurchaseForm.placeholders.email'
                 )}
                 required
               />
@@ -180,15 +180,15 @@ export default function CartPurchaseForm() {
 
             <div className="space-y-6">
               <Label className="text-sm font-medium">
-                {t(currentLanguage, "cartPurchaseForm.labels.phone")} *
+                {t(currentLanguage, 'cartPurchaseForm.labels.phone')} *
               </Label>
               <PhoneNumberInput
                 value={userPhone}
-                onChange={(value) => setUserPhone(value || "")}
+                onChange={value => setUserPhone(value || '')}
                 className="mt-2"
                 placeholder={t(
                   currentLanguage,
-                  "cartPurchaseForm.placeholders.phone",
+                  'cartPurchaseForm.placeholders.phone'
                 )}
               />
             </div>
@@ -209,22 +209,22 @@ export default function CartPurchaseForm() {
           <CartContainer className="space-y-2">
             <div className="flex justify-between items-center py-3">
               <p className="font-medium text-foreground">
-                {t(currentLanguage, "cartPurchaseForm.shipping")}
+                {t(currentLanguage, 'cartPurchaseForm.shipping')}
               </p>
               <p className="text-muted-foreground">
                 {cart?.cost.shippingAmount &&
                 Number(cart.cost.shippingAmount.amount) > 0
-                  ? `${Number(cart.cost.shippingAmount.amount).toLocaleString("fr-FR")} F CFA`
-                  : t(currentLanguage, "cartPurchaseForm.shippingCalculated")}
+                  ? `${Number(cart.cost.shippingAmount.amount).toLocaleString('fr-FR')} F CFA`
+                  : t(currentLanguage, 'cartPurchaseForm.shippingCalculated')}
               </p>
             </div>
             <div className="flex justify-between items-center py-2">
               <p className="text-lg font-bold text-foreground">
-                {t(currentLanguage, "cartPurchaseForm.total")}
+                {t(currentLanguage, 'cartPurchaseForm.total')}
               </p>
               <p className="text-xl font-bold text-primary">
-                {Number(totalAmount).toLocaleString("fr-FR")}{" "}
-                {t(currentLanguage, "cartPurchaseForm.currency")}
+                {Number(totalAmount).toLocaleString('fr-FR')}{' '}
+                {t(currentLanguage, 'cartPurchaseForm.currency')}
               </p>
             </div>
           </CartContainer>
@@ -245,10 +245,10 @@ export default function CartPurchaseForm() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                {t(currentLanguage, "cartPurchaseForm.buttons.processing")}
+                {t(currentLanguage, 'cartPurchaseForm.buttons.processing')}
               </>
             ) : (
-              t(currentLanguage, "cartPurchaseForm.buttons.completePurchase")
+              t(currentLanguage, 'cartPurchaseForm.buttons.completePurchase')
             )}
           </Button>
         </div>

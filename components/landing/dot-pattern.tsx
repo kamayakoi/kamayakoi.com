@@ -1,13 +1,12 @@
-import { useId } from "react";
-import React from "react";
+import { useId } from 'react';
+import React from 'react';
 
-import { cn } from "@/lib/actions/utils";
+import { cn } from '@/lib/actions/utils';
 
-interface DotPatternProps
-  extends Omit<
-    React.SVGAttributes<SVGSVGElement>,
-    "x" | "y" | "width" | "height" | "className"
-  > {
+interface DotPatternProps extends Omit<
+  React.SVGAttributes<SVGSVGElement>,
+  'x' | 'y' | 'width' | 'height' | 'className'
+> {
   width?: number;
   height?: number;
   x?: number;
@@ -35,8 +34,8 @@ export function DotPattern({
     <svg
       aria-hidden="true"
       className={cn(
-        "pointer-events-none absolute inset-0 h-full w-full fill-slate-500/50 md:fill-slate-500/70",
-        className,
+        'pointer-events-none absolute inset-0 h-full w-full fill-slate-500/50 md:fill-slate-500/70',
+        className
       )}
       {...props}
     >

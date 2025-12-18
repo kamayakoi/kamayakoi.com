@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { ReactLenis } from "lenis/react";
-import React, { forwardRef } from "react";
-import Image from "next/image";
+import { ReactLenis } from 'lenis/react';
+import React, { forwardRef } from 'react';
+import Image from 'next/image';
 
 const Component = forwardRef<HTMLElement>((props, ref) => {
   return (
@@ -153,6 +153,6 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
   );
 });
 
-Component.displayName = "Component";
+Component.displayName = 'Component';
 
 export default Component;

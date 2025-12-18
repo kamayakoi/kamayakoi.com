@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 interface YangoButtonProps {
   href: string;
@@ -9,9 +9,9 @@ interface YangoButtonProps {
 
 export const YangoButton: React.FC<YangoButtonProps> = ({
   href,
-  altText = "Get a ride with Yango",
-  buttonText = "Yango",
-  className = "",
+  altText = 'Get a ride with Yango',
+  buttonText = 'Yango',
+  className = '',
 }) => {
   return (
     <Link

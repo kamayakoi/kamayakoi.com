@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import { Suspense } from "react";
-import LoadingComponent from "@/components/ui/loader";
+import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import LoadingComponent from '@/components/ui/loader';
 
-import { getAllBlogPosts } from "@/lib/sanity/queries";
-import StoriesContentClient from "./stories-content-client";
+import { getAllBlogPosts } from '@/lib/sanity/queries';
+import StoriesContentClient from './stories-content-client';
 
 interface Story {
   _id: string;
@@ -38,9 +38,9 @@ interface Story {
 }
 
 export const metadata: Metadata = {
-  title: "Stories",
+  title: 'Stories',
   description:
-    "Discover inspiring stories, insights, and narratives from our community",
+    'Discover inspiring stories, insights, and narratives from our community',
 };
 
 async function StoriesContent() {

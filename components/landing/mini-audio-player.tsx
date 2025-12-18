@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import React, { useRef } from "react";
-import { Play, Pause } from "lucide-react";
-import { motion } from "framer-motion";
-import { cn } from "@/lib/actions/utils";
-import Image from "next/image";
-import { useMusic } from "@/lib/contexts/MusicContext";
+import React, { useRef } from 'react';
+import { Play, Pause } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/actions/utils';
+import Image from 'next/image';
+import { useMusic } from '@/lib/contexts/MusicContext';
 
 interface MiniAudioPlayerProps {
   className?: string;
@@ -20,11 +20,11 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
     e.preventDefault();
     e.stopPropagation();
 
-    console.log("🎵 Mini audio player clicked"); // Debug log
+    console.log('🎵 Mini audio player clicked'); // Debug log
 
     // If only one track or no track, double click does nothing special
     if (tracks.length <= 1) {
-      console.log("🎵 Single track - toggling play");
+      console.log('🎵 Single track - toggling play');
       togglePlay();
       return;
     }
@@ -33,12 +33,12 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
       // This is a double click
       clearTimeout(clickTimeout.current);
       clickTimeout.current = null;
-      console.log("🎵 Mini audio player double click: next track");
+      console.log('🎵 Mini audio player double click: next track');
       nextTrack();
     } else {
       // This is a single click
       clickTimeout.current = setTimeout(() => {
-        console.log("🎵 Mini audio player single click: toggle play");
+        console.log('🎵 Mini audio player single click: toggle play');
         togglePlay();
         clickTimeout.current = null;
       }, 250); // 250ms wait for a potential double click
@@ -46,21 +46,21 @@ const MiniAudioPlayer = ({ className }: MiniAudioPlayerProps) => {
   };
 
   if (!tracks || tracks.length === 0 || !currentTrack) {
-    console.log("🎵 Mini audio player: No tracks available");
+    console.log('🎵 Mini audio player: No tracks available');
     return null;
   }
 
   return (
     <motion.div
       className={cn(
-        "relative bg-[#1a1a1a] shadow-2xl border border-gray-800 rounded-sm w-[48px] h-[48px] md:w-[60px] md:h-[60px] overflow-visible cursor-pointer select-none",
-        className,
+        'relative bg-[#1a1a1a] shadow-2xl border border-gray-800 rounded-sm w-[48px] h-[48px] md:w-[60px] md:h-[60px] overflow-visible cursor-pointer select-none',
+        className
       )}
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
       onClick={handleClick}
-      style={{ pointerEvents: "auto" }} // Ensure pointer events are enabled
+      style={{ pointerEvents: 'auto' }} // Ensure pointer events are enabled
     >
       <div className="w-full h-full relative group">
         {currentTrack.coverImageUrl ? (

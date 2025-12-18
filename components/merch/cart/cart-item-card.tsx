@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { MinusIcon, PlusIcon, X } from "lucide-react";
-import Image from "next/image";
-import { useTransition } from "react";
-import { useCart, CartItem } from "./cart-context";
-import { Button } from "@/components/ui/button";
+import { MinusIcon, PlusIcon, X } from 'lucide-react';
+import Image from 'next/image';
+import { useTransition } from 'react';
+import { useCart, CartItem } from './cart-context';
+import { Button } from '@/components/ui/button';
 
 interface CartItemCardProps {
   item: CartItem;
@@ -17,19 +17,19 @@ export function CartItemCard({ item }: CartItemCardProps) {
 
   const { id, quantity, product } = item;
   const image = product.mainImage || product.images?.[0]?.asset?.url;
-  const hasValidImage = image && image.trim() !== "";
+  const hasValidImage = image && image.trim() !== '';
   // const imageWidth = product.images?.[0]?.metadata?.dimensions?.width || 400;
   // const imageHeight = product.images?.[0]?.metadata?.dimensions?.height || 600;
 
   const handleUpdateQuantity = (newQuantity: number) => {
     startTransition(async () => {
-      await updateItem(id, id, newQuantity, "plus");
+      await updateItem(id, id, newQuantity, 'plus');
     });
   };
 
   const handleRemoveItem = () => {
     startTransition(async () => {
-      await updateItem(id, id, 0, "delete");
+      await updateItem(id, id, 0, 'delete');
     });
   };
 
@@ -61,7 +61,7 @@ export function CartItemCard({ item }: CartItemCardProps) {
               {product.name}
             </h3>
             <p className="text-xs text-white/70 mt-1">
-              {product.price.toLocaleString("fr-FR")} F CFA
+              {product.price.toLocaleString('fr-FR')} F CFA
             </p>
           </div>
           <Button
@@ -102,7 +102,7 @@ export function CartItemCard({ item }: CartItemCardProps) {
           </div>
 
           <div className="text-sm font-medium text-white">
-            {(product.price * quantity).toLocaleString("fr-FR")} F CFA
+            {(product.price * quantity).toLocaleString('fr-FR')} F CFA
           </div>
         </div>
       </div>

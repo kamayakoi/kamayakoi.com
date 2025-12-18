@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
-import { Button } from "../ui/button";
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Menu, X } from 'lucide-react';
+import { Button } from '../ui/button';
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
   SheetTitle,
   SheetClose,
-} from "../ui/sheet";
-import styles from "@/lib/styles/header.module.css";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
-import CartModal from "@/components/merch/cart/cart-modal";
-import WishlistModal from "@/components/merch/wishlist/wishlist-modal";
-import MiniAudioPlayer from "@/components/landing/mini-audio-player";
-import { useMusic } from "@/lib/contexts/MusicContext";
+} from '../ui/sheet';
+import styles from '@/lib/styles/header.module.css';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
+import CartModal from '@/components/merch/cart/cart-modal';
+import WishlistModal from '@/components/merch/wishlist/wishlist-modal';
+import MiniAudioPlayer from '@/components/landing/mini-audio-player';
+import { useMusic } from '@/lib/contexts/MusicContext';
 
 interface NavItem {
   nameKey: string;
@@ -37,10 +37,10 @@ export default function Header() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
@@ -49,16 +49,16 @@ export default function Header() {
   };
 
   const navItems: NavItem[] = [
-    { nameKey: "header.nav.home", path: "/" },
-    { nameKey: "header.nav.events", path: "/events" },
-    { nameKey: "header.nav.room", path: "/artists" },
-    { nameKey: "header.nav.blog", path: "/stories" },
-    { nameKey: "header.nav.gallery", path: "/archives" },
-    { nameKey: "header.nav.shop", path: "/merch" },
+    { nameKey: 'header.nav.home', path: '/' },
+    { nameKey: 'header.nav.events', path: '/events' },
+    { nameKey: 'header.nav.room', path: '/artists' },
+    { nameKey: 'header.nav.blog', path: '/stories' },
+    { nameKey: 'header.nav.gallery', path: '/archives' },
+    { nameKey: 'header.nav.shop', path: '/merch' },
   ];
 
   return (
-    <header className={`${styles.header} ${isScrolled ? styles.scrolled : ""}`}>
+    <header className={`${styles.header} ${isScrolled ? styles.scrolled : ''}`}>
       {/* Mini Audio Player - positioned relative to header */}
       {audioPlayerEnabled && (
         <div className="absolute top-[14px] left-[19px] md:top-[12px] md:left-4 z-[60] pointer-events-auto">
@@ -70,7 +70,7 @@ export default function Header() {
         {/* Empty space for both mobile and desktop - adjusted for MiniAudioPlayer */}
         <div
           className="flex items-center"
-          style={{ width: audioPlayerEnabled ? "140px" : "20px" }}
+          style={{ width: audioPlayerEnabled ? '140px' : '20px' }}
         ></div>
 
         <nav className="hidden md:flex items-center gap-6">
@@ -90,7 +90,7 @@ export default function Header() {
                 <Link
                   key={item.path}
                   href={item.path}
-                  className={`${styles.navLink} ${isActive(item.path) ? styles.activeNavLink : ""}`}
+                  className={`${styles.navLink} ${isActive(item.path) ? styles.activeNavLink : ''}`}
                 >
                   {t(currentLanguage, item.nameKey)}
                 </Link>
@@ -100,7 +100,7 @@ export default function Header() {
               <Link
                 key={item.path}
                 href={item.path}
-                className={`${styles.navLink} ${isActive(item.path) ? styles.activeNavLink : ""}`}
+                className={`${styles.navLink} ${isActive(item.path) ? styles.activeNavLink : ''}`}
               >
                 {t(currentLanguage, item.nameKey)}
               </Link>
@@ -124,7 +124,7 @@ export default function Header() {
               >
                 <Menu className="h-5 w-5 text-foreground" />
                 <span className="sr-only">
-                  {t(currentLanguage, "header.mobileMenu.toggle")}
+                  {t(currentLanguage, 'header.mobileMenu.toggle')}
                 </span>
               </Button>
             </SheetTrigger>
@@ -133,7 +133,7 @@ export default function Header() {
               className={`${styles.customSheetContent} bg-background text-foreground h-screen w-screen p-16 duration-200 flex flex-col items-center justify-center`}
             >
               <SheetTitle className="sr-only">
-                {t(currentLanguage, "header.mobileMenu.title")}
+                {t(currentLanguage, 'header.mobileMenu.title')}
               </SheetTitle>
 
               <div className="absolute top-4 right-4">
@@ -145,7 +145,7 @@ export default function Header() {
                   >
                     <X className="h-6 w-6" />
                     <span className="sr-only">
-                      {t(currentLanguage, "header.mobileMenu.close")}
+                      {t(currentLanguage, 'header.mobileMenu.close')}
                     </span>
                   </Button>
                 </SheetClose>
@@ -168,7 +168,7 @@ export default function Header() {
                       <SheetClose asChild key={item.path}>
                         <Link
                           href={item.path}
-                          className={`${styles.mobileNavLink} ${isActive(item.path) ? styles.activeMobileNavLink : ""} text-3xl font-semibold text-white hover:text-gray-400 border-none`}
+                          className={`${styles.mobileNavLink} ${isActive(item.path) ? styles.activeMobileNavLink : ''} text-3xl font-semibold text-white hover:text-gray-400 border-none`}
                         >
                           {t(currentLanguage, item.nameKey)}
                         </Link>
@@ -179,7 +179,7 @@ export default function Header() {
                     <SheetClose asChild key={item.path}>
                       <Link
                         href={item.path}
-                        className={`${styles.mobileNavLink} ${isActive(item.path) ? styles.activeMobileNavLink : ""} text-3xl font-semibold text-white hover:text-gray-400 border-none`}
+                        className={`${styles.mobileNavLink} ${isActive(item.path) ? styles.activeMobileNavLink : ''} text-3xl font-semibold text-white hover:text-gray-400 border-none`}
                       >
                         {t(currentLanguage, item.nameKey)}
                       </Link>

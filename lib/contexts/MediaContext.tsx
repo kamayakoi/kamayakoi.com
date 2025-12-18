@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
   createContext,
@@ -7,8 +7,8 @@ import React, {
   useEffect,
   ReactNode,
   useCallback,
-} from "react";
-import { useMusic } from "./MusicContext";
+} from 'react';
+import { useMusic } from './MusicContext';
 
 interface MediaContextType {
   activeVideoIndex: number | null;
@@ -23,10 +23,10 @@ interface MediaContextType {
     slug: string,
     currentTime: number,
     muted: boolean,
-    wasPlaying: boolean,
+    wasPlaying: boolean
   ) => void;
   getVideoState: (
-    slug: string,
+    slug: string
   ) => { currentTime: number; muted: boolean; wasPlaying: boolean } | null;
 }
 
@@ -67,9 +67,9 @@ export function MediaProvider({ children }: MediaProviderProps) {
       slug: string,
       currentTime: number,
       muted: boolean,
-      wasPlaying: boolean,
+      wasPlaying: boolean
     ) => {
-      setVideoStates((prev) => ({
+      setVideoStates(prev => ({
         ...prev,
         [slug]: { currentTime, muted, wasPlaying },
       }));
@@ -83,14 +83,14 @@ export function MediaProvider({ children }: MediaProviderProps) {
               currentTime,
               muted,
               wasPlaying,
-            }),
+            })
           );
         } catch {
           // Ignore localStorage errors
         }
       }, 1000);
     },
-    [],
+    []
   );
 
   const getVideoState = useCallback(
@@ -112,7 +112,7 @@ export function MediaProvider({ children }: MediaProviderProps) {
 
       return null;
     },
-    [videoStates],
+    [videoStates]
   );
 
   const value: MediaContextType = {
@@ -133,7 +133,7 @@ export function MediaProvider({ children }: MediaProviderProps) {
 export function useMedia() {
   const context = useContext(MediaContext);
   if (context === undefined) {
-    throw new Error("useMedia must be used within a MediaProvider");
+    throw new Error('useMedia must be used within a MediaProvider');
   }
   return context;
 }

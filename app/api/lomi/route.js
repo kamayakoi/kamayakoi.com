@@ -1,40 +1,40 @@
-import { createClient } from "@supabase/supabase-js";
-import crypto from "crypto";
-import { Buffer } from "node:buffer";
+import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
+import { Buffer } from 'node:buffer';
 
 // --- Helper: Verify Lomi Webhook Signature ---
 async function verifyLomiWebhook(rawBody, signatureHeader, webhookSecret) {
   if (!signatureHeader) {
-    throw new Error("Missing Lomi signature header (X-Lomi-Signature).");
+    throw new Error('Missing Lomi signature header (X-Lomi-Signature).');
   }
   if (!webhookSecret) {
-    console.error("LOMI_WEBHOOK_SECRET is not set. Cannot verify webhook.");
-    throw new Error("Webhook secret not configured internally.");
+    console.error('LOMI_WEBHOOK_SECRET is not set. Cannot verify webhook.');
+    throw new Error('Webhook secret not configured internally.');
   }
   const expectedSignature = crypto
-    .createHmac("sha256", webhookSecret)
+    .createHmac('sha256', webhookSecret)
     .update(rawBody)
-    .digest("hex");
+    .digest('hex');
   const sigBuffer = Buffer.from(signatureHeader);
   const expectedSigBuffer = Buffer.from(expectedSignature);
   if (
     sigBuffer.length !== expectedSigBuffer.length ||
     !crypto.timingSafeEqual(sigBuffer, expectedSigBuffer)
   ) {
-    throw new Error("Lomi webhook signature mismatch.");
+    throw new Error('Lomi webhook signature mismatch.');
   }
-  return JSON.parse(rawBody.toString("utf8"));
+  return JSON.parse(rawBody.toString('utf8'));
 }
 
 // --- POST Handler for App Router ---
 export async function POST(request) {
   console.log(
-    "🚀 Events Webhook: Received request at",
-    new Date().toISOString(),
+    '🚀 Events Webhook: Received request at',
+    new Date().toISOString()
   );
   console.log(
-    "📧 Request headers:",
-    Object.fromEntries(request.headers.entries()),
+    '📧 Request headers:',
+    Object.fromEntries(request.headers.entries())
   );
 
   // --- Environment Variables (moved inside function) ---
@@ -42,28 +42,28 @@ export async function POST(request) {
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const lomiWebhookSecret = process.env.LOMI_WEBHOOK_SECRET;
 
-  console.log("🔧 Environment check:");
+  console.log('🔧 Environment check:');
   console.log(
-    `  - NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? "✅ Set" : "❌ Missing"}`,
+    `  - NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? '✅ Set' : '❌ Missing'}`
   );
   console.log(
-    `  - SUPABASE_SERVICE_ROLE_KEY: ${supabaseServiceKey ? "✅ Set" : "❌ Missing"}`,
+    `  - SUPABASE_SERVICE_ROLE_KEY: ${supabaseServiceKey ? '✅ Set' : '❌ Missing'}`
   );
   console.log(
-    `  - LOMI_WEBHOOK_SECRET: ${lomiWebhookSecret ? "✅ Set" : "❌ Missing"}`,
+    `  - LOMI_WEBHOOK_SECRET: ${lomiWebhookSecret ? '✅ Set' : '❌ Missing'}`
   );
 
   // Check for required environment variables
   if (!supabaseUrl || !supabaseServiceKey || !lomiWebhookSecret) {
     console.error(
-      "Events Webhook: Missing critical environment variables. Check NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, LOMI_WEBHOOK_SECRET.",
+      'Events Webhook: Missing critical environment variables. Check NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, LOMI_WEBHOOK_SECRET.'
     );
     return new Response(
-      JSON.stringify({ error: "Missing required environment variables" }),
+      JSON.stringify({ error: 'Missing required environment variables' }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
+        headers: { 'Content-Type': 'application/json' },
+      }
     );
   }
 
@@ -77,40 +77,40 @@ export async function POST(request) {
   try {
     rawBody = await request.text();
   } catch (bodyError) {
-    console.error("Events Webhook: Error reading request body:", bodyError);
+    console.error('Events Webhook: Error reading request body:', bodyError);
     return new Response(
-      JSON.stringify({ error: "Failed to read request body" }),
+      JSON.stringify({ error: 'Failed to read request body' }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
+        headers: { 'Content-Type': 'application/json' },
+      }
     );
   }
 
-  const signature = request.headers.get("x-lomi-signature");
+  const signature = request.headers.get('x-lomi-signature');
   let eventPayload;
 
   try {
     eventPayload = await verifyLomiWebhook(
       rawBody,
       signature,
-      lomiWebhookSecret,
+      lomiWebhookSecret
     );
     console.log(
-      "Events Webhook: Lomi event verified:",
-      eventPayload?.event || "Event type missing",
+      'Events Webhook: Lomi event verified:',
+      eventPayload?.event || 'Event type missing'
     );
   } catch (err) {
     console.error(
-      "Events Webhook: Lomi signature verification failed:",
-      err.message,
+      'Events Webhook: Lomi signature verification failed:',
+      err.message
     );
     return new Response(
       JSON.stringify({ error: `Webhook verification failed: ${err.message}` }),
       {
         status: 400,
-        headers: { "Content-Type": "application/json" },
-      },
+        headers: { 'Content-Type': 'application/json' },
+      }
     );
   }
 
@@ -121,22 +121,22 @@ export async function POST(request) {
 
     if (!lomiEventType || !eventData) {
       console.warn(
-        "Events Webhook: Event type or data missing in Lomi payload.",
-        eventPayload,
+        'Events Webhook: Event type or data missing in Lomi payload.',
+        eventPayload
       );
       return new Response(
-        JSON.stringify({ error: "Event type or data missing." }),
+        JSON.stringify({ error: 'Event type or data missing.' }),
         {
           status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+          headers: { 'Content-Type': 'application/json' },
+        }
       );
     }
 
-    console.log("Events Webhook: Received Lomi event type:", lomiEventType);
+    console.log('Events Webhook: Received Lomi event type:', lomiEventType);
     console.log(
-      "Events Webhook: Full event payload:",
-      JSON.stringify(eventPayload, null, 2),
+      'Events Webhook: Full event payload:',
+      JSON.stringify(eventPayload, null, 2)
     );
 
     const isMerchPurchase = eventData.metadata?.is_cart_checkout === true;
@@ -147,7 +147,7 @@ export async function POST(request) {
 
     let purchaseIds = [];
     if (purchaseIdsRaw) {
-      purchaseIds = purchaseIdsRaw.split(",");
+      purchaseIds = purchaseIdsRaw.split(',');
     } else if (purchaseId) {
       purchaseIds = [purchaseId];
     }
@@ -158,72 +158,78 @@ export async function POST(request) {
     // For PAYMENT_SUCCEEDED events from lomi, checkout_session_id is a direct field
     const lomiCheckoutSessionId = String(
       eventData.checkout_session_id ||
-      eventData.metadata?.checkout_session_id ||
-      eventData.metadata?.linkId ||
-      eventData.id ||
-      ''
+        eventData.metadata?.checkout_session_id ||
+        eventData.metadata?.linkId ||
+        eventData.id ||
+        ''
     );
 
     // Debug logging for RPC params
     console.log('Events Webhook: RPC params debug:', {
       lomiCheckoutSessionId,
-      checkoutSessionIdSource: eventData.checkout_session_id ? 'direct' :
-        eventData.metadata?.checkout_session_id ? 'metadata.checkout_session_id' :
-          eventData.metadata?.linkId ? 'metadata.linkId' : 'eventData.id',
+      checkoutSessionIdSource: eventData.checkout_session_id
+        ? 'direct'
+        : eventData.metadata?.checkout_session_id
+          ? 'metadata.checkout_session_id'
+          : eventData.metadata?.linkId
+            ? 'metadata.linkId'
+            : 'eventData.id',
     });
 
     // Amount: lomi sends gross_amount from the transactions table
-    const amount = parseFloat(eventData.gross_amount || eventData.amount || eventData.net_amount || '0');
+    const amount = parseFloat(
+      eventData.gross_amount || eventData.amount || eventData.net_amount || '0'
+    );
 
     // Currency: lomi sends currency_code from the transactions table
     const currency = eventData.currency_code || eventData.currency || 'XOF';
 
     if (purchaseIds.length === 0) {
       console.error(
-        "Events Webhook Error: Missing internal_purchase_id(s) in Lomi webhook metadata.",
-        { lomiEventData: eventData },
+        'Events Webhook Error: Missing internal_purchase_id(s) in Lomi webhook metadata.',
+        { lomiEventData: eventData }
       );
       return new Response(
         JSON.stringify({
-          error: "Missing internal_purchase_id(s) in Lomi webhook metadata.",
+          error: 'Missing internal_purchase_id(s) in Lomi webhook metadata.',
         }),
         {
           status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+          headers: { 'Content-Type': 'application/json' },
+        }
       );
     }
 
-    let paymentStatusForDb = "unknown";
-    if (lomiEventType === "CHECKOUT_COMPLETED") {
+    let paymentStatusForDb = 'unknown';
+    if (lomiEventType === 'CHECKOUT_COMPLETED') {
       // Check if checkout_session.status is 'paid' or similar if Lomi provides it.
       // For now, assuming completion means payment for simplicity, adjust if Lomi has distinct paid status on checkout object.
-      paymentStatusForDb = "paid"; // Or derive from eventData.status if available
-    } else if (lomiEventType === "PAYMENT_SUCCEEDED") {
-      paymentStatusForDb = "paid";
-    } else if (lomiEventType === "PAYMENT_FAILED") {
-      paymentStatusForDb = "payment_failed";
+      paymentStatusForDb = 'paid'; // Or derive from eventData.status if available
+    } else if (lomiEventType === 'PAYMENT_SUCCEEDED') {
+      paymentStatusForDb = 'paid';
+    } else if (lomiEventType === 'PAYMENT_FAILED') {
+      paymentStatusForDb = 'payment_failed';
     } else {
       console.log(
-        "Events Webhook: Lomi event type not handled for direct payment status update:",
-        lomiEventType,
+        'Events Webhook: Lomi event type not handled for direct payment status update:',
+        lomiEventType
       );
       return new Response(
         JSON.stringify({
           received: true,
-          message: "Webhook event type not handled for payment update.",
+          message: 'Webhook event type not handled for payment update.',
         }),
         {
           status: 200,
-          headers: { "Content-Type": "application/json" },
-        },
+          headers: { 'Content-Type': 'application/json' },
+        }
       );
     }
 
     // 1. Record Payment Outcome for each purchase
     for (const pId of purchaseIds) {
       const { error: rpcError } = await supabase.rpc(
-        "record_event_lomi_payment",
+        'record_event_lomi_payment',
         {
           p_purchase_id: pId,
           p_lomi_payment_id: lomiTransactionId,
@@ -232,36 +238,36 @@ export async function POST(request) {
           p_lomi_event_payload: eventPayload,
           p_amount_paid: amount, // This is the total amount for the whole cart
           p_currency_paid: currency,
-        },
+        }
       );
 
       if (rpcError) {
         console.error(
           `Events Webhook Error: Failed to call record_event_lomi_payment RPC for purchase ${pId}:`,
-          rpcError,
+          rpcError
         );
         // Log error but continue to ensure we attempt to process all purchase records
       } else {
         console.log(
-          `Events Webhook: Payment for purchase ${pId} (status: ${paymentStatusForDb}) processed.`,
+          `Events Webhook: Payment for purchase ${pId} (status: ${paymentStatusForDb}) processed.`
         );
       }
     }
 
     // Only proceed to email dispatch if payment was successful
-    if (paymentStatusForDb === "paid") {
+    if (paymentStatusForDb === 'paid') {
       if (isMerchPurchase) {
         // --- MERCHANDISE EMAIL ---
         console.log(
-          `🛒 Events Webhook: Triggering send-merch-receipt-email for purchases ${purchaseIds.join(", ")}`,
+          `🛒 Events Webhook: Triggering send-merch-receipt-email for purchases ${purchaseIds.join(', ')}`
         );
         try {
           const functionUrl = `${supabaseUrl}/functions/v1/send-merch-receipt-email`;
           const emailResponse = await fetch(functionUrl, {
-            method: "POST",
+            method: 'POST',
             headers: {
               Authorization: `Bearer ${supabaseServiceKey}`,
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({ purchase_ids: purchaseIds }),
           });
@@ -271,53 +277,53 @@ export async function POST(request) {
           if (!emailResponse.ok) {
             console.error(
               `❌ Events Webhook: Error triggering send-merch-receipt-email:`,
-              { status: emailResponse.status, body: emailResult },
+              { status: emailResponse.status, body: emailResult }
             );
           } else {
             console.log(
               `✅ Events Webhook: Successfully triggered send-merch-receipt-email:`,
-              emailResult,
+              emailResult
             );
           }
         } catch (functionError) {
           console.error(
             `❌ Events Webhook: Exception calling send-merch-receipt-email:`,
-            functionError,
+            functionError
           );
         }
       } else {
         // --- TICKET EMAIL (existing logic) ---
         // 2. Prepare for Email Dispatch
         const { error: prepError } = await supabase.rpc(
-          "prepare_purchase_for_email_dispatch",
+          'prepare_purchase_for_email_dispatch',
           {
             p_purchase_id: purchaseIds[0], // Ticket logic assumes one ID
-          },
+          }
         );
 
         if (prepError) {
           console.error(
             `Events Webhook Warning: Failed to prepare purchase ${purchaseIds[0]} for email dispatch:`,
-            prepError,
+            prepError
           );
           // Log and continue, as payment is recorded. Email might need manual retry or investigation.
         } else {
           console.log(
-            `Events Webhook: Purchase ${purchaseIds[0]} prepared for email dispatch.`,
+            `Events Webhook: Purchase ${purchaseIds[0]} prepared for email dispatch.`
           );
 
           // 3. Trigger Send Ticket Email Function via direct HTTP call
           console.log(
-            `📧 Events Webhook: Triggering send-ticket-email for ${purchaseIds[0]} via HTTP call`,
+            `📧 Events Webhook: Triggering send-ticket-email for ${purchaseIds[0]} via HTTP call`
           );
           try {
             const functionUrl = `${supabaseUrl}/functions/v1/send-ticket-email`;
 
             const emailResponse = await fetch(functionUrl, {
-              method: "POST",
+              method: 'POST',
               headers: {
                 Authorization: `Bearer ${supabaseServiceKey}`,
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
               },
               body: JSON.stringify({ purchase_id: purchaseIds[0] }),
             });
@@ -331,32 +337,32 @@ export async function POST(request) {
                   status: emailResponse.status,
                   statusText: emailResponse.statusText,
                   response: emailResult,
-                },
+                }
               );
 
               // Try to update purchase status to indicate email dispatch failed
               try {
-                await supabase.rpc("update_email_dispatch_status", {
+                await supabase.rpc('update_email_dispatch_status', {
                   p_purchase_id: purchaseIds[0],
-                  p_email_dispatch_status: "DISPATCH_FAILED",
+                  p_email_dispatch_status: 'DISPATCH_FAILED',
                   p_email_dispatch_error: `HTTP call failed: ${emailResponse.status} - ${emailResult}`,
                 });
               } catch (updateError) {
                 console.error(
                   `❌ Failed to update email dispatch status after HTTP error:`,
-                  updateError,
+                  updateError
                 );
               }
             } else {
               console.log(
                 `✅ Events Webhook: Successfully triggered send-ticket-email for ${purchaseIds[0]}:`,
-                emailResult,
+                emailResult
               );
             }
           } catch (functionError) {
             console.error(
               `❌ Events Webhook: Exception calling send-ticket-email for ${purchaseIds[0]}:`,
-              functionError,
+              functionError
             );
             // Log additional context about the error
             console.error(`❌ Function Error Details:`, {
@@ -367,15 +373,15 @@ export async function POST(request) {
 
             // Try to update purchase status to indicate email dispatch failed
             try {
-              await supabase.rpc("update_email_dispatch_status", {
+              await supabase.rpc('update_email_dispatch_status', {
                 p_purchase_id: purchaseIds[0],
-                p_email_dispatch_status: "DISPATCH_FAILED",
+                p_email_dispatch_status: 'DISPATCH_FAILED',
                 p_email_dispatch_error: `Function invocation error: ${functionError.message}`,
               });
             } catch (updateError) {
               console.error(
                 `❌ Failed to update email dispatch status after function error:`,
-                updateError,
+                updateError
               );
             }
           }
@@ -384,25 +390,25 @@ export async function POST(request) {
     }
 
     return new Response(
-      JSON.stringify({ received: true, message: "Webhook processed." }),
+      JSON.stringify({ received: true, message: 'Webhook processed.' }),
       {
         status: 200,
-        headers: { "Content-Type": "application/json" },
-      },
+        headers: { 'Content-Type': 'application/json' },
+      }
     );
   } catch (error) {
     console.error(
-      "Events Webhook - Uncaught error during event processing:",
-      error,
+      'Events Webhook - Uncaught error during event processing:',
+      error
     );
     return new Response(
       JSON.stringify({
-        error: "Internal server error processing webhook event.",
+        error: 'Internal server error processing webhook event.',
       }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
+        headers: { 'Content-Type': 'application/json' },
+      }
     );
   }
 }

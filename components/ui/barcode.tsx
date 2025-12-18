@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
+import { useEffect, useRef } from 'react';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
 
 export default function Barcode() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -12,7 +12,7 @@ export default function Barcode() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     // Set canvas dimensions
@@ -24,7 +24,7 @@ export default function Barcode() {
     // ctx.fillRect(0, 0, canvas.width, canvas.height)
 
     // Draw barcode with a lighter grey color
-    ctx.fillStyle = "hsl(0, 0%, 70%)"; // Changed from white to grey
+    ctx.fillStyle = 'hsl(0, 0%, 70%)'; // Changed from white to grey
 
     // Generate random barcode pattern
     let x = 0;
@@ -56,7 +56,7 @@ export default function Barcode() {
         rel="noopener noreferrer"
         className="absolute -bottom-6 right-0 text-xs text-white font-mono hover:underline"
       >
-        {t(currentLanguage, "barcode.opensource")}
+        {t(currentLanguage, 'barcode.opensource')}
       </a>
     </div>
   );

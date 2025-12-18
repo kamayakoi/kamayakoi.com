@@ -1,6 +1,6 @@
-import { cn } from "@/lib/actions/utils";
-import { ResultsCount } from "./results-count";
-import { SortDropdown } from "./sort-dropdown";
+import { cn } from '@/lib/actions/utils';
+import { ResultsCount } from './results-count';
+import { SortDropdown } from './sort-dropdown';
 
 interface ResultsControlsProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -15,8 +15,8 @@ export default function ResultsControls({
   return (
     <div
       className={cn(
-        "grid grid-cols-3 items-center mb-1 w-full px-4 md:px-6",
-        className,
+        'grid grid-cols-3 items-center mb-1 w-full px-4 md:px-6',
+        className
       )}
     >
       {/* Breadcrumb - can be added later */}

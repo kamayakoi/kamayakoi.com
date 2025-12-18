@@ -1,22 +1,22 @@
-import React, { Suspense } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Heart } from "lucide-react";
-import { useCart } from "./cart/cart-context";
-import { useWishlist } from "./wishlist/wishlist-context";
-import { SanityProduct } from "./types";
+import React, { Suspense } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Heart } from 'lucide-react';
+import { useCart } from './cart/cart-context';
+import { useWishlist } from './wishlist/wishlist-context';
+import { SanityProduct } from './types';
 
 function ProductCardContent({ product }: { product: SanityProduct }) {
   const { addItem } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const slug =
-    typeof product.slug === "string"
+    typeof product.slug === 'string'
       ? product.slug
-      : product.slug?.current || "";
+      : product.slug?.current || '';
   const mainImage = product.mainImage || product.images?.[0]?.asset?.url;
-  const hasValidImage = mainImage && mainImage.trim() !== "";
+  const hasValidImage = mainImage && mainImage.trim() !== '';
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
 
   // Format price with non-breaking space instead of comma
   const formatPrice = (price: number): string => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0');
   };
 
   return (
@@ -48,12 +48,12 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
           className="absolute top-2 right-2 z-10 cursor-pointer p-1.5 rounded-sm bg-black/10 hover:bg-black/20 text-white/70 hover:text-white transition-all"
           aria-label={
             isInWishlist(product._id)
-              ? "Remove from wishlist"
-              : "Add to wishlist"
+              ? 'Remove from wishlist'
+              : 'Add to wishlist'
           }
         >
           <Heart
-            className={`h-6 w-6 ${isInWishlist(product._id) ? "fill-red-500 text-red-500" : ""}`}
+            className={`h-6 w-6 ${isInWishlist(product._id) ? 'fill-red-500 text-red-500' : ''}`}
           />
         </div>
 
@@ -74,7 +74,7 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
                 quality={100}
                 placeholder={
                   product.images?.[0]?.asset?.metadata?.lqip
-                    ? "blur"
+                    ? 'blur'
                     : undefined
                 }
                 blurDataURL={product.images?.[0]?.asset?.metadata?.lqip}

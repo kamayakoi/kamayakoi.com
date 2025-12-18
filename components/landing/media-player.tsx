@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useRef } from "react";
-import { Play, Pause, Volume2, VolumeX, ExternalLink } from "lucide-react";
-import Image from "next/image";
-import { MediaItem } from "@/lib/sanity/queries";
+import { useState, useRef } from 'react';
+import { Play, Pause, Volume2, VolumeX, ExternalLink } from 'lucide-react';
+import Image from 'next/image';
+import { MediaItem } from '@/lib/sanity/queries';
 
 interface MediaPlayerProps {
   media: MediaItem;
@@ -48,7 +48,7 @@ export function MediaPlayer({ media, onPlay, onPause }: MediaPlayerProps) {
 
     // For direct audio/video URLs
     if (
-      (media.type === "audio_url" || media.type === "video_url") &&
+      (media.type === 'audio_url' || media.type === 'video_url') &&
       audioRef.current
     ) {
       audioRef.current.play().catch(() => {
@@ -76,19 +76,19 @@ export function MediaPlayer({ media, onPlay, onPause }: MediaPlayerProps) {
 
   const getEmbedUrl = () => {
     switch (media.type) {
-      case "youtube": {
+      case 'youtube': {
         const videoId = getYouTubeVideoId(media.url);
         return videoId
-          ? `https://www.youtube.com/embed/${videoId}?autoplay=${isPlaying ? 1 : 0}&mute=${isMuted ? 1 : 0}&enablejsapi=1&origin=${typeof window !== "undefined" ? window.location.origin : ""}`
+          ? `https://www.youtube.com/embed/${videoId}?autoplay=${isPlaying ? 1 : 0}&mute=${isMuted ? 1 : 0}&enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`
           : null;
       }
-      case "soundcloud": {
+      case 'soundcloud': {
         const trackId = getSoundCloudTrackId(media.url);
         return trackId
           ? `https://w.soundcloud.com/player/?url=https://soundcloud.com/${trackId}&auto_play=${isPlaying}&hide_related=true&show_comments=false&show_user=true&show_reposts=false&visual=true`
           : null;
       }
-      case "soundcloud_playlist": {
+      case 'soundcloud_playlist': {
         const trackId = getSoundCloudTrackId(media.url);
         return trackId
           ? `https://w.soundcloud.com/player/?url=https://soundcloud.com/${trackId}/sets&auto_play=${isPlaying}&hide_related=true&show_comments=false&show_user=true&show_reposts=false&visual=true`
@@ -123,7 +123,7 @@ export function MediaPlayer({ media, onPlay, onPause }: MediaPlayerProps) {
               fill={true}
               className="object-cover"
             />
-            {(media.type === "audio_url" || media.type === "video_url") && (
+            {(media.type === 'audio_url' || media.type === 'video_url') && (
               <>
                 <audio
                   ref={audioRef}
@@ -179,11 +179,11 @@ export function MediaPlayer({ media, onPlay, onPause }: MediaPlayerProps) {
 
           {/* Controls */}
           <div className="flex items-center gap-2 ml-4">
-            {(media.type === "audio_url" || media.type === "video_url") && (
+            {(media.type === 'audio_url' || media.type === 'video_url') && (
               <button
                 onClick={toggleMute}
                 className="p-2 text-white/70 hover:text-white transition-colors"
-                title={isMuted ? "Unmute" : "Mute"}
+                title={isMuted ? 'Unmute' : 'Mute'}
               >
                 {isMuted ? (
                   <VolumeX className="w-4 h-4" />

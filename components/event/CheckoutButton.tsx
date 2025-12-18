@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import PurchaseFormModal from "@/components/event/PurchaseFormModal";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Ticket } from "lucide-react";
-import { t } from "@/lib/i18n/translations";
-import Link from "next/link";
+import { useState } from 'react';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import PurchaseFormModal from '@/components/event/PurchaseFormModal';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Ticket } from 'lucide-react';
+import { t } from '@/lib/i18n/translations';
+import Link from 'next/link';
 
 export interface CheckoutItemData {
   id: string;
@@ -58,13 +58,13 @@ if (supabaseUrl && supabaseAnonKey) {
     supabase = createClient(supabaseUrl, supabaseAnonKey);
   } catch (error) {
     console.error(
-      "Failed to initialize Supabase client in CheckoutButton:",
-      error,
+      'Failed to initialize Supabase client in CheckoutButton:',
+      error
     );
   }
 } else {
   console.warn(
-    "Supabase URL or Anon Key is missing from .env. API checkout (modal) will be disabled if these are not set.",
+    'Supabase URL or Anon Key is missing from .env. API checkout (modal) will be disabled if these are not set.'
   );
 }
 
@@ -75,31 +75,31 @@ const getItemAvailabilityStatus = (
     salesStart?: string | null;
     salesEnd?: string | null;
   },
-  currentLanguage: string,
+  currentLanguage: string
 ): { available: boolean; reason: string } => {
-  if (typeof item.active === "boolean" && !item.active) {
+  if (typeof item.active === 'boolean' && !item.active) {
     return {
       available: false,
-      reason: t(currentLanguage, "eventSlugPage.availability.inactive"),
+      reason: t(currentLanguage, 'eventSlugPage.availability.inactive'),
     };
   }
 
-  if (typeof item.stock === "number" && item.stock <= 0) {
+  if (typeof item.stock === 'number' && item.stock <= 0) {
     return {
       available: false,
-      reason: t(currentLanguage, "eventSlugPage.availability.soldOut"),
+      reason: t(currentLanguage, 'eventSlugPage.availability.soldOut'),
     };
   }
   const now = new Date();
   if (item.salesStart && now < new Date(item.salesStart)) {
-    const startDate = new Date(item.salesStart).toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
+    const startDate = new Date(item.salesStart).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
     });
     return {
       available: false,
-      reason: t(currentLanguage, "eventSlugPage.availability.salesStart", {
+      reason: t(currentLanguage, 'eventSlugPage.availability.salesStart', {
         startDate,
       }),
     };
@@ -107,10 +107,10 @@ const getItemAvailabilityStatus = (
   if (item.salesEnd && now > new Date(item.salesEnd)) {
     return {
       available: false,
-      reason: t(currentLanguage, "eventSlugPage.availability.salesEnded"),
+      reason: t(currentLanguage, 'eventSlugPage.availability.salesEnded'),
     };
   }
-  return { available: true, reason: "" };
+  return { available: true, reason: '' };
 };
 
 export default function CheckoutButton({
@@ -128,16 +128,16 @@ export default function CheckoutButton({
       salesStart: item.salesStart,
       salesEnd: item.salesEnd,
     },
-    currentLanguage,
+    currentLanguage
   );
 
   const useDirectPaymentLink = !!item.paymentLink;
 
   const handleOpenPurchaseModal = () => {
     if (!supabase) {
-      alert(t(currentLanguage, "eventSlugPage.errors.supabaseNotInitialized"));
+      alert(t(currentLanguage, 'eventSlugPage.errors.supabaseNotInitialized'));
       console.error(
-        "Supabase client not initialized. Cannot open purchase modal.",
+        'Supabase client not initialized. Cannot open purchase modal.'
       );
       return;
     }
@@ -168,18 +168,18 @@ export default function CheckoutButton({
             rel="noopener noreferrer"
           >
             <Ticket className="mr-2 h-4 w-4" />
-            {t(currentLanguage, "eventSlugPage.tickets.buyNow")}
+            {t(currentLanguage, 'eventSlugPage.tickets.buyNow')}
           </Link>
         </Button>
       );
     } else if (supabase) {
       const isBundle = item.isBundle;
       const buttonText = isBundle
-        ? t(currentLanguage, "eventSlugPage.tickets.buyNow")
-        : t(currentLanguage, "eventSlugPage.tickets.getETicket");
+        ? t(currentLanguage, 'eventSlugPage.tickets.buyNow')
+        : t(currentLanguage, 'eventSlugPage.tickets.getETicket');
       const buttonClassName = isBundle
-        ? "sm:w-auto bg-orange-600 hover:bg-orange-700 text-white rounded-sm font-medium h-10 px-6 uppercase w-full md:w-auto justify-center"
-        : "sm:w-auto bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700 rounded-sm font-medium h-10 px-6 uppercase w-full md:w-auto justify-center";
+        ? 'sm:w-auto bg-orange-600 hover:bg-orange-700 text-white rounded-sm font-medium h-10 px-6 uppercase w-full md:w-auto justify-center'
+        : 'sm:w-auto bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700 rounded-sm font-medium h-10 px-6 uppercase w-full md:w-auto justify-center';
       return (
         <>
           <Button onClick={handleOpenPurchaseModal} className={buttonClassName}>
@@ -209,7 +209,7 @@ export default function CheckoutButton({
           variant="outline"
           className="text-sm sm:w-auto justify-center py-2 px-3 border-slate-600 text-slate-400 rounded-sm h-10 inline-flex items-center"
         >
-          {t(currentLanguage, "eventSlugPage.availability.misconfigured")}
+          {t(currentLanguage, 'eventSlugPage.availability.misconfigured')}
         </Badge>
       );
     }
@@ -217,26 +217,26 @@ export default function CheckoutButton({
     // Determine the styling based on the type of unavailability
     const isComingSoon =
       item.salesStart && new Date() < new Date(item.salesStart);
-    const isSoldOut = typeof item.stock === "number" && item.stock <= 0;
+    const isSoldOut = typeof item.stock === 'number' && item.stock <= 0;
 
     let badgeStyles =
-      "text-sm sm:w-auto justify-center py-2 px-4 rounded-sm h-10 inline-flex items-center font-medium w-full md:w-auto uppercase";
+      'text-sm sm:w-auto justify-center py-2 px-4 rounded-sm h-10 inline-flex items-center font-medium w-full md:w-auto uppercase';
 
     if (isComingSoon) {
       badgeStyles +=
-        " bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300";
+        ' bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300';
     } else if (isSoldOut) {
       badgeStyles +=
-        " bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300";
+        ' bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300';
     } else {
       badgeStyles +=
-        " bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400";
+        ' bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400';
     }
 
     return (
       <Badge variant="outline" className={badgeStyles}>
         {availabilityStatus.reason ||
-          t(currentLanguage, "eventSlugPage.availability.unavailable")}
+          t(currentLanguage, 'eventSlugPage.availability.unavailable')}
       </Badge>
     );
   }

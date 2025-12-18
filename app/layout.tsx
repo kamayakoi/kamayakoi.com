@@ -1,26 +1,26 @@
-import type React from "react";
-import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
-import { Analytics } from "@vercel/analytics/react";
-import { TranslationProvider } from "@/lib/contexts/TranslationContext";
-import { MediaProvider } from "@/lib/contexts/MediaContext";
-import MusicWrapper from "@/components/landing/music-wrapper";
-import { CartProvider } from "@/components/merch/cart/cart-context";
-import { WishlistProvider } from "@/components/merch/wishlist/wishlist-context";
-import { getHomepageMusicTracks } from "@/lib/sanity/queries";
+import type React from 'react';
+import type { Metadata } from 'next';
+import { Geist_Mono } from 'next/font/google';
+import './globals.css';
+import { Toaster } from '@/components/ui/sonner';
+import { Analytics } from '@vercel/analytics/react';
+import { TranslationProvider } from '@/lib/contexts/TranslationContext';
+import { MediaProvider } from '@/lib/contexts/MediaContext';
+import MusicWrapper from '@/components/landing/music-wrapper';
+import { CartProvider } from '@/components/merch/cart/cart-context';
+import { WishlistProvider } from '@/components/merch/wishlist/wishlist-context';
+import { getHomepageMusicTracks } from '@/lib/sanity/queries';
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 const siteConfig = {
-  name: "Kamayakoi",
-  description: "Abidjan Techno Gang",
-  url: "https://kamayakoi.com",
-  ogImage: "/banner.webp",
+  name: 'Kamayakoi',
+  description: 'Abidjan Techno Gang',
+  url: 'https://kamayakoi.com',
+  ogImage: '/banner.webp',
 };
 
 export const metadata: Metadata = {
@@ -31,30 +31,30 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   keywords: [
-    "techno",
-    "electronic music",
-    "Abidjan",
+    'techno',
+    'electronic music',
+    'Abidjan',
     "Côte d'Ivoire",
-    "underground music",
-    "techno collective",
-    "African techno",
-    "electronic music events",
-    "Abidjan nightlife",
-    "techno parties",
-    "music collective",
+    'underground music',
+    'techno collective',
+    'African techno',
+    'electronic music events',
+    'Abidjan nightlife',
+    'techno parties',
+    'music collective',
   ],
-  authors: [{ name: "Kamayakoi" }],
-  creator: "Kamayakoi",
-  publisher: "Kamayakoi",
+  authors: [{ name: 'Kamayakoi' }],
+  creator: 'Kamayakoi',
+  publisher: 'Kamayakoi',
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/icon.png",
-    apple: "/icon.png",
+    icon: '/favicon.ico',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
   },
   robots: {
     index: true,
@@ -64,9 +64,9 @@ export const metadata: Metadata = {
       index: true,
       follow: true,
       noimageindex: false,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
     },
   },
   openGraph: {
@@ -80,24 +80,24 @@ export const metadata: Metadata = {
         width: 1200,
         height: 630,
         alt: `${siteConfig.name} - ${siteConfig.description}`,
-        type: "image/webp",
+        type: 'image/webp',
       },
     ],
-    locale: "en_US",
-    type: "website",
+    locale: 'en_US',
+    type: 'website',
   },
   twitter: {
-    card: "summary_large_image",
+    card: 'summary_large_image',
     title: siteConfig.name,
     description: siteConfig.description,
     images: [siteConfig.ogImage],
-    creator: "@kamayakoi",
-    site: "https://www.kamayakoi.com",
+    creator: '@kamayakoi',
+    site: 'https://www.kamayakoi.com',
   },
   alternates: {
     canonical: siteConfig.url,
   },
-  category: "music",
+  category: 'music',
 };
 
 export default async function RootLayout({

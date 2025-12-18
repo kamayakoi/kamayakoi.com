@@ -1,11 +1,11 @@
-import { corsHeaders } from "../_shared/cors.ts";
-import { createClient } from "npm:@supabase/supabase-js@2.49.4";
-import { Resend } from "npm:resend@2.0.0";
-import { PDFDocument, StandardFonts, rgb } from "npm:pdf-lib@1.17.1";
+import { corsHeaders } from '../_shared/cors.ts';
+import { createClient } from 'npm:@supabase/supabase-js@2.49.4';
+import { Resend } from 'npm:resend@2.0.0';
+import { PDFDocument, StandardFonts, rgb } from 'npm:pdf-lib@1.17.1';
 
 // Helper function to convert Uint8Array to Base64 string
 function uint8ArrayToBase64(bytes: Uint8Array): string {
-  let binary = "";
+  let binary = '';
   const len = bytes.byteLength;
   for (let i = 0; i < len; i++) {
     binary += String.fromCharCode(bytes[i]);
@@ -21,37 +21,37 @@ interface IndividualTicket {
 // was removed from here to resolve TypeScript parsing errors.
 
 // --- Environment Variables ---
-const supabaseUrl = Deno.env.get("SUPABASE_URL") || Deno.env.get("URL");
+const supabaseUrl = Deno.env.get('SUPABASE_URL') || Deno.env.get('URL');
 const supabaseServiceRoleKey =
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("SERVICE_ROLE_KEY");
-const resendApiKey = Deno.env.get("RESEND_API_KEY");
-const fromEmail = Deno.env.get("FROM_EMAIL") || "tickets@updates.kamayakoi.com";
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('SERVICE_ROLE_KEY');
+const resendApiKey = Deno.env.get('RESEND_API_KEY');
+const fromEmail = Deno.env.get('FROM_EMAIL') || 'tickets@updates.kamayakoi.com';
 const APP_BASE_URL =
-  Deno.env.get("APP_BASE_URL") || "https://www.kamayakoi.com";
+  Deno.env.get('APP_BASE_URL') || 'https://www.kamayakoi.com';
 const defaultLogoUrl = `${supabaseUrl}/storage/v1/object/public/assets/logo.png`;
 
 // --- Environment Validation ---
-if (!supabaseUrl || supabaseUrl.trim() === "") {
-  console.error("SUPABASE_URL environment variable is missing or empty");
-  throw new Error("SUPABASE_URL environment variable is required");
+if (!supabaseUrl || supabaseUrl.trim() === '') {
+  console.error('SUPABASE_URL environment variable is missing or empty');
+  throw new Error('SUPABASE_URL environment variable is required');
 }
 
-if (!supabaseServiceRoleKey || supabaseServiceRoleKey.trim() === "") {
+if (!supabaseServiceRoleKey || supabaseServiceRoleKey.trim() === '') {
   console.error(
-    "SUPABASE_SERVICE_ROLE_KEY environment variable is missing or empty",
+    'SUPABASE_SERVICE_ROLE_KEY environment variable is missing or empty'
   );
-  throw new Error("SUPABASE_SERVICE_ROLE_KEY environment variable is required");
+  throw new Error('SUPABASE_SERVICE_ROLE_KEY environment variable is required');
 }
 
-if (!resendApiKey || resendApiKey.trim() === "") {
-  console.error("RESEND_API_KEY environment variable is missing or empty");
-  throw new Error("RESEND_API_KEY environment variable is required");
+if (!resendApiKey || resendApiKey.trim() === '') {
+  console.error('RESEND_API_KEY environment variable is missing or empty');
+  throw new Error('RESEND_API_KEY environment variable is required');
 }
 
 // --- Main Serve Function ---
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
   }
 
   let purchaseIdFromRequest: string | null = null;
@@ -65,45 +65,45 @@ Deno.serve(async (req: Request) => {
     purchaseIdFromRequest = purchase_id;
 
     if (!purchaseIdFromRequest) {
-      console.error("send-ticket-email: Missing purchase_id in request");
-      return new Response(JSON.stringify({ error: "Missing purchase_id" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      console.error('send-ticket-email: Missing purchase_id in request');
+      return new Response(JSON.stringify({ error: 'Missing purchase_id' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
       });
     }
 
     // --- 1. Fetch Purchase, Customer, and Event Details using RPC ---
     console.log(
-      `send-ticket-email: Fetching purchase data for ${purchaseIdFromRequest}`,
+      `send-ticket-email: Fetching purchase data for ${purchaseIdFromRequest}`
     );
     const { data: purchaseDataArray, error: purchaseError } =
-      await supabase.rpc("get_purchase_for_email_dispatch", {
+      await supabase.rpc('get_purchase_for_email_dispatch', {
         p_purchase_id: purchaseIdFromRequest,
       });
 
     if (purchaseError || !purchaseDataArray || purchaseDataArray.length === 0) {
       console.error(
         `send-ticket-email: Error fetching purchase ${purchaseIdFromRequest}:`,
-        purchaseError,
+        purchaseError
       );
       // Try to update status if we have a purchase ID
       if (purchaseIdFromRequest) {
         await supabase
-          .rpc("update_email_dispatch_status", {
+          .rpc('update_email_dispatch_status', {
             p_purchase_id: purchaseIdFromRequest,
-            p_email_dispatch_status: "DISPATCH_FAILED",
+            p_email_dispatch_status: 'DISPATCH_FAILED',
             p_email_dispatch_error: `Purchase not found or DB error: ${purchaseError?.message}`,
           })
           .catch((err: unknown) =>
-            console.error("Failed to update error status:", err),
+            console.error('Failed to update error status:', err)
           );
       }
       return new Response(
-        JSON.stringify({ error: "Purchase not found or database error" }),
+        JSON.stringify({ error: 'Purchase not found or database error' }),
         {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 404,
-        },
+        }
       );
     }
 
@@ -111,92 +111,92 @@ Deno.serve(async (req: Request) => {
 
     // Check if email already sent or in progress to prevent duplicates if retried
     if (
-      purchaseData.email_dispatch_status === "SENT_SUCCESSFULLY" ||
-      purchaseData.email_dispatch_status === "DISPATCH_IN_PROGRESS"
+      purchaseData.email_dispatch_status === 'SENT_SUCCESSFULLY' ||
+      purchaseData.email_dispatch_status === 'DISPATCH_IN_PROGRESS'
     ) {
       console.warn(
-        `send-ticket-email: Ticket email for purchase ${purchaseIdFromRequest} already processed or in progress (${purchaseData.email_dispatch_status}). Skipping.`,
+        `send-ticket-email: Ticket email for purchase ${purchaseIdFromRequest} already processed or in progress (${purchaseData.email_dispatch_status}). Skipping.`
       );
       return new Response(
         JSON.stringify({
-          message: "Ticket email already processed or in progress.",
+          message: 'Ticket email already processed or in progress.',
         }),
         {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
-        },
+        }
       );
     }
 
     // Update status to in progress using RPC
     console.log(
-      `send-ticket-email: Setting purchase ${purchaseIdFromRequest} to DISPATCH_IN_PROGRESS`,
+      `send-ticket-email: Setting purchase ${purchaseIdFromRequest} to DISPATCH_IN_PROGRESS`
     );
     const { error: updateError } = await supabase.rpc(
-      "update_email_dispatch_status",
+      'update_email_dispatch_status',
       {
         p_purchase_id: purchaseIdFromRequest,
-        p_email_dispatch_status: "DISPATCH_IN_PROGRESS",
+        p_email_dispatch_status: 'DISPATCH_IN_PROGRESS',
         p_email_dispatch_attempts:
           (purchaseData.email_dispatch_attempts || 0) + 1,
-      },
+      }
     );
 
     if (updateError) {
       console.error(
         `send-ticket-email: Failed to update dispatch status for ${purchaseIdFromRequest}:`,
-        updateError,
+        updateError
       );
       return new Response(
-        JSON.stringify({ error: "Failed to update dispatch status" }),
+        JSON.stringify({ error: 'Failed to update dispatch status' }),
         {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 500,
-        },
+        }
       );
     }
 
     // --- 2. Prepare Data for Ticket ---
     if (!purchaseData.customer_email || !purchaseData.customer_name) {
       console.error(
-        `send-ticket-email: Customer data missing for purchase ${purchaseIdFromRequest}`,
+        `send-ticket-email: Customer data missing for purchase ${purchaseIdFromRequest}`
       );
-      await supabase.rpc("update_email_dispatch_status", {
+      await supabase.rpc('update_email_dispatch_status', {
         p_purchase_id: purchaseIdFromRequest,
-        p_email_dispatch_status: "DISPATCH_FAILED",
-        p_email_dispatch_error: "Customer data missing for purchase.",
+        p_email_dispatch_status: 'DISPATCH_FAILED',
+        p_email_dispatch_error: 'Customer data missing for purchase.',
       });
-      return new Response(JSON.stringify({ error: "Customer data missing" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      return new Response(JSON.stringify({ error: 'Customer data missing' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       });
     }
 
-    const customerName = purchaseData.customer_name || "Valued Customer";
-    const nameParts = customerName.split(" ");
+    const customerName = purchaseData.customer_name || 'Valued Customer';
+    const nameParts = customerName.split(' ');
     const firstName = nameParts[0];
-    const lastName = nameParts.slice(1).join(" ");
+    const lastName = nameParts.slice(1).join(' ');
 
     let uniqueTicketId = purchaseData.unique_ticket_identifier;
     if (!uniqueTicketId) {
       uniqueTicketId = crypto.randomUUID();
       console.log(
-        `send-ticket-email: Generated unique ticket ID ${uniqueTicketId} for purchase ${purchaseIdFromRequest}`,
+        `send-ticket-email: Generated unique ticket ID ${uniqueTicketId} for purchase ${purchaseIdFromRequest}`
       );
       // Update using RPC
-      await supabase.rpc("update_email_dispatch_status", {
+      await supabase.rpc('update_email_dispatch_status', {
         p_purchase_id: purchaseIdFromRequest,
-        p_email_dispatch_status: "DISPATCH_IN_PROGRESS",
+        p_email_dispatch_status: 'DISPATCH_IN_PROGRESS',
         p_unique_ticket_identifier: uniqueTicketId,
       });
     }
 
     // Event data for ticket
     const eventDataForTicket = {
-      eventName: purchaseData.event_title || "Amazing Event",
-      eventDate: purchaseData.event_date_text || "To Be Announced",
-      eventTime: purchaseData.event_time_text || "Soon",
-      eventVenue: purchaseData.event_venue_name || "Secret Location",
+      eventName: purchaseData.event_title || 'Amazing Event',
+      eventDate: purchaseData.event_date_text || 'To Be Announced',
+      eventTime: purchaseData.event_time_text || 'Soon',
+      eventVenue: purchaseData.event_venue_name || 'Secret Location',
     };
 
     // Calculate actual ticket quantity for bundles
@@ -207,11 +207,11 @@ Deno.serve(async (req: Request) => {
       : purchaseData.quantity;
 
     console.log(
-      `Bundle calculation: isBundle=${isBundle}, quantity=${purchaseData.quantity}, ticketsPerBundle=${ticketsPerBundle}, actualTicketQuantity=${actualTicketQuantity}`,
+      `Bundle calculation: isBundle=${isBundle}, quantity=${purchaseData.quantity}, ticketsPerBundle=${ticketsPerBundle}, actualTicketQuantity=${actualTicketQuantity}`
     );
 
     // --- NEW LOGIC: Decide between individual tickets or legacy single QR ---
-    const INDIVIDUAL_TICKETS_CUTOFF_DATE = new Date("2025-07-01"); // Use new system for all purchases from July 1, 2025
+    const INDIVIDUAL_TICKETS_CUTOFF_DATE = new Date('2025-07-01'); // Use new system for all purchases from July 1, 2025
     const purchaseDate = new Date(purchaseData.created_at || Date.now());
     const useIndividualTickets =
       purchaseDate >= INDIVIDUAL_TICKETS_CUTOFF_DATE &&
@@ -224,35 +224,35 @@ Deno.serve(async (req: Request) => {
     if (useIndividualTickets) {
       // Generate individual tickets for new multi-person purchases
       console.log(
-        `Generating individual tickets for purchase ${purchaseIdFromRequest} (${actualTicketQuantity} tickets)`,
+        `Generating individual tickets for purchase ${purchaseIdFromRequest} (${actualTicketQuantity} tickets)`
       );
 
       const { data: generatedTickets, error: generateError } =
-        await supabase.rpc("generate_individual_tickets_for_purchase", {
+        await supabase.rpc('generate_individual_tickets_for_purchase', {
           p_purchase_id: purchaseIdFromRequest,
         });
 
       if (generateError || !generatedTickets) {
         console.error(
           `Failed to generate individual tickets for ${purchaseIdFromRequest}:`,
-          generateError,
+          generateError
         );
-        await supabase.rpc("update_email_dispatch_status", {
+        await supabase.rpc('update_email_dispatch_status', {
           p_purchase_id: purchaseIdFromRequest,
-          p_email_dispatch_status: "DISPATCH_FAILED",
+          p_email_dispatch_status: 'DISPATCH_FAILED',
           p_email_dispatch_error: `Individual ticket generation failed: ${generateError?.message}`,
         });
         return new Response(
-          JSON.stringify({ error: "Failed to generate individual tickets" }),
+          JSON.stringify({ error: 'Failed to generate individual tickets' }),
           {
             status: 500,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
         );
       }
 
       ticketIdentifiers = (generatedTickets as IndividualTicket[]).map(
-        (t: IndividualTicket) => t.ticket_identifier,
+        (t: IndividualTicket) => t.ticket_identifier
       );
 
       // Generate QR codes for each individual ticket
@@ -269,28 +269,28 @@ Deno.serve(async (req: Request) => {
         } catch (qrError) {
           console.error(
             `Failed to generate QR for individual ticket ${ticketId}:`,
-            qrError,
+            qrError
           );
-          await supabase.rpc("update_email_dispatch_status", {
+          await supabase.rpc('update_email_dispatch_status', {
             p_purchase_id: purchaseIdFromRequest,
-            p_email_dispatch_status: "DISPATCH_FAILED",
+            p_email_dispatch_status: 'DISPATCH_FAILED',
             p_email_dispatch_error: `QR generation failed for individual ticket: ${qrError}`,
           });
           return new Response(
             JSON.stringify({
-              error: "Failed to generate QR codes for individual tickets",
+              error: 'Failed to generate QR codes for individual tickets',
             }),
             {
               status: 500,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            },
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
           );
         }
       }
     } else {
       // Legacy single QR code system
       console.log(
-        `Using legacy single QR system for purchase ${purchaseIdFromRequest}`,
+        `Using legacy single QR system for purchase ${purchaseIdFromRequest}`
       );
       ticketIdentifiers = [uniqueTicketId];
 
@@ -302,7 +302,7 @@ Deno.serve(async (req: Request) => {
         const qrResponse = await fetch(qrCodeUrl);
         if (!qrResponse.ok)
           throw new Error(
-            `Failed to fetch QR code (${qrResponse.status} from ${qrCodeUrl})`,
+            `Failed to fetch QR code (${qrResponse.status} from ${qrCodeUrl})`
           );
         qrCodeImageBytes = new Uint8Array(await qrResponse.arrayBuffer());
         qrCodeData.push({
@@ -312,26 +312,26 @@ Deno.serve(async (req: Request) => {
       } catch (qrError) {
         console.error(
           `Failed to generate QR for ${purchaseIdFromRequest}:`,
-          qrError,
+          qrError
         );
         const errorMessage =
           qrError instanceof Error
             ? qrError.message
-            : "Unknown QR generation error";
-        await supabase.rpc("update_email_dispatch_status", {
+            : 'Unknown QR generation error';
+        await supabase.rpc('update_email_dispatch_status', {
           p_purchase_id: purchaseIdFromRequest,
-          p_email_dispatch_status: "DISPATCH_FAILED",
+          p_email_dispatch_status: 'DISPATCH_FAILED',
           p_email_dispatch_error: `QR generation error: ${errorMessage}`,
         });
         return new Response(
           JSON.stringify({
-            error: "Failed to generate QR code",
+            error: 'Failed to generate QR code',
             details: errorMessage,
           }),
           {
             status: 500,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
         );
       }
     }
@@ -347,7 +347,7 @@ Deno.serve(async (req: Request) => {
     const getNameText = (
       firstName: string,
       lastName: string,
-      quantity: number,
+      quantity: number
     ) => {
       if (quantity === 1) return `${firstName} ${lastName}`;
       if (quantity === 2) return `${firstName} ${lastName} + Friend`;
@@ -387,7 +387,7 @@ Deno.serve(async (req: Request) => {
 
         const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
         const helveticaBold = await pdfDoc.embedFont(
-          StandardFonts.HelveticaBold,
+          StandardFonts.HelveticaBold
         );
 
         // Receipt color scheme - white background, black text
@@ -418,7 +418,7 @@ Deno.serve(async (req: Request) => {
         let y = receiptHeight - 20;
 
         // Company header - left aligned
-        page.drawText("KAMAYAKOI", {
+        page.drawText('KAMAYAKOI', {
           x: 10,
           y: y,
           size: 10,
@@ -427,7 +427,7 @@ Deno.serve(async (req: Request) => {
         });
         y -= 15;
 
-        page.drawText("VOTRE BILLET", {
+        page.drawText('VOTRE BILLET', {
           x: 10,
           y: y,
           size: 8,
@@ -448,7 +448,7 @@ Deno.serve(async (req: Request) => {
         // Event details in receipt style - labels left, values right aligned
         const rightAlignX = receiptWidth - 10; // Right edge minus padding
 
-        page.drawText("ÉVÉNEMENT", {
+        page.drawText('ÉVÉNEMENT', {
           x: 10,
           y: y,
           size: 7,
@@ -457,7 +457,7 @@ Deno.serve(async (req: Request) => {
         });
         const eventNameWidth = helvetica.widthOfTextAtSize(
           ticketProps.eventName,
-          7,
+          7
         );
         page.drawText(ticketProps.eventName, {
           x: rightAlignX - eventNameWidth,
@@ -468,7 +468,7 @@ Deno.serve(async (req: Request) => {
         });
         y -= 12;
 
-        page.drawText("DATE", {
+        page.drawText('DATE', {
           x: 10,
           y: y,
           size: 7,
@@ -485,7 +485,7 @@ Deno.serve(async (req: Request) => {
         });
         y -= 12;
 
-        page.drawText("HEURE", {
+        page.drawText('HEURE', {
           x: 10,
           y: y,
           size: 7,
@@ -502,7 +502,7 @@ Deno.serve(async (req: Request) => {
         });
         y -= 12;
 
-        page.drawText("LIEU", {
+        page.drawText('LIEU', {
           x: 10,
           y: y,
           size: 7,
@@ -511,7 +511,7 @@ Deno.serve(async (req: Request) => {
         });
         const venueWidth = helvetica.widthOfTextAtSize(
           ticketProps.eventVenue,
-          7,
+          7
         );
         page.drawText(ticketProps.eventVenue, {
           x: rightAlignX - venueWidth,
@@ -522,7 +522,7 @@ Deno.serve(async (req: Request) => {
         });
         y -= 12;
 
-        page.drawText("TITULAIRE", {
+        page.drawText('TITULAIRE', {
           x: 10,
           y: y,
           size: 7,
@@ -579,13 +579,13 @@ Deno.serve(async (req: Request) => {
           const embedErrorMsg =
             imgError instanceof Error
               ? imgError.message
-              : "Unknown QR image embedding error";
+              : 'Unknown QR image embedding error';
           console.error(
             `Error embedding QR for ticket ${i + 1}:`,
-            embedErrorMsg,
+            embedErrorMsg
           );
 
-          const errorText = "[QR CODE INDISPONIBLE]";
+          const errorText = '[QR CODE INDISPONIBLE]';
           page.drawText(errorText, {
             x: (receiptWidth - 90) / 2,
             y: y - 15,
@@ -609,7 +609,7 @@ Deno.serve(async (req: Request) => {
           color: greyColor,
         });
 
-        const footerMsg2 = "Thank you for choosing Kamayakoi!";
+        const footerMsg2 = 'Thank you for choosing Kamayakoi!';
         const footerMsg2Width = helvetica.widthOfTextAtSize(footerMsg2, 5);
         page.drawText(footerMsg2, {
           x: rightAlignX - footerMsg2Width,
@@ -665,7 +665,7 @@ Deno.serve(async (req: Request) => {
       let y = receiptHeight - 20;
 
       // Company header - left aligned
-      page.drawText("KAMAYAKOI", {
+      page.drawText('KAMAYAKOI', {
         x: 10,
         y: y,
         size: 10,
@@ -674,7 +674,7 @@ Deno.serve(async (req: Request) => {
       });
       y -= 15;
 
-      page.drawText("VOTRE BILLET", {
+      page.drawText('VOTRE BILLET', {
         x: 10,
         y: y,
         size: 8,
@@ -695,7 +695,7 @@ Deno.serve(async (req: Request) => {
       // Event details in receipt style - labels left, values right aligned
       const legacyRightAlignX = receiptWidth - 10; // Right edge minus padding
 
-      page.drawText("ÉVÉNEMENT", {
+      page.drawText('ÉVÉNEMENT', {
         x: 10,
         y: y,
         size: 7,
@@ -704,7 +704,7 @@ Deno.serve(async (req: Request) => {
       });
       const legacyEventNameWidth = helvetica.widthOfTextAtSize(
         ticketProps.eventName,
-        7,
+        7
       );
       page.drawText(ticketProps.eventName, {
         x: legacyRightAlignX - legacyEventNameWidth,
@@ -715,7 +715,7 @@ Deno.serve(async (req: Request) => {
       });
       y -= 12;
 
-      page.drawText("DATE", {
+      page.drawText('DATE', {
         x: 10,
         y: y,
         size: 7,
@@ -724,7 +724,7 @@ Deno.serve(async (req: Request) => {
       });
       const legacyDateWidth = helvetica.widthOfTextAtSize(
         ticketProps.eventDate,
-        7,
+        7
       );
       page.drawText(`${ticketProps.eventDate}`, {
         x: legacyRightAlignX - legacyDateWidth,
@@ -735,7 +735,7 @@ Deno.serve(async (req: Request) => {
       });
       y -= 12;
 
-      page.drawText("HEURE", {
+      page.drawText('HEURE', {
         x: 10,
         y: y,
         size: 7,
@@ -744,7 +744,7 @@ Deno.serve(async (req: Request) => {
       });
       const legacyTimeWidth = helvetica.widthOfTextAtSize(
         ticketProps.eventTime,
-        7,
+        7
       );
       page.drawText(`${ticketProps.eventTime}`, {
         x: legacyRightAlignX - legacyTimeWidth,
@@ -755,7 +755,7 @@ Deno.serve(async (req: Request) => {
       });
       y -= 12;
 
-      page.drawText("LIEU", {
+      page.drawText('LIEU', {
         x: 10,
         y: y,
         size: 7,
@@ -764,7 +764,7 @@ Deno.serve(async (req: Request) => {
       });
       const legacyVenueWidth = helvetica.widthOfTextAtSize(
         ticketProps.eventVenue,
-        7,
+        7
       );
       page.drawText(ticketProps.eventVenue, {
         x: legacyRightAlignX - legacyVenueWidth,
@@ -775,7 +775,7 @@ Deno.serve(async (req: Request) => {
       });
       y -= 12;
 
-      page.drawText("TITULAIRE", {
+      page.drawText('TITULAIRE', {
         x: 10,
         y: y,
         size: 7,
@@ -785,11 +785,11 @@ Deno.serve(async (req: Request) => {
       const legacyDisplayName = getNameText(
         ticketProps.firstName,
         ticketProps.lastName,
-        ticketProps.quantity,
+        ticketProps.quantity
       );
       const legacyHolderWidth = helvetica.widthOfTextAtSize(
         legacyDisplayName,
-        7,
+        7
       );
       page.drawText(legacyDisplayName, {
         x: legacyRightAlignX - legacyHolderWidth,
@@ -843,12 +843,12 @@ Deno.serve(async (req: Request) => {
           const embedErrorMsg =
             imgError instanceof Error
               ? imgError.message
-              : "Unknown QR image embedding error";
+              : 'Unknown QR image embedding error';
           console.error(
-            `Error embedding QR for ${purchaseIdFromRequest}: ${embedErrorMsg}`,
+            `Error embedding QR for ${purchaseIdFromRequest}: ${embedErrorMsg}`
           );
 
-          const errorText = "[QR CODE INDISPONIBLE]";
+          const errorText = '[QR CODE INDISPONIBLE]';
           page.drawText(errorText, {
             x: (receiptWidth - 90) / 2,
             y: y - 15,
@@ -859,7 +859,7 @@ Deno.serve(async (req: Request) => {
           y -= 25;
         }
       } else {
-        const missingText = "[QR UNAVAILABLE]";
+        const missingText = '[QR UNAVAILABLE]';
         page.drawText(missingText, {
           x: (receiptWidth - 90) / 2,
           y: y - 15,
@@ -876,7 +876,7 @@ Deno.serve(async (req: Request) => {
       const legacyFooterMsg1 = "Présentez ce code QR à l'entrée";
       const legacyFooterMsg1Width = helvetica.widthOfTextAtSize(
         legacyFooterMsg1,
-        5,
+        5
       );
       page.drawText(legacyFooterMsg1, {
         x: legacyRightAlignX - legacyFooterMsg1Width,
@@ -886,10 +886,10 @@ Deno.serve(async (req: Request) => {
         color: greyColor,
       });
 
-      const legacyFooterMsg2 = "Merci de soutenir le mouvement!";
+      const legacyFooterMsg2 = 'Merci de soutenir le mouvement!';
       const legacyFooterMsg2Width = helvetica.widthOfTextAtSize(
         legacyFooterMsg2,
-        5,
+        5
       );
       page.drawText(legacyFooterMsg2, {
         x: legacyRightAlignX - legacyFooterMsg2Width,
@@ -912,12 +912,12 @@ Deno.serve(async (req: Request) => {
     let logoSrc = defaultLogoUrl; // Always have a fallback URL
 
     try {
-      console.log("Fetching logo from Supabase Storage...");
+      console.log('Fetching logo from Supabase Storage...');
 
       // First, try to get the image from Supabase Storage
       const { data: logoData, error: logoError } = await supabase.storage
-        .from("assets")
-        .download("logo.png");
+        .from('assets')
+        .download('logo.png');
 
       if (logoData && !logoError) {
         try {
@@ -925,17 +925,17 @@ Deno.serve(async (req: Request) => {
           const logoBase64 = uint8ArrayToBase64(logoBytes);
           logoSrc = `data:image/png;base64,${logoBase64}`;
           console.log(
-            "Successfully fetched and encoded logo from Supabase Storage.",
+            'Successfully fetched and encoded logo from Supabase Storage.'
           );
         } catch (conversionError) {
           console.warn(
-            "Failed to convert Supabase logo to Base64, using URL fallback:",
-            conversionError,
+            'Failed to convert Supabase logo to Base64, using URL fallback:',
+            conversionError
           );
         }
       } else {
         console.warn(
-          "Logo not found in Supabase Storage, trying direct URL fetch...",
+          'Logo not found in Supabase Storage, trying direct URL fetch...'
         );
 
         // Fallback: try direct fetch from the URL
@@ -945,16 +945,16 @@ Deno.serve(async (req: Request) => {
             const logoBytes = new Uint8Array(await logoResponse.arrayBuffer());
             const logoBase64 = uint8ArrayToBase64(logoBytes);
             logoSrc = `data:image/png;base64,${logoBase64}`;
-            console.log("Successfully fetched logo via direct URL.");
+            console.log('Successfully fetched logo via direct URL.');
           } else {
             console.warn(
-              `Failed to fetch logo (status: ${logoResponse.status}), using URL as final fallback.`,
+              `Failed to fetch logo (status: ${logoResponse.status}), using URL as final fallback.`
             );
           }
         } catch (urlFetchError) {
           console.warn(
-            "Failed to fetch logo via URL, using URL as final fallback:",
-            urlFetchError,
+            'Failed to fetch logo via URL, using URL as final fallback:',
+            urlFetchError
           );
         }
       }
@@ -962,8 +962,8 @@ Deno.serve(async (req: Request) => {
       // This catch block should NEVER be reached due to nested try-catches above
       // But it's here as a final safety net
       console.error(
-        "Unexpected error in logo fetching, using URL fallback:",
-        logoError,
+        'Unexpected error in logo fetching, using URL fallback:',
+        logoError
       );
     }
 
@@ -996,8 +996,8 @@ Deno.serve(async (req: Request) => {
 
           <p style="font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
             Merci de soutenir le mouvement.
-            ${ticketProps.isBundle ? `<br><br>Vous avez réservé ${ticketProps.bundleQuantity} pack(s) comprenant ${ticketProps.quantity} accès au total.` : ""}
-            ${ticketProps.useIndividualTickets ? `<br><br><strong>🎫 Vous recevez ${ticketProps.quantity} codes individuels</strong> - un par personne.` : ""}
+            ${ticketProps.isBundle ? `<br><br>Vous avez réservé ${ticketProps.bundleQuantity} pack(s) comprenant ${ticketProps.quantity} accès au total.` : ''}
+            ${ticketProps.useIndividualTickets ? `<br><br><strong>🎫 Vous recevez ${ticketProps.quantity} codes individuels</strong> - un par personne.` : ''}
           </p>
 
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
@@ -1039,7 +1039,7 @@ Deno.serve(async (req: Request) => {
     const { data: emailData, error: emailError } = await resend.emails.send({
       from: `Kamayakoi <${fromEmail}>`,
       to: ticketProps.email,
-      reply_to: "kamayakoi@gmail.com",
+      reply_to: 'kamayakoi@gmail.com',
       subject: `Votre ticket pour ${ticketProps.eventName}`,
       html: emailHtmlBody,
       attachments: pdfsToAttach,
@@ -1052,81 +1052,81 @@ Deno.serve(async (req: Request) => {
           : JSON.stringify(emailError);
       console.error(
         `Resend error for purchase ${purchaseIdFromRequest}:`,
-        resendErrorMsg,
+        resendErrorMsg
       );
-      await supabase.rpc("update_email_dispatch_status", {
+      await supabase.rpc('update_email_dispatch_status', {
         p_purchase_id: purchaseIdFromRequest,
-        p_email_dispatch_status: "DISPATCH_FAILED",
+        p_email_dispatch_status: 'DISPATCH_FAILED',
         p_email_dispatch_error: `Resend API error: ${resendErrorMsg}`,
       });
       return new Response(
         JSON.stringify({
-          error: "Failed to send email",
+          error: 'Failed to send email',
           details: resendErrorMsg,
         }),
         {
           status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
       );
     }
 
     // --- 6. Update Purchase Record on Success ---
     console.log(
-      `send-ticket-email: Email sent successfully for purchase ${purchaseIdFromRequest}. Email ID: ${emailData?.id}`,
+      `send-ticket-email: Email sent successfully for purchase ${purchaseIdFromRequest}. Email ID: ${emailData?.id}`
     );
-    await supabase.rpc("update_email_dispatch_status", {
+    await supabase.rpc('update_email_dispatch_status', {
       p_purchase_id: purchaseIdFromRequest,
-      p_email_dispatch_status: "SENT_SUCCESSFULLY",
+      p_email_dispatch_status: 'SENT_SUCCESSFULLY',
       p_pdf_ticket_generated: true,
       p_pdf_ticket_sent_at: new Date().toISOString(),
       p_email_dispatch_error: null,
     });
 
     console.log(
-      `Email with PDF sent for ${purchaseIdFromRequest}. Email ID: ${emailData?.id}`,
+      `Email with PDF sent for ${purchaseIdFromRequest}. Email ID: ${emailData?.id}`
     );
     return new Response(
       JSON.stringify({
-        message: "Ticket email with PDF sent successfully!",
+        message: 'Ticket email with PDF sent successfully!',
         email_id: emailData?.id,
       }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
     );
   } catch (e: unknown) {
     const errorMessage =
-      e instanceof Error ? e.message : "An unknown error occurred";
+      e instanceof Error ? e.message : 'An unknown error occurred';
     console.error(
-      `Unexpected error for ${purchaseIdFromRequest || "unknown"}:`,
-      e,
+      `Unexpected error for ${purchaseIdFromRequest || 'unknown'}:`,
+      e
     );
     if (purchaseIdFromRequest) {
       try {
         const supabaseForErrorFallback = createClient(
           supabaseUrl!,
-          supabaseServiceRoleKey!,
+          supabaseServiceRoleKey!
         );
-        await supabaseForErrorFallback.rpc("update_email_dispatch_status", {
+        await supabaseForErrorFallback.rpc('update_email_dispatch_status', {
           p_purchase_id: purchaseIdFromRequest,
-          p_email_dispatch_status: "DISPATCH_FAILED",
+          p_email_dispatch_status: 'DISPATCH_FAILED',
           p_email_dispatch_error: `Unexpected error: ${errorMessage}`,
         });
       } catch (updateError) {
         console.error(
           `Failed to update error status for ${purchaseIdFromRequest}:`,
-          updateError,
+          updateError
         );
       }
     }
     return new Response(
-      JSON.stringify({ error: "Internal server error", details: errorMessage }),
+      JSON.stringify({ error: 'Internal server error', details: errorMessage }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
     );
   }
 });

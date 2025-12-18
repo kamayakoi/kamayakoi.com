@@ -1,4 +1,4 @@
-import { createGlobalState } from "react-hooks-global-state";
+import { createGlobalState } from 'react-hooks-global-state';
 
 // Define the type for the initial state
 interface InitialState {
@@ -9,5 +9,5 @@ const initialState: InitialState = { photoToScrollTo: null };
 const { useGlobalState } = createGlobalState(initialState);
 
 export const useLastViewedPhoto = () => {
-  return useGlobalState("photoToScrollTo");
+  return useGlobalState('photoToScrollTo');
 };

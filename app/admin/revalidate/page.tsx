@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { revalidateAll } from "@/lib/actions/revalidate";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { revalidateAll } from '@/lib/actions/revalidate';
 
 export default function RevalidatePage() {
-  const [status, setStatus] = useState<"loading" | "success" | "error">(
-    "loading",
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading'
   );
   const router = useRouter();
 
@@ -14,15 +14,15 @@ export default function RevalidatePage() {
     const performRevalidation = async () => {
       try {
         await revalidateAll();
-        setStatus("success");
+        setStatus('success');
 
         // Redirect to home page after 2 seconds
         setTimeout(() => {
-          router.push("/");
+          router.push('/');
         }, 2000);
       } catch (error) {
-        console.error("Revalidation failed:", error);
-        setStatus("error");
+        console.error('Revalidation failed:', error);
+        setStatus('error');
         // Stay on page if there's an error
       }
     };
@@ -33,7 +33,7 @@ export default function RevalidatePage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
       <div className="text-center">
-        {status === "loading" && (
+        {status === 'loading' && (
           <>
             <div className="text-2xl mb-4">🔄</div>
             <h1 className="text-2xl font-bold mb-2">
@@ -45,7 +45,7 @@ export default function RevalidatePage() {
           </>
         )}
 
-        {status === "success" && (
+        {status === 'success' && (
           <>
             <div className="text-2xl mb-4">✅</div>
             <h1 className="text-2xl font-bold mb-2">Revalidation complete!</h1>
@@ -53,7 +53,7 @@ export default function RevalidatePage() {
           </>
         )}
 
-        {status === "error" && (
+        {status === 'error' && (
           <>
             <div className="text-2xl mb-4">❌</div>
             <h1 className="text-2xl font-bold mb-2">Revalidation failed</h1>

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Play,
   Pause,
@@ -9,16 +9,16 @@ import {
   SkipForward,
   X,
   ChevronRight,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/actions/utils";
-import Image from "next/image";
-import { useMusic } from "@/lib/contexts/MusicContext";
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/actions/utils';
+import Image from 'next/image';
+import { useMusic } from '@/lib/contexts/MusicContext';
 
 const formatTime = (seconds: number = 0) => {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
 const CustomSlider = ({
@@ -42,8 +42,8 @@ const CustomSlider = ({
   return (
     <div
       className={cn(
-        "relative w-full h-1 bg-white/20 rounded-sm cursor-pointer",
-        className,
+        'relative w-full h-1 bg-white/20 rounded-sm cursor-pointer',
+        className
       )}
       onClick={handleClick}
     >
@@ -52,7 +52,7 @@ const CustomSlider = ({
         style={{ width: `${value}%` }}
         initial={{ width: 0 }}
         animate={{ width: `${value}%` }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       />
     </div>
   );
@@ -92,9 +92,9 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
     return <div className="hidden" />;
   }
 
-  console.log("🎵 AudioPlayer - tracks:", tracks);
-  console.log("🎵 AudioPlayer - currentTrack:", currentTrack);
-  console.log("🎵 AudioPlayer - tracks length:", tracks?.length);
+  console.log('🎵 AudioPlayer - tracks:', tracks);
+  console.log('🎵 AudioPlayer - currentTrack:', currentTrack);
+  console.log('🎵 AudioPlayer - tracks length:', tracks?.length);
 
   const handleSeek = (value: number) => {
     if (duration && duration > 0) {
@@ -106,7 +106,7 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
   };
 
   const handleClose = () => {
-    console.log("🎵 AudioPlayer - Stop button clicked");
+    console.log('🎵 AudioPlayer - Stop button clicked');
     stop(); // Use stop to permanently stop the music
     setIsVisible(false);
   };
@@ -119,8 +119,8 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
     e.preventDefault();
     e.stopPropagation();
     console.log(
-      "🎵 Audio player toggle button clicked - current state:",
-      isPlaying,
+      '🎵 Audio player toggle button clicked - current state:',
+      isPlaying
     );
     togglePlay();
   };
@@ -128,7 +128,7 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   if (!tracks || tracks.length === 0 || !currentTrack || !isVisible) {
-    console.log("🎵 AudioPlayer - Not rendering because:", {
+    console.log('🎵 AudioPlayer - Not rendering because:', {
       hasNoTracks: !tracks,
       tracksLength: tracks?.length,
       hasNoCurrentTrack: !currentTrack,
@@ -137,15 +137,15 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
     return null;
   }
 
-  console.log("🎵 AudioPlayer - Rendering with track:", currentTrack.title);
+  console.log('🎵 AudioPlayer - Rendering with track:', currentTrack.title);
 
   // Compact version for events page or when collapsed
   if (!isExpanded) {
     return (
       <motion.div
         className={cn(
-          "relative bg-[#1a1a1a] shadow-2xl border border-gray-800 rounded-sm w-[60px] h-[60px] overflow-visible",
-          className,
+          'relative bg-[#1a1a1a] shadow-2xl border border-gray-800 rounded-sm w-[60px] h-[60px] overflow-visible',
+          className
         )}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -186,17 +186,17 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
     <AnimatePresence>
       <motion.div
         className={cn(
-          "relative bg-[#1a1a1a] shadow-2xl border border-gray-800 rounded-sm overflow-visible w-[320px] h-[65px]",
-          className,
+          'relative bg-[#1a1a1a] shadow-2xl border border-gray-800 rounded-sm overflow-visible w-[320px] h-[65px]',
+          className
         )}
-        initial={{ opacity: 0, filter: "blur(10px)" }}
-        animate={{ opacity: 1, filter: "blur(0px)" }}
-        exit={{ opacity: 0, filter: "blur(10px)" }}
+        initial={{ opacity: 0, filter: 'blur(10px)' }}
+        animate={{ opacity: 1, filter: 'blur(0px)' }}
+        exit={{ opacity: 0, filter: 'blur(10px)' }}
         transition={{
           duration: 0.3,
-          ease: "easeInOut",
+          ease: 'easeInOut',
           delay: 0.1,
-          type: "spring",
+          type: 'spring',
         }}
         layout
       >
@@ -223,7 +223,7 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
           className="flex items-center w-full p-2 pt-2"
           layout
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
         >
           {/* Cover Image */}
           {currentTrack.coverImageUrl && (
@@ -247,7 +247,7 @@ const AudioPlayerInternal = ({ className }: AudioPlayerProps) => {
                   {currentTrack.title}
                   {currentTrack.artist && (
                     <span className="text-white/70 font-normal">
-                      {" "}
+                      {' '}
                       • {currentTrack.artist}
                     </span>
                   )}
@@ -338,7 +338,7 @@ const AudioPlayer = ({ className }: AudioPlayerProps) => {
   try {
     return <AudioPlayerInternal className={className} />;
   } catch (error) {
-    console.log("🎵 AudioPlayer - Error caught:", error);
+    console.log('🎵 AudioPlayer - Error caught:', error);
     return <div className="hidden" />;
   }
 };

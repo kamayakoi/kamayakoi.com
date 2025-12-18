@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
-import { Card, CardContent } from "@/components/ui/card";
+import { useMemo } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface MediaItem {
   _id: string;
@@ -32,12 +32,12 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
 
   // Get the localized title and description
   const localizedTitle =
-    currentLanguage === "fr" && mediaItem.title_fr
+    currentLanguage === 'fr' && mediaItem.title_fr
       ? mediaItem.title_fr
       : mediaItem.title;
 
   const localizedDescription =
-    currentLanguage === "fr" && mediaItem.description_fr
+    currentLanguage === 'fr' && mediaItem.description_fr
       ? mediaItem.description_fr
       : mediaItem.description;
 
@@ -62,9 +62,9 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
 
     // Second priority: YouTube thumbnail extraction
     if (
-      mediaItem.type === "youtube" ||
-      mediaItem.url.includes("youtube.com") ||
-      mediaItem.url.includes("youtu.be")
+      mediaItem.type === 'youtube' ||
+      mediaItem.url.includes('youtube.com') ||
+      mediaItem.url.includes('youtu.be')
     ) {
       const videoId = extractYouTubeId(mediaItem.url);
       if (videoId) {
@@ -75,12 +75,12 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
     return null;
   }, [mediaItem.thumbnail, mediaItem.type, mediaItem.url]);
 
-  const mainImage = getDynamicThumbnail || "/placeholder.webp";
+  const mainImage = getDynamicThumbnail || '/placeholder.webp';
   const hasValidImage =
-    mainImage && mainImage.trim() !== "" && mainImage !== "/placeholder.webp";
+    mainImage && mainImage.trim() !== '' && mainImage !== '/placeholder.webp';
 
   const handleMediaClick = () => {
-    window.open(mediaItem.url, "_blank");
+    window.open(mediaItem.url, '_blank');
   };
 
   return (
@@ -92,8 +92,8 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
           role="button"
           tabIndex={0}
           aria-label={`Play ${localizedTitle}`}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               handleMediaClick();
             }
@@ -173,7 +173,7 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
             className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium cursor-pointer"
             onClick={handleMediaClick}
           >
-            {t(currentLanguage, "eventShowcase.media.play")}
+            {t(currentLanguage, 'eventShowcase.media.play')}
           </div>
         </div>
       </CardContent>
@@ -194,10 +194,10 @@ export function MediaShowcase({ media }: MediaShowcaseProps) {
           <div className="w-1 h-12 bg-white"></div>
           <div>
             <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-              {t(currentLanguage, "eventShowcase.media.title")}
+              {t(currentLanguage, 'eventShowcase.media.title')}
               <span className="text-white/60 mx-3 hidden md:inline">·</span>
               <span className="text-white/70 font-normal text-xl md:text-2xl block md:inline-block transform -translate-y-[5px]">
-                {t(currentLanguage, "eventShowcase.media.subtitle")}
+                {t(currentLanguage, 'eventShowcase.media.subtitle')}
               </span>
             </h2>
           </div>
@@ -207,12 +207,12 @@ export function MediaShowcase({ media }: MediaShowcaseProps) {
           <>
             {/* Media Grid with Horizontal Scroll */}
             <div
-              className={`mb-12 ${media.length > 4 ? "overflow-x-auto pb-4" : ""}`}
+              className={`mb-12 ${media.length > 4 ? 'overflow-x-auto pb-4' : ''}`}
             >
               <div
-                className={`grid gap-6 ${media.length > 4 ? "grid-cols-1 md:grid-cols-4 lg:grid-cols-10" : "grid-cols-1 md:grid-cols-4"} ${media.length > 4 ? "w-max" : ""}`}
+                className={`grid gap-6 ${media.length > 4 ? 'grid-cols-1 md:grid-cols-4 lg:grid-cols-10' : 'grid-cols-1 md:grid-cols-4'} ${media.length > 4 ? 'w-max' : ''}`}
               >
-                {media.slice(0, Math.min(media.length, 25)).map((mediaItem) => (
+                {media.slice(0, Math.min(media.length, 25)).map(mediaItem => (
                   <MediaCard key={mediaItem._id} mediaItem={mediaItem} />
                 ))}
 
@@ -232,16 +232,16 @@ export function MediaShowcase({ media }: MediaShowcaseProps) {
 
                     <div className="pt-1 pb-4 px-4 space-y-1">
                       <h3 className="font-medium text-base leading-tight text-center hover:text-primary transition-colors">
-                        {t(currentLanguage, "eventShowcase.media.viewAll")}
+                        {t(currentLanguage, 'eventShowcase.media.viewAll')}
                       </h3>
                       <p className="text-sm text-muted-foreground text-center leading-relaxed">
                         {media.length > 25
-                          ? currentLanguage === "fr"
-                            ? `${media.length - 25} média${media.length - 25 > 1 ? "s" : ""} de plus`
+                          ? currentLanguage === 'fr'
+                            ? `${media.length - 25} média${media.length - 25 > 1 ? 's' : ''} de plus`
                             : `${media.length - 25} more media`
-                          : currentLanguage === "fr"
-                            ? "Tous les médias"
-                            : "All media"}
+                          : currentLanguage === 'fr'
+                            ? 'Tous les médias'
+                            : 'All media'}
                       </p>
                     </div>
                   </Link>
@@ -253,10 +253,10 @@ export function MediaShowcase({ media }: MediaShowcaseProps) {
           /* Coming Soon Message - using translations */
           <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-sm p-8 mb-20">
             <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
-              {t(currentLanguage, "eventShowcase.media.comingSoon.title")}
+              {t(currentLanguage, 'eventShowcase.media.comingSoon.title')}
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400 mb-6">
-              {t(currentLanguage, "eventShowcase.media.comingSoon.description")}
+              {t(currentLanguage, 'eventShowcase.media.comingSoon.description')}
             </p>
           </div>
         )}

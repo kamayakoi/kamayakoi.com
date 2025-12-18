@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
 // Simple variant selector for Sanity products
 // This is a simplified version since Sanity doesn't have the same variant system as Shopify
@@ -33,7 +33,7 @@ export function VariantSelector({
           <Button
             key={index}
             variant={
-              selectedOption?.value === option.value ? "default" : "outline"
+              selectedOption?.value === option.value ? 'default' : 'outline'
             }
             size="sm"
             onClick={() => onVariantChange?.(option)}

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { MusicProvider } from "@/lib/contexts/MusicContext";
-import type { HomepageAudioSettings } from "@/lib/sanity/queries";
+import { MusicProvider } from '@/lib/contexts/MusicContext';
+import type { HomepageAudioSettings } from '@/lib/sanity/queries';
 
 interface MusicWrapperProps {
   children: React.ReactNode;

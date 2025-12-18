@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useRef, useEffect, useState } from "react";
-import Image from "next/image";
-import { Volume2, VolumeX, ImageIcon, Play } from "lucide-react";
-import { useMusic } from "@/lib/contexts/MusicContext";
-import { useMedia } from "@/lib/contexts/MediaContext";
+import { useRef, useEffect, useState } from 'react';
+import Image from 'next/image';
+import { Volume2, VolumeX, ImageIcon, Play } from 'lucide-react';
+import { useMusic } from '@/lib/contexts/MusicContext';
+import { useMedia } from '@/lib/contexts/MediaContext';
 
 interface EventMediaDisplayProps {
   flyerUrl?: string;
@@ -62,12 +62,12 @@ export function EventMediaDisplay({
       setVideoPlaying(false);
     };
 
-    video.addEventListener("play", handlePlay);
-    video.addEventListener("pause", handlePause);
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
 
     return () => {
-      video.removeEventListener("play", handlePlay);
-      video.removeEventListener("pause", handlePause);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
     };
   }, [isMusicPlaying, pauseMusic, setVideoPlaying]);
 
@@ -80,7 +80,7 @@ export function EventMediaDisplay({
           eventSlug,
           videoElement.currentTime,
           videoElement.muted,
-          !videoElement.paused,
+          !videoElement.paused
         );
       }
     };
@@ -106,17 +106,17 @@ export function EventMediaDisplay({
         }
       } else {
         // Switching to image - resume music if it was playing before
-        const wasMusicPlaying = localStorage.getItem("music-was-playing");
-        if (wasMusicPlaying === "true") {
+        const wasMusicPlaying = localStorage.getItem('music-was-playing');
+        if (wasMusicPlaying === 'true') {
           playMusic();
         }
       }
     }
   };
 
-  const currentMedia = showVideo ? "video" : "image";
+  const currentMedia = showVideo ? 'video' : 'image';
 
-  if (currentMedia === "video" && promoVideoUrl) {
+  if (currentMedia === 'video' && promoVideoUrl) {
     return (
       <div className="relative w-full h-full">
         <video
@@ -134,7 +134,7 @@ export function EventMediaDisplay({
           <button
             onClick={toggleMute}
             className="p-2 bg-black/20 hover:bg-black/40 rounded-sm text-white focus:outline-none transition-colors duration-200 backdrop-blur-sm"
-            aria-label={isMuted ? "Unmute video" : "Mute video"}
+            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
             {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
           </button>

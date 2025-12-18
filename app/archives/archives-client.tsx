@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import React, { useState, useEffect, useMemo } from "react";
-import { motion } from "framer-motion";
-import type { ImageProps } from "@/lib/utils/types";
-import LoadingComponent from "@/components/ui/loader";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
+import Image from 'next/image';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion } from 'framer-motion';
+import type { ImageProps } from '@/lib/utils/types';
+import LoadingComponent from '@/components/ui/loader';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
 
 // Renamed component to ArchivesClientComponent
 export default function ArchivesClientComponent() {
@@ -19,18 +19,18 @@ export default function ArchivesClientComponent() {
 
   // Memoize filtered and grouped image lists
   const taggedImages = useMemo(
-    () => images.filter((img) => img.tags && img.tags.length > 0),
-    [images],
+    () => images.filter(img => img.tags && img.tags.length > 0),
+    [images]
   );
   const untaggedImages = useMemo(
-    () => images.filter((img) => !img.tags || img.tags.length === 0),
-    [images],
+    () => images.filter(img => !img.tags || img.tags.length === 0),
+    [images]
   );
 
   // Group tagged images by their first tag
   const imagesByTag = useMemo(() => {
     const groups: { [key: string]: ImageProps[] } = {};
-    taggedImages.forEach((img) => {
+    taggedImages.forEach(img => {
       if (img.tags && img.tags.length > 0) {
         const tag = img.tags[0];
         if (!groups[tag]) {
@@ -47,9 +47,9 @@ export default function ArchivesClientComponent() {
     const fetchImages = async () => {
       setIsLoading(true);
       setError(null);
-      console.log("[Archives Client] Fetching images from API route...");
+      console.log('[Archives Client] Fetching images from API route...');
       try {
-        const response = await fetch("/api/gallery-images"); // Call the API route
+        const response = await fetch('/api/gallery-images'); // Call the API route
 
         if (!response.ok) {
           // Try to parse error message from API response body
@@ -62,8 +62,8 @@ export default function ArchivesClientComponent() {
           } catch (parseError) {
             // Ignore if response body is not JSON or empty
             console.error(
-              "[Archives Client] Failed to parse error response:",
-              parseError,
+              '[Archives Client] Failed to parse error response:',
+              parseError
             );
           }
           throw new Error(errorMsg);
@@ -74,27 +74,25 @@ export default function ArchivesClientComponent() {
         // Validate fetched data structure (optional but recommended)
         if (!Array.isArray(fetchedImages)) {
           console.error(
-            "[Archives Client] API response is not an array:",
-            fetchedImages,
+            '[Archives Client] API response is not an array:',
+            fetchedImages
           );
-          throw new Error("Invalid data format received from server.");
+          throw new Error('Invalid data format received from server.');
         }
 
         console.log(
-          `[Archives Client] Successfully fetched ${fetchedImages.length} images.`,
+          `[Archives Client] Successfully fetched ${fetchedImages.length} images.`
         );
         setImages(fetchedImages); // Update state with fetched images
       } catch (err) {
-        console.error("[Archives Client] Error fetching images from API:", err);
+        console.error('[Archives Client] Error fetching images from API:', err);
         setError(
-          err instanceof Error
-            ? err.message
-            : "An unknown fetch error occurred",
+          err instanceof Error ? err.message : 'An unknown fetch error occurred'
         );
         setImages([]); // Ensure images array is empty on error
       } finally {
         setIsLoading(false);
-        console.log("[Archives Client] Image fetch attempt complete.");
+        console.log('[Archives Client] Image fetch attempt complete.');
       }
     };
 
@@ -104,7 +102,7 @@ export default function ArchivesClientComponent() {
   // Find the image object based on zoomedImageId
   const zoomedImage =
     zoomedImageId !== null
-      ? images.find((img) => img.id === zoomedImageId)
+      ? images.find(img => img.id === zoomedImageId)
       : null;
 
   // Reset further zoom when modal closes or image changes
@@ -138,7 +136,7 @@ export default function ArchivesClientComponent() {
   // Function to toggle further zoom on image click
   const handleImageClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent modal close
-    setIsFurtherZoomed((prev) => !prev); // Toggle further zoom state
+    setIsFurtherZoomed(prev => !prev); // Toggle further zoom state
   };
 
   // Return the main archives content and modal
@@ -149,10 +147,10 @@ export default function ArchivesClientComponent() {
         <div className="relative pt-24 md:pt-32 pb-16">
           <div>
             <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6 text-left">
-              {t(currentLanguage, "archivesPage.title")}
+              {t(currentLanguage, 'archivesPage.title')}
             </h1>
             <div className="text-muted-foreground text-lg mt-4 mb-8 max-w-3xl leading-relaxed text-left">
-              {t(currentLanguage, "archivesPage.description")}
+              {t(currentLanguage, 'archivesPage.description')}
             </div>
           </div>
         </div>
@@ -173,10 +171,10 @@ export default function ArchivesClientComponent() {
               transition={{ duration: 0.5 }}
             >
               <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
-                {t(currentLanguage, "archivesPage.noImages")}
+                {t(currentLanguage, 'archivesPage.noImages')}
               </h2>
               <p className="text-zinc-600 dark:text-zinc-400 mb-6">
-                {t(currentLanguage, "archivesPage.description")}
+                {t(currentLanguage, 'archivesPage.description')}
               </p>
             </motion.div>
           )}
@@ -208,7 +206,7 @@ export default function ArchivesClientComponent() {
                         <Image
                           alt={`Archives photo - ${tag}`}
                           className="transform rounded-sm brightness-90 transition will-change-auto group-hover:brightness-110"
-                          style={{ transform: "translate3d(0, 0, 0)" }}
+                          style={{ transform: 'translate3d(0, 0, 0)' }}
                           src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_scale,w_720,f_auto,q_auto/${public_id}.${format}`}
                           width={!isNaN(numericWidth) ? numericWidth : 720}
                           height={!isNaN(numericHeight) ? numericHeight : 480}
@@ -220,7 +218,7 @@ export default function ArchivesClientComponent() {
                         />
                       </div>
                     );
-                  },
+                  }
                 )}
               </div>
             </section>
@@ -231,7 +229,7 @@ export default function ArchivesClientComponent() {
             <section className="mb-16">
               {/* Section Title */}
               <h2 className="text-2xl sm:text-3xl md:text-4xl tracking-tighter font-regular text-zinc-800 dark:text-white -mt-16 mb-8 text-left">
-                {t(currentLanguage, "archivesPage.untagged")}
+                {t(currentLanguage, 'archivesPage.untagged')}
               </h2>
 
               <div className="columns-1 gap-4 sm:columns-2 xl:columns-3 2xl:columns-4">
@@ -253,7 +251,7 @@ export default function ArchivesClientComponent() {
                         <Image
                           alt="Archives photo"
                           className="transform rounded-sm brightness-90 transition will-change-auto group-hover:brightness-110"
-                          style={{ transform: "translate3d(0, 0, 0)" }}
+                          style={{ transform: 'translate3d(0, 0, 0)' }}
                           src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_scale,w_720,f_auto,q_auto/${public_id}.${format}`}
                           width={!isNaN(numericWidth) ? numericWidth : 720}
                           height={!isNaN(numericHeight) ? numericHeight : 480}
@@ -266,7 +264,7 @@ export default function ArchivesClientComponent() {
                         {/* No tag display for untagged images, or could be an empty placeholder if design requires */}
                       </div>
                     );
-                  },
+                  }
                 )}
               </div>
             </section>
@@ -291,9 +289,9 @@ export default function ArchivesClientComponent() {
 
             // Determine container size based on orientation
             const containerMaxWidth = isLandscape
-              ? "md:max-w-4xl"
-              : "md:max-w-xl"; // Larger for landscape
-            const containerMaxHeight = "md:max-h-[70vh]"; // Increased height slightly
+              ? 'md:max-w-4xl'
+              : 'md:max-w-xl'; // Larger for landscape
+            const containerMaxHeight = 'md:max-h-[70vh]'; // Increased height slightly
 
             const containerClasses = `
                             relative w-auto flex items-center justify-center 
@@ -311,27 +309,27 @@ export default function ArchivesClientComponent() {
             const baseHeight = numericHeight || (isLandscape ? 720 : 1080); // Approximate inverse aspect
 
             // Determine sizes prop based on container logic
-            const imageSizes = `(max-width: 767px) 95vw, ${isLandscape ? "80vw" : "50vw"}`;
+            const imageSizes = `(max-width: 767px) 95vw, ${isLandscape ? '80vw' : '50vw'}`;
 
             return (
               <div // This is containerClasses (outermost modal content box)
                 className={containerClasses}
-                onClick={(e) => e.stopPropagation()} // Stop backdrop click from closing if click is on padding of containerClasses
+                onClick={e => e.stopPropagation()} // Stop backdrop click from closing if click is on padding of containerClasses
               >
                 {/* New scaling and clickable wrapper */}
                 <div
                   className={`
                     relative cursor-zoom-in 
                     transition-transform duration-300 ease-in-out
-                    ${isFurtherZoomed ? "scale-125" : "scale-100"}
+                    ${isFurtherZoomed ? 'scale-125' : 'scale-100'}
                   `}
-                  style={{ transformOrigin: "center center" }} // Ensure scaling is from the center
+                  style={{ transformOrigin: 'center center' }} // Ensure scaling is from the center
                   onClick={handleImageClick} // Click this whole area to further zoom/unzoom
                 >
                   <Image
                     alt={`Zoomed archives photo ${zoomedImage.id}`}
                     className="object-contain w-full h-full rounded-sm" // Transform class removed
-                    style={{ transform: "translate3d(0, 0, 0)" }} // Keep for potential GPU layer promotion
+                    style={{ transform: 'translate3d(0, 0, 0)' }} // Keep for potential GPU layer promotion
                     src={imageSrc}
                     width={baseWidth}
                     height={baseHeight}

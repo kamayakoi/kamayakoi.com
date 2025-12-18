@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React, { useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Play, Pause, Volume2, Volume1, VolumeX } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/actions/utils";
+import React, { useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Play, Pause, Volume2, Volume1, VolumeX } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/actions/utils';
 
 const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
 const CustomSlider = ({
@@ -24,10 +24,10 @@ const CustomSlider = ({
   return (
     <motion.div
       className={cn(
-        "relative w-full h-1 bg-white/20 rounded-sm cursor-pointer",
-        className,
+        'relative w-full h-1 bg-white/20 rounded-sm cursor-pointer',
+        className
       )}
-      onClick={(e) => {
+      onClick={e => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const percentage = (x / rect.width) * 100;
@@ -39,7 +39,7 @@ const CustomSlider = ({
         style={{ width: `${value}%` }}
         initial={{ width: 0 }}
         animate={{ width: `${value}%` }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       />
     </motion.div>
   );
@@ -137,10 +137,10 @@ const VideoPlayer = ({ src }: { src: string }) => {
         {showControls && (
           <motion.div
             className="absolute bottom-0 mx-auto max-w-xl left-0 right-0 p-4 m-2 bg-[#11111198] backdrop-blur-md rounded-sm"
-            initial={{ y: 20, opacity: 0, filter: "blur(10px)" }}
-            animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-            exit={{ y: 20, opacity: 0, filter: "blur(10px)" }}
-            transition={{ duration: 0.6, ease: "circInOut", type: "spring" }}
+            initial={{ y: 20, opacity: 0, filter: 'blur(10px)' }}
+            animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+            exit={{ y: 20, opacity: 0, filter: 'blur(10px)' }}
+            transition={{ duration: 0.6, ease: 'circInOut', type: 'spring' }}
           >
             <div className="flex items-center gap-2 mb-2">
               <span className="text-white text-sm">
@@ -204,7 +204,7 @@ const VideoPlayer = ({ src }: { src: string }) => {
               </div>
 
               <div className="flex items-center gap-2">
-                {[0.5, 1, 1.5, 2].map((speed) => (
+                {[0.5, 1, 1.5, 2].map(speed => (
                   <motion.div
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
@@ -215,8 +215,8 @@ const VideoPlayer = ({ src }: { src: string }) => {
                       variant="ghost"
                       size="icon"
                       className={cn(
-                        "text-white hover:bg-[#111111d1] hover:text-white",
-                        playbackSpeed === speed && "bg-[#111111d1]",
+                        'text-white hover:bg-[#111111d1] hover:text-white',
+                        playbackSpeed === speed && 'bg-[#111111d1]'
                       )}
                     >
                       {speed}x

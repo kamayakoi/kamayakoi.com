@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { IG } from "@/components/icons/IG";
+import Image from 'next/image';
+import Link from 'next/link';
+import { IG } from '@/components/icons/IG';
 
 interface Artist {
   _id: string;
@@ -28,7 +28,7 @@ export default function ArtistHoverCard({ artist }: ArtistHoverCardProps) {
             <div className="relative w-full aspect-[4/3] overflow-hidden">
               <Image
                 src={artist.image}
-                alt={`${artist.name ?? "Artist"}'s image`}
+                alt={`${artist.name ?? 'Artist'}'s image`}
                 layout="fill"
                 objectFit="cover"
                 className="w-full aspect-[4/3] object-cover"
@@ -77,7 +77,7 @@ export default function ArtistHoverCard({ artist }: ArtistHoverCardProps) {
                     href={artist.socialLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`${artist.name ?? "Artist"}'s social media`}
+                    aria-label={`${artist.name ?? 'Artist'}'s social media`}
                     className="text-gray-300 dark:text-gray-300"
                   >
                     <IG className="h-6 w-6" />
@@ -97,7 +97,7 @@ export default function ArtistHoverCard({ artist }: ArtistHoverCardProps) {
                   href={artist.socialLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`${artist.name ?? "Artist"}'s social media`}
+                  aria-label={`${artist.name ?? 'Artist'}'s social media`}
                   className="text-gray-300 dark:text-gray-300"
                 >
                   <IG className="h-6 w-6" />

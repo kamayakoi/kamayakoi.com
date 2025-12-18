@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { Heart, X, ShoppingCart } from "lucide-react";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import Image from "next/image";
-import Link from "next/link";
-import { useWishlist } from "./wishlist-context";
-import { useCart } from "../cart/cart-context";
-import { createPortal } from "react-dom";
-import { SanityProduct } from "../types";
+import { Heart, X, ShoppingCart } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useWishlist } from './wishlist-context';
+import { useCart } from '../cart/cart-context';
+import { createPortal } from 'react-dom';
+import { SanityProduct } from '../types';
 
 export default function WishlistModal() {
   const { wishlist, removeFromWishlist, wishlistCount } = useWishlist();
@@ -33,7 +33,7 @@ export default function WishlistModal() {
   };
 
   const formatPrice = (price: number): string => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   };
 
   // Only show wishlist button if there are items in the wishlist
@@ -47,8 +47,8 @@ export default function WishlistModal() {
         aria-label="Open wishlist"
         onClick={openWishlist}
         className="relative bg-pink-800 hover:bg-pink-700 text-pink-200 border-pink-700"
-        size={"sm"}
-        onClickCapture={(e) => {
+        size={'sm'}
+        onClickCapture={e => {
           e.stopPropagation();
           openWishlist();
         }}
@@ -72,12 +72,12 @@ export default function WishlistModal() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
                   className="fixed inset-0 z-[60] bg-foreground/30 will-change-auto"
                   onClick={closeWishlist}
                   aria-hidden="true"
                   style={{
-                    position: "fixed",
+                    position: 'fixed',
                     top: 0,
                     left: 0,
                     right: 0,
@@ -87,12 +87,12 @@ export default function WishlistModal() {
 
                 {/* Panel */}
                 <motion.div
-                  initial={{ x: "100%" }}
+                  initial={{ x: '100%' }}
                   animate={{ x: 0 }}
-                  exit={{ x: "100%" }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  exit={{ x: '100%' }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
                   className="fixed top-0 bottom-0 right-0 flex w-full md:w-[500px] p-4 z-[70] will-change-transform"
-                  style={{ position: "fixed", top: 0, right: 0, bottom: 0 }}
+                  style={{ position: 'fixed', top: 0, right: 0, bottom: 0 }}
                 >
                   <div className="flex flex-col py-6 w-full bg-[#1a1a1a] backdrop-blur-xl rounded-sm shadow-2xl">
                     <div className="flex justify-between items-center px-6 mb-6">
@@ -101,7 +101,7 @@ export default function WishlistModal() {
                           Wishlist
                         </h2>
                         <p className="text-muted-foreground text-sm mt-1">
-                          {wishlistCount} item{wishlistCount !== 1 ? "s" : ""}{" "}
+                          {wishlistCount} item{wishlistCount !== 1 ? 's' : ''}{' '}
                           saved for later
                         </p>
                       </div>
@@ -127,7 +127,7 @@ export default function WishlistModal() {
                               transition={{
                                 duration: 0.3,
                                 delay: i * 0.1,
-                                ease: "easeOut",
+                                ease: 'easeOut',
                               }}
                             >
                               <Card className="bg-[#2a2a2a]/50 hover:bg-[#2a2a2a]/70 rounded-sm p-4 transition-colors">
@@ -135,7 +135,7 @@ export default function WishlistModal() {
                                   {/* Product Image */}
                                   <div className="flex-shrink-0 w-16">
                                     {item.product.mainImage &&
-                                    item.product.mainImage.trim() !== "" ? (
+                                    item.product.mainImage.trim() !== '' ? (
                                       <div className="h-full aspect-square relative overflow-hidden rounded-sm bg-muted">
                                         <Image
                                           src={item.product.mainImage}
@@ -186,7 +186,7 @@ export default function WishlistModal() {
                                         asChild
                                       >
                                         <Link
-                                          href={`/merch/${typeof item.product.slug === "string" ? item.product.slug : item.product.slug?.current || ""}`}
+                                          href={`/merch/${typeof item.product.slug === 'string' ? item.product.slug : item.product.slug?.current || ''}`}
                                         >
                                           View
                                         </Link>
@@ -215,7 +215,7 @@ export default function WishlistModal() {
               </>
             )}
           </AnimatePresence>,
-          document.body,
+          document.body
         )}
     </>
   );

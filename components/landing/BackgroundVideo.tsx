@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useState, useRef, useEffect } from "react";
-import { Volume2, VolumeX, ChevronLeft, ChevronRight } from "lucide-react"; // Import icons
+import React, { useState, useRef, useEffect } from 'react';
+import { Volume2, VolumeX, ChevronLeft, ChevronRight } from 'lucide-react'; // Import icons
 
 // Define props interface
 interface BackgroundVideoProps {
@@ -12,8 +12,8 @@ interface BackgroundVideoProps {
 
 export default function BackgroundVideo({
   videoUrls,
-  height = "min-h-screen",
-  className = "",
+  height = 'min-h-screen',
+  className = '',
 }: BackgroundVideoProps) {
   // State to manage sound, default to muted
   const [isMuted, setIsMuted] = useState(false);
@@ -50,7 +50,7 @@ export default function BackgroundVideo({
   function goTo(idx: number) {
     if (!videoUrls.length) return;
     // On mobile, allow seamless looping; on desktop, clamp between 0 and last
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
       setCurrent((idx + videoUrls.length) % videoUrls.length);
     } else {
       setCurrent(Math.max(0, Math.min(idx, videoUrls.length - 1)));
@@ -65,7 +65,7 @@ export default function BackgroundVideo({
 
   // No videos: render nothing
   if (!videoUrls || videoUrls.length === 0) {
-    console.warn("Homepage background video URLs not provided.");
+    console.warn('Homepage background video URLs not provided.');
     return null;
   }
 
@@ -117,7 +117,7 @@ export default function BackgroundVideo({
       <button
         onClick={toggleSound}
         className="absolute bottom-4 right-4 z-20 p-2 bg-black/10 hover:bg-black/30 rounded-sm text-white focus:outline-none transition-colors duration-200"
-        aria-label={isMuted ? "Unmute video" : "Mute video"}
+        aria-label={isMuted ? 'Unmute video' : 'Mute video'}
       >
         {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
       </button>
@@ -157,7 +157,7 @@ export default function BackgroundVideo({
             <button
               key={idx}
               onClick={() => goTo(idx)}
-              className={`w-2 h-2 rounded-sm border border-white transition-all duration-200 ${idx === current ? "bg-white" : "bg-white/30"}`}
+              className={`w-2 h-2 rounded-sm border border-white transition-all duration-200 ${idx === current ? 'bg-white' : 'bg-white/30'}`}
               aria-label={`Go to video ${idx + 1}`}
               tabIndex={0}
             />

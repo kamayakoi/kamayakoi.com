@@ -1,15 +1,15 @@
-import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const images = [
-  { title: "Joshua Hibbert", url: "https://picsum.photos/id/870/600/1000" },
-  { title: "Joshua Earle", url: "https://picsum.photos/id/883/600/1000" },
+  { title: 'Joshua Hibbert', url: 'https://picsum.photos/id/870/600/1000' },
+  { title: 'Joshua Earle', url: 'https://picsum.photos/id/883/600/1000' },
   {
-    title: "Antoine Beauvillain",
-    url: "https://picsum.photos/id/478/600/1000",
+    title: 'Antoine Beauvillain',
+    url: 'https://picsum.photos/id/478/600/1000',
   },
-  { title: "Greg Rakozy", url: "https://picsum.photos/id/903/600/1000" },
-  { title: "Ramiro Checchi", url: "https://picsum.photos/id/503/600/1000" },
+  { title: 'Greg Rakozy', url: 'https://picsum.photos/id/903/600/1000' },
+  { title: 'Ramiro Checchi', url: 'https://picsum.photos/id/503/600/1000' },
 ];
 
 const FLIP_SPEED = 750;
@@ -17,26 +17,26 @@ const flipTiming = { duration: FLIP_SPEED, iterations: 1 };
 
 // flip down
 const flipAnimationTop = [
-  { transform: "rotateX(0)" },
-  { transform: "rotateX(-90deg)" },
-  { transform: "rotateX(-90deg)" },
+  { transform: 'rotateX(0)' },
+  { transform: 'rotateX(-90deg)' },
+  { transform: 'rotateX(-90deg)' },
 ];
 const flipAnimationBottom = [
-  { transform: "rotateX(90deg)" },
-  { transform: "rotateX(90deg)" },
-  { transform: "rotateX(0)" },
+  { transform: 'rotateX(90deg)' },
+  { transform: 'rotateX(90deg)' },
+  { transform: 'rotateX(0)' },
 ];
 
 // flip up
 const flipAnimationTopReverse = [
-  { transform: "rotateX(-90deg)" },
-  { transform: "rotateX(-90deg)" },
-  { transform: "rotateX(0)" },
+  { transform: 'rotateX(-90deg)' },
+  { transform: 'rotateX(-90deg)' },
+  { transform: 'rotateX(0)' },
 ];
 const flipAnimationBottomReverse = [
-  { transform: "rotateX(0)" },
-  { transform: "rotateX(90deg)" },
-  { transform: "rotateX(90deg)" },
+  { transform: 'rotateX(0)' },
+  { transform: 'rotateX(90deg)' },
+  { transform: 'rotateX(90deg)' },
 ];
 
 export default function FlipGallery() {
@@ -48,7 +48,7 @@ export default function FlipGallery() {
   useEffect(() => {
     if (!containerRef.current) return;
     uniteRef.current = Array.from(
-      containerRef.current.querySelectorAll(".unite"),
+      containerRef.current.querySelectorAll('.unite')
     );
     defineFirstImg();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -66,9 +66,9 @@ export default function FlipGallery() {
   const setImageTitle = () => {
     const gallery = containerRef.current;
     if (!gallery) return;
-    gallery.setAttribute("data-title", images[currentIndex].title);
-    gallery.style.setProperty("--title-y", "0");
-    gallery.style.setProperty("--title-opacity", "1");
+    gallery.setAttribute('data-title', images[currentIndex].title);
+    gallery.style.setProperty('--title-y', '0');
+    gallery.style.setProperty('--title-opacity', '1');
   };
 
   const updateGallery = (nextIndex: number, isReverse = false) => {
@@ -81,13 +81,13 @@ export default function FlipGallery() {
       ? flipAnimationBottomReverse
       : flipAnimationBottom;
 
-    gallery.querySelector(".overlay-top")?.animate(topAnim, flipTiming);
-    gallery.querySelector(".overlay-bottom")?.animate(bottomAnim, flipTiming);
+    gallery.querySelector('.overlay-top')?.animate(topAnim, flipTiming);
+    gallery.querySelector('.overlay-bottom')?.animate(bottomAnim, flipTiming);
 
     // hide title
-    gallery.style.setProperty("--title-y", "-1rem");
-    gallery.style.setProperty("--title-opacity", "0");
-    gallery.setAttribute("data-title", "");
+    gallery.style.setProperty('--title-y', '-1rem');
+    gallery.style.setProperty('--title-opacity', '0');
+    gallery.setAttribute('data-title', '');
 
     // update images with slight delay so animation looks continuous
     uniteRef.current.forEach((el, idx) => {
@@ -118,7 +118,7 @@ export default function FlipGallery() {
         className="relative bg-white/10 border border-white/25 p-2"
         style={
           {
-            "--gallery-bg-color": "rgba(255 255 255 / 0.075)",
+            '--gallery-bg-color': 'rgba(255 255 255 / 0.075)',
           } as React.CSSProperties
         }
       >
@@ -127,7 +127,7 @@ export default function FlipGallery() {
           id="flip-gallery"
           ref={containerRef}
           className="relative w-[240px] h-[400px] md:w-[300px] md:h-[500px] text-center"
-          style={{ perspective: "800px" }}
+          style={{ perspective: '800px' }}
         >
           <div className="top unite bg-cover bg-no-repeat"></div>
           <div className="bottom unite bg-cover bg-no-repeat"></div>

@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Loader2, Ticket, Plus, Minus, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { createPortal } from "react-dom";
-import { t } from "@/lib/i18n/translations";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { SupabaseClient } from "@supabase/supabase-js";
-import PhoneNumberInput from "@/components/ui/phone-number-input";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Loader2, Ticket, Plus, Minus, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
+import { t } from '@/lib/i18n/translations';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { SupabaseClient } from '@supabase/supabase-js';
+import PhoneNumberInput from '@/components/ui/phone-number-input';
 
 // Helper function for formatting price (matching event page)
 const formatPrice = (price: number): string => {
   // Use non-breaking space (\u00A0) for thousands separator
-  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
+  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0');
 };
 
 // Define the shape of the ticket/bundle item passed to the modal
@@ -78,10 +78,10 @@ export default function PurchaseFormModal({
 }: PurchaseFormModalProps) {
   const { currentLanguage } = useTranslation();
   const [quantity, setQuantity] = useState(1);
-  const [quantityDisplay, setQuantityDisplay] = useState("1");
-  const [userName, setUserName] = useState("");
-  const [userEmail, setUserEmail] = useState("");
-  const [userPhone, setUserPhone] = useState("");
+  const [quantityDisplay, setQuantityDisplay] = useState('1');
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [userPhone, setUserPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -94,24 +94,24 @@ export default function PurchaseFormModal({
 
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && isOpen) {
+      if (event.key === 'Escape' && isOpen) {
         onClose();
       }
     };
 
     if (isOpen) {
-      document.addEventListener("keydown", handleEscapeKey);
+      document.addEventListener('keydown', handleEscapeKey);
     }
 
     return () => {
-      document.removeEventListener("keydown", handleEscapeKey);
+      document.removeEventListener('keydown', handleEscapeKey);
     };
   }, [isOpen, onClose]);
 
   useEffect(() => {
     if (item) {
       setQuantity(1); // Reset quantity when item changes
-      setQuantityDisplay("1"); // Reset display value too
+      setQuantityDisplay('1'); // Reset display value too
       setError(null); // Reset error
     }
   }, [item]);
@@ -135,8 +135,8 @@ export default function PurchaseFormModal({
     const value = e.target.value;
 
     // Allow empty string for better UX (user can clear and type new number)
-    if (value === "") {
-      setQuantityDisplay("");
+    if (value === '') {
+      setQuantityDisplay('');
       return;
     }
 
@@ -165,9 +165,9 @@ export default function PurchaseFormModal({
 
   const handleQuantityBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === "" || parseInt(value, 10) < 1) {
+    if (value === '' || parseInt(value, 10) < 1) {
       setQuantity(1);
-      setQuantityDisplay("1");
+      setQuantityDisplay('1');
     } else {
       // Ensure display matches the actual quantity
       setQuantityDisplay(quantity.toString());
@@ -200,26 +200,26 @@ export default function PurchaseFormModal({
     setError(null);
 
     if (!userName.trim()) {
-      setError(t(currentLanguage, "purchaseModal.errors.nameRequired"));
+      setError(t(currentLanguage, 'purchaseModal.errors.nameRequired'));
       return;
     }
     if (!userEmail.trim()) {
-      setError(t(currentLanguage, "purchaseModal.errors.emailRequired"));
+      setError(t(currentLanguage, 'purchaseModal.errors.emailRequired'));
       return;
     }
     if (!validateEmail(userEmail)) {
-      setError(t(currentLanguage, "purchaseModal.errors.emailInvalid"));
+      setError(t(currentLanguage, 'purchaseModal.errors.emailInvalid'));
       return;
     }
     if (quantity <= 0) {
-      setError(t(currentLanguage, "purchaseModal.errors.quantityInvalid"));
+      setError(t(currentLanguage, 'purchaseModal.errors.quantityInvalid'));
       return;
     }
     if (item.maxPerOrder && quantity > item.maxPerOrder) {
       setError(
-        t(currentLanguage, "purchaseModal.errors.quantityExceedsMax", {
+        t(currentLanguage, 'purchaseModal.errors.quantityExceedsMax', {
           max: item.maxPerOrder,
-        }),
+        })
       );
       return;
     }
@@ -229,16 +229,16 @@ export default function PurchaseFormModal({
       quantity > item.stock
     ) {
       setError(
-        t(currentLanguage, "purchaseModal.errors.quantityExceedsStock", {
+        t(currentLanguage, 'purchaseModal.errors.quantityExceedsStock', {
           stock: item.stock,
-        }),
+        })
       );
       return;
     }
 
     setIsLoading(true);
 
-    console.log("PurchaseFormModal - item.productId:", item.productId);
+    console.log('PurchaseFormModal - item.productId:', item.productId);
 
     const shouldAllowQuantity =
       (item.maxPerOrder && item.maxPerOrder > 1) ||
@@ -256,9 +256,9 @@ export default function PurchaseFormModal({
       userName: userName.trim(),
       userEmail: userEmail.trim(),
       userPhone: userPhone || undefined, // Send phone number properly formatted
-      currencyCode: "XOF", // Assuming XOF, make dynamic if needed
-      successUrlPath: "/payment/success", // Or from config
-      cancelUrlPath: "/payment/error", // Or from config
+      currencyCode: 'XOF', // Assuming XOF, make dynamic if needed
+      successUrlPath: '/payment/success', // Or from config
+      cancelUrlPath: '/payment/error', // Or from config
       productId: item.productId,
       allowCouponCode: true, // Enable coupon codes by default
       allowQuantity: shouldAllowQuantity,
@@ -275,15 +275,15 @@ export default function PurchaseFormModal({
     try {
       // Note: Ensure your Supabase function is named 'create-lomi-checkout-session'
       const { data, error: functionError } =
-        await supabaseClient.functions.invoke("create-lomi-checkout-session", {
+        await supabaseClient.functions.invoke('create-lomi-checkout-session', {
           body: payload,
         });
 
       if (functionError) {
-        console.error("Supabase function error:", functionError);
+        console.error('Supabase function error:', functionError);
         setError(
           functionError.message ||
-            t(currentLanguage, "purchaseModal.errors.functionError"),
+            t(currentLanguage, 'purchaseModal.errors.functionError')
         );
         setIsLoading(false);
         return;
@@ -293,18 +293,18 @@ export default function PurchaseFormModal({
         window.location.href = data.checkout_url;
         successfullyInitiatedRedirect = true;
       } else {
-        console.error("Lomi checkout URL not found in response:", data);
+        console.error('Lomi checkout URL not found in response:', data);
         setError(
           data.error ||
-            t(currentLanguage, "purchaseModal.errors.lomiUrlMissing"),
+            t(currentLanguage, 'purchaseModal.errors.lomiUrlMissing')
         );
       }
     } catch (e: unknown) {
-      console.error("Error invoking Supabase function:", e);
-      let message = t(currentLanguage, "purchaseModal.errors.submitError");
+      console.error('Error invoking Supabase function:', e);
+      let message = t(currentLanguage, 'purchaseModal.errors.submitError');
       if (e instanceof Error) {
         message = e.message;
-      } else if (typeof e === "string") {
+      } else if (typeof e === 'string') {
         message = e;
       }
       setError(message);
@@ -344,16 +344,16 @@ export default function PurchaseFormModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="fixed inset-0 z-[60] bg-foreground/30 will-change-auto cursor-pointer"
-            onClick={(e) => {
+            onClick={e => {
               e.preventDefault();
               e.stopPropagation();
               onClose();
             }}
             aria-hidden="true"
             style={{
-              position: "fixed",
+              position: 'fixed',
               top: 0,
               left: 0,
               right: 0,
@@ -363,23 +363,23 @@ export default function PurchaseFormModal({
 
           {/* Panel */}
           <motion.div
-            initial={{ x: "100%" }}
+            initial={{ x: '100%' }}
             animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            exit={{ x: '100%' }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="fixed top-0 bottom-0 right-0 flex w-full md:w-[500px] p-4 z-[70] will-change-transform pointer-events-auto"
-            style={{ position: "fixed", top: 0, right: 0, bottom: 0 }}
-            onClick={(e) => e.stopPropagation()} // Prevent event bubbling to backdrop
+            style={{ position: 'fixed', top: 0, right: 0, bottom: 0 }}
+            onClick={e => e.stopPropagation()} // Prevent event bubbling to backdrop
           >
             <div className="flex flex-col w-full bg-[#1a1a1a] backdrop-blur-xl rounded-sm shadow-2xl">
               {/* Header */}
               <div className="flex justify-between items-center px-3 md:px-4 py-6 mb-0">
                 <div>
                   <h2 className="text-3xl font-bold text-foreground">
-                    {t(currentLanguage, "purchaseModal.title")}
+                    {t(currentLanguage, 'purchaseModal.title')}
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {t(currentLanguage, "purchaseModal.description")}
+                    {t(currentLanguage, 'purchaseModal.description')}
                   </p>
                 </div>
                 <Button
@@ -406,15 +406,15 @@ export default function PurchaseFormModal({
                           {formatPrice(item.price)}
                           {t(
                             currentLanguage,
-                            "eventSlugPage.tickets.currencySuffix",
+                            'eventSlugPage.tickets.currencySuffix'
                           )}
                         </p>
                       </div>
                       <div className="flex flex-col items-end gap-1">
                         {item.isBundle && (
                           <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-sm">
-                            {item.ticketsIncluded || 1}{" "}
-                            {item.ticketsIncluded === 1 ? "billet" : "billets"}
+                            {item.ticketsIncluded || 1}{' '}
+                            {item.ticketsIncluded === 1 ? 'billet' : 'billets'}
                           </span>
                         )}
                         {!item.isBundle &&
@@ -422,13 +422,13 @@ export default function PurchaseFormModal({
                           item.stock !== undefined &&
                           item.stock > 0 && (
                             <span className="text-xs bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-sm">
-                              {t(currentLanguage, "purchaseModal.only")}{" "}
-                              {item.stock}{" "}
+                              {t(currentLanguage, 'purchaseModal.only')}{' '}
+                              {item.stock}{' '}
                               {item.stock === 1
-                                ? t(currentLanguage, "purchaseModal.available")
+                                ? t(currentLanguage, 'purchaseModal.available')
                                 : t(
                                     currentLanguage,
-                                    "purchaseModal.availablePlural",
+                                    'purchaseModal.availablePlural'
                                   )}
                             </span>
                           )}
@@ -439,16 +439,16 @@ export default function PurchaseFormModal({
                   {/* Name Field */}
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-sm">
-                      {t(currentLanguage, "purchaseModal.labels.name")}
+                      {t(currentLanguage, 'purchaseModal.labels.name')}
                     </Label>
                     <Input
                       id="name"
                       value={userName}
-                      onChange={(e) => setUserName(e.target.value)}
+                      onChange={e => setUserName(e.target.value)}
                       className="rounded-sm h-9 text-sm mt-2"
                       placeholder={t(
                         currentLanguage,
-                        "purchaseModal.placeholders.name",
+                        'purchaseModal.placeholders.name'
                       )}
                       required
                     />
@@ -457,17 +457,17 @@ export default function PurchaseFormModal({
                   {/* Email Field */}
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-sm">
-                      {t(currentLanguage, "purchaseModal.labels.email")}
+                      {t(currentLanguage, 'purchaseModal.labels.email')}
                     </Label>
                     <Input
                       id="email"
                       type="email"
                       value={userEmail}
-                      onChange={(e) => setUserEmail(e.target.value)}
+                      onChange={e => setUserEmail(e.target.value)}
                       className="rounded-sm h-9 text-sm mt-2"
                       placeholder={t(
                         currentLanguage,
-                        "purchaseModal.placeholders.email",
+                        'purchaseModal.placeholders.email'
                       )}
                       required
                     />
@@ -476,15 +476,15 @@ export default function PurchaseFormModal({
                   {/* Phone Field */}
                   <div className="space-y-2">
                     <Label className="text-sm">
-                      {t(currentLanguage, "purchaseModal.labels.phone")}
+                      {t(currentLanguage, 'purchaseModal.labels.phone')}
                     </Label>
                     <PhoneNumberInput
                       value={userPhone}
-                      onChange={(value) => setUserPhone(value || "")}
+                      onChange={value => setUserPhone(value || '')}
                       className="rounded-sm h-9 text-sm mt-2"
                       placeholder={t(
                         currentLanguage,
-                        "purchaseModal.placeholders.phone",
+                        'purchaseModal.placeholders.phone'
                       )}
                     />
                   </div>
@@ -492,7 +492,7 @@ export default function PurchaseFormModal({
                   {/* Quantity Field */}
                   <div className="space-y-2">
                     <Label htmlFor="quantity" className="text-sm">
-                      {t(currentLanguage, "purchaseModal.labels.quantity")}
+                      {t(currentLanguage, 'purchaseModal.labels.quantity')}
                     </Label>
                     <div className="flex items-center space-x-2">
                       <Button
@@ -539,20 +539,20 @@ export default function PurchaseFormModal({
                   <div className="pt-3 border-t border-border">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-muted-foreground">
-                        {t(currentLanguage, "purchaseModal.totalPrice")}
+                        {t(currentLanguage, 'purchaseModal.totalPrice')}
                       </span>
                       <span className="text-primary font-semibold">
                         {formatPrice(totalPrice)}
                         {t(
                           currentLanguage,
-                          "eventSlugPage.tickets.currencySuffix",
+                          'eventSlugPage.tickets.currencySuffix'
                         )}
                       </span>
                     </div>
                     {item.isBundle && (
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-muted-foreground">
-                          {t(currentLanguage, "purchaseModal.ticketsGenerated")}
+                          {t(currentLanguage, 'purchaseModal.ticketsGenerated')}
                         </span>
                         <span className="text-xs font-medium">
                           {actualTicketCount}
@@ -574,12 +574,12 @@ export default function PurchaseFormModal({
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {t(currentLanguage, "purchaseModal.buttons.processing")}
+                      {t(currentLanguage, 'purchaseModal.buttons.processing')}
                     </>
                   ) : (
                     <>
                       <Ticket className="mr-2 h-4 w-4" />
-                      {t(currentLanguage, "purchaseModal.buttons.pay")}
+                      {t(currentLanguage, 'purchaseModal.buttons.pay')}
                     </>
                   )}
                 </Button>
@@ -589,6 +589,6 @@ export default function PurchaseFormModal({
         </>
       )}
     </AnimatePresence>,
-    document.body,
+    document.body
   );
 }

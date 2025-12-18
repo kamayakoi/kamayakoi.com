@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React, { ReactNode } from "react";
-import { Share2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import React, { ReactNode } from 'react';
+import { Share2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface TitleBoxProps {
   children: ReactNode;
@@ -23,7 +23,7 @@ export default function TitleBox({
   categories,
 }: TitleBoxProps) {
   const shareUrl =
-    typeof window !== "undefined"
+    typeof window !== 'undefined'
       ? `${window.location.origin}/stories/${slug}`
       : `/stories/${slug}`;
 
@@ -35,7 +35,7 @@ export default function TitleBox({
           url: shareUrl,
         });
       } catch (error) {
-        console.log("Error sharing:", error);
+        console.log('Error sharing:', error);
       }
     } else {
       // Fallback: copy to clipboard
@@ -55,10 +55,10 @@ export default function TitleBox({
           <div className="text-sm text-muted-foreground space-y-1 text-left md:text-right">
             {date && (
               <p className="font-medium">
-                {new Date(date).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
+                {new Date(date).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
                 })}
               </p>
             )}

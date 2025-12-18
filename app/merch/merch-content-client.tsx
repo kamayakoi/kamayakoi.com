@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import Header from "@/components/landing/header";
-import { Footer } from "@/components/landing/footer";
-import { ProductListContent } from "../../components/merch/product-list-content";
-import { ProductGrid } from "../../components/merch/product-grid";
-import { ProductCardSkeleton } from "../../components/merch/product-card-skeleton";
-import { Suspense, useState, useMemo } from "react";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
-import { Input } from "@/components/ui/input";
+import { motion } from 'framer-motion';
+import Header from '@/components/landing/header';
+import { Footer } from '@/components/landing/footer';
+import { ProductListContent } from '../../components/merch/product-list-content';
+import { ProductGrid } from '../../components/merch/product-grid';
+import { ProductCardSkeleton } from '../../components/merch/product-card-skeleton';
+import { Suspense, useState, useMemo } from 'react';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Search } from "lucide-react";
-import { SanityProduct } from "../../components/merch/types";
+} from '@/components/ui/select';
+import { Search } from 'lucide-react';
+import { SanityProduct } from '../../components/merch/types';
 
 interface MerchContentClientProps {
   products: SanityProduct[];
@@ -28,19 +28,19 @@ export default function MerchContentClient({
   products,
 }: MerchContentClientProps) {
   const { currentLanguage } = useTranslation();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedTag, setSelectedTag] = useState("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedTag, setSelectedTag] = useState('all');
 
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
-    const filtered = products.filter((product) => {
+    const filtered = products.filter(product => {
       // Handle search query - check product name and description
-      const productName = product.name?.toLowerCase() || "";
+      const productName = product.name?.toLowerCase() || '';
       const productDescription =
-        typeof product.description === "string"
+        typeof product.description === 'string'
           ? product.description.toLowerCase()
-          : "";
+          : '';
       const trimmedSearch = searchQuery.trim().toLowerCase();
       const matchesSearch =
         !trimmedSearch ||
@@ -49,13 +49,13 @@ export default function MerchContentClient({
 
       // Handle category filter
       const matchesCategory =
-        selectedCategory === "all" ||
-        product.categories?.some((cat) => cat.slug === selectedCategory);
+        selectedCategory === 'all' ||
+        product.categories?.some(cat => cat.slug === selectedCategory);
 
       // Handle tag filter
       const matchesTag =
-        selectedTag === "all" ||
-        product.tags?.some((tag) => tag?.toLowerCase() === selectedTag);
+        selectedTag === 'all' ||
+        product.tags?.some(tag => tag?.toLowerCase() === selectedTag);
 
       return matchesSearch && matchesCategory && matchesTag;
     });
@@ -66,9 +66,9 @@ export default function MerchContentClient({
   // Get unique categories and tags from products
   const availableCategories = useMemo(() => {
     const cats = new Set<string>();
-    products.forEach((product) => {
-      product.categories?.forEach((cat) => {
-        if (cat.slug && typeof cat.slug === "string") {
+    products.forEach(product => {
+      product.categories?.forEach(cat => {
+        if (cat.slug && typeof cat.slug === 'string') {
           cats.add(cat.slug);
         }
       });
@@ -78,9 +78,9 @@ export default function MerchContentClient({
 
   const availableTags = useMemo(() => {
     const tags = new Set<string>();
-    products.forEach((product) => {
-      product.tags?.forEach((tag) => {
-        if (tag && typeof tag === "string") {
+    products.forEach(product => {
+      product.tags?.forEach(tag => {
+        if (tag && typeof tag === 'string') {
           tags.add(tag.toLowerCase());
         }
       });
@@ -102,7 +102,7 @@ export default function MerchContentClient({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              {t(currentLanguage, "merchPage.title")}
+              {t(currentLanguage, 'merchPage.title')}
             </motion.h1>
             <motion.p
               className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-3xl"
@@ -110,7 +110,7 @@ export default function MerchContentClient({
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              {t(currentLanguage, "merchPage.subtitle")}
+              {t(currentLanguage, 'merchPage.subtitle')}
             </motion.p>
           </div>
 
@@ -129,10 +129,10 @@ export default function MerchContentClient({
                   <Input
                     placeholder={t(
                       currentLanguage,
-                      "merchPage.searchPlaceholder",
+                      'merchPage.searchPlaceholder'
                     )}
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value.trim())}
+                    onChange={e => setSearchQuery(e.target.value.trim())}
                     className="pl-10 rounded-sm bg-background h-10 border border-border"
                   />
                 </div>
@@ -146,9 +146,9 @@ export default function MerchContentClient({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">
-                      {t(currentLanguage, "merchPage.categoryFilter")}
+                      {t(currentLanguage, 'merchPage.categoryFilter')}
                     </SelectItem>
-                    {availableCategories.map((category) => (
+                    {availableCategories.map(category => (
                       <SelectItem key={category} value={category}>
                         {category.charAt(0).toUpperCase() + category.slice(1)}
                       </SelectItem>
@@ -161,15 +161,15 @@ export default function MerchContentClient({
                     <SelectValue
                       placeholder={t(
                         currentLanguage,
-                        "merchPage.tagPlaceholder",
+                        'merchPage.tagPlaceholder'
                       )}
                     />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">
-                      {t(currentLanguage, "merchPage.tagFilter")}
+                      {t(currentLanguage, 'merchPage.tagFilter')}
                     </SelectItem>
-                    {availableTags.map((tag) => (
+                    {availableTags.map(tag => (
                       <SelectItem key={tag} value={tag}>
                         {tag.charAt(0).toUpperCase() + tag.slice(1)}
                       </SelectItem>
@@ -208,17 +208,17 @@ export default function MerchContentClient({
             >
               <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
                 {searchQuery ||
-                selectedCategory !== "all" ||
-                selectedTag !== "all"
-                  ? t(currentLanguage, "merchPage.noProductsFound")
-                  : t(currentLanguage, "merchPage.comingSoon.title")}
+                selectedCategory !== 'all' ||
+                selectedTag !== 'all'
+                  ? t(currentLanguage, 'merchPage.noProductsFound')
+                  : t(currentLanguage, 'merchPage.comingSoon.title')}
               </h2>
               <p className="text-zinc-600 dark:text-zinc-400 mb-6">
                 {searchQuery ||
-                selectedCategory !== "all" ||
-                selectedTag !== "all"
-                  ? t(currentLanguage, "merchPage.noProductsFoundDescription")
-                  : t(currentLanguage, "merchPage.comingSoon.description")}
+                selectedCategory !== 'all' ||
+                selectedTag !== 'all'
+                  ? t(currentLanguage, 'merchPage.noProductsFoundDescription')
+                  : t(currentLanguage, 'merchPage.comingSoon.description')}
               </p>
             </motion.div>
           )}

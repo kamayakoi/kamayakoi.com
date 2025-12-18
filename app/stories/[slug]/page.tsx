@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { Suspense } from "react";
-import { notFound } from "next/navigation";
-import { getBlogPostBySlug } from "@/lib/sanity/queries";
-import LoadingComponent from "@/components/ui/loader";
-import Header from "@/components/landing/header";
-import { Footer } from "@/components/landing/footer";
-import Image from "next/image";
-import { PortableText } from "@portabletext/react";
-import { portableTextRenderers } from "@/components/blog/portable-text-renderers";
-import { BackButton } from "./back-button.tsx";
-import { t } from "@/lib/i18n/translations";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { useEffect, useState } from "react";
+import { Suspense } from 'react';
+import { notFound } from 'next/navigation';
+import { getBlogPostBySlug } from '@/lib/sanity/queries';
+import LoadingComponent from '@/components/ui/loader';
+import Header from '@/components/landing/header';
+import { Footer } from '@/components/landing/footer';
+import Image from 'next/image';
+import { PortableText } from '@portabletext/react';
+import { portableTextRenderers } from '@/components/blog/portable-text-renderers';
+import { BackButton } from './back-button.tsx';
+import { t } from '@/lib/i18n/translations';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { useEffect, useState } from 'react';
 // Define a simple type for PortableText content
 type PortableTextContent = Array<{
   _type: string;
@@ -112,7 +112,7 @@ function StoryPage({ params }: PageProps) {
 
         setPost(fetchedPost);
       } catch (err) {
-        console.error("Error fetching post:", err);
+        console.error('Error fetching post:', err);
         setError(true);
       } finally {
         setLoading(false);
@@ -132,15 +132,15 @@ function StoryPage({ params }: PageProps) {
 
   // Select content based on language - handle empty strings properly
   const title =
-    currentLanguage === "fr" && post.title_fr && post.title_fr.trim() !== ""
+    currentLanguage === 'fr' && post.title_fr && post.title_fr.trim() !== ''
       ? post.title_fr
       : post.title;
   const excerpt =
-    currentLanguage === "fr" && post.excerpt_fr && post.excerpt_fr.trim() !== ""
+    currentLanguage === 'fr' && post.excerpt_fr && post.excerpt_fr.trim() !== ''
       ? post.excerpt_fr
       : post.excerpt;
   const body =
-    currentLanguage === "fr" && post.body_fr && post.body_fr.length > 0
+    currentLanguage === 'fr' && post.body_fr && post.body_fr.length > 0
       ? post.body_fr
       : post.body;
 
@@ -188,13 +188,13 @@ function StoryPage({ params }: PageProps) {
                       {post.author.image && (
                         <Image
                           src={
-                            post.author.image?.asset?.url || "/placeholder.webp"
+                            post.author.image?.asset?.url || '/placeholder.webp'
                           }
                           alt={post.author.name}
                           width={48}
                           height={48}
                           className="rounded-sm mr-3 object-cover"
-                          style={{ objectFit: "fill" }}
+                          style={{ objectFit: 'fill' }}
                         />
                       )}
                       <span className="mr-2">·</span>
@@ -212,14 +212,14 @@ function StoryPage({ params }: PageProps) {
                   <div className="rounded-sm overflow-hidden mb-6 shadow-md">
                     <div className="aspect-[16/9] md:aspect-[16/9] relative">
                       <Image
-                        src={post.mainImage?.asset?.url || "/placeholder.webp"}
+                        src={post.mainImage?.asset?.url || '/placeholder.webp'}
                         alt={post.mainImage.alt || title}
                         fill
                         priority
                         className="object-cover"
                         placeholder={
                           post.mainImage.asset.metadata?.lqip
-                            ? "blur"
+                            ? 'blur'
                             : undefined
                         }
                         blurDataURL={post.mainImage.asset.metadata?.lqip}
@@ -248,7 +248,7 @@ function StoryPage({ params }: PageProps) {
                     <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed break-words overflow-wrap-anywhere">
                       {t(
                         currentLanguage,
-                        "storyPage.placeholderContent.excerpt",
+                        'storyPage.placeholderContent.excerpt'
                       )}
                     </p>
                   </div>
@@ -257,7 +257,7 @@ function StoryPage({ params }: PageProps) {
                     <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed break-words overflow-wrap-anywhere">
                       {t(
                         currentLanguage,
-                        "storyPage.placeholderContent.fallback",
+                        'storyPage.placeholderContent.fallback'
                       )}
                     </p>
                   </div>

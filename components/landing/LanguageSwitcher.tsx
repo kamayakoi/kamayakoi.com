@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { memo, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { usePathname } from "next/navigation";
-import { languages } from "@/lib/i18n/config";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
+import { memo, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { usePathname } from 'next/navigation';
+import { languages } from '@/lib/i18n/config';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
 
 interface LanguageSwitcherProps {
   onLanguageChange?: (language: string) => void;
@@ -15,14 +15,14 @@ interface LanguageSwitcherProps {
 export const LanguageSwitcher = memo(
   ({
     onLanguageChange,
-    className = "",
+    className = '',
     useAbbreviated = false,
   }: LanguageSwitcherProps) => {
     const { currentLanguage, setLanguage } = useTranslation();
     const pathname = usePathname();
 
-    const currentLangObj = languages.find((l) => l.code === currentLanguage);
-    const isPortalRoute = pathname.startsWith("/portal");
+    const currentLangObj = languages.find(l => l.code === currentLanguage);
+    const isPortalRoute = pathname.startsWith('/portal');
 
     // Display abbreviated language names if requested (e.g., "FR EN" instead of "Français English")
     const displayName = useAbbreviated
@@ -40,11 +40,11 @@ export const LanguageSwitcher = memo(
         }
 
         const currentIndex = languages.findIndex(
-          (l) => l.code === currentLanguage,
+          l => l.code === currentLanguage
         );
         const nextIndex = (currentIndex + 1) % languages.length;
-        const nextLang = languages[nextIndex]?.code || "en";
-        const nextLangName = languages[nextIndex]?.name || "English";
+        const nextLang = languages[nextIndex]?.code || 'en';
+        const nextLangName = languages[nextIndex]?.name || 'English';
 
         // Update language via context
         setLanguage(nextLang);
@@ -54,7 +54,7 @@ export const LanguageSwitcher = memo(
           onLanguageChange(nextLangName);
         }
       },
-      [currentLanguage, isPortalRoute, onLanguageChange, setLanguage],
+      [currentLanguage, isPortalRoute, onLanguageChange, setLanguage]
     );
 
     // Don't render the switcher in portal routes
@@ -88,7 +88,7 @@ export const LanguageSwitcher = memo(
         </div>
       </button>
     );
-  },
+  }
 );
 
-LanguageSwitcher.displayName = "LanguageSwitcher";
+LanguageSwitcher.displayName = 'LanguageSwitcher';

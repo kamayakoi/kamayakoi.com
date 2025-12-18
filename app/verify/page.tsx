@@ -1,6 +1,6 @@
-import { Suspense } from "react";
-import { VerifyClient } from "./verify-client";
-import LoadingComponent from "@/components/ui/loader";
+import { Suspense } from 'react';
+import { VerifyClient } from './verify-client';
+import LoadingComponent from '@/components/ui/loader';
 
 interface SearchParamsProps {
   searchParams: Promise<{

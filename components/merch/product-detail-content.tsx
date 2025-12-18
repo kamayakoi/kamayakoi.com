@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { PlusIcon, MinusIcon, Heart, Share2 } from "lucide-react";
-import { motion } from "framer-motion";
-import { useCart } from "./cart/cart-context";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
-import { useWishlist } from "./wishlist/wishlist-context";
-import { SanityProduct } from "./types";
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { PlusIcon, MinusIcon, Heart, Share2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useCart } from './cart/cart-context';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
+import { useWishlist } from './wishlist/wishlist-context';
+import { SanityProduct } from './types';
 import {
   Carousel,
   CarouselContent,
@@ -16,8 +16,8 @@ import {
   CarouselNext,
   CarouselPrevious,
   type CarouselApi,
-} from "@/components/ui/carousel";
-import { useState } from "react";
+} from '@/components/ui/carousel';
+import { useState } from 'react';
 
 interface ProductImageCarouselProps {
   images: Array<{ url: string }>;
@@ -40,7 +40,7 @@ function ProductImageCarousel({
                 <Image
                   src={image.url}
                   alt={
-                    typeof productName === "string" ? productName : "Product"
+                    typeof productName === 'string' ? productName : 'Product'
                   }
                   fill
                   className="object-cover"
@@ -71,9 +71,9 @@ function ProductDetail({ product }: ProductDetailContentProps) {
 
   const allImages = product.images || [];
   const carouselImages = allImages
-    .map((image) => image.asset?.url)
+    .map(image => image.asset?.url)
     .filter((url): url is string => !!url)
-    .map((url) => ({ url }));
+    .map(url => ({ url }));
 
   const mainImage = product.mainImage || carouselImages[0]?.url;
 
@@ -82,18 +82,18 @@ function ProductDetail({ product }: ProductDetailContentProps) {
     // Could add toast notification here
   };
 
-  const incrementQuantity = () => setQuantity((prev) => prev + 1);
-  const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1));
+  const incrementQuantity = () => setQuantity(prev => prev + 1);
+  const decrementQuantity = () => setQuantity(prev => Math.max(1, prev - 1));
 
   const handleShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: typeof product.name === "string" ? product.name : "Product",
+          title: typeof product.name === 'string' ? product.name : 'Product',
           url: window.location.href,
         });
       } catch (err) {
-        console.log("Error sharing:", err);
+        console.log('Error sharing:', err);
       }
     } else {
       // Fallback: copy to clipboard
@@ -122,7 +122,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 <Image
                   src={mainImage}
                   alt={
-                    typeof product.name === "string" ? product.name : "Product"
+                    typeof product.name === 'string' ? product.name : 'Product'
                   }
                   fill
                   className="object-cover"
@@ -133,7 +133,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
             ) : (
               <div className="flex-1 min-h-[650px] relative overflow-hidden rounded-sm bg-muted flex items-center justify-center shadow-2xl">
                 <span className="text-muted-foreground">
-                  {t(currentLanguage, "merchPage.productDetail.noImage")}
+                  {t(currentLanguage, 'merchPage.productDetail.noImage')}
                 </span>
               </div>
             )}
@@ -154,7 +154,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
-                {typeof product.name === "string" ? product.name : "Product"}
+                {typeof product.name === 'string' ? product.name : 'Product'}
               </motion.h1>
 
               <div className="flex justify-start">
@@ -164,11 +164,11 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.4 }}
                 >
-                  {typeof product.price === "number"
+                  {typeof product.price === 'number'
                     ? product.price
                         .toString()
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-                    : "0"}{" "}
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+                    : '0'}{' '}
                   F CFA
                 </motion.p>
               </div>
@@ -184,30 +184,30 @@ function ProductDetail({ product }: ProductDetailContentProps) {
               >
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-xl font-semibold text-foreground">
-                    {t(currentLanguage, "merchPage.productDetail.description")}
+                    {t(currentLanguage, 'merchPage.productDetail.description')}
                   </h3>
                   {product.stock !== undefined && (
                     <div
                       className={`px-4 py-2 rounded-sm text-sm font-medium ${
-                        typeof product.stock === "number" && product.stock > 0
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                          : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                        typeof product.stock === 'number' && product.stock > 0
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                       }`}
                     >
-                      {typeof product.stock === "number" && product.stock > 0
+                      {typeof product.stock === 'number' && product.stock > 0
                         ? `${product.stock} in stock`
-                        : "Out of Stock"}
+                        : 'Out of Stock'}
                     </div>
                   )}
                 </div>
                 <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
                   <p>
-                    {typeof product.description === "string"
+                    {typeof product.description === 'string'
                       ? product.description
                       : Array.isArray(product.description) &&
                           product.description[0]?.children?.[0]?.text
                         ? product.description[0].children[0].text
-                        : "No description available"}
+                        : 'No description available'}
                   </p>
                 </div>
               </motion.div>
@@ -227,7 +227,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                   <div className="bg-card/30 backdrop-blur-sm rounded-sm p-6 border border-border/20">
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-medium text-foreground">
-                        {t(currentLanguage, "merchPage.productDetail.quantity")}
+                        {t(currentLanguage, 'merchPage.productDetail.quantity')}
                       </span>
                       <div className="flex items-center space-x-3">
                         <Button
@@ -261,16 +261,16 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                     <div className="mt-4 pt-4 border-t border-border/20">
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">
-                          {t(currentLanguage, "merchPage.productDetail.total")}
+                          {t(currentLanguage, 'merchPage.productDetail.total')}
                         </span>
                         <span className="text-xl font-bold text-primary">
                           {(
-                            (typeof product.price === "number"
+                            (typeof product.price === 'number'
                               ? product.price
                               : 0) * quantity
                           )
                             .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}{' '}
                           F CFA
                         </span>
                       </div>
@@ -283,7 +283,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                     size="lg"
                     onClick={handleAddToCart}
                   >
-                    {t(currentLanguage, "merchPage.productDetail.addToCart")}
+                    {t(currentLanguage, 'merchPage.productDetail.addToCart')}
                   </Button>
                 </>
               )}
@@ -304,18 +304,18 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                   <Heart
                     className={`mr-2 h-4 w-4 ${
                       isInWishlist(product._id)
-                        ? "fill-red-500 text-red-500"
-                        : ""
+                        ? 'fill-red-500 text-red-500'
+                        : ''
                     }`}
                   />
                   {isInWishlist(product._id)
                     ? t(
                         currentLanguage,
-                        "merchPage.productDetail.removeFromWishlist",
-                      ) || "Remove from Wishlist"
+                        'merchPage.productDetail.removeFromWishlist'
+                      ) || 'Remove from Wishlist'
                     : t(
                         currentLanguage,
-                        "merchPage.productDetail.addToWishlist",
+                        'merchPage.productDetail.addToWishlist'
                       )}
                 </Button>
                 <Button
@@ -324,7 +324,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                   onClick={handleShare}
                 >
                   <Share2 className="mr-2 h-4 w-4" />
-                  {t(currentLanguage, "merchPage.productDetail.share")}
+                  {t(currentLanguage, 'merchPage.productDetail.share')}
                 </Button>
               </div>
             </motion.div>

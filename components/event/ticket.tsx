@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { QRCodeSVG } from "qrcode.react";
-import { useEffect, useState } from "react";
+import { QRCodeSVG } from 'qrcode.react';
+import { useEffect, useState } from 'react';
 import {
   Calendar,
   Clock,
@@ -13,7 +13,7 @@ import {
   Star,
   Music,
   Headphones,
-} from "lucide-react";
+} from 'lucide-react';
 
 interface EventTicketProps {
   firstName: string;
@@ -34,10 +34,10 @@ export default function EventTicket({
   quantity = 1,
   ticketIdentifier,
 }: EventTicketProps) {
-  const [ticketId, setTicketId] = useState(ticketIdentifier || "");
+  const [ticketId, setTicketId] = useState(ticketIdentifier || '');
   const [qrStyle, setQrStyle] = useState({
-    bgColor: "#000000",
-    fgColor: "#ffffff",
+    bgColor: '#000000',
+    fgColor: '#ffffff',
   });
   const [decorativeElement, setDecorativeElement] = useState(0);
 
@@ -51,34 +51,34 @@ export default function EventTicket({
     const styles = [
       {
         // Neon style
-        bgColor: "#000000",
-        fgColor: "#00ffcc",
+        bgColor: '#000000',
+        fgColor: '#00ffcc',
       },
       {
         // Party style
-        bgColor: "#1a1a2e",
-        fgColor: "#ff2e63",
+        bgColor: '#1a1a2e',
+        fgColor: '#ff2e63',
       },
       {
         // Minimal style
-        bgColor: "#000000",
-        fgColor: "#ffffff",
+        bgColor: '#000000',
+        fgColor: '#ffffff',
       },
       {
         // Funky style
-        bgColor: "#240046",
-        fgColor: "#ff9100",
+        bgColor: '#240046',
+        fgColor: '#ff9100',
       },
       {
         // Cool blue style
-        bgColor: "#03045e",
-        fgColor: "#caf0f8",
+        bgColor: '#03045e',
+        fgColor: '#caf0f8',
       },
     ];
 
     // Select a random style based on the user's name or ticket ID
     const nameHash = (firstName + lastName + ticketId)
-      .split("")
+      .split('')
       .reduce((a, b) => {
         return a + b.charCodeAt(0);
       }, 0);
@@ -102,9 +102,9 @@ export default function EventTicket({
 
   // Get admission text based on quantity
   const getAdmissionText = () => {
-    if (quantity === 1) return "ADMIT ONE";
-    if (quantity === 2) return "ADMIT TWO";
-    if (quantity === 3) return "ADMIT THREE";
+    if (quantity === 1) return 'ADMIT ONE';
+    if (quantity === 2) return 'ADMIT TWO';
+    if (quantity === 3) return 'ADMIT THREE';
     return `ADMIT ${quantity}`;
   };
 
@@ -133,11 +133,11 @@ export default function EventTicket({
     >
       <Music
         className="h-8 w-8 text-pink-400 animate-bounce"
-        style={{ animationDuration: "2s" }}
+        style={{ animationDuration: '2s' }}
       />
       <Music
         className="h-6 w-6 text-cyan-400 mt-2 animate-bounce"
-        style={{ animationDuration: "1.5s", animationDelay: "0.5s" }}
+        style={{ animationDuration: '1.5s', animationDelay: '0.5s' }}
       />
       <Star className="absolute -top-4 -right-4 h-6 w-6 text-yellow-400" />
       <Star className="absolute -bottom-4 -left-4 h-5 w-5 text-green-400" />
@@ -175,7 +175,7 @@ export default function EventTicket({
           className="absolute inset-0 opacity-5 pointer-events-none"
           style={{
             backgroundImage: `radial-gradient(circle at 20px 20px, rgba(255,255,255,0.1) 2px, transparent 0)`,
-            backgroundSize: "40px 40px",
+            backgroundSize: '40px 40px',
           }}
         ></div>
 

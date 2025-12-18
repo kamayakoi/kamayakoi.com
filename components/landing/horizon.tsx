@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef, useState } from "react";
-import * as THREE from "three";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+import React, { useEffect, useRef, useState } from 'react';
+import * as THREE from 'three';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -68,7 +68,7 @@ export const Component = () => {
         75,
         window.innerWidth / window.innerHeight,
         0.1,
-        2000,
+        2000
       );
       refs.camera.position.z = 100;
       refs.camera.position.y = 20;
@@ -93,7 +93,7 @@ export const Component = () => {
         new THREE.Vector2(window.innerWidth, window.innerHeight),
         0.6,
         0.3,
-        0.75,
+        0.75
       );
       refs.composer.addPass(bloomPass);
 
@@ -149,11 +149,11 @@ export const Component = () => {
         }
 
         geometry.setAttribute(
-          "position",
-          new THREE.BufferAttribute(positions, 3),
+          'position',
+          new THREE.BufferAttribute(positions, 3)
         );
-        geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-        geometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
         const material = new THREE.ShaderMaterial({
           uniforms: {
@@ -355,7 +355,7 @@ export const Component = () => {
       const time = Date.now() * 0.001;
 
       // Update stars
-      refs.stars.forEach((starField) => {
+      refs.stars.forEach(starField => {
         if (starField.material.uniforms) {
           starField.material.uniforms.time.value = time;
         }
@@ -414,7 +414,7 @@ export const Component = () => {
       }
     };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
 
     // Cleanup
     return () => {
@@ -424,15 +424,15 @@ export const Component = () => {
         cancelAnimationFrame(refs.animationId);
       }
 
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('resize', handleResize);
 
       // Dispose Three.js resources
-      refs.stars.forEach((starField) => {
+      refs.stars.forEach(starField => {
         starField.geometry.dispose();
         starField.material.dispose();
       });
 
-      refs.mountains.forEach((mountain) => {
+      refs.mountains.forEach(mountain => {
         mountain.geometry.dispose();
         mountain.material.dispose();
       });
@@ -465,15 +465,15 @@ export const Component = () => {
     gsap.set(
       [titleRef.current, subtitleRef.current, scrollProgressRef.current],
       {
-        visibility: "visible",
-      },
+        visibility: 'visible',
+      }
     );
 
     const tl = gsap.timeline();
 
     // Animate title with split text
     if (titleRef.current) {
-      const titleChars = titleRef.current.querySelectorAll(".title-char");
+      const titleChars = titleRef.current.querySelectorAll('.title-char');
       tl.from(
         titleChars,
         {
@@ -481,16 +481,16 @@ export const Component = () => {
           opacity: 0,
           duration: 1.5,
           stagger: 0.05,
-          ease: "power4.out",
+          ease: 'power4.out',
         },
-        "-=0.5",
+        '-=0.5'
       );
     }
 
     // Animate subtitle lines
     if (subtitleRef.current) {
       const subtitleLines =
-        subtitleRef.current.querySelectorAll(".subtitle-line");
+        subtitleRef.current.querySelectorAll('.subtitle-line');
       tl.from(
         subtitleLines,
         {
@@ -498,9 +498,9 @@ export const Component = () => {
           opacity: 0,
           duration: 1,
           stagger: 0.2,
-          ease: "power3.out",
+          ease: 'power3.out',
         },
-        "-=0.8",
+        '-=0.8'
       );
     }
 
@@ -512,9 +512,9 @@ export const Component = () => {
           opacity: 0,
           y: 50,
           duration: 1,
-          ease: "power2.out",
+          ease: 'power2.out',
         },
-        "-=0.5",
+        '-=0.5'
       );
     }
 
@@ -592,30 +592,30 @@ export const Component = () => {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
     handleScroll(); // Set initial position
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [totalSections]);
 
   // Function to get current section content
   const getCurrentSectionContent = () => {
-    const sectionKeys = ["kamayakoi", "rvs", "liberation"];
-    const sectionKey = sectionKeys[currentSection] || "kamayakoi";
+    const sectionKeys = ['kamayakoi', 'rvs', 'liberation'];
+    const sectionKey = sectionKeys[currentSection] || 'kamayakoi';
 
     const title = t(currentLanguage, `horizon.sections.${sectionKey}.title`);
     const subtitleLine1 = t(
       currentLanguage,
-      `horizon.sections.${sectionKey}.subtitle.line1`,
+      `horizon.sections.${sectionKey}.subtitle.line1`
     );
     const subtitleLine2 = t(
       currentLanguage,
-      `horizon.sections.${sectionKey}.subtitle.line2`,
+      `horizon.sections.${sectionKey}.subtitle.line2`
     );
 
     // Get subtitle opacity based on section
     const subtitleOpacity =
-      currentSection === 0 ? "text-white/80" : "text-white/50";
+      currentSection === 0 ? 'text-white/80' : 'text-white/50';
 
     return {
       title,
@@ -653,19 +653,19 @@ export const Component = () => {
                 0 1px 3px rgba(0, 0, 0, 1)
               `,
               background:
-                "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)",
-              backdropFilter: "blur(15px)",
-              borderRadius: "12px",
-              padding: "20px 30px",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
+                'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+              backdropFilter: 'blur(15px)',
+              borderRadius: '12px',
+              padding: '20px 30px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
             }}
           >
             <p
               className="subtitle-line mb-3"
               style={{
-                textShadow: "inherit",
-                fontWeight: "600",
-                letterSpacing: "0.02em",
+                textShadow: 'inherit',
+                fontWeight: '600',
+                letterSpacing: '0.02em',
               }}
             >
               {currentContent.subtitle.line1}
@@ -673,9 +673,9 @@ export const Component = () => {
             <p
               className="subtitle-line"
               style={{
-                textShadow: "inherit",
-                fontWeight: "600",
-                letterSpacing: "0.02em",
+                textShadow: 'inherit',
+                fontWeight: '600',
+                letterSpacing: '0.02em',
               }}
             >
               {currentContent.subtitle.line2}
@@ -688,7 +688,7 @@ export const Component = () => {
       <div
         ref={scrollProgressRef}
         className="scroll-progress fixed bottom-20 md:bottom-16 left-1/2 transform -translate-x-1/2 flex items-center gap-4 text-white z-20"
-        style={{ visibility: "hidden" }}
+        style={{ visibility: 'hidden' }}
       >
         <div className="scroll-text text-sm uppercase tracking-wider">
           SCROLL
@@ -701,11 +701,11 @@ export const Component = () => {
         </div>
         <div className="section-counter text-sm font-mono flex items-center justify-center min-w-[4rem]">
           <span className="inline-block">
-            {String(currentSection + 1).padStart(2, "0")}
+            {String(currentSection + 1).padStart(2, '0')}
           </span>
           <span className="inline-block mx-1">/</span>
           <span className="inline-block">
-            {String(totalSections).padStart(2, "0")}
+            {String(totalSections).padStart(2, '0')}
           </span>
         </div>
       </div>

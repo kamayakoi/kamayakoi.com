@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { ReactNode } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import React, { ReactNode } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface SinglePageProps {
   title: string;
@@ -20,7 +20,7 @@ const SinglePage = ({
   coverImage,
   coverImageAlt,
   withBackButton = false,
-  backHref = "/stories",
+  backHref = '/stories',
   children,
 }: SinglePageProps) => {
   return (

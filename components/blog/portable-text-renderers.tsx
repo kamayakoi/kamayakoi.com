@@ -1,9 +1,9 @@
-import Image from "next/image";
+import Image from 'next/image';
 import {
   PortableText,
   type PortableTextReactComponents,
   type PortableTextBlock,
-} from "@portabletext/react";
+} from '@portabletext/react';
 
 // TODO: Ensure urlFor is correctly imported and configured from your Sanity client setup.
 // import { urlFor } from '@/lib/sanity/client';
@@ -13,7 +13,7 @@ const urlFor = (source: any) => ({
   image: () => ({
     url: () =>
       source?.asset?._ref ||
-      "https://via.placeholder.com/800x400.png?text=Placeholder+Image",
+      'https://via.placeholder.com/800x400.png?text=Placeholder+Image',
   }),
 });
 
@@ -68,7 +68,7 @@ const InfoBlockRenderer: React.FC<BlockProps> = ({ value }) => {
           </h4>
         )}
         <div className="text-sm text-blue-700 dark:text-blue-300 prose prose-sm dark:prose-invert max-w-none prose-p:my-1">
-          {typeof value.text === "string" ? (
+          {typeof value.text === 'string' ? (
             <p>{value.text}</p>
           ) : (
             <PortableText
@@ -112,7 +112,7 @@ const WarningBlockRenderer: React.FC<BlockProps> = ({ value }) => {
           </h4>
         )}
         <div className="text-sm text-yellow-700 dark:text-yellow-300 prose prose-sm dark:prose-invert max-w-none prose-p:my-1">
-          {typeof value.text === "string" ? (
+          {typeof value.text === 'string' ? (
             <p>{value.text}</p>
           ) : (
             <PortableText
@@ -158,8 +158,8 @@ const TableRenderer: React.FC<BlockProps> = ({ value }) => {
                 key={row._key || i}
                 className={
                   i % 2 === 0
-                    ? "bg-white dark:bg-zinc-800/50"
-                    : "bg-zinc-50 dark:bg-zinc-700/50"
+                    ? 'bg-white dark:bg-zinc-800/50'
+                    : 'bg-zinc-50 dark:bg-zinc-700/50'
                 }
               >
                 {row.cells.map((cell: string, j: number) => (
@@ -171,7 +171,7 @@ const TableRenderer: React.FC<BlockProps> = ({ value }) => {
                   </td>
                 ))}
               </tr>
-            ),
+            )
           )}
         </tbody>
       </table>
@@ -188,7 +188,7 @@ const BodyImageRenderer: React.FC<BlockProps> = ({ value }) => {
       <div className="relative aspect-video rounded-sm overflow-hidden shadow-lg">
         <Image
           src={imageUrl}
-          alt={value.alt || "Blog post image"}
+          alt={value.alt || 'Blog post image'}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 1024px"
           className="object-cover transform transition-transform duration-500 hover:scale-105"
@@ -215,12 +215,12 @@ export const portableTextRenderers: Partial<PortableTextReactComponents> = {
   marks: {
     link: ({ value, children }) => {
       const href = value?.href as string | undefined;
-      const target = href?.startsWith("http") ? "_blank" : undefined;
+      const target = href?.startsWith('http') ? '_blank' : undefined;
       return (
         <a
           href={href}
           target={target}
-          rel={target === "_blank" ? "noopener noreferrer" : undefined}
+          rel={target === '_blank' ? 'noopener noreferrer' : undefined}
           className="text-primary hover:underline decoration-primary/70 underline-offset-2 transition-colors"
         >
           {children}

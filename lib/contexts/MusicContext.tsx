@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
   createContext,
@@ -8,8 +8,8 @@ import React, {
   useEffect,
   useCallback,
   ReactNode,
-} from "react";
-import type { MusicTrack } from "@/lib/sanity/queries";
+} from 'react';
+import type { MusicTrack } from '@/lib/sanity/queries';
 
 interface MusicContextType {
   // Track data
@@ -114,10 +114,10 @@ export function MusicProvider({
       // This logic remains the same
     };
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
@@ -125,21 +125,21 @@ export function MusicProvider({
   useEffect(() => {
     const handleUserInteraction = () => {
       setHasUserInteracted(true);
-      document.removeEventListener("click", handleUserInteraction);
-      document.removeEventListener("touchstart", handleUserInteraction);
-      document.removeEventListener("keydown", handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
     };
 
     if (!hasUserInteracted) {
-      document.addEventListener("click", handleUserInteraction);
-      document.addEventListener("touchstart", handleUserInteraction);
-      document.addEventListener("keydown", handleUserInteraction);
+      document.addEventListener('click', handleUserInteraction);
+      document.addEventListener('touchstart', handleUserInteraction);
+      document.addEventListener('keydown', handleUserInteraction);
     }
 
     return () => {
-      document.removeEventListener("click", handleUserInteraction);
-      document.removeEventListener("touchstart", handleUserInteraction);
-      document.removeEventListener("keydown", handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
     };
   }, [hasUserInteracted]);
 
@@ -152,8 +152,8 @@ export function MusicProvider({
         setIsPlaying(true);
       } catch (error: unknown) {
         const errorMessage =
-          error instanceof Error ? error.message : "Unknown error";
-        console.log("🎵 Autoplay prevented:", errorMessage);
+          error instanceof Error ? error.message : 'Unknown error';
+        console.log('🎵 Autoplay prevented:', errorMessage);
         setIsPlaying(false);
       }
     }
@@ -168,7 +168,7 @@ export function MusicProvider({
 
   const stop = useCallback(() => {
     if (audioRef.current) {
-      console.log("🎵 Stopping audio permanently");
+      console.log('🎵 Stopping audio permanently');
       isStoppedRef.current = true; // User explicitly stopped
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -178,7 +178,7 @@ export function MusicProvider({
   }, []);
 
   const togglePlay = useCallback(() => {
-    console.log("🎵 Toggle play called - current state:", {
+    console.log('🎵 Toggle play called - current state:', {
       isPlaying: isPlayingRef.current,
       isAudioPaused: audioRef.current?.paused,
     });
@@ -191,15 +191,13 @@ export function MusicProvider({
 
   const nextTrack = useCallback(() => {
     if (tracks.length > 0) {
-      setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
+      setCurrentTrackIndex(prev => (prev + 1) % tracks.length);
     }
   }, [tracks.length]);
 
   const prevTrack = useCallback(() => {
     if (tracks.length > 0) {
-      setCurrentTrackIndex(
-        (prev) => (prev - 1 + tracks.length) % tracks.length,
-      );
+      setCurrentTrackIndex(prev => (prev - 1 + tracks.length) % tracks.length);
     }
   }, [tracks.length]);
 
@@ -214,7 +212,7 @@ export function MusicProvider({
         setCurrentTrackIndex(index);
       }
     },
-    [tracks.length],
+    [tracks.length]
   );
 
   const seekTo = (time: number) => {
@@ -257,7 +255,7 @@ export function MusicProvider({
       const shouldPlay =
         (wasPlaying || currentTrackIndex === 0) && !isStoppedRef.current;
 
-      console.log("🎵 Track change:", {
+      console.log('🎵 Track change:', {
         wasPlaying,
         isStopped: isStoppedRef.current,
         shouldPlay,
@@ -266,8 +264,8 @@ export function MusicProvider({
       if (shouldPlay) {
         const playPromise = audioRef.current.play();
         if (playPromise !== undefined) {
-          playPromise.catch((error) => {
-            console.error("🎵 Auto-play on track change failed:", error);
+          playPromise.catch(error => {
+            console.error('🎵 Auto-play on track change failed:', error);
             setIsPlaying(false);
           });
         }
@@ -287,7 +285,7 @@ export function MusicProvider({
   // Auto-play music on page load if enabled
   useEffect(() => {
     if (autoPlayMusic && tracks.length > 0 && hasUserInteracted && !isPlaying) {
-      console.log("🎵 Auto-playing music on page load");
+      console.log('🎵 Auto-playing music on page load');
       // Small delay to ensure audio element is ready
       const timer = setTimeout(() => {
         play();
@@ -341,7 +339,7 @@ export function MusicProvider({
 export function useMusic() {
   const context = useContext(MusicContext);
   if (context === undefined) {
-    throw new Error("useMusic must be used within a MusicProvider");
+    throw new Error('useMusic must be used within a MusicProvider');
   }
   return context;
 }

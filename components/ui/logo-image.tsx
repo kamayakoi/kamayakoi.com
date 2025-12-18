@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import Image from 'next/image';
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 
 export function LogoImage({
   width = 40,
@@ -12,11 +12,11 @@ export function LogoImage({
   height?: number;
 }) {
   const { resolvedTheme } = useTheme();
-  const [logoSrc, setLogoSrc] = useState("/white.svg"); // Default or initial guess
+  const [logoSrc, setLogoSrc] = useState('/white.svg'); // Default or initial guess
 
   useEffect(() => {
     // Set the logo based on the resolved theme
-    setLogoSrc(resolvedTheme === "dark" ? "/dark.svg" : "/white.svg");
+    setLogoSrc(resolvedTheme === 'dark' ? '/dark.svg' : '/white.svg');
   }, [resolvedTheme]);
 
   // Avoid hydration mismatch by ensuring the correct logo is ready client-side

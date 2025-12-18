@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { X, PartyPopper } from "lucide-react";
-import { motion } from "framer-motion";
-import Image from "next/image";
-import Link from "next/link";
+import { useState, useEffect } from 'react';
+import { X, PartyPopper } from 'lucide-react';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import Link from 'next/link';
 
 interface FloatingPromoProps {
   imageUrl?: string;
@@ -16,12 +16,12 @@ interface FloatingPromoProps {
 }
 
 export default function FloatingPromo({
-  imageUrl = "/placeholder.svg?height=180&width=320",
+  imageUrl = '/placeholder.svg?height=180&width=320',
   onClose = () => {},
   onButtonClick = () => {},
   href,
-  title = "Promotional event flyer",
-  buttonText = "Get your ticket",
+  title = 'Promotional event flyer',
+  buttonText = 'Get your ticket',
 }: FloatingPromoProps) {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -75,7 +75,7 @@ export default function FloatingPromo({
         {/* Image - 16:9 ratio */}
         <div className="relative w-full aspect-video">
           <Image
-            src={imageUrl || "/placeholder.svg"}
+            src={imageUrl || '/placeholder.svg'}
             alt={title}
             fill
             className="object-cover"

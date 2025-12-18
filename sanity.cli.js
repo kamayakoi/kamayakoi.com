@@ -1,13 +1,13 @@
-import { defineCliConfig } from "sanity/cli";
+import { defineCliConfig } from 'sanity/cli';
 
 export default defineCliConfig({
   api: {
-    projectId: "qziej56d",
-    dataset: "production",
+    projectId: 'qziej56d',
+    dataset: 'production',
   },
-  studioHost: "kamayakoi",
+  studioHost: 'kamayakoi',
   deployment: {
     autoUpdates: true,
-    appId: "di07jixik6nilgfn7cgvqibz",
+    appId: 'di07jixik6nilgfn7cgvqibz',
   },
 });

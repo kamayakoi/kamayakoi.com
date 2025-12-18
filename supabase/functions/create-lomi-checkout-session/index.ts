@@ -1,28 +1,28 @@
 /// <reference types="https://deno.land/x/deno/cli/tsc/dts/lib.deno.d.ts" />
 /// <reference lib="deno.ns" />
 
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { corsHeaders } from "../_shared/cors.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+import { corsHeaders } from '../_shared/cors.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // Initialize Supabase client
-const supabaseUrl = Deno.env.get("SUPABASE_URL");
-const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+const supabaseUrl = Deno.env.get('SUPABASE_URL');
+const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
 if (!supabaseUrl || !supabaseServiceRoleKey) {
   console.error(
-    "Supabase URL or Service Role Key is not set. Ensure SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are defined in Edge Function environment variables.",
+    'Supabase URL or Service Role Key is not set. Ensure SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are defined in Edge Function environment variables.'
   );
 }
-const supabase = createClient(supabaseUrl || "", supabaseServiceRoleKey || "");
+const supabase = createClient(supabaseUrl || '', supabaseServiceRoleKey || '');
 
 // lomi. API Config
-const LOMI_API_KEY = Deno.env.get("LOMI_API_KEY");
+const LOMI_API_KEY = Deno.env.get('LOMI_API_KEY');
 const LOMI_API_BASE_URL =
-  Deno.env.get("LOMI_API_BASE_URL") || "https://api.lomi.africa/v1";
+  Deno.env.get('LOMI_API_BASE_URL') || 'https://api.lomi.africa/v1';
 const APP_BASE_URL = (
-  Deno.env.get("APP_BASE_URL") || "http://localhost:3000"
-).replace(/\/$/, ""); // Remove trailing slash
+  Deno.env.get('APP_BASE_URL') || 'http://localhost:3000'
+).replace(/\/$/, ''); // Remove trailing slash
 
 interface RequestPayload {
   eventId: string;
@@ -53,111 +53,111 @@ interface RequestPayload {
 
 serve(async (req: Request) => {
   // Handle CORS preflight requests first
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
   }
 
   if (!supabaseUrl || !supabaseServiceRoleKey) {
     return new Response(
       JSON.stringify({
         error:
-          "Supabase environment variables not configured for the function.",
+          'Supabase environment variables not configured for the function.',
       }),
       {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
-      },
+      }
     );
   }
   if (!LOMI_API_KEY) {
-    console.error("LOMI_API_KEY is not set for the function.");
+    console.error('LOMI_API_KEY is not set for the function.');
     return new Response(
       JSON.stringify({
-        error: "LOMI API key not configured for the function.",
+        error: 'LOMI API key not configured for the function.',
       }),
       {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
-      },
+      }
     );
   }
 
   try {
     const payload: RequestPayload = await req.json();
-    console.log("Received payload:", JSON.stringify(payload, null, 2));
-    console.log("Product ID in request:", payload.productId);
+    console.log('Received payload:', JSON.stringify(payload, null, 2));
+    console.log('Product ID in request:', payload.productId);
 
     // --- Validate Input ---
     const requiredFields: (keyof RequestPayload)[] = [
-      "eventId",
-      "eventTitle",
-      "ticketTypeId",
-      "ticketName",
-      "pricePerTicket",
-      "quantity",
-      "userName",
-      "userEmail",
+      'eventId',
+      'eventTitle',
+      'ticketTypeId',
+      'ticketName',
+      'pricePerTicket',
+      'quantity',
+      'userName',
+      'userEmail',
     ];
     for (const field of requiredFields) {
       if (
         !(field in payload) ||
         payload[field] === undefined ||
         payload[field] === null ||
-        String(payload[field]).trim() === ""
+        String(payload[field]).trim() === ''
       ) {
-        if (field === "pricePerTicket" && payload[field] === 0) continue;
+        if (field === 'pricePerTicket' && payload[field] === 0) continue;
 
         return new Response(
           JSON.stringify({
             error: `Missing or invalid required field: ${field}`,
           }),
           {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,
-          },
+          }
         );
       }
     }
     if (payload.quantity <= 0) {
       return new Response(
-        JSON.stringify({ error: "Quantity must be greater than 0." }),
+        JSON.stringify({ error: 'Quantity must be greater than 0.' }),
         {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400,
-        },
+        }
       );
     }
 
     // --- Upsert Customer using RPC ---
-    console.log("Creating/updating customer using RPC function");
+    console.log('Creating/updating customer using RPC function');
     const { data: customerId, error: customerError } = await supabase.rpc(
-      "upsert_customer",
+      'upsert_customer',
       {
         p_name: payload.userName,
         p_email: payload.userEmail,
         p_phone: payload.userPhone || null,
         p_whatsapp: payload.userPhone || null, // Set WhatsApp same as phone
-      },
+      }
     );
 
     if (customerError || !customerId) {
-      console.error("Error upserting customer:", customerError);
+      console.error('Error upserting customer:', customerError);
       return new Response(
         JSON.stringify({
-          error: `Error creating/updating customer: ${customerError?.message || "No customer ID returned"}`,
+          error: `Error creating/updating customer: ${customerError?.message || 'No customer ID returned'}`,
         }),
         {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 500,
-        },
+        }
       );
     }
 
-    console.log("Customer upserted successfully:", customerId);
+    console.log('Customer upserted successfully:', customerId);
 
     // --- Create Purchase Record using RPC ---
     const totalAmount = payload.pricePerTicket * payload.quantity;
-    const currencyCode = payload.currencyCode || "XOF";
+    const currencyCode = payload.currencyCode || 'XOF';
 
     // Calculate actual ticket quantity for bundles
     const isBundle = payload.isBundle || false;
@@ -166,13 +166,13 @@ serve(async (req: Request) => {
       ? payload.quantity * ticketsPerBundle
       : payload.quantity;
 
-    console.log("Creating purchase record using RPC function");
+    console.log('Creating purchase record using RPC function');
     console.log(
-      `Bundle details: isBundle=${isBundle}, ticketsPerBundle=${ticketsPerBundle}, actualTicketQuantity=${actualTicketQuantity}`,
+      `Bundle details: isBundle=${isBundle}, ticketsPerBundle=${ticketsPerBundle}, actualTicketQuantity=${actualTicketQuantity}`
     );
 
     const { data: purchaseId, error: purchaseError } = await supabase.rpc(
-      "create_purchase",
+      'create_purchase',
       {
         p_customer_id: customerId,
         p_event_id: payload.eventId,
@@ -183,41 +183,41 @@ serve(async (req: Request) => {
         p_price_per_ticket: payload.pricePerTicket,
         p_total_amount: totalAmount,
         p_currency_code: currencyCode,
-        p_event_date_text: payload.eventDateText || "To Be Announced",
-        p_event_time_text: payload.eventTimeText || "Time TBA",
-        p_event_venue_name: payload.eventVenueName || "Venue TBA",
+        p_event_date_text: payload.eventDateText || 'To Be Announced',
+        p_event_time_text: payload.eventTimeText || 'Time TBA',
+        p_event_venue_name: payload.eventVenueName || 'Venue TBA',
         p_is_bundle: isBundle,
         p_tickets_per_bundle: ticketsPerBundle,
-      },
+      }
     );
 
     if (purchaseError || !purchaseId) {
-      console.error("Error creating purchase record:", purchaseError);
+      console.error('Error creating purchase record:', purchaseError);
       return new Response(
         JSON.stringify({
-          error: `Error creating purchase record: ${purchaseError?.message || "No purchase ID returned"}`,
+          error: `Error creating purchase record: ${purchaseError?.message || 'No purchase ID returned'}`,
         }),
         {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 500,
-        },
+        }
       );
     }
 
-    console.log("Created purchase record:", purchaseId);
+    console.log('Created purchase record:', purchaseId);
 
     // --- Handle Coupon Codes (Optional - if coupon system is needed) ---
     // Note: This events app doesn't have a coupon system, so we'll skip this section
     // If you need coupons, you would need to create the discount_coupons table first
 
     // --- Prepare lomi. Payload ---
-    const successRedirectPath = payload.successUrlPath || "/payment/success";
-    const cancelRedirectPath = payload.cancelUrlPath || "/payment/error";
+    const successRedirectPath = payload.successUrlPath || '/payment/success';
+    const cancelRedirectPath = payload.cancelUrlPath || '/payment/error';
 
     // Determine if we're using product-based or event-based checkout
     const isProductBased = !!payload.productId;
-    console.log("Is product-based checkout:", isProductBased);
-    console.log("Product ID being used:", payload.productId);
+    console.log('Is product-based checkout:', isProductBased);
+    console.log('Product ID being used:', payload.productId);
 
     const baseLomiPayload = {
       success_url: `${APP_BASE_URL}${successRedirectPath}?purchase_id=${purchaseId}&status=success`,
@@ -236,7 +236,7 @@ serve(async (req: Request) => {
         event_id: payload.eventId,
         ticket_type_id: payload.ticketTypeId,
         customer_id: customerId,
-        app_source: "kamayakoi_events_app",
+        app_source: 'kamayakoi_events_app',
         is_product_based: isProductBased,
       },
     };
@@ -257,91 +257,88 @@ serve(async (req: Request) => {
         };
 
     console.log(
-      "Using",
-      isProductBased ? "product-based" : "event-based",
-      "checkout",
+      'Using',
+      isProductBased ? 'product-based' : 'event-based',
+      'checkout'
     );
 
     console.log(
-      "Calling lomi. API with URL:",
-      `${LOMI_API_BASE_URL}/checkout-sessions`,
+      'Calling lomi. API with URL:',
+      `${LOMI_API_BASE_URL}/checkout-sessions`
     );
-    console.log("Final lomi.payload:", JSON.stringify(lomiPayload, null, 2));
+    console.log('Final lomi.payload:', JSON.stringify(lomiPayload, null, 2));
 
     // --- Call lomi. API ---
     const lomiResponse = await fetch(`${LOMI_API_BASE_URL}/checkout-sessions`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "x-api-key": LOMI_API_KEY,
+        'Content-Type': 'application/json',
+        'x-api-key': LOMI_API_KEY,
       },
       body: JSON.stringify(lomiPayload),
     });
 
-    console.log("lomi. API response status:", lomiResponse.status);
+    console.log('lomi. API response status:', lomiResponse.status);
     console.log(
-      "lomi. API response headers:",
-      Object.fromEntries(lomiResponse.headers.entries()),
+      'lomi. API response headers:',
+      Object.fromEntries(lomiResponse.headers.entries())
     );
 
     // Get response text first to handle both JSON and HTML responses
     const lomiResponseText = await lomiResponse.text();
-    console.log("lomi. API response body:", lomiResponseText);
+    console.log('lomi. API response body:', lomiResponseText);
 
     let lomiResponseData;
     try {
       lomiResponseData = JSON.parse(lomiResponseText);
     } catch (parseError) {
-      console.error("Failed to parse lomi. API response as JSON:", parseError);
-      console.error("Response was:", lomiResponseText);
+      console.error('Failed to parse lomi. API response as JSON:', parseError);
+      console.error('Response was:', lomiResponseText);
 
       // Update purchase status to failed using RPC
-      await supabase.rpc("update_purchase_lomi_session", {
+      await supabase.rpc('update_purchase_lomi_session', {
         p_purchase_id: purchaseId,
-        p_lomi_session_id: "failed",
-        p_lomi_checkout_url: "failed",
+        p_lomi_session_id: 'failed',
+        p_lomi_checkout_url: 'failed',
         p_payment_processor_details: {
-          error: "Invalid JSON response from lomi. API",
+          error: 'Invalid JSON response from lomi. API',
           response: lomiResponseText,
         },
       });
 
       return new Response(
         JSON.stringify({
-          error: "Invalid response from payment provider",
+          error: 'Invalid response from payment provider',
           details:
-            "The payment provider returned an invalid response. Please try again later.",
+            'The payment provider returned an invalid response. Please try again later.',
         }),
         {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 502,
-        },
+        }
       );
     }
 
-    if (
-      !lomiResponse.ok ||
-      !lomiResponseData.checkout_session_id
-    ) {
-      console.error("lomi. API error:", lomiResponseData);
+    if (!lomiResponse.ok || !lomiResponseData.checkout_session_id) {
+      console.error('lomi. API error:', lomiResponseData);
 
       // Update purchase with failure details using RPC
-      await supabase.rpc("update_purchase_lomi_session", {
+      await supabase.rpc('update_purchase_lomi_session', {
         p_purchase_id: purchaseId,
-        p_lomi_session_id: "failed",
-        p_lomi_checkout_url: "failed",
+        p_lomi_session_id: 'failed',
+        p_lomi_checkout_url: 'failed',
         p_payment_processor_details: lomiResponseData,
       });
 
       return new Response(
         JSON.stringify({
-          error: "Failed to create lomi. checkout session",
+          error: 'Failed to create lomi. checkout session',
           details: lomiResponseData.error || lomiResponseData,
         }),
         {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: lomiResponseData.error?.status || 500,
-        },
+        }
       );
     }
 
@@ -350,7 +347,7 @@ serve(async (req: Request) => {
 
     // --- Update Purchase Record with lomi. details using RPC ---
     const { error: updatePurchaseError } = await supabase.rpc(
-      "update_purchase_lomi_session",
+      'update_purchase_lomi_session',
       {
         p_purchase_id: purchaseId,
         p_lomi_session_id: lomiResponseData.checkout_session_id,
@@ -359,30 +356,30 @@ serve(async (req: Request) => {
           request: lomiPayload,
           response: lomiResponseData,
         },
-      },
+      }
     );
 
     if (updatePurchaseError) {
       // Check if this is the expected "already has session ID" warning
       const isDuplicateSessionError = updatePurchaseError.message?.includes(
-        "already has a lomi session ID",
+        'already has a lomi session ID'
       );
 
       if (isDuplicateSessionError) {
         console.log(
-          "Purchase already has lomi session details (likely from retry), proceeding with existing checkout URL",
+          'Purchase already has lomi session details (likely from retry), proceeding with existing checkout URL'
         );
       } else {
         console.warn(
-          "Failed to update purchase record with lomi. details, but checkout URL obtained:",
-          updatePurchaseError,
+          'Failed to update purchase record with lomi. details, but checkout URL obtained:',
+          updatePurchaseError
         );
       }
     }
 
     console.log(
-      "Successfully created checkout session:",
-      lomiResponseData.checkout_session_id,
+      'Successfully created checkout session:',
+      lomiResponseData.checkout_session_id
     );
 
     // --- Success Response ---
@@ -392,25 +389,25 @@ serve(async (req: Request) => {
         purchase_id: purchaseId,
       }),
       {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
-      },
+      }
     );
   } catch (error) {
     console.error(
-      "!!!!!!!!!! CAUGHT ERROR in main try/catch !!!!!!!!!:",
-      error,
+      '!!!!!!!!!! CAUGHT ERROR in main try/catch !!!!!!!!!:',
+      error
     );
-    let message = "An unexpected error occurred.";
+    let message = 'An unexpected error occurred.';
     if (error instanceof Error) {
       message = error.message;
     }
     return new Response(
       JSON.stringify({ error: message, details: String(error) }),
       {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
-      },
+      }
     );
   }
 });

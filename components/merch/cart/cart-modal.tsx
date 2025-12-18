@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { PlusCircleIcon, ShoppingCart, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { useFormStatus } from "react-dom";
-import { useCart } from "./cart-context";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import Loader from "@/components/ui/loader";
-import { CartItemCard } from "./cart-item-card";
-import Link from "next/link";
-import { cn } from "@/lib/actions/utils";
-import { createPortal } from "react-dom";
-import CartPurchaseForm from "./cart-purchase-form";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
+import { PlusCircleIcon, ShoppingCart, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useFormStatus } from 'react-dom';
+import { useCart } from './cart-context';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import Loader from '@/components/ui/loader';
+import { CartItemCard } from './cart-item-card';
+import Link from 'next/link';
+import { cn } from '@/lib/actions/utils';
+import { createPortal } from 'react-dom';
+import CartPurchaseForm from './cart-purchase-form';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
 
 const CartContainer = ({
   children,
@@ -22,7 +22,7 @@ const CartContainer = ({
   children: React.ReactNode;
   className?: string;
 }) => {
-  return <div className={cn("px-3 md:px-4", className)}>{children}</div>;
+  return <div className={cn('px-3 md:px-4', className)}>{children}</div>;
 };
 
 const CartItems = ({
@@ -41,16 +41,16 @@ const CartItems = ({
     <div className="flex flex-col justify-between h-full overflow-hidden">
       <CartContainer className="flex justify-between items-center px-2 text-sm text-muted-foreground mb-4">
         <span className="font-medium">
-          {t(currentLanguage, "cartModal.products")}
+          {t(currentLanguage, 'cartModal.products')}
         </span>
         <span className="bg-muted/50 px-2 py-1 rounded-sm text-xs">
-          {cart.lines.length}{" "}
+          {cart.lines.length}{' '}
           {t(
             currentLanguage,
             cart.lines.length !== 1
-              ? "cartPurchaseForm.itemCountPlural"
-              : "cartPurchaseForm.itemCount",
-            { count: cart.lines.length },
+              ? 'cartPurchaseForm.itemCountPlural'
+              : 'cartPurchaseForm.itemCount',
+            { count: cart.lines.length }
           )}
         </span>
       </CartContainer>
@@ -62,7 +62,7 @@ const CartItems = ({
                 key={item.id}
                 layout
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3, delay: i * 0.1, ease: "easeOut" }}
+                transition={{ duration: 0.3, delay: i * 0.1, ease: 'easeOut' }}
               >
                 <CartItemCard item={item} onCloseCart={closeCart} />
               </motion.div>
@@ -75,21 +75,21 @@ const CartItems = ({
           <CartContainer className="space-y-2">
             <div className="flex justify-between items-center py-3">
               <p className="font-medium text-foreground">
-                {t(currentLanguage, "cartModal.shipping")}
+                {t(currentLanguage, 'cartModal.shipping')}
               </p>
               <p className="text-muted-foreground">
                 {cart.cost.shippingAmount &&
                 Number(cart.cost.shippingAmount.amount) > 0
-                  ? `${Number(cart.cost.shippingAmount.amount).toLocaleString("fr-FR")} F CFA`
-                  : t(currentLanguage, "cartModal.calculatedAtCheckout")}
+                  ? `${Number(cart.cost.shippingAmount.amount).toLocaleString('fr-FR')} F CFA`
+                  : t(currentLanguage, 'cartModal.calculatedAtCheckout')}
               </p>
             </div>
             <div className="flex justify-between items-center py-2">
               <p className="text-lg font-bold text-foreground">
-                {t(currentLanguage, "cartModal.total")}
+                {t(currentLanguage, 'cartModal.total')}
               </p>
               <p className="text-xl font-bold text-primary">
-                {Number(cart.cost.totalAmount.amount).toLocaleString("fr-FR")} F
+                {Number(cart.cost.totalAmount.amount).toLocaleString('fr-FR')} F
                 CFA
               </p>
             </div>
@@ -103,10 +103,10 @@ const CartItems = ({
 
 const serializeCart = (cart: { lines: { id: string; quantity: number }[] }) => {
   return JSON.stringify(
-    cart.lines.map((line) => ({
+    cart.lines.map(line => ({
       merchandiseId: line.id,
       // Don't include quantity changes for auto-open logic
-    })),
+    }))
   );
 };
 
@@ -151,17 +151,17 @@ export default function CartModal() {
 
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && isOpen) {
+      if (event.key === 'Escape' && isOpen) {
         setIsOpen(false);
       }
     };
 
     if (isOpen) {
-      document.addEventListener("keydown", handleEscapeKey);
+      document.addEventListener('keydown', handleEscapeKey);
     }
 
     return () => {
-      document.removeEventListener("keydown", handleEscapeKey);
+      document.removeEventListener('keydown', handleEscapeKey);
     };
   }, [isOpen]);
 
@@ -186,10 +186,10 @@ export default function CartModal() {
               </div>
               <div className="flex flex-col flex-1 gap-2">
                 <span className="text-xl font-bold text-foreground">
-                  {t(currentLanguage, "cartModal.yourCartIsEmpty")}
+                  {t(currentLanguage, 'cartModal.yourCartIsEmpty')}
                 </span>
                 <p className="text-muted-foreground hover:text-primary transition-colors">
-                  {t(currentLanguage, "cartModal.startShopping")}
+                  {t(currentLanguage, 'cartModal.startShopping')}
                 </p>
               </div>
             </div>
@@ -219,8 +219,8 @@ export default function CartModal() {
         aria-label="Open cart"
         onClick={openCart}
         className="uppercase relative bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700"
-        size={"sm"}
-        onClickCapture={(e) => {
+        size={'sm'}
+        onClickCapture={e => {
           // Prevent event bubbling that might interfere with modal
           e.stopPropagation();
           openCart();
@@ -245,12 +245,12 @@ export default function CartModal() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
                   className="fixed inset-0 z-[60] bg-foreground/30 will-change-auto"
                   onClick={closeCart}
                   aria-hidden="true"
                   style={{
-                    position: "fixed",
+                    position: 'fixed',
                     top: 0,
                     left: 0,
                     right: 0,
@@ -260,19 +260,19 @@ export default function CartModal() {
 
                 {/* Panel */}
                 <motion.div
-                  initial={{ x: "100%" }}
+                  initial={{ x: '100%' }}
                   animate={{ x: 0 }}
-                  exit={{ x: "100%" }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  exit={{ x: '100%' }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
                   className="fixed top-0 bottom-0 right-0 flex w-full md:w-[500px] p-4 z-[70] will-change-transform"
-                  style={{ position: "fixed", top: 0, right: 0, bottom: 0 }}
-                  onClick={(e) => e.stopPropagation()} // Prevent event bubbling to cart button
+                  style={{ position: 'fixed', top: 0, right: 0, bottom: 0 }}
+                  onClick={e => e.stopPropagation()} // Prevent event bubbling to cart button
                 >
                   <div className="flex flex-col py-6 w-full bg-[#1a1a1a] backdrop-blur-xl rounded-sm shadow-2xl">
                     <CartContainer className="flex justify-between items-center mb-8">
                       <div>
                         <h2 className="text-3xl font-bold text-foreground">
-                          {t(currentLanguage, "cartModal.cart")}
+                          {t(currentLanguage, 'cartModal.cart')}
                         </h2>
                       </div>
                       <Button
@@ -292,7 +292,7 @@ export default function CartModal() {
               </>
             )}
           </AnimatePresence>,
-          document.body,
+          document.body
         )}
     </>
   );
@@ -321,7 +321,7 @@ function CheckoutButton({
       >
         <AnimatePresence initial={false} mode="wait">
           <motion.div
-            key={isLoading ? "loading" : "content"}
+            key={isLoading ? 'loading' : 'content'}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -332,7 +332,7 @@ function CheckoutButton({
               <Loader />
             ) : (
               <span className="font-semibold">
-                {t(currentLanguage, "cartModal.proceedToCheckout")}
+                {t(currentLanguage, 'cartModal.proceedToCheckout')}
               </span>
             )}
           </motion.div>

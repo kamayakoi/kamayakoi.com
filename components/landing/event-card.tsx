@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import Image from "next/image";
-import { CalendarDays, Clock, MapPin } from "lucide-react";
-import { motion } from "framer-motion";
+import Link from 'next/link';
+import Image from 'next/image';
+import { CalendarDays, Clock, MapPin } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-import { Button } from "../ui/button";
-import { Badge } from "../ui/badge";
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
 
 type EventProps = {
   _id: string;
@@ -33,7 +33,7 @@ export default function EventCard({ event }: { event: EventProps }) {
 
       <div className="relative h-full w-full">
         <Image
-          src={event.flyer?.url || "/placeholder.webp?height=600&width=400"}
+          src={event.flyer?.url || '/placeholder.webp?height=600&width=400'}
           alt={event.title}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -70,7 +70,7 @@ export default function EventCard({ event }: { event: EventProps }) {
             className="w-full opacity-0 transform translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0"
             disabled={!event.ticketsAvailable}
           >
-            {event.ticketsAvailable ? "Get Tickets" : "Sold Out"}
+            {event.ticketsAvailable ? 'Get Tickets' : 'Sold Out'}
           </Button>
         </div>
       </div>

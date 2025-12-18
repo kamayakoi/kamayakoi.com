@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
+import { useState } from 'react';
+import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
 
 interface BackButtonProps {
   className?: string;
 }
 
-export function BackButton({ className = "" }: BackButtonProps) {
+export function BackButton({ className = '' }: BackButtonProps) {
   const { currentLanguage } = useTranslation();
   const [isHovered, setIsHovered] = useState(false);
 
@@ -30,7 +30,7 @@ export function BackButton({ className = "" }: BackButtonProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            {t(currentLanguage, "storyPage.backButton")}
+            {t(currentLanguage, 'storyPage.backButton')}
           </motion.span>
         ) : (
           <motion.span

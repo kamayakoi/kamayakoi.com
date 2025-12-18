@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useTranslation } from "@/lib/contexts/TranslationContext";
+import { useTranslation } from '@/lib/contexts/TranslationContext';
 import CheckoutButton, {
   CheckoutItemData,
-} from "@/components/event/CheckoutButton";
+} from '@/components/event/CheckoutButton';
 
 interface CheckoutButtonWrapperProps {
   item: CheckoutItemData;

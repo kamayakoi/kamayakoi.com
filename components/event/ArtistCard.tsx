@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { IG } from "@/components/icons/IG";
-import { t } from "@/lib/i18n/translations";
+import Image from 'next/image';
+import Link from 'next/link';
+import { IG } from '@/components/icons/IG';
+import { t } from '@/lib/i18n/translations';
 
 interface Artist {
   _id: string;
@@ -24,8 +24,8 @@ export default function ArtistCard({
   currentLanguage,
 }: ArtistCardProps) {
   const cardBaseClasses =
-    "relative flex flex-col w-64 md:w-80 bg-white dark:bg-[#1a1a1a] rounded-sm shadow-lg dark:shadow-2xl dark:shadow-black/80 overflow-hidden";
-  const artistDisplayName = artist.name || "Artist";
+    'relative flex flex-col w-64 md:w-80 bg-white dark:bg-[#1a1a1a] rounded-sm shadow-lg dark:shadow-2xl dark:shadow-black/80 overflow-hidden';
+  const artistDisplayName = artist.name || 'Artist';
 
   return (
     <div className={cardBaseClasses}>
@@ -34,18 +34,18 @@ export default function ArtistCard({
           href={artist.socialLink}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={t(currentLanguage, "artistCard.socialAriaLabel", {
+          aria-label={t(currentLanguage, 'artistCard.socialAriaLabel', {
             artistName: artistDisplayName,
           })}
           className="block relative w-full h-64 md:h-80 overflow-hidden group cursor-pointer"
         >
           <Image
             src={artist.image}
-            alt={t(currentLanguage, "artistCard.imageAlt", {
+            alt={t(currentLanguage, 'artistCard.imageAlt', {
               artistName: artistDisplayName,
             })}
             fill
-            style={{ objectFit: "cover" }}
+            style={{ objectFit: 'cover' }}
             priority
             className="object-cover"
           />
@@ -67,7 +67,7 @@ export default function ArtistCard({
                 <span className="relative flex h-2 w-2 mr-1.5">
                   <span className="relative inline-flex rounded-sm h-2 w-2 bg-green-500"></span>
                 </span>
-                {t(currentLanguage, "artistCard.residentBadge")}
+                {t(currentLanguage, 'artistCard.residentBadge')}
               </div>
             </div>
           )}
@@ -78,11 +78,11 @@ export default function ArtistCard({
         <div className="relative w-full h-64 md:h-80 overflow-hidden">
           <Image
             src={artist.image}
-            alt={t(currentLanguage, "artistCard.imageAlt", {
+            alt={t(currentLanguage, 'artistCard.imageAlt', {
               artistName: artistDisplayName,
             })}
             fill
-            style={{ objectFit: "cover" }}
+            style={{ objectFit: 'cover' }}
             priority
             className="object-cover"
           />
@@ -94,7 +94,7 @@ export default function ArtistCard({
                 <span className="relative flex h-2 w-2 mr-1.5">
                   <span className="relative inline-flex rounded-sm h-2 w-2 bg-green-500"></span>
                 </span>
-                {t(currentLanguage, "artistCard.residentBadge")}
+                {t(currentLanguage, 'artistCard.residentBadge')}
               </div>
             </div>
           )}
@@ -115,7 +115,7 @@ export default function ArtistCard({
                       <span className="relative inline-flex rounded-sm h-2 w-2 bg-green-500"></span>
                     </span>
                     <span className="font-medium">
-                      {t(currentLanguage, "artistCard.residentBadge")}
+                      {t(currentLanguage, 'artistCard.residentBadge')}
                     </span>
                   </div>
                 )}
@@ -127,7 +127,7 @@ export default function ArtistCard({
                 href={artist.socialLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={t(currentLanguage, "artistCard.socialAriaLabel", {
+                aria-label={t(currentLanguage, 'artistCard.socialAriaLabel', {
                   artistName: artistDisplayName,
                 })}
                 className="text-gray-300 dark:text-gray-300"

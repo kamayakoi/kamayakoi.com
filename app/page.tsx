@@ -1,21 +1,21 @@
-import type { Metadata } from "next";
-import Header from "@/components/landing/header";
-import { HeroSection } from "@/components/landing/hero-section";
-import { EventShowcase } from "@/components/landing/event-showcase";
-import { FeaturedArticles } from "@/components/landing/featured-articles";
-import { MediaShowcase } from "@/components/landing/media-showcase";
-import { Footer } from "@/components/landing/footer";
+import type { Metadata } from 'next';
+import Header from '@/components/landing/header';
+import { HeroSection } from '@/components/landing/hero-section';
+import { EventShowcase } from '@/components/landing/event-showcase';
+import { FeaturedArticles } from '@/components/landing/featured-articles';
+import { MediaShowcase } from '@/components/landing/media-showcase';
+import { Footer } from '@/components/landing/footer';
 import {
   getHomepageContent,
   getLatestEvents,
   getLatestBlogPosts,
   getMedia,
-} from "@/lib/sanity/queries";
+} from '@/lib/sanity/queries';
 
 // Use the general site metadata for the home page
 export const metadata: Metadata = {
-  title: "Kamayakoi",
-  description: "Abidjan Techno Gang",
+  title: 'Kamayakoi',
+  description: 'Abidjan Techno Gang',
 };
 
 export default async function Home() {

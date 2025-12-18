@@ -1,9 +1,9 @@
-import { client } from "./client";
+import { client } from './client';
 
 // Helper function to get cache configuration based on environment
 const getCacheConfig = (tags: string[]) => ({
   next: {
-    revalidate: process.env.NODE_ENV === "production" ? 900 : 0, // No cache in development, 15 minutes in production
+    revalidate: process.env.NODE_ENV === 'production' ? 900 : 0, // No cache in development, 15 minutes in production
     tags,
   },
 });
@@ -27,7 +27,7 @@ export async function getLatestEvents(limit = 3) {
     }
   `,
     { limit },
-    getCacheConfig(["events"]),
+    getCacheConfig(['events'])
   );
 }
 
@@ -117,7 +117,7 @@ export async function getEventBySlug(slug: string, locale: string) {
     }
   `,
     { slug, locale },
-    getCacheConfig([`event-${slug}`, "events"]),
+    getCacheConfig([`event-${slug}`, 'events'])
   );
 
   return event;
@@ -164,7 +164,7 @@ export async function getLatestBlogPosts(limit = 2) {
     }
   `,
     { limit },
-    getCacheConfig(["posts"]),
+    getCacheConfig(['posts'])
   );
 }
 
@@ -256,7 +256,7 @@ export async function getBlogPostBySlug(slug: string) {
       body_zh
     }
   `,
-    { slug },
+    { slug }
   );
 
   return post;
@@ -266,7 +266,7 @@ export async function getBlogPostBySlug(slug: string) {
 export async function getRelatedPosts(
   currentSlug: string,
   tags: string[] = [],
-  limit = 3,
+  limit = 3
 ) {
   if (!tags || tags.length === 0) {
     return client.fetch(
@@ -304,7 +304,7 @@ export async function getRelatedPosts(
         }
       }
     `,
-      { currentSlug },
+      { currentSlug }
     );
   }
 
@@ -344,7 +344,7 @@ export async function getRelatedPosts(
       }
     }
   `,
-    { currentSlug, tags },
+    { currentSlug, tags }
   );
 }
 
@@ -358,7 +358,7 @@ export async function getStory() {
         "url": url,
         "alt": alt
       }
-    }`,
+    }`
   );
 }
 
@@ -397,7 +397,7 @@ export async function getAllProducts() {
     }
   `,
     {},
-    getCacheConfig(["products"]),
+    getCacheConfig(['products'])
   );
 }
 
@@ -439,7 +439,7 @@ export async function getProductBySlug(slug: string) {
     }
   `,
     { slug },
-    getCacheConfig([`product-${slug}`, "products"]),
+    getCacheConfig([`product-${slug}`, 'products'])
   );
 }
 
@@ -455,7 +455,7 @@ export const getShippingSettings = async (): Promise<ShippingSettings> => {
   const result = await client.fetch<{ defaultShippingCost?: number }>(
     query,
     {},
-    getCacheConfig(["homepage", "settings"]),
+    getCacheConfig(['homepage', 'settings'])
   );
   return {
     defaultShippingCost: result?.defaultShippingCost ?? 0,
@@ -487,7 +487,7 @@ export interface EventParallaxData {
 
 // New query for ImageScroller
 export const getEventsForScroller = async (
-  limit = 10,
+  limit = 10
 ): Promise<EventScrollerData[]> => {
   // Use the specific interface
   const query = `*[_type == "event"] | order(date desc) [0...$limit] {
@@ -506,7 +506,7 @@ export const getEventsForScroller = async (
 
 // New query for Parallax Gallery
 export const getEventsForParallax = async (
-  limit = 5,
+  limit = 5
 ): Promise<EventParallaxData[]> => {
   const query = `*[_type == "event"] | order(date desc) [0...$limit] {
     _id,
@@ -559,7 +559,7 @@ export const getHomepageMusicTracks =
         audioPlayerEnabled?: boolean;
         autoPlayMusic?: boolean;
         musicTracks?: MusicTrack[];
-      }>(query, {}, getCacheConfig(["homepage", "music"]));
+      }>(query, {}, getCacheConfig(['homepage', 'music']));
 
       // Handle case when no homepage document exists
       if (!result) {
@@ -573,11 +573,10 @@ export const getHomepageMusicTracks =
       return {
         audioPlayerEnabled: result.audioPlayerEnabled ?? true,
         autoPlayMusic: result.autoPlayMusic ?? false,
-        musicTracks:
-          result.musicTracks?.filter((track) => track.audioUrl) ?? [],
+        musicTracks: result.musicTracks?.filter(track => track.audioUrl) ?? [],
       };
     } catch (error) {
-      console.error("Error fetching homepage music tracks:", error);
+      console.error('Error fetching homepage music tracks:', error);
       // Return default values instead of throwing error to prevent app crash
       return {
         audioPlayerEnabled: true,
@@ -625,13 +624,13 @@ export const getAllArtists = async (): Promise<ArtistData[]> => {
   return await client.fetch<ArtistData[]>(
     query,
     {},
-    getCacheConfig(["artists"]),
+    getCacheConfig(['artists'])
   );
 };
 
 // Fetch artist by slug
 export const getArtistBySlug = async (
-  slug: string,
+  slug: string
 ): Promise<ArtistData | null> => {
   const query = `*[_type == "artist" && slug.current == $slug][0] {
     _id,
@@ -649,7 +648,7 @@ export const getArtistBySlug = async (
   return await client.fetch<ArtistData | null>(
     query,
     { slug },
-    getCacheConfig([`artist-${slug}`, "artists"]),
+    getCacheConfig([`artist-${slug}`, 'artists'])
   );
 };
 
@@ -672,7 +671,7 @@ export const getHomepagePromoEvent =
     const result = await client.fetch<{ promoEvent?: HomepagePromoEventData }>(
       query,
       {},
-      getCacheConfig(["homepage", "events"]),
+      getCacheConfig(['homepage', 'events'])
     );
     return result?.promoEvent ?? null;
   };
@@ -684,7 +683,7 @@ export interface HomepageHeroItem {
   _key: string;
   title?: string;
   description?: string;
-  type: "image" | "video";
+  type: 'image' | 'video';
   image?: {
     asset: { url: string };
     alt?: string;
@@ -760,7 +759,7 @@ export const getHomepageContent = async (): Promise<HomepageData | null> => {
   const result = await client.fetch<HomepageData | null>(
     query,
     {},
-    getCacheConfig(["homepage"]),
+    getCacheConfig(['homepage'])
   );
 
   return result;
@@ -774,11 +773,11 @@ export interface MediaItem {
   title: string;
   title_fr?: string;
   type:
-    | "youtube"
-    | "soundcloud"
-    | "soundcloud_playlist"
-    | "audio_url"
-    | "video_url";
+    | 'youtube'
+    | 'soundcloud'
+    | 'soundcloud_playlist'
+    | 'audio_url'
+    | 'video_url';
   url: string;
   description?: string;
   description_fr?: string;
@@ -808,7 +807,7 @@ export const getAllMedia = async (): Promise<MediaItem[]> => {
     publishedAt
   }`;
 
-  return await client.fetch<MediaItem[]>(query, {}, getCacheConfig(["media"]));
+  return await client.fetch<MediaItem[]>(query, {}, getCacheConfig(['media']));
 };
 
 // Fetch media items (chronological order)
@@ -832,14 +831,14 @@ export const getMedia = async (limit = 10): Promise<MediaItem[]> => {
   return await client.fetch<MediaItem[]>(
     query,
     { limit },
-    getCacheConfig(["media"]),
+    getCacheConfig(['media'])
   );
 };
 
 // Fetch media by type
 export const getMediaByType = async (
   type: string,
-  limit = 20,
+  limit = 20
 ): Promise<MediaItem[]> => {
   const query = `*[_type == "media" && type == $type] | order(publishedAt desc) [0...$limit] {
     _id,
@@ -860,6 +859,6 @@ export const getMediaByType = async (
   return await client.fetch<MediaItem[]>(
     query,
     { type, limit },
-    getCacheConfig(["media"]),
+    getCacheConfig(['media'])
   );
 };

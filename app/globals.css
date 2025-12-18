@@ -1,10 +1,10 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 /* Custom fonts like Oroko */
 @font-face {
   font-family: Public-Sans;
-  src: url("/fonts/PublicSans-Regular.woff2") format("woff2");
+  src: url('/fonts/PublicSans-Regular.woff2') format('woff2');
   font-weight: 400;
   font-display: swap;
 }
@@ -116,7 +116,7 @@
   /* Minimal hover effects - just opacity change */
   a:hover,
   button:hover,
-  [role="button"]:hover {
+  [role='button']:hover {
     opacity: 0.7 !important;
     color: inherit !important;
   }
@@ -264,7 +264,7 @@
 }
 
 @supports (font: -apple-system-body) and (-webkit-appearance: none) {
-  img[loading="lazy"] {
+  img[loading='lazy'] {
     clip-path: inset(0.6px);
   }
 }

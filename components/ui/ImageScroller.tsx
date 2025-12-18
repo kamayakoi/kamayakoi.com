@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import styles from "@/lib/styles/ImageScroller.module.css";
-import Image from "next/image";
-import { initImageScroller } from "@/lib/actions/ImageScroller.js";
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import styles from '@/lib/styles/ImageScroller.module.css';
+import Image from 'next/image';
+import { initImageScroller } from '@/lib/actions/ImageScroller.js';
 
 interface EventImageData {
   _id: string;
@@ -30,19 +30,15 @@ const ImageScroller: React.FC<ImageScrollerProps> = ({ images }) => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
-        setActiveImageIndex((prev) =>
-          prev > 0 ? prev - 1 : images.length - 1,
-        );
-      } else if (e.key === "ArrowDown" || e.key === "ArrowRight") {
-        setActiveImageIndex((prev) =>
-          prev < images.length - 1 ? prev + 1 : 0,
-        );
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        setActiveImageIndex(prev => (prev > 0 ? prev - 1 : images.length - 1));
+      } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        setActiveImageIndex(prev => (prev < images.length - 1 ? prev + 1 : 0));
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [images.length]);
 
   useEffect(() => {
@@ -52,20 +48,18 @@ const ImageScroller: React.FC<ImageScrollerProps> = ({ images }) => {
       setImageStyle(
         isMobileView
           ? {
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "center",
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center',
             }
-          : {},
+          : {}
       );
-      setActiveImageIndex((prevIndex) =>
-        Math.min(prevIndex, images.length - 1),
-      );
+      setActiveImageIndex(prevIndex => Math.min(prevIndex, images.length - 1));
     };
     handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [images.length]);
 
   const handleScroll = useCallback(() => {
@@ -93,9 +87,9 @@ const ImageScroller: React.FC<ImageScrollerProps> = ({ images }) => {
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (scroller) {
-      scroller.addEventListener("scroll", handleScroll);
+      scroller.addEventListener('scroll', handleScroll);
       return () => {
-        scroller.removeEventListener("scroll", handleScroll);
+        scroller.removeEventListener('scroll', handleScroll);
       };
     }
   }, [handleScroll]);
@@ -117,19 +111,19 @@ const ImageScroller: React.FC<ImageScrollerProps> = ({ images }) => {
     if (activeImage && activeImage.slug) {
       router.push(`/events/${activeImage.slug}`);
     } else {
-      console.error("No active image or slug available for navigation");
+      console.error('No active image or slug available for navigation');
     }
   };
 
   const handleTouchStart = () => {
     if (scrollerRef.current) {
-      scrollerRef.current.style.scrollBehavior = "auto";
+      scrollerRef.current.style.scrollBehavior = 'auto';
     }
   };
 
   const handleTouchEnd = () => {
     if (scrollerRef.current) {
-      scrollerRef.current.style.scrollBehavior = "smooth";
+      scrollerRef.current.style.scrollBehavior = 'smooth';
     }
   };
 
@@ -150,14 +144,14 @@ const ImageScroller: React.FC<ImageScrollerProps> = ({ images }) => {
     <div className={styles.imageScrollerContainer} ref={containerRef}>
       <div className={styles.imageBox}>
         <main className={styles.main}>
-          <div className={styles.front} style={{ position: "relative" }}>
+          <div className={styles.front} style={{ position: 'relative' }}>
             <Image
-              src={activeImage.featuredImage || "/placeholder.webp"}
+              src={activeImage.featuredImage || '/placeholder.webp'}
               alt={activeImage.title}
               className={`${styles.mainImg} mainImg`}
               onClick={handleMainImageClick}
               style={{
-                cursor: "pointer",
+                cursor: 'pointer',
                 ...imageStyle,
               }}
               width={800}
@@ -181,17 +175,17 @@ const ImageScroller: React.FC<ImageScrollerProps> = ({ images }) => {
                 {images.map((image, index) => (
                   <li
                     key={image._id}
-                    className={`${styles.li} ${index === activeImageIndex ? styles.active : ""} li`}
+                    className={`${styles.li} ${index === activeImageIndex ? styles.active : ''} li`}
                   >
                     <button
                       onClick={() => handleImageClick(index)}
                       className={styles.liButton}
                     >
                       <Image
-                        src={image.featuredImage || "/placeholder.webp"}
+                        src={image.featuredImage || '/placeholder.webp'}
                         alt={image.title}
                         className={styles.liImg}
-                        loading={index <= 5 ? "eager" : "lazy"}
+                        loading={index <= 5 ? 'eager' : 'lazy'}
                         width={55}
                         height={55}
                         quality={75}

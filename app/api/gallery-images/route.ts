@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
-import cloudinary from "@/lib/utils/cloudinary"; // Assuming your configured Cloudinary instance
-import type { ImageProps } from "@/lib/utils/types"; // Assuming your type definition path
+import { NextResponse } from 'next/server';
+import cloudinary from '@/lib/utils/cloudinary'; // Assuming your configured Cloudinary instance
+import type { ImageProps } from '@/lib/utils/types'; // Assuming your type definition path
 
-export const dynamic = "force-dynamic"; // Ensure fresh data on each request (or use revalidate)
+export const dynamic = 'force-dynamic'; // Ensure fresh data on each request (or use revalidate)
 
 // Basic type for Cloudinary resource - replace with actual SDK type if available
 interface CloudinaryResource {
@@ -24,27 +24,27 @@ interface CloudinaryError {
 }
 
 export async function GET() {
-  console.log("[API Route /api/archives-images] Received GET request.");
+  console.log('[API Route /api/archives-images] Received GET request.');
   console.log(
-    "[API Route] Cloudinary Folder Env:",
-    process.env.CLOUDINARY_FOLDER,
+    '[API Route] Cloudinary Folder Env:',
+    process.env.CLOUDINARY_FOLDER
   );
   console.log(
-    "[API Route] Cloudinary Cloud Name:",
-    process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    '[API Route] Cloudinary Cloud Name:',
+    process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
   );
 
   if (
     !process.env.CLOUDINARY_FOLDER ||
     !process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
   ) {
-    console.error("[API Route] Missing required environment variables.");
+    console.error('[API Route] Missing required environment variables.');
     return NextResponse.json(
       {
         error:
-          "Server configuration error: Missing Cloudinary environment variables.",
+          'Server configuration error: Missing Cloudinary environment variables.',
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -52,20 +52,20 @@ export async function GET() {
     // Fetch results from Cloudinary
     const results = await cloudinary.v2.search
       .expression(`folder:${process.env.CLOUDINARY_FOLDER}/*`)
-      .sort_by("public_id", "desc")
+      .sort_by('public_id', 'desc')
       .max_results(400) // Adjust max_results as needed
-      .with_field("tags") // Added to fetch tags
+      .with_field('tags') // Added to fetch tags
       .execute();
 
     console.log(
-      `[API Route] Fetched ${results?.resources?.length ?? 0} resources from Cloudinary.`,
+      `[API Route] Fetched ${results?.resources?.length ?? 0} resources from Cloudinary.`
     );
 
     // Use explicit type for resources array
     const resources: CloudinaryResource[] = results?.resources || [];
 
     if (resources.length === 0) {
-      console.warn("[API Route] No resources found in Cloudinary folder.");
+      console.warn('[API Route] No resources found in Cloudinary folder.');
       return NextResponse.json([]); // Return empty array if no resources
     }
 
@@ -73,7 +73,7 @@ export async function GET() {
     const imagePropsPromises = resources.map(
       async (
         result: CloudinaryResource,
-        i: number,
+        i: number
       ): Promise<ImageProps | null> => {
         // Removed blurImageUrl and blurDataUrl logic
 
@@ -84,7 +84,7 @@ export async function GET() {
 
         if (isNaN(height) || isNaN(width)) {
           console.warn(
-            `[API Route] Invalid dimensions for ${result.public_id}: height=${result.height}, width=${result.width}. Skipping image.`,
+            `[API Route] Invalid dimensions for ${result.public_id}: height=${result.height}, width=${result.width}. Skipping image.`
           );
           return null; // Skip images with invalid dimensions
         }
@@ -99,14 +99,14 @@ export async function GET() {
           format: result.format,
           tags: result.tags || [], // Add tags, defaulting to empty array
         };
-      },
+      }
     );
 
     const imagesWithoutBlur: (ImageProps | null)[] =
       await Promise.all(imagePropsPromises);
     // Filter out nulls (due to invalid dimensions)
     const finalImages: ImageProps[] = imagesWithoutBlur.filter(
-      (img): img is ImageProps => img !== null,
+      (img): img is ImageProps => img !== null
     );
 
     // Sort images: tagged images first, then by original recency (id)
@@ -126,29 +126,29 @@ export async function GET() {
     });
 
     console.log(
-      `[API Route] Processed and sorted ${finalImages.length} images successfully (without blur).`,
+      `[API Route] Processed and sorted ${finalImages.length} images successfully (without blur).`
     );
     return NextResponse.json(finalImages);
   } catch (error: unknown) {
     console.error(
-      "[API Route] Error fetching or processing Cloudinary data:",
-      error,
+      '[API Route] Error fetching or processing Cloudinary data:',
+      error
     );
 
     // Type checking for error structure using the interface
-    if (typeof error === "object" && error !== null && "error" in error) {
+    if (typeof error === 'object' && error !== null && 'error' in error) {
       // Check if error conforms to CloudinaryError structure before accessing properties
       const potentialError = error as Partial<CloudinaryError>; // Use partial as error structure might vary
       if (potentialError.error?.message) {
         return NextResponse.json(
           { error: `Cloudinary API Error: ${potentialError.error.message}` },
-          { status: potentialError.error.http_code || 500 },
+          { status: potentialError.error.http_code || 500 }
         );
       }
     }
     return NextResponse.json(
-      { error: "Internal Server Error fetching gallery images." },
-      { status: 500 },
+      { error: 'Internal Server Error fetching gallery images.' },
+      { status: 500 }
     );
   }
 }

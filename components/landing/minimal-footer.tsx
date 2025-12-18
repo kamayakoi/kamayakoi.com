@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { LanguageSwitcher } from "@/components/landing/LanguageSwitcher";
-import { IG } from "@/components/icons/IG";
-import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
-import { FacebookIcon } from "@/components/icons/FacebookIcon";
-import { Soundcloud } from "@/components/icons/Soundcloud";
+import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { LanguageSwitcher } from '@/components/landing/LanguageSwitcher';
+import { IG } from '@/components/icons/IG';
+import { WhatsappIcon } from '@/components/icons/WhatsappIcon';
+import { FacebookIcon } from '@/components/icons/FacebookIcon';
+import { Soundcloud } from '@/components/icons/Soundcloud';
 // import { useTranslation } from "@/lib/contexts/TranslationContext";
 // import { t } from "@/lib/i18n/translations";
 
@@ -18,9 +18,9 @@ export default function MinimalFooter() {
   // const { currentLanguage } = useTranslation();
 
   // Pages where footer should appear as regular footer (not fixed)
-  const staticFooterPages = ["/artists", "/terms", "/privacy"];
-  const isStaticFooter = staticFooterPages.some((page) =>
-    pathname?.includes(page),
+  const staticFooterPages = ['/artists', '/terms', '/privacy'];
+  const isStaticFooter = staticFooterPages.some(page =>
+    pathname?.includes(page)
   );
 
   useEffect(() => {
@@ -42,10 +42,10 @@ export default function MinimalFooter() {
       setIsVisible(scrollProgress >= 0.85);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
     handleScroll(); // Check initial state
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [isStaticFooter]);
 
   if (!isVisible) {

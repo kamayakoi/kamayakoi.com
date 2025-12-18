@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
 
 interface TranslatedLabelProps {
   translationKey: string;

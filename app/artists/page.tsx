@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import { Suspense } from "react";
-import { getAllArtists, type ArtistData } from "@/lib/sanity/queries";
-import LoadingComponent from "@/components/ui/loader";
-import ArtistsContentClient from "@/app/artists/artists-content-client";
+import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import { getAllArtists, type ArtistData } from '@/lib/sanity/queries';
+import LoadingComponent from '@/components/ui/loader';
+import ArtistsContentClient from '@/app/artists/artists-content-client';
 
 export const metadata: Metadata = {
-  title: "Artists",
-  description: "Meet the talented artists and creators of Kamayakoi.",
+  title: 'Artists',
+  description: 'Meet the talented artists and creators of Kamayakoi.',
 };
 
 async function ArtistsContent() {

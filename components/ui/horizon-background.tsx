@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef } from "react";
-import * as THREE from "three";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+import React, { useEffect, useRef } from 'react';
+import * as THREE from 'three';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
 interface ThreeRefs {
   scene: THREE.Scene | null;
@@ -24,7 +24,7 @@ interface HorizonBackgroundProps {
 }
 
 export default function HorizonBackground({
-  className = "",
+  className = '',
   staticPosition = false,
   opacity = 1,
 }: HorizonBackgroundProps) {
@@ -55,7 +55,7 @@ export default function HorizonBackground({
         75,
         window.innerWidth / window.innerHeight,
         0.1,
-        2000,
+        2000
       );
       refs.camera.position.z = staticPosition ? -300 : 100;
       refs.camera.position.y = staticPosition ? 40 : 20;
@@ -80,7 +80,7 @@ export default function HorizonBackground({
         new THREE.Vector2(window.innerWidth, window.innerHeight),
         0.8,
         0.4,
-        0.85,
+        0.85
       );
       refs.composer.addPass(bloomPass);
 
@@ -132,11 +132,11 @@ export default function HorizonBackground({
         }
 
         geometry.setAttribute(
-          "position",
-          new THREE.BufferAttribute(positions, 3),
+          'position',
+          new THREE.BufferAttribute(positions, 3)
         );
-        geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-        geometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
         const material = new THREE.ShaderMaterial({
           uniforms: {
@@ -338,7 +338,7 @@ export default function HorizonBackground({
       const time = Date.now() * 0.001;
 
       // Update stars
-      refs.stars.forEach((starField) => {
+      refs.stars.forEach(starField => {
         if (starField.material.uniforms) {
           starField.material.uniforms.time.value = time;
         }
@@ -385,7 +385,7 @@ export default function HorizonBackground({
       }
     };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
 
     // Cleanup
     return () => {
@@ -395,15 +395,15 @@ export default function HorizonBackground({
         cancelAnimationFrame(refs.animationId);
       }
 
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('resize', handleResize);
 
       // Dispose Three.js resources
-      refs.stars.forEach((starField) => {
+      refs.stars.forEach(starField => {
         starField.geometry.dispose();
         starField.material.dispose();
       });
 
-      refs.mountains.forEach((mountain) => {
+      refs.mountains.forEach(mountain => {
         mountain.geometry.dispose();
         mountain.material.dispose();
       });
@@ -428,7 +428,7 @@ export default function HorizonBackground({
         ref={canvasRef}
         className="w-full h-full"
         style={{
-          position: "absolute",
+          position: 'absolute',
           top: 0,
           left: 0,
           zIndex: -1,

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { notFound } from "next/navigation";
+import { notFound } from 'next/navigation';
 import {
   CalendarDays,
   Clock,
@@ -8,26 +8,26 @@ import {
   Users,
   Check,
   ChevronRight,
-} from "lucide-react";
-import Header from "@/components/landing/header";
-import { Separator } from "@/components/ui/separator";
+} from 'lucide-react';
+import Header from '@/components/landing/header';
+import { Separator } from '@/components/ui/separator';
 import {
   getEventBySlug,
   getEventsForParallax,
   EventParallaxData,
-} from "@/lib/sanity/queries";
-import { EventShareButton } from "@/components/event/event-share-button";
-import { Card } from "@/components/ui/card";
-import CheckoutButtonWrapper from "@/components/event/CheckoutButtonWrapper";
-import LoadingComponent from "@/components/ui/loader";
-import { EventMediaDisplay } from "@/components/event/event-media-display";
-import { Footer } from "@/components/landing/footer";
-import ArtistCard from "@/components/event/ArtistCard";
-import Link from "next/link";
-import SwipeNavigation from "@/components/event/SwipeNavigation";
-import { TranslatedLabel } from "@/components/event/TranslatedLabel";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { useEffect, useState } from "react";
+} from '@/lib/sanity/queries';
+import { EventShareButton } from '@/components/event/event-share-button';
+import { Card } from '@/components/ui/card';
+import CheckoutButtonWrapper from '@/components/event/CheckoutButtonWrapper';
+import LoadingComponent from '@/components/ui/loader';
+import { EventMediaDisplay } from '@/components/event/event-media-display';
+import { Footer } from '@/components/landing/footer';
+import ArtistCard from '@/components/event/ArtistCard';
+import Link from 'next/link';
+import SwipeNavigation from '@/components/event/SwipeNavigation';
+import { TranslatedLabel } from '@/components/event/TranslatedLabel';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { useEffect, useState } from 'react';
 
 // Define specific type for TicketType
 interface TicketTypeData {
@@ -104,18 +104,18 @@ type EventData = {
 // Helper function for formatting price
 const formatPrice = (price: number): string => {
   // Use non-breaking space (\u00A0) for thousands separator
-  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
+  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0');
 };
 
 // Enhanced text renderer for better formatting
 const renderFormattedText = (text: string) => {
-  return text.split("\n").map((line, index, array) => {
+  return text.split('\n').map((line, index, array) => {
     const trimmedLine = line.trim();
 
     // Handle empty lines with better spacing
-    if (trimmedLine === "") {
+    if (trimmedLine === '') {
       const nextLine = array[index + 1];
-      if (nextLine && nextLine.trim() === "") {
+      if (nextLine && nextLine.trim() === '') {
         return <div key={index} className="h-4" />; // Larger spacing for multiple breaks
       }
       return <div key={index} className="h-2" />; // Smaller spacing for single breaks
@@ -125,7 +125,7 @@ const renderFormattedText = (text: string) => {
     const isHeading =
       trimmedLine.length < 60 &&
       (trimmedLine === trimmedLine.toUpperCase() ||
-        trimmedLine.endsWith(":") ||
+        trimmedLine.endsWith(':') ||
         trimmedLine.match(/^[A-Z][A-Z\s&-]{3,}$/));
 
     // Detect list items
@@ -134,24 +134,24 @@ const renderFormattedText = (text: string) => {
 
     // Detect emphasis (special characters, quotes, warnings)
     const hasEmphasis =
-      trimmedLine.includes("**") ||
-      trimmedLine.includes("*") ||
+      trimmedLine.includes('**') ||
+      trimmedLine.includes('*') ||
       trimmedLine.startsWith('"') ||
-      trimmedLine.startsWith("⚠️") ||
-      trimmedLine.startsWith("✨") ||
-      trimmedLine.startsWith("🎵") ||
-      trimmedLine.startsWith("💫") ||
-      trimmedLine.startsWith("🔥");
+      trimmedLine.startsWith('⚠️') ||
+      trimmedLine.startsWith('✨') ||
+      trimmedLine.startsWith('🎵') ||
+      trimmedLine.startsWith('💫') ||
+      trimmedLine.startsWith('🔥');
 
     // Detect important venue info
     const isImportant =
-      trimmedLine.startsWith("⚠️") ||
-      trimmedLine.startsWith("🅿️") ||
-      trimmedLine.startsWith("♿") ||
-      trimmedLine.startsWith("📍") ||
-      trimmedLine.toLowerCase().includes("parking") ||
-      trimmedLine.toLowerCase().includes("entrance") ||
-      trimmedLine.toLowerCase().includes("access");
+      trimmedLine.startsWith('⚠️') ||
+      trimmedLine.startsWith('🅿️') ||
+      trimmedLine.startsWith('♿') ||
+      trimmedLine.startsWith('📍') ||
+      trimmedLine.toLowerCase().includes('parking') ||
+      trimmedLine.toLowerCase().includes('entrance') ||
+      trimmedLine.toLowerCase().includes('access');
 
     if (isHeading) {
       return (
@@ -159,7 +159,7 @@ const renderFormattedText = (text: string) => {
           key={index}
           className="text-gray-100 font-semibold text-base mt-4 mb-2 tracking-wide"
         >
-          {trimmedLine.replace(/[:]*$/, "")}
+          {trimmedLine.replace(/[:]*$/, '')}
         </h4>
       );
     }
@@ -168,7 +168,7 @@ const renderFormattedText = (text: string) => {
       return (
         <p key={index} className="mb-1 ml-4 relative">
           <span className="absolute -ml-4 text-primary">•</span>
-          {trimmedLine.replace(/^[-•*→]\s/, "").replace(/^\d+\.\s/, "")}
+          {trimmedLine.replace(/^[-•*→]\s/, '').replace(/^\d+\.\s/, '')}
         </p>
       );
     }
@@ -218,7 +218,7 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
         setEvent(eventData);
         setAllEvents(eventsData);
       } catch (error) {
-        console.error("Error fetching event data:", error);
+        console.error('Error fetching event data:', error);
       } finally {
         setLoading(false);
       }
@@ -230,7 +230,7 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
   }, [slug, currentLanguage]);
 
   // Get all events for navigation
-  const currentIndex = allEvents.findIndex((e) => e.slug === slug);
+  const currentIndex = allEvents.findIndex(e => e.slug === slug);
   // Reverse navigation logic to make chronological sense:
   // Events are sorted newest first, so lower index = newer events, higher index = older events
   const chronologicallyNewerEvent =
@@ -259,7 +259,7 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
       queryParts.push(event.location.address.trim());
     }
 
-    const saneQuery = queryParts.join(", ");
+    const saneQuery = queryParts.join(', ');
     if (saneQuery && saneQuery.length > 2) {
       const encodedQuery = encodeURIComponent(saneQuery);
       mapEmbedSrc = `https://www.google.com/maps?q=${encodedQuery}&output=embed`;
@@ -269,17 +269,17 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
   // Format Date and Time
   const eventDate = event.date ? new Date(event.date) : null;
   const formattedDate =
-    eventDate?.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    }) || "Date TBC";
+    eventDate?.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    }) || 'Date TBC';
   const formattedTime =
-    eventDate?.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
+    eventDate?.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
       hour12: true,
-    }) || "Time TBC";
+    }) || 'Time TBC';
 
   // Simplified availability check for the main "Get Tickets" section
   const globallyTicketsOnSale =
@@ -440,12 +440,12 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
                       {/* Ticket Types */}
                       {hasDefinedTickets && (
                         <div className="space-y-3">
-                          {event.ticketTypes?.map((ticket) => {
+                          {event.ticketTypes?.map(ticket => {
                             console.log(
-                              "Event page - ticket.productId:",
+                              'Event page - ticket.productId:',
                               ticket.productId,
-                              "for ticket:",
-                              ticket.name,
+                              'for ticket:',
+                              ticket.name
                             );
                             return (
                               <Card
@@ -459,7 +459,7 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
                                         <h4 className="text-foreground font-bold text-xl">
                                           {ticket.name.replace(
                                             /\s*\(\d+(\s*\w+)?\)$/,
-                                            "",
+                                            ''
                                           )}
                                         </h4>
                                         <div className="h-6 w-px bg-border"></div>
@@ -472,13 +472,13 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
                                       {ticket.description && (
                                         <div className="space-y-2">
                                           {ticket.description
-                                            .split("\n")
+                                            .split('\n')
                                             .map((line, index) => {
                                               const trimmedLine = line.trim();
-                                              if (trimmedLine === "")
+                                              if (trimmedLine === '')
                                                 return <br key={index} />;
                                               if (
-                                                trimmedLine.startsWith("⚠️")
+                                                trimmedLine.startsWith('⚠️')
                                               ) {
                                                 return (
                                                   <p
@@ -504,14 +504,14 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
                                       {ticket.details && (
                                         <div className="space-y-1">
                                           {ticket.details
-                                            .split("\n")
+                                            .split('\n')
                                             .map((line, idx) => {
                                               const trimmedLine = line.trim();
-                                              if (trimmedLine === "")
+                                              if (trimmedLine === '')
                                                 return <br key={idx} />;
                                               const match =
                                                 trimmedLine.match(
-                                                  /^(✅|✔|•|-|\*)\s*(.*)/,
+                                                  /^(✅|✔|•|-|\*)\s*(.*)/
                                                 );
                                               if (match && match[2]) {
                                                 return (
@@ -580,12 +580,12 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
                           <h3 className="font-semibold text-lg text-center">
                             <TranslatedLabel translationKey="eventSlugPage.bundles.title" />
                           </h3>
-                          {event.bundles?.map((bundle) => {
+                          {event.bundles?.map(bundle => {
                             console.log(
-                              "Event page - bundle.productId:",
+                              'Event page - bundle.productId:',
                               bundle.productId,
-                              "for bundle:",
-                              bundle.name,
+                              'for bundle:',
+                              bundle.name
                             );
                             return (
                               <Card
@@ -599,7 +599,7 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
                                         <h4 className="text-foreground font-bold text-xl">
                                           {bundle.name.replace(
                                             /\s*\(\d+(\s*\w+)?\)$/,
-                                            "",
+                                            ''
                                           )}
                                         </h4>
                                         <div className="h-6 w-px bg-border"></div>
@@ -612,13 +612,13 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
                                       {bundle.description && (
                                         <div className="space-y-2">
                                           {bundle.description
-                                            .split("\n")
+                                            .split('\n')
                                             .map((line, index) => {
                                               const trimmedLine = line.trim();
-                                              if (trimmedLine === "")
+                                              if (trimmedLine === '')
                                                 return <br key={index} />;
                                               if (
-                                                trimmedLine.startsWith("⚠️")
+                                                trimmedLine.startsWith('⚠️')
                                               ) {
                                                 return (
                                                   <p
@@ -644,14 +644,14 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
                                       {bundle.details && (
                                         <div className="space-y-1">
                                           {bundle.details
-                                            .split("\n")
+                                            .split('\n')
                                             .map((line, idx) => {
                                               const trimmedLine = line.trim();
-                                              if (trimmedLine === "")
+                                              if (trimmedLine === '')
                                                 return <br key={idx} />;
                                               const match =
                                                 trimmedLine.match(
-                                                  /^(✅|✔|•|-|\*)\s*(.*)/,
+                                                  /^(✅|✔|•|-|\*)\s*(.*)/
                                                 );
                                               if (match && match[2]) {
                                                 return (
@@ -774,7 +774,7 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
                         allowFullScreen={false}
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"
-                        title={`Map of ${event.location?.venueName || "event location"}`}
+                        title={`Map of ${event.location?.venueName || 'event location'}`}
                         className="absolute top-0 left-0 w-full h-full"
                       ></iframe>
                     </div>
@@ -799,7 +799,7 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
                 </div>
                 <div className="bg-card/30 backdrop-blur-sm rounded-sm p-8 border border-border/20">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {event.lineup.map((artist) => (
+                    {event.lineup.map(artist => (
                       <div key={artist._id} className="flex justify-center">
                         <ArtistCard
                           artist={{

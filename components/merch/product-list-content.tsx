@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { ProductCard } from "@/components/merch/product-card";
-import { Card } from "@/components/ui/card";
-import { SanityProduct } from "./types";
+import { ProductCard } from '@/components/merch/product-card';
+import { Card } from '@/components/ui/card';
+import { SanityProduct } from './types';
 
 interface ProductListContentProps {
   products: SanityProduct[];
@@ -11,7 +11,7 @@ interface ProductListContentProps {
 export function ProductListContent({ products }: ProductListContentProps) {
   return products.length > 0 ? (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-      {products.map((product) => (
+      {products.map(product => (
         <ProductCard key={product._id} product={product} />
       ))}
     </div>

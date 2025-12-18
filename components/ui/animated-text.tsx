@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import * as React from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 
 interface AnimatedTextCycleProps {
   words: string[];
@@ -13,10 +13,10 @@ interface AnimatedTextCycleProps {
 export default function AnimatedTextCycle({
   words,
   interval = 5000,
-  className = "",
+  className = '',
 }: AnimatedTextCycleProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [width, setWidth] = useState("auto");
+  const [width, setWidth] = useState('auto');
   const measureRef = useRef<HTMLDivElement>(null);
 
   // Get the width of the current word
@@ -33,7 +33,7 @@ export default function AnimatedTextCycle({
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % words.length);
+      setCurrentIndex(prevIndex => (prevIndex + 1) % words.length);
     }, interval);
 
     return () => clearInterval(timer);
@@ -44,12 +44,12 @@ export default function AnimatedTextCycle({
     hidden: {
       y: -20,
       opacity: 0,
-      filter: "blur(8px)",
+      filter: 'blur(8px)',
     },
     visible: {
       y: 0,
       opacity: 1,
-      filter: "blur(0px)",
+      filter: 'blur(0px)',
       transition: {
         duration: 0.4,
         ease: [0.4, 0, 0.2, 1], // easeOut cubic-bezier
@@ -58,7 +58,7 @@ export default function AnimatedTextCycle({
     exit: {
       y: 20,
       opacity: 0,
-      filter: "blur(8px)",
+      filter: 'blur(8px)',
       transition: {
         duration: 0.3,
         ease: [0.4, 0, 1, 1], // easeIn cubic-bezier
@@ -73,7 +73,7 @@ export default function AnimatedTextCycle({
         ref={measureRef}
         aria-hidden="true"
         className="absolute opacity-0 pointer-events-none"
-        style={{ visibility: "hidden" }}
+        style={{ visibility: 'hidden' }}
       >
         {words.map((word, i) => (
           <span key={i} className={`font-bold ${className}`}>
@@ -88,7 +88,7 @@ export default function AnimatedTextCycle({
         animate={{
           width,
           transition: {
-            type: "spring",
+            type: 'spring',
             stiffness: 150,
             damping: 15,
             mass: 1.2,
@@ -103,7 +103,7 @@ export default function AnimatedTextCycle({
             initial="hidden"
             animate="visible"
             exit="exit"
-            style={{ whiteSpace: "nowrap" }}
+            style={{ whiteSpace: 'nowrap' }}
           >
             {words[currentIndex]}
           </motion.span>

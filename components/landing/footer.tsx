@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import Image from "next/image";
-import { ArrowRight, Loader2, Check, X } from "lucide-react";
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { IG } from "@/components/icons/IG";
-import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
-import { FacebookIcon } from "@/components/icons/FacebookIcon";
-import { Soundcloud } from "@/components/icons/Soundcloud";
-import { LanguageSwitcher } from "@/components/landing/LanguageSwitcher";
+import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowRight, Loader2, Check, X } from 'lucide-react';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { IG } from '@/components/icons/IG';
+import { WhatsappIcon } from '@/components/icons/WhatsappIcon';
+import { FacebookIcon } from '@/components/icons/FacebookIcon';
+import { Soundcloud } from '@/components/icons/Soundcloud';
+import { LanguageSwitcher } from '@/components/landing/LanguageSwitcher';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { toast } from "@/components/ui/sonner";
-import { sendEmail } from "@/lib/actions/send-email";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
+} from '@/components/ui/dialog';
+import { toast } from '@/components/ui/sonner';
+import { sendEmail } from '@/lib/actions/send-email';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
 
 // Contact Form Component
 function ContactForm({ onClose }: { onClose: () => void }) {
@@ -32,10 +32,10 @@ function ContactForm({ onClose }: { onClose: () => void }) {
     try {
       // Construct proper FormData like newsletter subscription
       const contactData = new FormData();
-      contactData.append("email", formData.get("email") as string);
-      contactData.append("subject", "New Contact Form Message");
-      contactData.append("message", formData.get("message") as string);
-      contactData.append("type", "contact");
+      contactData.append('email', formData.get('email') as string);
+      contactData.append('subject', 'New Contact Form Message');
+      contactData.append('message', formData.get('message') as string);
+      contactData.append('type', 'contact');
 
       const result = await sendEmail(contactData);
 
@@ -43,10 +43,10 @@ function ContactForm({ onClose }: { onClose: () => void }) {
         toast(result.success);
         onClose();
       } else {
-        toast(result.error || t(currentLanguage, "footer.contact.sendError"));
+        toast(result.error || t(currentLanguage, 'footer.contact.sendError'));
       }
     } catch {
-      toast(t(currentLanguage, "footer.contact.sendError"));
+      toast(t(currentLanguage, 'footer.contact.sendError'));
     } finally {
       setIsPending(false);
     }
@@ -56,13 +56,13 @@ function ContactForm({ onClose }: { onClose: () => void }) {
     <form action={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <label htmlFor="email" className="block text-sm font-medium">
-          {t(currentLanguage, "footer.contact.emailLabel")}
+          {t(currentLanguage, 'footer.contact.emailLabel')}
         </label>
         <input
           type="email"
           id="email"
           name="email"
-          placeholder={t(currentLanguage, "footer.contact.emailPlaceholder")}
+          placeholder={t(currentLanguage, 'footer.contact.emailPlaceholder')}
           required
           className="w-full bg-background rounded-sm px-3 py-2 text-sm border border-input focus:ring-2 focus:ring-ring placeholder:text-muted-foreground transition-colors"
         />
@@ -70,12 +70,12 @@ function ContactForm({ onClose }: { onClose: () => void }) {
 
       <div className="space-y-2">
         <label htmlFor="message" className="block text-sm font-medium">
-          {t(currentLanguage, "footer.contact.messageLabel")}
+          {t(currentLanguage, 'footer.contact.messageLabel')}
         </label>
         <textarea
           id="message"
           name="message"
-          placeholder={t(currentLanguage, "footer.contact.messagePlaceholder")}
+          placeholder={t(currentLanguage, 'footer.contact.messagePlaceholder')}
           required
           rows={4}
           className="w-full bg-background rounded-sm px-3 py-2 text-sm border border-input focus:ring-2 focus:ring-ring placeholder:text-muted-foreground transition-colors resize-none"
@@ -92,7 +92,7 @@ function ContactForm({ onClose }: { onClose: () => void }) {
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             <>
-              <span>{t(currentLanguage, "footer.contact.sendButton")}</span>
+              <span>{t(currentLanguage, 'footer.contact.sendButton')}</span>
               <ArrowRight className="w-4 h-4" />
             </>
           )}
@@ -106,8 +106,8 @@ export function Footer() {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isNewsletterFocused, setIsNewsletterFocused] = useState(false);
   const [newsletterStatus, setNewsletterStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
+    'idle' | 'loading' | 'success' | 'error'
+  >('idle');
   const { currentLanguage } = useTranslation();
 
   return (
@@ -185,7 +185,7 @@ export function Footer() {
             <div>
               <div className="mb-6">
                 <h4 className="text-xs font-mono uppercase tracking-widest">
-                  {t(currentLanguage, "footer.sections.explore")}
+                  {t(currentLanguage, 'footer.sections.explore')}
                 </h4>
               </div>
               <ul className="space-y-3">
@@ -194,7 +194,7 @@ export function Footer() {
                     href="/events"
                     className="text-white/70 hover:text-white transition-colors text-sm font-bold"
                   >
-                    {t(currentLanguage, "footer.navigation.events")}
+                    {t(currentLanguage, 'footer.navigation.events')}
                   </Link>
                 </li>
                 <li>
@@ -202,7 +202,7 @@ export function Footer() {
                     href="/stories"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
-                    {t(currentLanguage, "footer.navigation.stories")}
+                    {t(currentLanguage, 'footer.navigation.stories')}
                   </Link>
                 </li>
                 <li>
@@ -210,7 +210,7 @@ export function Footer() {
                     href="/merch"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
-                    {t(currentLanguage, "footer.navigation.merch")}
+                    {t(currentLanguage, 'footer.navigation.merch')}
                   </Link>
                 </li>
               </ul>
@@ -219,7 +219,7 @@ export function Footer() {
             <div>
               <div className="mb-6">
                 <h4 className="text-xs font-mono uppercase tracking-widest">
-                  {t(currentLanguage, "footer.sections.connect")}
+                  {t(currentLanguage, 'footer.sections.connect')}
                 </h4>
               </div>
               <ul className="space-y-3">
@@ -228,7 +228,7 @@ export function Footer() {
                     href="/artists"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
-                    {t(currentLanguage, "footer.navigation.artists")}
+                    {t(currentLanguage, 'footer.navigation.artists')}
                   </Link>
                 </li>
                 <li>
@@ -236,21 +236,21 @@ export function Footer() {
                     href="/archives"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
-                    {t(currentLanguage, "footer.navigation.archive")}
+                    {t(currentLanguage, 'footer.navigation.archive')}
                   </Link>
                 </li>
                 <li>
                   <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
                     <DialogTrigger asChild>
                       <button className="text-white/70 hover:text-white transition-colors text-sm font-light text-left">
-                        {t(currentLanguage, "footer.navigation.contact")}
+                        {t(currentLanguage, 'footer.navigation.contact')}
                       </button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px] p-4 rounded-sm border border-border/40 bg-background backdrop-blur-sm">
                       <DialogHeader>
                         <DialogTitle className="flex items-center">
                           <span>
-                            {t(currentLanguage, "footer.contact.title")}
+                            {t(currentLanguage, 'footer.contact.title')}
                           </span>
                         </DialogTitle>
                       </DialogHeader>
@@ -264,7 +264,7 @@ export function Footer() {
             <div>
               <div className="mb-6">
                 <h4 className="text-xs font-mono uppercase tracking-widest">
-                  {t(currentLanguage, "footer.sections.legal")}
+                  {t(currentLanguage, 'footer.sections.legal')}
                 </h4>
               </div>
               <ul className="space-y-3">
@@ -273,7 +273,7 @@ export function Footer() {
                     href="/privacy"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
-                    {t(currentLanguage, "footer.links.privacy")}
+                    {t(currentLanguage, 'footer.links.privacy')}
                   </Link>
                 </li>
                 <li>
@@ -281,7 +281,7 @@ export function Footer() {
                     href="/terms"
                     className="text-white/70 hover:text-white transition-colors text-sm font-light"
                   >
-                    {t(currentLanguage, "footer.links.terms")}
+                    {t(currentLanguage, 'footer.links.terms')}
                   </Link>
                 </li>
               </ul>
@@ -292,11 +292,11 @@ export function Footer() {
         <div className="flex justify-between items-center text-white/70 pt-6 relative isolate">
           <div
             className="absolute top-0 left-0 right-0 h-px bg-white/20 z-10"
-            style={{ backgroundColor: "rgb(255 255 255 / 0.2)" }}
+            style={{ backgroundColor: 'rgb(255 255 255 / 0.2)' }}
           ></div>
           <div className="flex items-center gap-3">
             <p className="text-[10px] font-mono md:text-xs">
-              {t(currentLanguage, "footer.copyright", {
+              {t(currentLanguage, 'footer.copyright', {
                 year: new Date().getFullYear(),
               })}
             </p>
@@ -308,48 +308,48 @@ export function Footer() {
               <motion.div
                 className="flex items-center"
                 animate={{
-                  width: isNewsletterFocused ? "180px" : "130px",
+                  width: isNewsletterFocused ? '180px' : '130px',
                 }}
                 transition={{
                   duration: 0.4,
                   ease: [0.4, 0.0, 0.2, 1],
-                  type: "tween",
+                  type: 'tween',
                 }}
-                style={{ justifyContent: "flex-end" }}
+                style={{ justifyContent: 'flex-end' }}
               >
                 <motion.form
-                  onSubmit={async (e) => {
+                  onSubmit={async e => {
                     e.preventDefault();
                     const formData = new FormData(e.target as HTMLFormElement);
-                    const email = formData.get("email") as string;
+                    const email = formData.get('email') as string;
 
                     if (!email) return;
 
-                    setNewsletterStatus("loading");
+                    setNewsletterStatus('loading');
 
                     const newsletterData = new FormData();
-                    newsletterData.append("email", email);
+                    newsletterData.append('email', email);
                     newsletterData.append(
-                      "subject",
-                      "New Newsletter Subscription",
+                      'subject',
+                      'New Newsletter Subscription'
                     );
                     newsletterData.append(
-                      "message",
-                      `New person subscribed to newsletter: ${email}`,
+                      'message',
+                      `New person subscribed to newsletter: ${email}`
                     );
-                    newsletterData.append("type", "newsletter");
+                    newsletterData.append('type', 'newsletter');
 
                     const result = await sendEmail(newsletterData);
                     if (result.success) {
-                      setNewsletterStatus("success");
+                      setNewsletterStatus('success');
                       (e.target as HTMLFormElement).reset();
                       setIsNewsletterFocused(false);
                       // Reset status after 3 seconds
-                      setTimeout(() => setNewsletterStatus("idle"), 3000);
+                      setTimeout(() => setNewsletterStatus('idle'), 3000);
                     } else {
-                      setNewsletterStatus("error");
+                      setNewsletterStatus('error');
                       // Reset status after 3 seconds
-                      setTimeout(() => setNewsletterStatus("idle"), 3000);
+                      setTimeout(() => setNewsletterStatus('idle'), 3000);
                     }
                   }}
                   className="flex"
@@ -359,7 +359,7 @@ export function Footer() {
                     name="email"
                     placeholder={t(
                       currentLanguage,
-                      "footer.newsletter.placeholder",
+                      'footer.newsletter.placeholder'
                     )}
                     required
                     animate={{
@@ -368,7 +368,7 @@ export function Footer() {
                     transition={{
                       duration: 0.4,
                       ease: [0.4, 0.0, 0.2, 1],
-                      type: "tween",
+                      type: 'tween',
                     }}
                     onFocus={() => setIsNewsletterFocused(true)}
                     onBlur={() => {
@@ -387,30 +387,30 @@ export function Footer() {
                     transition={{
                       duration: 0.4,
                       ease: [0.4, 0.0, 0.2, 1],
-                      type: "tween",
+                      type: 'tween',
                     }}
                     style={{
-                      pointerEvents: isNewsletterFocused ? "auto" : "none",
+                      pointerEvents: isNewsletterFocused ? 'auto' : 'none',
                     }}
                     className={`px-2 py-1 rounded-sm text-xs font-medium transition-colors h-6 -ml-8 flex items-center justify-center min-w-[50px] ${
-                      isNewsletterFocused ? "" : "invisible"
+                      isNewsletterFocused ? '' : 'invisible'
                     } ${
-                      newsletterStatus === "success"
-                        ? "bg-green-800 text-green-100"
-                        : newsletterStatus === "error"
-                          ? "bg-red-800 text-red-100"
-                          : "bg-teal-800 hover:bg-teal-700 text-teal-100"
+                      newsletterStatus === 'success'
+                        ? 'bg-green-800 text-green-100'
+                        : newsletterStatus === 'error'
+                          ? 'bg-red-800 text-red-100'
+                          : 'bg-teal-800 hover:bg-teal-700 text-teal-100'
                     }`}
-                    disabled={newsletterStatus === "loading"}
+                    disabled={newsletterStatus === 'loading'}
                   >
-                    {newsletterStatus === "loading" ? (
+                    {newsletterStatus === 'loading' ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : newsletterStatus === "success" ? (
+                    ) : newsletterStatus === 'success' ? (
                       <Check className="w-4 h-4" />
-                    ) : newsletterStatus === "error" ? (
+                    ) : newsletterStatus === 'error' ? (
                       <X className="w-4 h-4" />
                     ) : (
-                      t(currentLanguage, "footer.newsletter.sendButton")
+                      t(currentLanguage, 'footer.newsletter.sendButton')
                     )}
                   </motion.button>
                 </motion.form>

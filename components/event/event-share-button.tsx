@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -8,15 +8,15 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { XIcon as TwitterIcon } from "@/components/icons/X";
-import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
-import { IG } from "@/components/icons/IG";
-import { Facebook, Copy, Share2, Check } from "lucide-react";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { XIcon as TwitterIcon } from '@/components/icons/X';
+import { WhatsappIcon } from '@/components/icons/WhatsappIcon';
+import { IG } from '@/components/icons/IG';
+import { Facebook, Copy, Share2, Check } from 'lucide-react';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
 
 interface EventShareButtonProps {
   eventTitle: string;
@@ -29,12 +29,12 @@ export function EventShareButton({
 }: EventShareButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [shareUrl, setShareUrl] = useState("");
+  const [shareUrl, setShareUrl] = useState('');
   const { currentLanguage } = useTranslation();
 
   // Construct URL client-side
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       setShareUrl(`${window.location.origin}/events/${eventSlug}`);
     }
   }, [eventSlug]);
@@ -43,7 +43,7 @@ export function EventShareButton({
   const encodedTitle = encodeURIComponent(eventTitle);
 
   const baseButtonClasses =
-    "flex items-center justify-start gap-2 text-left h-12 rounded-sm text-white transition-colors duration-200";
+    'flex items-center justify-start gap-2 text-left h-12 rounded-sm text-white transition-colors duration-200';
 
   // Define handleCopy function BEFORE shareOptions that uses it
   const handleCopy = () => {
@@ -53,46 +53,46 @@ export function EventShareButton({
       .then(() => {
         setCopied(true);
         // Optional: Add a visual cue like a toast here if you re-introduce it
-        console.log("Link copied!");
+        console.log('Link copied!');
         setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
       })
-      .catch((err) => {
-        console.error("Failed to copy: ", err);
+      .catch(err => {
+        console.error('Failed to copy: ', err);
         // Optional: Add error feedback
       });
   };
 
   const platformTranslations = {
-    twitter: t(currentLanguage, "eventShare.platformTwitter"),
-    facebook: t(currentLanguage, "eventShare.platformFacebook"),
-    whatsapp: t(currentLanguage, "eventShare.platformWhatsApp"),
-    instagram: t(currentLanguage, "eventShare.platformInstagram"),
+    twitter: t(currentLanguage, 'eventShare.platformTwitter'),
+    facebook: t(currentLanguage, 'eventShare.platformFacebook'),
+    whatsapp: t(currentLanguage, 'eventShare.platformWhatsApp'),
+    instagram: t(currentLanguage, 'eventShare.platformInstagram'),
   };
 
   const shareOptions = [
     {
-      id: "twitter",
+      id: 'twitter',
       name: platformTranslations.twitter,
       icon: <TwitterIcon className="h-5 w-5" />,
       url: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
       className: `${baseButtonClasses} bg-black hover:bg-zinc-800 dark:bg-black dark:text-white dark:hover:bg-black`,
     },
     {
-      id: "facebook",
+      id: 'facebook',
       name: platformTranslations.facebook,
       icon: <Facebook className="h-5 w-5" />,
       url: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
       className: `${baseButtonClasses} bg-[#1877F2] hover:bg-[#166FE5] dark:bg-[#1877F2] dark:hover:bg-[#3B82F6]`,
     },
     {
-      id: "whatsapp",
+      id: 'whatsapp',
       name: platformTranslations.whatsapp,
       icon: <WhatsappIcon className="h-5 w-5" />,
       url: `https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`,
       className: `${baseButtonClasses} bg-[#128C7E] hover:bg-[#075E54] dark:bg-[#128C7E] dark:hover:bg-[#075E54]`,
     },
     {
-      id: "instagram",
+      id: 'instagram',
       name: platformTranslations.instagram,
       icon: <IG className="h-5 w-5" />,
       onClick: handleCopy,
@@ -115,7 +115,7 @@ export function EventShareButton({
         onClick={() => setIsOpen(true)}
       >
         <Share2 className="h-4 w-4" />
-        {t(currentLanguage, "eventShare.triggerButton")}
+        {t(currentLanguage, 'eventShare.triggerButton')}
       </Button>
 
       {/* The Modal Dialog */}
@@ -123,15 +123,15 @@ export function EventShareButton({
         <DialogContent className="sm:max-w-[425px] p-4 rounded-sm border border-border/40 bg-background backdrop-blur-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center">
-              <Share2 className="h-5 w-5 mr-2" />{" "}
-              {t(currentLanguage, "eventShare.modalTitle")}
+              <Share2 className="h-5 w-5 mr-2" />{' '}
+              {t(currentLanguage, 'eventShare.modalTitle')}
             </DialogTitle>
             <DialogDescription>
-              {t(currentLanguage, "eventShare.modalDescription")}
+              {t(currentLanguage, 'eventShare.modalDescription')}
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 py-2">
-            {shareOptions.map((option) => {
+            {shareOptions.map(option => {
               if (option.url) {
                 // Render link button
                 return (
@@ -175,7 +175,7 @@ export function EventShareButton({
                 value={shareUrl}
                 readOnly
                 className="flex-1 rounded-sm"
-                placeholder={t(currentLanguage, "eventShare.inputPlaceholder")}
+                placeholder={t(currentLanguage, 'eventShare.inputPlaceholder')}
               />
               <Button
                 type="button"
@@ -192,8 +192,8 @@ export function EventShareButton({
                 )}
                 <span className="sr-only">
                   {copied
-                    ? t(currentLanguage, "eventShare.copyButtonCopied")
-                    : t(currentLanguage, "eventShare.copyButtonCopy")}
+                    ? t(currentLanguage, 'eventShare.copyButtonCopied')
+                    : t(currentLanguage, 'eventShare.copyButtonCopy')}
                 </span>
               </Button>
             </div>

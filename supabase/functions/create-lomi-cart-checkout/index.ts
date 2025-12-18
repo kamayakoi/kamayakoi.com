@@ -23,7 +23,6 @@ const LOMI_API_BASE_URL =
 const APP_BASE_URL = (
   Deno.env.get("APP_BASE_URL") || "http://localhost:3000"
 ).replace(/\/$/, ""); // Remove trailing slash
-const LOMI_CHECKOUT_BASE_URL = "https://checkout.lomi.africa/";
 
 interface CartItem {
   merchandiseId: string;
@@ -390,8 +389,8 @@ serve(async (req: Request) => {
       );
     }
 
-    // --- Construct checkout URL from session ID ---
-    const checkoutUrl = `${LOMI_CHECKOUT_BASE_URL}/${lomiResponseData.checkout_session_id}`;
+    // --- Use checkout URL directly from lomi. API response ---
+    const checkoutUrl = lomiResponseData.checkout_url;
 
     // --- Update Purchase Records with lomi. details using RPC ---
     for (const purchaseId of purchaseIds) {

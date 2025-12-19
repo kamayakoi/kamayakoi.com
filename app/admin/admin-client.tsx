@@ -749,7 +749,7 @@ export default function AdminClient() {
             <div className="mt-4 flex justify-end">
               <Button
                 onClick={() => setIsInviteDialogOpen(true)}
-                className="rounded-sm bg-purple-600 hover:bg-purple-700 text-white w-full sm:w-auto"
+                className="rounded-sm bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
               >
                 <UserPlus className="h-4 w-4 mr-2" />
                 Invite Guest
@@ -1004,7 +1004,7 @@ export default function AdminClient() {
             <Card className="rounded-sm border-slate-700 bg-card/30 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-xl text-gray-100">
-                  Scan History
+                  Scan history
                 </CardTitle>
                 <CardDescription className="text-gray-400">
                   Recent verification attempts help identify issues with
@@ -1232,8 +1232,8 @@ export default function AdminClient() {
                 Invite Guest
               </DialogTitle>
               <DialogDescription className="text-gray-300 text-xs sm:text-sm">
-                Create a complimentary ticket for a guest and send them an email
-                with their QR code.
+                Create a ticket for a guest and send them an email with their QR
+                code.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
@@ -1338,7 +1338,7 @@ export default function AdminClient() {
                     !inviteGuestEmail.trim() ||
                     !inviteGuestName.trim()
                   }
-                  className="rounded-sm bg-purple-600 hover:bg-purple-700 w-full sm:w-auto"
+                  className="rounded-sm bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
                 >
                   {inviteLoading ? (
                     <>
@@ -1348,7 +1348,7 @@ export default function AdminClient() {
                   ) : (
                     <>
                       <Send className="h-4 w-4 mr-2" />
-                      Create & Send Ticket
+                      Send ticket
                     </>
                   )}
                 </Button>

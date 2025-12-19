@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import supabase from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -224,13 +224,31 @@ export default function AdminClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEvent, statusFilter, isAuthenticated]);
 
+  const loadScanLogs = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.rpc(
+        'get_admin_verification_logs',
+        {
+          p_event_id: selectedEvent,
+          p_limit: 50,
+        }
+      );
+      if (error) {
+        console.error('Error loading scan logs:', error);
+      } else {
+        setScanLogs(data || []);
+      }
+    } catch (error) {
+      console.error('Error loading scan logs:', error);
+    }
+  }, [selectedEvent]);
+
   // Load logs when tab changes to scans
   useEffect(() => {
     if (isAuthenticated && activeTab === 'scans') {
       loadScanLogs();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, selectedEvent, isAuthenticated]);
+  }, [activeTab, selectedEvent, isAuthenticated, loadScanLogs]);
 
   const handleAuth = async () => {
     setAuthError('');
@@ -310,25 +328,6 @@ export default function AdminClient() {
       }
     } catch (error) {
       console.error('Error loading events:', error);
-    }
-  };
-
-  const loadScanLogs = async () => {
-    try {
-      const { data, error } = await supabase.rpc(
-        'get_admin_verification_logs',
-        {
-          p_event_id: selectedEvent,
-          p_limit: 50,
-        }
-      );
-      if (error) {
-        console.error('Error loading scan logs:', error);
-      } else {
-        setScanLogs(data || []);
-      }
-    } catch (error) {
-      console.error('Error loading scan logs:', error);
     }
   };
 
@@ -972,14 +971,24 @@ export default function AdminClient() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="text-left w-[20%]">Customer</TableHead>
+                          <TableHead className="text-left w-[20%]">
+                            Customer
+                          </TableHead>
                           <TableHead className="text-left hidden sm:table-cell w-[25%]">
                             Event
                           </TableHead>
-                          <TableHead className="text-center w-[10%]">Tickets</TableHead>
-                          <TableHead className="text-center w-[12%]">Status</TableHead>
-                          <TableHead className="text-center w-[15%]">Email</TableHead>
-                          <TableHead className="text-center w-[18%]">Actions</TableHead>
+                          <TableHead className="text-center w-[10%]">
+                            Tickets
+                          </TableHead>
+                          <TableHead className="text-center w-[12%]">
+                            Status
+                          </TableHead>
+                          <TableHead className="text-center w-[15%]">
+                            Email
+                          </TableHead>
+                          <TableHead className="text-center w-[18%]">
+                            Actions
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>

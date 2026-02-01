@@ -239,6 +239,7 @@ serve(async (req: Request) => {
         app_source: 'kamayakoi_events_app',
         is_product_based: isProductBased,
       },
+      require_billing_address: false,
     };
 
     const lomiPayload = isProductBased

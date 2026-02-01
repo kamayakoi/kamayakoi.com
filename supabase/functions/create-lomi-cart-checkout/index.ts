@@ -280,6 +280,7 @@ serve(async (req: Request) => {
         item_count: payload.cartItems.length,
         total_shipping_cost: totalShippingCost,
       },
+      require_billing_address: true,
     };
 
     const lomiPayload = isProductBased

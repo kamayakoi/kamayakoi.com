@@ -44,13 +44,12 @@ const CartItems = ({
           {t(currentLanguage, 'cartModal.products')}
         </span>
         <span className="bg-muted/50 px-2 py-1 rounded-sm text-xs">
-          {cart.lines.length}{' '}
           {t(
             currentLanguage,
-            cart.lines.length !== 1
+            cart.totalQuantity !== 1
               ? 'cartPurchaseForm.itemCountPlural'
               : 'cartPurchaseForm.itemCount',
-            { count: cart.lines.length }
+            { count: cart.totalQuantity }
           )}
         </span>
       </CartContainer>
@@ -79,7 +78,7 @@ const CartItems = ({
               </p>
               <p className="text-muted-foreground">
                 {cart.cost.shippingAmount &&
-                Number(cart.cost.shippingAmount.amount) > 0
+                  Number(cart.cost.shippingAmount.amount) > 0
                   ? `${Number(cart.cost.shippingAmount.amount).toLocaleString('fr-FR')} F CFA`
                   : t(currentLanguage, 'cartModal.calculatedAtCheckout')}
               </p>
@@ -246,7 +245,7 @@ export default function CartModal() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  className="fixed inset-0 z-[60] bg-foreground/30 will-change-auto"
+                  className="fixed inset-0 z-60 bg-foreground/30 will-change-auto"
                   onClick={closeCart}
                   aria-hidden="true"
                   style={{
@@ -264,7 +263,7 @@ export default function CartModal() {
                   animate={{ x: 0 }}
                   exit={{ x: '100%' }}
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  className="fixed top-0 bottom-0 right-0 flex w-full md:w-[500px] p-4 z-[70] will-change-transform"
+                  className="fixed top-0 bottom-0 right-0 flex w-full md:w-[500px] p-4 z-70 will-change-transform"
                   style={{ position: 'fixed', top: 0, right: 0, bottom: 0 }}
                   onClick={e => e.stopPropagation()} // Prevent event bubbling to cart button
                 >

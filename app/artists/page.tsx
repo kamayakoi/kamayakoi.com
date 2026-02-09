@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { getAllArtists, type ArtistData } from '@/lib/sanity/queries';
+import { getAllArtists, getHomepageContent } from '@/lib/sanity/queries';
 import LoadingComponent from '@/components/ui/loader';
 import ArtistsContentClient from '@/app/artists/artists-content-client';
 
@@ -10,9 +10,19 @@ export const metadata: Metadata = {
 };
 
 async function ArtistsContent() {
-  const artists: ArtistData[] = await getAllArtists();
+  const [artists, homepageData] = await Promise.all([
+    getAllArtists(),
+    getHomepageContent(),
+  ]);
 
-  return <ArtistsContentClient artists={artists} />;
+  return (
+    <ArtistsContentClient
+      artists={artists}
+      ticketsButtonLocation={homepageData?.ticketsButtonLocation}
+      showBlogInNavigation={homepageData?.showBlogInNavigation}
+      showArchivesInNavigation={homepageData?.showArchivesInNavigation}
+    />
+  );
 }
 
 export default async function ArtistsPage() {

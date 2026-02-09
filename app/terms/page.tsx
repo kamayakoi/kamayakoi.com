@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import TermsClientPage from './terms-client';
 import LoadingComponent from '@/components/ui/loader';
+import { getHomepageContent } from '@/lib/sanity/queries';
 
 export const metadata: Metadata = {
   title: 'Terms',
@@ -9,10 +10,16 @@ export const metadata: Metadata = {
     "Understand the Terms and Conditions for engaging with Kamayakoi, Abidjan's pioneering alternative Hip-Hop & Electronic music collective and event organizer.",
 };
 
-export default function Page() {
+export default async function Page() {
+  const homepageData = await getHomepageContent();
+
   return (
     <Suspense fallback={<LoadingComponent />}>
-      <TermsClientPage />
+      <TermsClientPage
+        ticketsButtonLocation={homepageData?.ticketsButtonLocation}
+        showBlogInNavigation={homepageData?.showBlogInNavigation}
+        showArchivesInNavigation={homepageData?.showArchivesInNavigation}
+      />
     </Suspense>
   );
 }

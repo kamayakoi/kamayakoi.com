@@ -202,13 +202,6 @@ export default {
       validation: (Rule: Rule) => Rule.integer().min(0),
     },
     {
-      name: 'baseSku',
-      title: 'Product ID (if not managing variants)',
-      type: 'string',
-      group: 'variants',
-      validation: (Rule: Rule) => Rule.required(),
-    },
-    {
       name: 'categories',
       title: 'Categories',
       type: 'array',
@@ -236,13 +229,6 @@ export default {
       type: 'boolean',
       group: 'shipping',
       initialValue: true,
-    },
-    {
-      name: 'weight',
-      title: 'Weight (kg)',
-      type: 'number',
-      group: 'shipping',
-      hidden: ({document}: {document: {requiresShipping?: boolean}}) => !document?.requiresShipping,
     },
   ],
   preview: {

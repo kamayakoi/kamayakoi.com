@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { getAllProducts } from '@/lib/sanity/queries';
+import { getAllProducts, getHomepageContent } from '@/lib/sanity/queries';
 import LoadingComponent from '@/components/ui/loader';
 import MerchContentClient from './merch-content-client';
 
@@ -11,8 +11,18 @@ export const metadata: Metadata = {
 };
 
 async function MerchContent() {
-  const products = await getAllProducts();
-  return <MerchContentClient products={products || []} />;
+  const [products, homepageData] = await Promise.all([
+    getAllProducts(),
+    getHomepageContent(),
+  ]);
+  return (
+    <MerchContentClient
+      products={products || []}
+      ticketsButtonLocation={homepageData?.ticketsButtonLocation}
+      showBlogInNavigation={homepageData?.showBlogInNavigation}
+      showArchivesInNavigation={homepageData?.showArchivesInNavigation}
+    />
+  );
 }
 
 export default async function MerchPage() {

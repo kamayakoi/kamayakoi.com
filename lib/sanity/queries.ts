@@ -696,22 +696,21 @@ export interface NavigationSettings {
   showArchivesInNavigation?: boolean;
 }
 
-export const getNavigationSettings =
-  async (): Promise<NavigationSettings> => {
-    const query = `*[_type == "homepage"][0] {
+export const getNavigationSettings = async (): Promise<NavigationSettings> => {
+  const query = `*[_type == "homepage"][0] {
       showBlogInNavigation,
       showArchivesInNavigation,
     }`;
-    const result = await client.fetch<NavigationSettings>(
-      query,
-      {},
-      getCacheConfig(['homepage', 'navigation'])
-    );
-    return {
-      showBlogInNavigation: result?.showBlogInNavigation ?? true,
-      showArchivesInNavigation: result?.showArchivesInNavigation ?? true,
-    };
+  const result = await client.fetch<NavigationSettings>(
+    query,
+    {},
+    getCacheConfig(['homepage', 'navigation'])
+  );
+  return {
+    showBlogInNavigation: result?.showBlogInNavigation ?? true,
+    showArchivesInNavigation: result?.showArchivesInNavigation ?? true,
   };
+};
 
 // ================================= Homepage Content ================================
 

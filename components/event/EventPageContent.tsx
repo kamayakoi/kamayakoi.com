@@ -192,9 +192,17 @@ const renderFormattedText = (text: string) => {
 
 interface EventPageContentProps {
   slug: string;
+  ticketsButtonLocation?: 'header' | 'hero';
+  showBlogInNavigation?: boolean;
+  showArchivesInNavigation?: boolean;
 }
 
-export default function EventPageContent({ slug }: EventPageContentProps) {
+export default function EventPageContent({
+  slug,
+  ticketsButtonLocation = 'header',
+  showBlogInNavigation = true,
+  showArchivesInNavigation = true,
+}: EventPageContentProps) {
   const { currentLanguage } = useTranslation();
   const [event, setEvent] = useState<EventData | null>(null);
   const [allEvents, setAllEvents] = useState<EventParallaxData[]>([]);
@@ -283,7 +291,11 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
 
   return (
     <>
-      <Header />
+      <Header
+        ticketsButtonLocation={ticketsButtonLocation}
+        showBlogInNavigation={showBlogInNavigation}
+        showArchivesInNavigation={showArchivesInNavigation}
+      />
       <div className="relative">
         <div className="relative container mx-auto py-24 px-4">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">

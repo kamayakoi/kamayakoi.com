@@ -10,16 +10,26 @@ import { t } from '@/lib/i18n/translations';
 
 interface ArtistsContentClientProps {
   artists: ArtistData[];
+  ticketsButtonLocation?: 'header' | 'hero';
+  showBlogInNavigation?: boolean;
+  showArchivesInNavigation?: boolean;
 }
 
 export default function ArtistsContentClient({
   artists,
+  ticketsButtonLocation = 'header',
+  showBlogInNavigation = true,
+  showArchivesInNavigation = true,
 }: ArtistsContentClientProps) {
   const { currentLanguage } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header
+        ticketsButtonLocation={ticketsButtonLocation}
+        showBlogInNavigation={showBlogInNavigation}
+        showArchivesInNavigation={showArchivesInNavigation}
+      />
 
       <main>
         <div className="container mx-auto px-4 py-0 max-w-7xl">

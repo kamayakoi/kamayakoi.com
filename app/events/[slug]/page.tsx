@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import EventPageContent from '@/components/event/EventPageContent';
 import LoadingComponent from '@/components/ui/loader';
+import { getHomepageContent } from '@/lib/sanity/queries';
 
 // Helper to get locale (consistent with other page)
 const getPageLocale = (params?: { slug?: string; locale?: string }): string => {
@@ -37,10 +38,16 @@ export default async function EventPage({
 }) {
   const params = await paramsPromise;
   const { slug } = params;
+  const homepageData = await getHomepageContent();
 
   return (
     <Suspense fallback={<LoadingComponent />}>
-      <EventPageContent slug={slug} />
+      <EventPageContent
+        slug={slug}
+        ticketsButtonLocation={homepageData?.ticketsButtonLocation}
+        showBlogInNavigation={homepageData?.showBlogInNavigation}
+        showArchivesInNavigation={homepageData?.showArchivesInNavigation}
+      />
     </Suspense>
   );
 }

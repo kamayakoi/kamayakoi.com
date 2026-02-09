@@ -13,12 +13,26 @@ const formattedDate = lastUpdatedDate.toLocaleDateString('fr-FR', {
   day: 'numeric',
 });
 
-export default function TermsClientPage() {
+interface TermsClientPageProps {
+  ticketsButtonLocation?: 'header' | 'hero';
+  showBlogInNavigation?: boolean;
+  showArchivesInNavigation?: boolean;
+}
+
+export default function TermsClientPage({
+  ticketsButtonLocation = 'header',
+  showBlogInNavigation = true,
+  showArchivesInNavigation = true,
+}: TermsClientPageProps) {
   const { currentLanguage } = useTranslation();
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <Header />
+      <Header
+        ticketsButtonLocation={ticketsButtonLocation}
+        showBlogInNavigation={showBlogInNavigation}
+        showArchivesInNavigation={showArchivesInNavigation}
+      />
       <main className="flex-grow container mx-auto px-4 sm:px-6 py-12 md:py-16">
         <article className="max-w-4xl mx-auto">
           {/* Hero Section */}

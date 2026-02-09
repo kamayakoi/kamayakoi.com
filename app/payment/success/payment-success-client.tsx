@@ -12,17 +12,27 @@ import { motion } from 'framer-motion';
 
 interface PaymentSuccessClientProps {
   purchaseId?: string;
+  ticketsButtonLocation?: 'header' | 'hero';
+  showBlogInNavigation?: boolean;
+  showArchivesInNavigation?: boolean;
 }
 
 export function PaymentSuccessClient({
   purchaseId,
+  ticketsButtonLocation = 'header',
+  showBlogInNavigation = true,
+  showArchivesInNavigation = true,
 }: PaymentSuccessClientProps) {
   const { currentLanguage } = useTranslation();
   const { button } = useTheme();
 
   return (
     <>
-      <Header />
+      <Header
+        ticketsButtonLocation={ticketsButtonLocation}
+        showBlogInNavigation={showBlogInNavigation}
+        showArchivesInNavigation={showArchivesInNavigation}
+      />
       <div className="min-h-screen bg-[#1a1a1a] flex flex-col py-12 px-4">
         <div className="max-w-md mx-auto mt-32">
           <motion.div

@@ -62,6 +62,9 @@ interface Story {
 
 interface StoriesContentClientProps {
   allStories: Story[];
+  ticketsButtonLocation?: 'header' | 'hero';
+  showBlogInNavigation?: boolean;
+  showArchivesInNavigation?: boolean;
 }
 
 function StoryCard({ story }: { story: Story }) {
@@ -178,13 +181,20 @@ function StoryCard({ story }: { story: Story }) {
 
 export default function StoriesContentClient({
   allStories,
+  ticketsButtonLocation = 'header',
+  showBlogInNavigation = true,
+  showArchivesInNavigation = true,
 }: StoriesContentClientProps) {
   const { currentLanguage } = useTranslation();
 
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <Header />
+      <Header
+        ticketsButtonLocation={ticketsButtonLocation}
+        showBlogInNavigation={showBlogInNavigation}
+        showArchivesInNavigation={showArchivesInNavigation}
+      />
 
       {/* Main Content */}
       <main>

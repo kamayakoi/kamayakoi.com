@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { getBlogPostBySlug } from '@/lib/sanity/queries';
+import { getBlogPostBySlug, getHomepageContent } from '@/lib/sanity/queries';
 import LoadingComponent from '@/components/ui/loader';
 import Header from '@/components/landing/header';
 import { Footer } from '@/components/landing/footer';
@@ -97,13 +97,22 @@ function StoryPage({ params }: PageProps) {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [homepageData, setHomepageData] = useState<{
+    ticketsButtonLocation?: 'header' | 'hero';
+    showBlogInNavigation?: boolean;
+    showArchivesInNavigation?: boolean;
+  } | null>(null);
+
   useEffect(() => {
-    const fetchPost = async () => {
+    const fetchData = async () => {
       try {
         const paramsData = await params;
         const postSlug = paramsData.slug;
 
-        const fetchedPost = await getBlogPostBySlug(postSlug);
+        const [fetchedPost, homepage] = await Promise.all([
+          getBlogPostBySlug(postSlug),
+          getHomepageContent(),
+        ]);
 
         if (!fetchedPost) {
           setError(true);
@@ -111,15 +120,16 @@ function StoryPage({ params }: PageProps) {
         }
 
         setPost(fetchedPost);
+        setHomepageData(homepage);
       } catch (err) {
-        console.error('Error fetching post:', err);
+        console.error('Error fetching data:', err);
         setError(true);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPost();
+    fetchData();
   }, [params]);
 
   if (loading) {
@@ -147,7 +157,11 @@ function StoryPage({ params }: PageProps) {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <Header />
+      <Header
+        ticketsButtonLocation={homepageData?.ticketsButtonLocation}
+        showBlogInNavigation={homepageData?.showBlogInNavigation}
+        showArchivesInNavigation={homepageData?.showArchivesInNavigation}
+      />
 
       {/* Main Content */}
       <main>

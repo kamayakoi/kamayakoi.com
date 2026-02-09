@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { getProductBySlug } from '@/lib/sanity/queries';
+import { getProductBySlug, getHomepageContent } from '@/lib/sanity/queries';
 import { notFound } from 'next/navigation';
 import LoadingComponent from '@/components/ui/loader';
 import Header from '@/components/landing/header';
@@ -12,7 +12,10 @@ type Props = {
 
 async function ProductContent({ params }: Props) {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const [product, homepageData] = await Promise.all([
+    getProductBySlug(slug),
+    getHomepageContent(),
+  ]);
 
   if (!product) {
     notFound(); // Trigger 404 if product not found
@@ -20,7 +23,11 @@ async function ProductContent({ params }: Props) {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
+      <Header
+        ticketsButtonLocation={homepageData?.ticketsButtonLocation}
+        showBlogInNavigation={homepageData?.showBlogInNavigation}
+        showArchivesInNavigation={homepageData?.showArchivesInNavigation}
+      />
       <main className="flex-grow">
         <ProductDetailContent product={product} />
       </main>

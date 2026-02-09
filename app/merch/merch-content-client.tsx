@@ -22,10 +22,16 @@ import { SanityProduct } from '../../components/merch/types';
 
 interface MerchContentClientProps {
   products: SanityProduct[];
+  ticketsButtonLocation?: 'header' | 'hero';
+  showBlogInNavigation?: boolean;
+  showArchivesInNavigation?: boolean;
 }
 
 export default function MerchContentClient({
   products,
+  ticketsButtonLocation = 'header',
+  showBlogInNavigation = true,
+  showArchivesInNavigation = true,
 }: MerchContentClientProps) {
   const { currentLanguage } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
@@ -90,7 +96,11 @@ export default function MerchContentClient({
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header
+        ticketsButtonLocation={ticketsButtonLocation}
+        showBlogInNavigation={showBlogInNavigation}
+        showArchivesInNavigation={showArchivesInNavigation}
+      />
 
       <main>
         <div className="container mx-auto px-4 py-0 max-w-7xl">

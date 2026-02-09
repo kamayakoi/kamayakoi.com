@@ -17,9 +17,9 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
 const supabase = createClient(supabaseUrl || '', supabaseServiceRoleKey || '');
 
 // lomi. API Config
-const LOMI_API_KEY = Deno.env.get('LOMI_API_KEY');
-const LOMI_API_BASE_URL =
-  Deno.env.get('LOMI_API_BASE_URL') || 'https://api.lomi.africa';
+const LOMI_SECRET_KEY = Deno.env.get('LOMI_SECRET_KEY');
+const LOMI_API_URL =
+  Deno.env.get('LOMI_API_URL') || 'https://api.lomi.africa';
 const APP_BASE_URL = (
   Deno.env.get('APP_BASE_URL') || 'http://localhost:3000'
 ).replace(/\/$/, ''); // Remove trailing slash
@@ -63,11 +63,11 @@ serve(async (req: Request) => {
       }
     );
   }
-  if (!LOMI_API_KEY) {
-    console.error('LOMI_API_KEY is not set for the function.');
+  if (!LOMI_SECRET_KEY) {
+    console.error('LOMI_SECRET_KEY is not set for the function.');
     return new Response(
       JSON.stringify({
-        error: 'LOMI API key not configured for the function.',
+        error: 'lomi. API key not configured for the function.',
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -169,8 +169,15 @@ serve(async (req: Request) => {
 
     console.log('Customer upserted successfully:', customerId);
 
+    // --- Validate and normalize currency code ---
+    let currencyCode = (payload.currencyCode || 'XOF').toUpperCase();
+    const validCurrencies = ['XOF', 'EUR', 'USD'];
+    if (!validCurrencies.includes(currencyCode)) {
+      console.warn(`Invalid currency code "${currencyCode}", defaulting to XOF`);
+      currencyCode = 'XOF';
+    }
+
     // --- Calculate totals and create purchase records ---
-    const currencyCode = payload.currencyCode || 'XOF';
     let totalAmount = 0;
     const purchaseIds: string[] = [];
     let totalShippingCost = 0;
@@ -305,16 +312,16 @@ serve(async (req: Request) => {
 
     console.log(
       'Calling lomi. API with URL:',
-      `${LOMI_API_BASE_URL}/checkout-sessions`
+      `${LOMI_API_URL}/checkout-sessions`
     );
     console.log('Final lomi. payload:', JSON.stringify(lomiPayload, null, 2));
 
     // --- Call lomi. API ---
-    const lomiResponse = await fetch(`${LOMI_API_BASE_URL}/checkout-sessions`, {
+    const lomiResponse = await fetch(`${LOMI_API_URL}/checkout-sessions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': LOMI_API_KEY,
+        'x-api-key': LOMI_SECRET_KEY,
       },
       body: JSON.stringify(lomiPayload),
     });
@@ -337,14 +344,17 @@ serve(async (req: Request) => {
       console.error('Response was:', lomiResponseText);
 
       // Update purchase status to failed using RPC
+      // Use NULL for lomi_session_id to avoid unique constraint violations
+      // Failure details are stored in payment_processor_details
       for (const purchaseId of purchaseIds) {
         await supabase.rpc('update_purchase_lomi_session', {
           p_purchase_id: purchaseId,
-          p_lomi_session_id: 'failed',
-          p_lomi_checkout_url: 'failed',
+          p_lomi_session_id: null,
+          p_lomi_checkout_url: null,
           p_payment_processor_details: {
             error: 'Invalid JSON response from lomi. API',
             response: lomiResponseText,
+            failure_reason: 'invalid_json_response',
           },
         });
       }
@@ -366,12 +376,17 @@ serve(async (req: Request) => {
       console.error('lomi. API error:', lomiResponseData);
 
       // Update purchase with failure details using RPC
+      // Use NULL for lomi_session_id to avoid unique constraint violations
+      // Failure details are stored in payment_processor_details
       for (const purchaseId of purchaseIds) {
         await supabase.rpc('update_purchase_lomi_session', {
           p_purchase_id: purchaseId,
-          p_lomi_session_id: 'failed',
-          p_lomi_checkout_url: 'failed',
-          p_payment_processor_details: lomiResponseData,
+          p_lomi_session_id: null,
+          p_lomi_checkout_url: null,
+          p_payment_processor_details: {
+            ...lomiResponseData,
+            failure_reason: 'lomi_api_error',
+          },
         });
       }
 

@@ -186,25 +186,6 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
             </div>
           )}
 
-          {/* Video */}
-          {artist.videoUrl && (
-            <div className="mb-4">
-              <video
-                src={artist.videoUrl}
-                controls
-                className="w-full rounded-sm shadow-sm border"
-                preload="metadata"
-              >
-                Your browser does not support the video tag.
-              </video>
-              {artist.videoCaption && (
-                <p className="text-xs text-muted-foreground mt-2 italic">
-                  {artist.videoCaption}
-                </p>
-              )}
-            </div>
-          )}
-
           {/* Separator */}
           <div className="mt-6 pt-4 border-t border-border/40"></div>
         </CardContent>

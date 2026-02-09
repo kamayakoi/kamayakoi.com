@@ -9,7 +9,11 @@ import { MediaProvider } from '@/lib/contexts/MediaContext';
 import MusicWrapper from '@/components/landing/music-wrapper';
 import { CartProvider } from '@/components/merch/cart/cart-context';
 import { WishlistProvider } from '@/components/merch/wishlist/wishlist-context';
-import { getHomepageMusicTracks } from '@/lib/sanity/queries';
+import {
+  getHomepageMusicTracks,
+  getHomepageThemeSettings,
+} from '@/lib/sanity/queries';
+import { ThemeProvider } from '@/lib/contexts/ThemeContext';
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
@@ -105,25 +109,30 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Fetch music tracks for global audio player
-  const musicTracks = await getHomepageMusicTracks();
+  // Fetch music tracks and theme (button color) for global use
+  const [musicTracks, themeSettings] = await Promise.all([
+    getHomepageMusicTracks(),
+    getHomepageThemeSettings(),
+  ]);
 
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body
         className={`${geistMono.variable} font-sans flex flex-col min-h-screen`}
       >
-        <MusicWrapper audioSettings={musicTracks}>
-          <TranslationProvider>
-            <MediaProvider>
-              <CartProvider>
-                <WishlistProvider>
-                  <main className="flex-grow">{children}</main>
-                </WishlistProvider>
-              </CartProvider>
-            </MediaProvider>
-          </TranslationProvider>
-        </MusicWrapper>
+        <ThemeProvider primaryButtonColor={themeSettings.primaryButtonColor}>
+          <MusicWrapper audioSettings={musicTracks}>
+            <TranslationProvider>
+              <MediaProvider>
+                <CartProvider>
+                  <WishlistProvider>
+                    <main className="flex-grow">{children}</main>
+                  </WishlistProvider>
+                </CartProvider>
+              </MediaProvider>
+            </TranslationProvider>
+          </MusicWrapper>
+        </ThemeProvider>
         <Toaster />
         <Analytics />
       </body>

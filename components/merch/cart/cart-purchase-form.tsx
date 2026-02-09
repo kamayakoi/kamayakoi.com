@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase/client';
 import PhoneNumberInput from '@/components/ui/phone-number-input';
 import { cn } from '@/lib/actions/utils';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import { t } from '@/lib/i18n/translations';
 
 const CartContainer = ({
@@ -25,6 +26,7 @@ const CartContainer = ({
 export default function CartPurchaseForm() {
   const { cart, shippingSettings } = useCart();
   const { currentLanguage } = useTranslation();
+  const { button } = useTheme();
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [userPhone, setUserPhone] = useState('');
@@ -69,7 +71,7 @@ export default function CartPurchaseForm() {
       const cartItems = cart.lines.map(line => ({
         merchandiseId: line.id,
         quantity: line.quantity,
-        productId: line.product.productId,
+        productId: undefined, // Products no longer have lomi productId - direct charges only
         title: line.product.name,
         price: line.product.price,
         shippingFee:
@@ -240,7 +242,7 @@ export default function CartPurchaseForm() {
               !userEmail.trim() ||
               !userPhone.trim()
             }
-            className="w-full bg-teal-800 hover:bg-teal-700 text-teal-200 rounded-sm font-semibold h-9"
+            className={`w-full ${button.secondary} rounded-sm font-semibold h-9`}
           >
             {isLoading ? (
               <>

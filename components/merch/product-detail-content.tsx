@@ -6,6 +6,7 @@ import { PlusIcon, MinusIcon, Heart, Share2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCart } from './cart/cart-context';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import { t } from '@/lib/i18n/translations';
 import { useWishlist } from './wishlist/wishlist-context';
 import { SanityProduct } from './types';
@@ -64,6 +65,7 @@ interface ProductDetailContentProps {
 
 function ProductDetail({ product }: ProductDetailContentProps) {
   const { currentLanguage } = useTranslation();
+  const { button } = useTheme();
   const [quantity, setQuantity] = useState(1);
 
   const { addItem } = useCart();
@@ -279,7 +281,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
 
                   {/* Add to Cart Button */}
                   <Button
-                    className="w-full bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700 h-14 text-lg font-semibold rounded-sm"
+                    className={`w-full ${button.secondaryBorder} h-14 text-lg font-semibold rounded-sm`}
                     size="lg"
                     onClick={handleAddToCart}
                   >

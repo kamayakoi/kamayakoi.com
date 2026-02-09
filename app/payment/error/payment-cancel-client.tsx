@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import Header from '@/components/landing/header';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import { t } from '@/lib/i18n/translations';
 import { motion } from 'framer-motion';
 
@@ -15,6 +16,7 @@ interface PaymentCancelClientProps {
 
 export function PaymentCancelClient({ purchaseId }: PaymentCancelClientProps) {
   const { currentLanguage } = useTranslation();
+  const { button } = useTheme();
 
   return (
     <>
@@ -82,7 +84,7 @@ export function PaymentCancelClient({ purchaseId }: PaymentCancelClientProps) {
                 <div className="flex flex-col gap-3">
                   <Button
                     asChild
-                    className="w-full bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700"
+                    className={`w-full ${button.secondaryBorder}`}
                   >
                     <Link href="/">
                       <Calendar className="w-4 h-4 mr-2" />

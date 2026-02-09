@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import { t } from '@/lib/i18n/translations';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import { SupabaseClient } from '@supabase/supabase-js';
 import PhoneNumberInput from '@/components/ui/phone-number-input';
 
@@ -77,6 +78,7 @@ export default function PurchaseFormModal({
   supabaseClient,
 }: PurchaseFormModalProps) {
   const { currentLanguage } = useTranslation();
+  const { button } = useTheme();
   const [quantity, setQuantity] = useState(1);
   const [quantityDisplay, setQuantityDisplay] = useState('1');
   const [userName, setUserName] = useState('');
@@ -421,7 +423,9 @@ export default function PurchaseFormModal({
                           item.stock !== null &&
                           item.stock !== undefined &&
                           item.stock > 0 && (
-                            <span className="text-xs bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-sm">
+                            <span
+                              className={`text-xs px-2 py-0.5 rounded-sm ${button.tag}`}
+                            >
                               {t(currentLanguage, 'purchaseModal.only')}{' '}
                               {item.stock}{' '}
                               {item.stock === 1
@@ -569,7 +573,7 @@ export default function PurchaseFormModal({
                   type="submit"
                   disabled={isLoading || !isFormValid()}
                   onClick={handleSubmit}
-                  className="bg-teal-800 hover:bg-teal-700 text-teal-200 rounded-sm text-sm w-full font-medium h-10"
+                  className={`${button.secondary} rounded-sm text-sm w-full font-medium h-10`}
                 >
                   {isLoading ? (
                     <>

@@ -241,12 +241,6 @@ export default {
           type: 'object',
           fields: [
             {
-              name: 'paymentLink',
-              title: 'Direct payment link',
-              type: 'url',
-              description: 'URL for direct purchase of this specific ticket type.',
-            },
-            {
               name: 'name',
               title: 'Name',
               type: 'string',
@@ -263,7 +257,8 @@ export default {
               title: 'lomi. Product ID',
               type: 'string',
               description:
-                'Optional lomi.africa product ID for this ticket type (UUID format). Leave empty if not this event is not tied to a specific product.',
+                'lomi.africa product ID for this ticket type (UUID format). Required for event ticket types.',
+              validation: (Rule: Rule) => Rule.required(),
             },
             {
               name: 'description',
@@ -388,7 +383,8 @@ export default {
               title: 'lomi. Product ID',
               type: 'string',
               description:
-                'Optional lomi. product ID for this bundle (UUID format). Leave empty if not this event is not tied to a specific product.',
+                'lomi. product ID for this bundle (UUID format). Required for event bundles.',
+              validation: (Rule: Rule) => Rule.required(),
             },
             {
               name: 'ticketsIncluded',
@@ -417,12 +413,6 @@ export default {
               type: 'number',
               description: "Number of bundles available. Leave empty or set 0 for 'Sold Out'.",
               validation: (Rule: Rule) => Rule.integer().min(0),
-            },
-            {
-              name: 'paymentLink',
-              title: 'Direct payment link',
-              type: 'url',
-              description: 'URL for direct purchase of this specific bundle.',
             },
             {
               name: 'active',

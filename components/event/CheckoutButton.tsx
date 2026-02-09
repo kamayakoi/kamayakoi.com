@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Ticket } from 'lucide-react';
 import { t } from '@/lib/i18n/translations';
-import Link from 'next/link';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 
 export interface CheckoutItemData {
   id: string;
@@ -17,7 +17,6 @@ export interface CheckoutItemData {
   maxPerOrder?: number;
   stock?: number | null;
 
-  paymentLink?: string;
   active?: boolean;
   salesStart?: string | null;
   salesEnd?: string | null;
@@ -120,6 +119,7 @@ export default function CheckoutButton({
   currentLanguage,
 }: CheckoutButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { button } = useTheme();
 
   const availabilityStatus = getItemAvailabilityStatus(
     {
@@ -130,8 +130,6 @@ export default function CheckoutButton({
     },
     currentLanguage
   );
-
-  const useDirectPaymentLink = !!item.paymentLink;
 
   const handleOpenPurchaseModal = () => {
     if (!supabase) {
@@ -156,30 +154,14 @@ export default function CheckoutButton({
   };
 
   if (globallyTicketsOnSale && availabilityStatus.available) {
-    if (useDirectPaymentLink && item.paymentLink) {
-      return (
-        <Button
-          asChild
-          className="sm:w-auto bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700 rounded-sm font-medium h-10 px-6 uppercase w-full md:w-auto justify-center"
-        >
-          <Link
-            href={item.paymentLink}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Ticket className="mr-2 h-4 w-4" />
-            {t(currentLanguage, 'eventSlugPage.tickets.buyNow')}
-          </Link>
-        </Button>
-      );
-    } else if (supabase) {
+    if (supabase) {
       const isBundle = item.isBundle;
       const buttonText = isBundle
         ? t(currentLanguage, 'eventSlugPage.tickets.buyNow')
         : t(currentLanguage, 'eventSlugPage.tickets.getETicket');
       const buttonClassName = isBundle
         ? 'sm:w-auto bg-orange-600 hover:bg-orange-700 text-white rounded-sm font-medium h-10 px-6 uppercase w-full md:w-auto justify-center'
-        : 'sm:w-auto bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700 rounded-sm font-medium h-10 px-6 uppercase w-full md:w-auto justify-center';
+        : `sm:w-auto ${button.secondaryBorder} rounded-sm font-medium h-10 px-6 uppercase w-full md:w-auto justify-center`;
       return (
         <>
           <Button onClick={handleOpenPurchaseModal} className={buttonClassName}>

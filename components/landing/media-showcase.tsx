@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import { t } from '@/lib/i18n/translations';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -19,7 +20,6 @@ interface MediaItem {
   duration?: string;
   artist?: string;
   genre?: string;
-  tags?: string[];
   publishedAt?: string;
 }
 
@@ -29,6 +29,7 @@ interface MediaShowcaseProps {
 
 function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
   const { currentLanguage } = useTranslation();
+  const { button } = useTheme();
 
   // Get the localized title and description
   const localizedTitle =
@@ -84,7 +85,7 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
   };
 
   return (
-    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0 mb-6">
+    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0">
       <div className="relative rounded-t-sm overflow-hidden">
         <div
           className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer"
@@ -159,7 +160,9 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {mediaItem.artist && (
-              <span className="px-2 py-1 text-xs font-medium rounded-sm bg-teal-900 text-teal-200">
+              <span
+                className={`px-2 py-1 text-xs font-medium rounded-sm ${button.badgeMuted}`}
+              >
                 {mediaItem.artist}
               </span>
             )}
@@ -183,6 +186,7 @@ function MediaCard({ mediaItem }: { mediaItem: MediaItem }) {
 
 export function MediaShowcase({ media }: MediaShowcaseProps) {
   const { currentLanguage } = useTranslation();
+  const { button } = useTheme();
 
   const hasMedia = media && media.length > 0;
 
@@ -205,48 +209,41 @@ export function MediaShowcase({ media }: MediaShowcaseProps) {
 
         {hasMedia ? (
           <>
-            {/* Media Grid with Horizontal Scroll */}
-            <div
-              className={`mb-12 ${media.length > 4 ? 'overflow-x-auto pb-4' : ''}`}
-            >
-              <div
-                className={`grid gap-6 ${media.length > 4 ? 'grid-cols-1 md:grid-cols-4 lg:grid-cols-10' : 'grid-cols-1 md:grid-cols-4'} ${media.length > 4 ? 'w-max' : ''}`}
-              >
-                {media.slice(0, Math.min(media.length, 25)).map(mediaItem => (
-                  <MediaCard key={mediaItem._id} mediaItem={mediaItem} />
-                ))}
-
-                {/* Show "Show More" card when more than 25 items */}
-                {media.length > 25 && (
-                  <Link
-                    href="/archives"
-                    className="group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0 mb-6 block"
-                  >
-                    <div className="relative rounded-t-sm overflow-hidden">
-                      <div className="aspect-square relative bg-gradient-to-br from-teal-900/20 to-teal-800/20 flex items-center justify-center">
-                        <div className="text-6xl text-teal-300/60 group-hover:text-teal-300/80 transition-colors duration-300">
-                          +
-                        </div>
+            {/* Single row, horizontal scroll */}
+            <div className="flex gap-6 overflow-x-auto pb-4 mb-12 scrollbar-hide -mx-4 px-4 md:-mx-8 md:px-8">
+              {media.slice(0, Math.min(media.length, 25)).map(mediaItem => (
+                <div key={mediaItem._id} className="flex-shrink-0 w-[280px]">
+                  <MediaCard mediaItem={mediaItem} />
+                </div>
+              ))}
+              {media.length > 25 && (
+                <Link
+                  href="/archives"
+                  className="flex-shrink-0 w-[280px] group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0 block"
+                >
+                  <div className="relative rounded-t-sm overflow-hidden">
+                    <div
+                      className={`aspect-square relative bg-gradient-to-br ${button.gradient} flex items-center justify-center`}
+                    >
+                      <div
+                        className={`text-6xl ${button.gradientText} transition-colors duration-300`}
+                      >
+                        +
                       </div>
                     </div>
-
-                    <div className="pt-1 pb-4 px-4 space-y-1">
-                      <h3 className="font-medium text-base leading-tight text-center hover:text-primary transition-colors">
-                        {t(currentLanguage, 'eventShowcase.media.viewAll')}
-                      </h3>
-                      <p className="text-sm text-muted-foreground text-center leading-relaxed">
-                        {media.length > 25
-                          ? currentLanguage === 'fr'
-                            ? `${media.length - 25} média${media.length - 25 > 1 ? 's' : ''} de plus`
-                            : `${media.length - 25} more media`
-                          : currentLanguage === 'fr'
-                            ? 'Tous les médias'
-                            : 'All media'}
-                      </p>
-                    </div>
-                  </Link>
-                )}
-              </div>
+                  </div>
+                  <div className="pt-1 pb-4 px-4 space-y-1">
+                    <h3 className="font-medium text-base leading-tight text-center hover:text-primary transition-colors">
+                      {t(currentLanguage, 'eventShowcase.media.viewAll')}
+                    </h3>
+                    <p className="text-sm text-muted-foreground text-center leading-relaxed">
+                      {currentLanguage === 'fr'
+                        ? `${media.length - 25} média${media.length - 25 > 1 ? 's' : ''} de plus`
+                        : `${media.length - 25} more media`}
+                    </p>
+                  </div>
+                </Link>
+              )}
             </div>
           </>
         ) : (

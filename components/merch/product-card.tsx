@@ -1,3 +1,5 @@
+'use client';
+
 import React, { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -6,10 +8,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Heart } from 'lucide-react';
 import { useCart } from './cart/cart-context';
 import { useWishlist } from './wishlist/wishlist-context';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import { SanityProduct } from './types';
 
 function ProductCardContent({ product }: { product: SanityProduct }) {
   const { addItem } = useCart();
+  const { button } = useTheme();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const slug =
     typeof product.slug === 'string'
@@ -115,7 +119,7 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
               <Button
                 size="sm"
                 disabled
-                className="rounded-sm px-4 py-2 text-xs font-medium bg-teal-800 text-teal-200"
+                className={`rounded-sm px-4 py-2 text-xs font-medium ${button.secondary}`}
               >
                 ...
               </Button>
@@ -123,7 +127,7 @@ function ProductCardContent({ product }: { product: SanityProduct }) {
           >
             <Button
               size="sm"
-              className="rounded-sm px-4 py-2 text-xs font-medium bg-teal-800 hover:bg-teal-700 text-teal-200 transition-colors"
+              className={`rounded-sm px-4 py-2 text-xs font-medium ${button.secondary} transition-colors`}
               onClick={handleAddToCart}
             >
               Add to Cart

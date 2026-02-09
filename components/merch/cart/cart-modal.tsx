@@ -13,6 +13,7 @@ import { cn } from '@/lib/actions/utils';
 import { createPortal } from 'react-dom';
 import CartPurchaseForm from './cart-purchase-form';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import { t } from '@/lib/i18n/translations';
 
 const CartContainer = ({
@@ -78,7 +79,7 @@ const CartItems = ({
               </p>
               <p className="text-muted-foreground">
                 {cart.cost.shippingAmount &&
-                  Number(cart.cost.shippingAmount.amount) > 0
+                Number(cart.cost.shippingAmount.amount) > 0
                   ? `${Number(cart.cost.shippingAmount.amount).toLocaleString('fr-FR')} F CFA`
                   : t(currentLanguage, 'cartModal.calculatedAtCheckout')}
               </p>
@@ -112,6 +113,7 @@ const serializeCart = (cart: { lines: { id: string; quantity: number }[] }) => {
 export default function CartModal() {
   const { cart } = useCart();
   const { currentLanguage } = useTranslation();
+  const { button } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
@@ -217,7 +219,7 @@ export default function CartModal() {
       <Button
         aria-label="Open cart"
         onClick={openCart}
-        className="uppercase relative bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700"
+        className={`uppercase relative ${button.secondaryBorder}`}
         size={'sm'}
         onClickCapture={e => {
           // Prevent event bubbling that might interfere with modal
@@ -227,7 +229,9 @@ export default function CartModal() {
       >
         <ShoppingCart className="h-4 w-4" />
         {cart.totalQuantity > 0 && (
-          <span className="absolute -top-1 -right-1 bg-teal-600 text-teal-100 text-xs rounded-sm h-5 w-5 flex items-center justify-center font-medium border border-teal-500">
+          <span
+            className={`absolute -top-1 -right-1 text-xs rounded-sm h-5 w-5 flex items-center justify-center font-medium border ${button.cartBadge}`}
+          >
             {cart.totalQuantity}
           </span>
         )}
@@ -305,6 +309,7 @@ function CheckoutButton({
   const { pending } = useFormStatus();
   const { cart, isPending } = useCart();
   const { currentLanguage } = useTranslation();
+  const { button } = useTheme();
 
   const isLoading = pending;
   const isDisabled = !cart || cart.lines.length === 0 || isPending;
@@ -315,7 +320,7 @@ function CheckoutButton({
         type="submit"
         disabled={isDisabled}
         size="lg"
-        className="flex relative gap-3 justify-between items-center w-full bg-teal-800 hover:bg-teal-700 text-teal-200 rounded-sm font-semibold py-4"
+        className={`flex relative gap-3 justify-between items-center w-full ${button.secondary} rounded-sm font-semibold py-4`}
         onClick={onProceedToCheckout}
       >
         <AnimatePresence initial={false} mode="wait">

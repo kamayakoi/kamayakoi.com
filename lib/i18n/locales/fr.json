@@ -232,6 +232,9 @@
       "title": "Partager cet événement",
       "subtitle": "Faites passer le mot et invitez vos amis"
     },
+    "previousEvents": {
+      "title": "Événements précédents"
+    },
     "hostedBy": "Organisé par {name}",
     "errors": {
       "supabaseNotInitialized": "La billetterie en ligne est temporairement indisponible. Veuillez réessayer plus tard."
@@ -582,8 +585,8 @@
     "text": "CHARGEMENT"
   },
   "heroSection": {
-    "getYourTickets": "Réserver",
-    "getTickets": "Réserver"
+    "getYourTickets": "Réserver un billet",
+    "getTickets": "Réserver un billet"
   },
   "artistsPage": {
     "title": "Artistes",

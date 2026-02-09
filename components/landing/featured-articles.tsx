@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import { t } from '@/lib/i18n/translations';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -181,6 +182,7 @@ function ArticleCard({ article }: { article: FeaturedArticle }) {
 
 export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
   const { currentLanguage } = useTranslation();
+  const { button } = useTheme();
 
   const hasArticles = articles && articles.length > 0;
 
@@ -196,7 +198,7 @@ export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
               <span className="text-white/60 mx-2 align-middle hidden md:inline">
                 ·
               </span>
-              <span className="text-white/70 font-normal text-xl md:text-2xl block md:inline-block transform -translate-y-0.25">
+              <span className="text-white/70 font-normal text-xl md:text-2xl block md:inline-block -translate-y-0.5">
                 {t(currentLanguage, 'eventShowcase.articles.subtitle')}
               </span>
             </h2>
@@ -225,8 +227,12 @@ export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
                     className="group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0 mb-6 block"
                   >
                     <div className="relative rounded-t-sm overflow-hidden">
-                      <div className="aspect-square relative bg-gradient-to-br from-teal-900/20 to-teal-800/20 flex items-center justify-center">
-                        <div className="text-6xl text-teal-300/60 group-hover:text-teal-300/80 transition-colors duration-300">
+                      <div
+                        className={`aspect-square relative bg-gradient-to-br ${button.gradient} flex items-center justify-center`}
+                      >
+                        <div
+                          className={`text-6xl ${button.gradientText} transition-colors duration-300`}
+                        >
                           +
                         </div>
                       </div>

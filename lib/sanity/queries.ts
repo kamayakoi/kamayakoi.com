@@ -65,7 +65,6 @@ export async function getEventBySlug(slug: string, locale: string) {
       "venueDetails": coalesce(venueDetails[$locale], venueDetails.en),
       hostedBy,
       ticketsAvailable,
-      paymentLink,
       paymentProductId,
       ticketTypes[]{
         _key,
@@ -75,7 +74,6 @@ export async function getEventBySlug(slug: string, locale: string) {
         details,
         stock,
         maxPerOrder,
-        paymentLink,
         salesStart,
         salesEnd,
         active,
@@ -107,7 +105,6 @@ export async function getEventBySlug(slug: string, locale: string) {
         details,
         stock,
         active,
-        paymentLink,
         salesStart,
         salesEnd,
         maxPerOrder,
@@ -370,7 +367,6 @@ export async function getAllProducts() {
       _id,
       name,
       "slug": slug.current,
-      productId,
       "mainImage": images[0].asset->url,
       "price": basePrice,
       "stock": baseStock,
@@ -408,7 +404,6 @@ export async function getProductBySlug(slug: string) {
       _id,
       "name": name,
       "slug": slug.current,
-      productId,
       "mainImage": images[0].asset->url,
       description,
       "images": images[]{
@@ -434,7 +429,6 @@ export async function getProductBySlug(slug: string) {
       tags,
       requiresShipping,
       weight,
-      dimensions,
       shippingFee,
     }
   `,
@@ -461,6 +455,26 @@ export const getShippingSettings = async (): Promise<ShippingSettings> => {
     defaultShippingCost: result?.defaultShippingCost ?? 0,
   };
 };
+
+// ================================= Theme / Button Color ================================
+export interface HomepageThemeSettings {
+  primaryButtonColor: string;
+}
+
+export const getHomepageThemeSettings =
+  async (): Promise<HomepageThemeSettings> => {
+    const query = `*[_type == "homepage"][0] {
+      primaryButtonColor,
+    }`;
+    const result = await client.fetch<{ primaryButtonColor?: string }>(
+      query,
+      {},
+      getCacheConfig(['homepage', 'settings'])
+    );
+    return {
+      primaryButtonColor: result?.primaryButtonColor ?? 'teal',
+    };
+  };
 
 // Define interface for the data returned by getEventsForScroller
 interface EventScrollerData {
@@ -598,8 +612,6 @@ export interface ArtistData {
     fr?: string;
   };
   imageUrl?: string;
-  videoUrl?: string;
-  videoCaption?: string;
   socialLink?: string;
   socialHandle?: string;
   isResident: boolean;
@@ -614,8 +626,6 @@ export const getAllArtists = async (): Promise<ArtistData[]> => {
     slug,
     description,
     "imageUrl": image.asset->url,
-    "videoUrl": video.asset->url,
-    "videoCaption": video.caption,
     socialLink,
     socialHandle,
     isResident,
@@ -638,8 +648,6 @@ export const getArtistBySlug = async (
     slug,
     description,
     "imageUrl": image.asset->url,
-    "videoUrl": video.asset->url,
-    "videoCaption": video.caption,
     socialLink,
     socialHandle,
     isResident,
@@ -698,6 +706,7 @@ export interface HomepageHeroItem {
 
 // Interface for homepage data
 export interface HomepageData {
+  ticketsButtonLocation?: 'header' | 'hero';
   heroContent?: HomepageHeroItem[];
   featuredEvents?: {
     _id: string;
@@ -725,6 +734,7 @@ export interface HomepageData {
 // Fetch homepage content
 export const getHomepageContent = async (): Promise<HomepageData | null> => {
   const query = `*[_type == "homepage"][0] {
+    ticketsButtonLocation,
     heroContent[]{
       _key,
       title,
@@ -765,6 +775,63 @@ export const getHomepageContent = async (): Promise<HomepageData | null> => {
   return result;
 };
 
+// ================================= Archives / Gallery ================================
+
+// Interface for archive image data
+export interface ArchiveImageData {
+  _id: string;
+  imageUrl: string;
+  width?: number;
+  height?: number;
+  category?: string;
+}
+
+// Fetch archive images for the archives page
+// Flattens images from gallery documents, using title as category
+export const getArchiveImages = async (): Promise<ArchiveImageData[]> => {
+  const query = `*[_type == "gallery"] | order(_createdAt desc) {
+    _id,
+    title,
+    images[]{
+      _key,
+      "imageUrl": asset->url,
+      "width": asset->metadata.dimensions.width,
+      "height": asset->metadata.dimensions.height
+    }
+  }`;
+
+  const galleries = await client.fetch<Array<{
+    _id: string;
+    title: string;
+    images: Array<{
+      _key: string;
+      imageUrl: string;
+      width?: number;
+      height?: number;
+    }>;
+  }>>(
+    query,
+    {},
+    getCacheConfig(['archives'])
+  );
+
+  // Flatten the structure: each image becomes a separate entry with title as category
+  const flattened: ArchiveImageData[] = [];
+  galleries.forEach((gallery) => {
+    gallery.images.forEach((image) => {
+      flattened.push({
+        _id: `${gallery._id}-${image._key}`, // Use gallery _id and image _key for unique ID
+        imageUrl: image.imageUrl,
+        width: image.width,
+        height: image.height,
+        category: gallery.title, // Use title as category
+      });
+    });
+  });
+
+  return flattened;
+};
+
 // ================================= Media Queries ================================
 
 // Interface for media data
@@ -785,7 +852,6 @@ export interface MediaItem {
   duration?: string;
   artist?: string;
   genre?: string;
-  tags?: string[];
   publishedAt?: string;
 }
 
@@ -803,7 +869,6 @@ export const getAllMedia = async (): Promise<MediaItem[]> => {
     duration,
     artist,
     genre,
-    tags,
     publishedAt
   }`;
 
@@ -824,7 +889,6 @@ export const getMedia = async (limit = 10): Promise<MediaItem[]> => {
     duration,
     artist,
     genre,
-    tags,
     publishedAt
   }`;
 
@@ -852,7 +916,6 @@ export const getMediaByType = async (
     duration,
     artist,
     genre,
-    tags,
     publishedAt
   }`;
 

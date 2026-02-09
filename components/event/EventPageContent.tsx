@@ -1,14 +1,7 @@
 'use client';
 
 import { notFound } from 'next/navigation';
-import {
-  CalendarDays,
-  Clock,
-  MapPin,
-  Users,
-  Check,
-  ChevronRight,
-} from 'lucide-react';
+import { CalendarDays, Clock, MapPin, Users, Check } from 'lucide-react';
 import Header from '@/components/landing/header';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -17,7 +10,8 @@ import {
   EventParallaxData,
 } from '@/lib/sanity/queries';
 import { EventShareButton } from '@/components/event/event-share-button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import Image from 'next/image';
 import CheckoutButtonWrapper from '@/components/event/CheckoutButtonWrapper';
 import LoadingComponent from '@/components/ui/loader';
 import { EventMediaDisplay } from '@/components/event/event-media-display';
@@ -27,6 +21,7 @@ import Link from 'next/link';
 import SwipeNavigation from '@/components/event/SwipeNavigation';
 import { TranslatedLabel } from '@/components/event/TranslatedLabel';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
 import { useEffect, useState } from 'react';
 
 // Define specific type for TicketType
@@ -40,7 +35,6 @@ interface TicketTypeData {
   maxPerOrder?: number;
   salesStart?: string | null; // Allow null
   salesEnd?: string | null; // Allow null
-  paymentLink?: string;
   active: boolean; // <-- ADDED active field
   productId?: string;
 }
@@ -54,7 +48,6 @@ interface BundleData {
   description?: string;
   details?: string;
   stock?: number | null; // Allow null
-  paymentLink?: string;
   active: boolean; // Kept for bundles
   salesStart?: string | null; // Added salesStart for bundles
   salesEnd?: string | null; // Added salesEnd for bundles
@@ -548,7 +541,6 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
                                           isBundle: false,
                                           maxPerOrder: ticket.maxPerOrder,
                                           stock: ticket.stock,
-                                          paymentLink: ticket.paymentLink,
                                           active: ticket.active,
                                           salesStart: ticket.salesStart,
                                           salesEnd: ticket.salesEnd,
@@ -688,7 +680,6 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
                                           isBundle: true,
                                           maxPerOrder: bundle.maxPerOrder,
                                           stock: bundle.stock,
-                                          paymentLink: bundle.paymentLink,
                                           active: bundle.active,
                                           salesStart: bundle.salesStart,
                                           salesEnd: bundle.salesEnd,
@@ -840,29 +831,123 @@ export default function EventPageContent({ slug }: EventPageContentProps) {
               </div>
             </div>
 
-            {/* Mobile Navigation Buttons - Only visible on mobile, hidden on desktop */}
-            <div className="md:hidden max-w-4xl mx-auto mt-6">
-              <div className="flex justify-between gap-4">
-                {chronologicallyOlderEvent && (
-                  <Link
-                    href={`/events/${chronologicallyOlderEvent.slug}`}
-                    className="flex-1 flex items-center justify-center gap-2 uppercase bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700 rounded-sm py-4 px-6 font-medium transition-colors duration-200 shadow-lg"
-                  >
-                    Older
-                    <ChevronRight className="w-5 h-5" />
-                  </Link>
-                )}
-                {chronologicallyNewerEvent && (
-                  <Link
-                    href={`/events/${chronologicallyNewerEvent.slug}`}
-                    className="flex-1 flex items-center justify-center gap-2 uppercase bg-teal-800 hover:bg-teal-700 text-teal-200 border-teal-700 rounded-sm py-4 px-6 font-medium transition-colors duration-200 shadow-lg"
-                  >
-                    Newer
-                    <ChevronRight className="w-5 h-5" />
-                  </Link>
-                )}
-              </div>
-            </div>
+            {/* Previous events - cards like landing event-showcase */}
+            {(() => {
+              const previousEvents = allEvents.filter(e => e.slug !== slug);
+              if (previousEvents.length === 0) return null;
+              const getMonthColor = (date: Date) => {
+                const month = date.getMonth();
+                const colorMap: Record<number, { bg: string; text: string }> = {
+                  0: { bg: 'bg-red-600', text: 'text-white' },
+                  1: { bg: 'bg-amber-600', text: 'text-white' },
+                  2: { bg: 'bg-yellow-600', text: 'text-white' },
+                  3: { bg: 'bg-cyan-600', text: 'text-white' },
+                  4: { bg: 'bg-teal-600', text: 'text-white' },
+                  5: { bg: 'bg-sky-600', text: 'text-white' },
+                  6: { bg: 'bg-purple-600', text: 'text-white' },
+                  7: { bg: 'bg-pink-600', text: 'text-white' },
+                  8: { bg: 'bg-indigo-600', text: 'text-white' },
+                  9: { bg: 'bg-orange-600', text: 'text-white' },
+                  10: { bg: 'bg-emerald-600', text: 'text-white' },
+                  11: { bg: 'bg-green-600', text: 'text-white' },
+                };
+                return (
+                  colorMap[month] || { bg: 'bg-blue-600', text: 'text-white' }
+                );
+              };
+              return (
+                <div className="max-w-7xl mx-auto px-4">
+                  <div className="mb-8">
+                    <h2 className="text-3xl font-bold text-foreground">
+                      <TranslatedLabel translationKey="eventSlugPage.previousEvents.title" />
+                    </h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {previousEvents.slice(0, 4).map(ev => {
+                      const evDate = ev.date ? new Date(ev.date) : null;
+                      const formattedEvDate = evDate?.toLocaleDateString(
+                        currentLanguage === 'fr' ? 'fr-FR' : 'en-US',
+                        { day: 'numeric', month: 'short' }
+                      );
+                      const desc =
+                        typeof ev.description === 'string'
+                          ? ev.description
+                          : null;
+                      const img = ev.featuredImage || '/placeholder.webp';
+                      const hasValidImage =
+                        img && img.trim() !== '' && img !== '/placeholder.webp';
+                      return (
+                        <Card
+                          key={ev._id}
+                          className="group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0"
+                        >
+                          <div className="relative rounded-t-sm overflow-hidden">
+                            <Link
+                              href={`/events/${ev.slug}`}
+                              className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                              aria-label={`View ${ev.title}`}
+                              prefetch
+                            >
+                              <div className="aspect-square relative bg-muted overflow-hidden">
+                                <Image
+                                  src={
+                                    hasValidImage ? img : '/placeholder.webp'
+                                  }
+                                  alt={ev.title}
+                                  fill
+                                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                                  className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                                  quality={100}
+                                  placeholder="blur"
+                                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+IRjWjBqO6O2mhP//Z"
+                                />
+                              </div>
+                            </Link>
+                          </div>
+                          <CardContent className="pt-1 pb-4 px-4 flex flex-col min-h-[120px]">
+                            <div className="flex-1 space-y-1">
+                              <Link
+                                href={`/events/${ev.slug}`}
+                                className="block"
+                              >
+                                <h3 className="font-medium text-base leading-tight hover:text-primary transition-colors line-clamp-2 break-words overflow-wrap-anywhere">
+                                  {ev.title}
+                                </h3>
+                              </Link>
+                              {desc && (
+                                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed break-words overflow-wrap-anywhere">
+                                  {desc}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex items-center justify-between mt-4">
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                {formattedEvDate && evDate && (
+                                  <span
+                                    className={`px-2 py-1 text-xs font-medium rounded-sm ${getMonthColor(evDate).bg} ${getMonthColor(evDate).text}`}
+                                  >
+                                    {formattedEvDate}
+                                  </span>
+                                )}
+                              </div>
+                              <Link
+                                href={`/events/${ev.slug}`}
+                                className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium"
+                              >
+                                {t(
+                                  currentLanguage,
+                                  'eventShowcase.events.viewEvent'
+                                )}
+                              </Link>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>

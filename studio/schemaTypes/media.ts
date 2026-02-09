@@ -5,7 +5,7 @@ export default defineType({
   name: 'media',
   title: 'DJ Sets',
   type: 'document',
-  icon: PlayIcon,
+  icon: PlayIcon as any,
   fields: [
     defineField({
       name: 'title',
@@ -65,18 +65,6 @@ export default defineType({
       options: {
         hotspot: true,
       },
-      fields: [
-        {
-          name: 'alt',
-          title: 'Alt Text',
-          type: 'string',
-        },
-        {
-          name: 'caption',
-          title: 'Caption',
-          type: 'string',
-        },
-      ],
     }),
     defineField({
       name: 'duration',
@@ -95,13 +83,6 @@ export default defineType({
       title: 'Genre/Category',
       type: 'string',
       description: 'Music genre, video category, etc.',
-    }),
-    defineField({
-      name: 'tags',
-      title: 'Tags',
-      type: 'array',
-      of: [{type: 'string'}],
-      description: 'Tags for organization and filtering',
     }),
     defineField({
       name: 'publishedAt',

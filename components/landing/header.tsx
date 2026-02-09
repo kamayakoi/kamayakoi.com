@@ -14,6 +14,7 @@ import {
 } from '../ui/sheet';
 import styles from '@/lib/styles/header.module.css';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import { t } from '@/lib/i18n/translations';
 import CartModal from '@/components/merch/cart/cart-modal';
 import WishlistModal from '@/components/merch/wishlist/wishlist-modal';
@@ -27,10 +28,17 @@ interface NavItem {
   isComingSoonBadgeOnly?: boolean;
 }
 
-export default function Header() {
+interface HeaderProps {
+  ticketsButtonLocation?: 'header' | 'hero';
+}
+
+export default function Header({
+  ticketsButtonLocation = 'header',
+}: HeaderProps) {
   const [isScrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const { currentLanguage } = useTranslation();
+  const { button } = useTheme();
   const { audioPlayerEnabled } = useMusic();
 
   useEffect(() => {
@@ -57,11 +65,13 @@ export default function Header() {
     { nameKey: 'header.nav.shop', path: '/merch' },
   ];
 
+  const showTicketsCta = pathname === '/' && ticketsButtonLocation === 'header';
+
   return (
     <header className={`${styles.header} ${isScrolled ? styles.scrolled : ''}`}>
       {/* Mini Audio Player - positioned relative to header */}
       {audioPlayerEnabled && (
-        <div className="absolute top-[14px] left-[19px] md:top-[12px] md:left-4 z-[60] pointer-events-auto">
+        <div className="absolute top-[14px] left-[19px] md:top-[12px] md:left-4 z-60 pointer-events-auto">
           <MiniAudioPlayer />
         </div>
       )}
@@ -108,8 +118,18 @@ export default function Header() {
           })}
         </nav>
 
-        {/* Cart and Wishlist Modals - Desktop */}
+        {/* Cart, Wishlist and Tickets CTA - Desktop */}
         <div className="hidden md:flex items-center ml-4 gap-2">
+          {showTicketsCta && (
+            <Link href="/events">
+              <Button
+                size="sm"
+                className={`rounded-sm px-3 font-semibold tracking-tight ${button.secondaryBorder}`}
+              >
+                {t(currentLanguage, 'heroSection.getTickets')}
+              </Button>
+            </Link>
+          )}
           <CartModal />
           <WishlistModal />
         </div>
@@ -117,6 +137,16 @@ export default function Header() {
         <div className="flex items-center gap-2 md:hidden -translate-y-[7px]">
           <CartModal />
           <WishlistModal />
+          {showTicketsCta && (
+            <Link href="/events">
+              <Button
+                size="sm"
+                className={`rounded-sm px-2.5 font-semibold tracking-tight text-xs ${button.secondaryBorder}`}
+              >
+                {t(currentLanguage, 'heroSection.getTickets')}
+              </Button>
+            </Link>
+          )}
           <Sheet>
             <SheetTrigger asChild>
               <Button

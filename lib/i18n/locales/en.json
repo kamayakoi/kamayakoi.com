@@ -232,6 +232,9 @@
       "title": "Share this event",
       "subtitle": "Spread the word and invite your friends"
     },
+    "previousEvents": {
+      "title": "Previous events"
+    },
     "hostedBy": "Hosted by {name}",
     "errors": {
       "supabaseNotInitialized": "Online ticketing is temporarily unavailable. Please try again later."
@@ -582,8 +585,8 @@
     "text": "LOADING"
   },
   "heroSection": {
-    "getYourTickets": "Get Tickets",
-    "getTickets": "Get Tickets"
+    "getYourTickets": "Reserve a ticket",
+    "getTickets": "Reserve a ticket"
   },
   "artistsPage": {
     "title": "Artists",

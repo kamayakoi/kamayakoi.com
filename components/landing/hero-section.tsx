@@ -7,14 +7,13 @@ import {
   ChevronRight,
   Play,
   Pause,
-  Ticket,
   Volume2,
   VolumeX,
-  X,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import { t } from '@/lib/i18n/translations';
+import { motion } from 'framer-motion';
 
 // Define content item interface
 interface ContentItem {
@@ -39,6 +38,7 @@ interface ContentItem {
 // Props interface
 interface HeroSectionProps {
   contentItems?: ContentItem[];
+  ticketsButtonLocation?: 'header' | 'hero';
   sanityHeroItems?: {
     _key: string;
     title?: string;
@@ -98,19 +98,19 @@ interface HeroSectionProps {
 
 export function HeroSection({
   contentItems = [],
+  ticketsButtonLocation = 'header',
   sanityHeroItems,
   featuredEvents,
   highlightedContent,
 }: HeroSectionProps) {
   const { currentLanguage } = useTranslation();
+  const { button } = useTheme();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [showControls, setShowControls] = useState(false);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [showCloseButton, setShowCloseButton] = useState(false);
-  const [isTicketsButtonVisible, setIsTicketsButtonVisible] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Default content items (fallback)
@@ -248,20 +248,6 @@ export function HeroSection({
       videoRef.current.muted = isMuted;
     }
   }, [isMuted]);
-
-  // Show tickets button with animation delay
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsTicketsButtonVisible(true);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Handle close button click
-  const handleCloseTicketsButton = () => {
-    setIsTicketsButtonVisible(false);
-  };
 
   // Handle mouse movement to show/hide controls and navigation
   useEffect(() => {
@@ -588,19 +574,18 @@ export function HeroSection({
               {/* Event description removed for cleaner look */}
             </div>
 
-            {/* Get Tickets button on bottom right */}
+            {/* Get Tickets button - aligned bottom right with consistent spacing */}
             {currentItem.slug && (
-              <div className="absolute bottom-8 right-8">
+              <div className="absolute bottom-8 right-8 left-8 md:left-auto flex justify-end">
                 <button
                   onClick={() => {
                     if (currentItem.slug) {
-                      // Use the same approach as event-showcase.tsx
                       const slug = (currentItem.slug as { current: string })
                         .current;
                       window.location.href = `/events/${slug}`;
                     }
                   }}
-                  className="px-8 py-4 md:px-6 md:py-3 bg-white text-black hover:bg-white/90 rounded-sm font-semibold transition-all duration-300 shadow-lg text-lg md:text-base"
+                  className="px-8 py-4 md:px-8 md:py-3.5 bg-white text-black font-semibold rounded-sm text-base md:text-lg tracking-tight shadow-xl hover:shadow-2xl hover:bg-white/95 active:scale-[0.98] transition-all duration-200"
                 >
                   {t(currentLanguage, 'heroSection.getYourTickets')}
                 </button>
@@ -608,65 +593,6 @@ export function HeroSection({
             )}
           </div>
         </>
-      )}
-
-      {/* Get Tickets Button - Floating Bottom Right */}
-      {isTicketsButtonVisible && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3 }}
-          className="fixed z-50
-                     right-4 bottom-24  // Mobile: much higher up
-                     sm:right-6 sm:bottom-6  // Small screens: default size & pos
-                     md:right-8 md:bottom-16  // Medium screens and up: larger, higher up
-                     lg:right-24 lg:bottom-20  // Larger screens: more to the left
-                     "
-          onMouseEnter={() => setShowCloseButton(true)}
-          onMouseLeave={() => setShowCloseButton(false)}
-        >
-          {/* Close button - positioned as a separate element */}
-          {showCloseButton && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2 }}
-              className="absolute -top-3 -right-3 z-20"
-            >
-              <button
-                onClick={handleCloseTicketsButton}
-                className="bg-[#2a2a2a] rounded-sm w-6 h-6 flex items-center justify-center shadow-md hover:bg-[#3a3a3a] transition-colors border border-gray-700"
-                aria-label="Close tickets button"
-              >
-                <X className="h-3.5 w-3.5 text-gray-300" />
-              </button>
-            </motion.div>
-          )}
-
-          <div className="bg-[#1a1a1a] rounded-sm shadow-2xl overflow-hidden border border-gray-800 relative min-w-[160px] md:min-w-[180px] lg:min-w-[200px]">
-            {/* Button */}
-            <div className="w-full">
-              <button
-                onClick={() => {
-                  if (currentItem.type === 'event' && currentItem.slug) {
-                    const slug = (currentItem.slug as { current: string })
-                      .current;
-                    window.location.href = `/events/${slug}`;
-                  } else {
-                    window.location.href = `/events`;
-                  }
-                }}
-                className="w-full py-4 px-6 md:px-8 md:py-5 lg:px-10 lg:py-4 bg-teal-800 hover:bg-teal-700 text-teal-200 hover:text-white text-base md:text-lg font-medium transition-all duration-300 rounded-b-sm flex items-center justify-center uppercase shadow-lg"
-                aria-label="Get tickets"
-              >
-                <Ticket className="h-5 w-5 md:h-6 md:w-6 mr-2 md:mr-3" />
-                <span className="font-medium">
-                  {t(currentLanguage, 'heroSection.getTickets')}
-                </span>
-              </button>
-            </div>
-          </div>
-        </motion.div>
       )}
 
       {/* Sound Toggle Button - Bottom Left (only for videos) */}
@@ -678,6 +604,34 @@ export function HeroSection({
         >
           {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
         </button>
+      )}
+
+      {/* Get Tickets Button - Floating (only when ticketsButtonLocation is 'hero') */}
+      {ticketsButtonLocation === 'hero' && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="fixed z-50 right-5 bottom-20 sm:right-6 sm:bottom-8 md:right-8 md:bottom-10 lg:right-10 lg:bottom-12"
+        >
+          <div className="rounded-sm overflow-hidden border border-white/10 bg-[#1a1a1a]/95 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.4)] min-w-[168px] sm:min-w-[180px] md:min-w-[192px]">
+            <button
+              onClick={() => {
+                if (currentItem.type === 'event' && currentItem.slug) {
+                  const slug = (currentItem.slug as { current: string })
+                    .current;
+                  window.location.href = `/events/${slug}`;
+                } else {
+                  window.location.href = `/events`;
+                }
+              }}
+              className={`w-full py-4 px-5 sm:py-4 sm:px-6 md:py-4 md:px-6 font-semibold text-sm sm:text-base tracking-tight rounded-sm flex items-center justify-center gap-2.5 transition-all duration-200 hover:shadow-lg active:scale-[0.98] ${button.primary}`}
+              aria-label="Get tickets"
+            >
+              <span>{t(currentLanguage, 'heroSection.getTickets')}</span>
+            </button>
+          </div>
+        </motion.div>
       )}
 
       {/* Navigation Controls */}

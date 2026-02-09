@@ -3,15 +3,23 @@
 import Image from 'next/image';
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import type { ImageProps } from '@/lib/utils/types';
 import LoadingComponent from '@/components/ui/loader';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
 import { t } from '@/lib/i18n/translations';
 
+// Local type for archive images fetched from Sanity via the API route
+interface ArchiveImage {
+  id: number;
+  height: string;
+  width: string;
+  url: string;
+  tags?: string[]; // First tag is treated as the category for grouping
+}
+
 // Renamed component to ArchivesClientComponent
 export default function ArchivesClientComponent() {
   const { currentLanguage } = useTranslation();
-  const [images, setImages] = useState<ImageProps[]>([]);
+  const [images, setImages] = useState<ArchiveImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [zoomedImageId, setZoomedImageId] = useState<number | null>(null); // State for zoomed image ID
@@ -29,7 +37,7 @@ export default function ArchivesClientComponent() {
 
   // Group tagged images by their first tag
   const imagesByTag = useMemo(() => {
-    const groups: { [key: string]: ImageProps[] } = {};
+    const groups: { [key: string]: ArchiveImage[] } = {};
     taggedImages.forEach(img => {
       if (img.tags && img.tags.length > 0) {
         const tag = img.tags[0];
@@ -69,7 +77,7 @@ export default function ArchivesClientComponent() {
           throw new Error(errorMsg);
         }
 
-        const fetchedImages: ImageProps[] = await response.json();
+        const fetchedImages: ArchiveImage[] = await response.json();
 
         // Validate fetched data structure (optional but recommended)
         if (!Array.isArray(fetchedImages)) {
@@ -189,37 +197,35 @@ export default function ArchivesClientComponent() {
 
               {/* Images Grid */}
               <div className="columns-1 gap-4 sm:columns-2 xl:columns-3 2xl:columns-4">
-                {tagImages.map(
-                  ({ id, public_id, format, width, height }, index) => {
-                    const numericWidth = parseInt(width, 10);
-                    const numericHeight = parseInt(height, 10);
-                    return (
-                      <div
-                        key={`tagged-${id}`}
-                        onClick={() => setZoomedImageId(id)}
-                        className={`
+                {tagImages.map(({ id, url, width, height }, index) => {
+                  const numericWidth = parseInt(width, 10);
+                  const numericHeight = parseInt(height, 10);
+                  return (
+                    <div
+                      key={`tagged-${id}`}
+                      onClick={() => setZoomedImageId(id)}
+                      className={`
                                         relative
                                         mb-5 block w-full cursor-zoom-in
                                         after:content after:pointer-events-none after:absolute after:inset-0 after:rounded-sm after:shadow-highlight
                                     `}
-                      >
-                        <Image
-                          alt={`Archives photo - ${tag}`}
-                          className="transform rounded-sm brightness-90 transition will-change-auto group-hover:brightness-110"
-                          style={{ transform: 'translate3d(0, 0, 0)' }}
-                          src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_scale,w_720,f_auto,q_auto/${public_id}.${format}`}
-                          width={!isNaN(numericWidth) ? numericWidth : 720}
-                          height={!isNaN(numericHeight) ? numericHeight : 480}
-                          sizes="(max-width: 640px) 100vw,
+                    >
+                      <Image
+                        alt={`Archives photo - ${tag}`}
+                        className="transform rounded-sm brightness-90 transition will-change-auto group-hover:brightness-110"
+                        style={{ transform: 'translate3d(0, 0, 0)' }}
+                        src={url}
+                        width={!isNaN(numericWidth) ? numericWidth : 720}
+                        height={!isNaN(numericHeight) ? numericHeight : 480}
+                        sizes="(max-width: 640px) 100vw,
                                           (max-width: 1280px) 50vw,
                                           (max-width: 1536px) 33vw,
                                           25vw"
-                          priority={index < 3} // Priority for first few images in each section
-                        />
-                      </div>
-                    );
-                  }
-                )}
+                        priority={index < 3} // Priority for first few images in each section
+                      />
+                    </div>
+                  );
+                })}
               </div>
             </section>
           ))}
@@ -233,39 +239,37 @@ export default function ArchivesClientComponent() {
               </h2>
 
               <div className="columns-1 gap-4 sm:columns-2 xl:columns-3 2xl:columns-4">
-                {untaggedImages.map(
-                  ({ id, public_id, format, width, height }, index) => {
-                    const numericWidth = parseInt(width, 10);
-                    const numericHeight = parseInt(height, 10);
-                    // console.log(`Untagged Image ${public_id} tags:`, tags);
-                    return (
-                      <div
-                        key={`untagged-${id}`}
-                        onClick={() => setZoomedImageId(id)}
-                        className={`
+                {untaggedImages.map(({ id, url, width, height }, index) => {
+                  const numericWidth = parseInt(width, 10);
+                  const numericHeight = parseInt(height, 10);
+                  // console.log(`Untagged Image ${public_id} tags:`, tags);
+                  return (
+                    <div
+                      key={`untagged-${id}`}
+                      onClick={() => setZoomedImageId(id)}
+                      className={`
                                         relative 
                                         mb-5 block w-full cursor-zoom-in
                                         after:content after:pointer-events-none after:absolute after:inset-0 after:rounded-sm after:shadow-highlight
                                     `}
-                      >
-                        <Image
-                          alt="Archives photo"
-                          className="transform rounded-sm brightness-90 transition will-change-auto group-hover:brightness-110"
-                          style={{ transform: 'translate3d(0, 0, 0)' }}
-                          src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_scale,w_720,f_auto,q_auto/${public_id}.${format}`}
-                          width={!isNaN(numericWidth) ? numericWidth : 720}
-                          height={!isNaN(numericHeight) ? numericHeight : 480}
-                          sizes="(max-width: 640px) 100vw,
+                    >
+                      <Image
+                        alt="Archives photo"
+                        className="transform rounded-sm brightness-90 transition will-change-auto group-hover:brightness-110"
+                        style={{ transform: 'translate3d(0, 0, 0)' }}
+                        src={url}
+                        width={!isNaN(numericWidth) ? numericWidth : 720}
+                        height={!isNaN(numericHeight) ? numericHeight : 480}
+                        sizes="(max-width: 640px) 100vw,
                                           (max-width: 1280px) 50vw,
                                           (max-width: 1536px) 33vw,
                                           25vw"
-                          priority={index < 3 && taggedImages.length === 0} // Priority only if no tagged images were prioritized
-                        />
-                        {/* No tag display for untagged images, or could be an empty placeholder if design requires */}
-                      </div>
-                    );
-                  }
-                )}
+                        priority={index < 3 && taggedImages.length === 0} // Priority only if no tagged images were prioritized
+                      />
+                      {/* No tag display for untagged images, or could be an empty placeholder if design requires */}
+                    </div>
+                  );
+                })}
               </div>
             </section>
           )}
@@ -301,15 +305,16 @@ export default function ArchivesClientComponent() {
                         `;
 
             // Determine image source width based on orientation for better quality/speed balance
-            const imageSrcWidth = isLandscape ? 1080 : 720;
-            const imageSrc = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_scale,w_${imageSrcWidth},f_auto,q_auto/${zoomedImage.public_id}.${zoomedImage.format}`;
+            const imageSrc = zoomedImage.url;
 
             // Calculate base width/height for the Image component (guides aspect ratio)
             const baseWidth = numericWidth || (isLandscape ? 1080 : 720);
             const baseHeight = numericHeight || (isLandscape ? 720 : 1080); // Approximate inverse aspect
 
             // Determine sizes prop based on container logic
-            const imageSizes = `(max-width: 767px) 95vw, ${isLandscape ? '80vw' : '50vw'}`;
+            const imageSizes = `(max-width: 767px) 95vw, ${
+              isLandscape ? '80vw' : '50vw'
+            }`;
 
             return (
               <div // This is containerClasses (outermost modal content box)

@@ -22,18 +22,19 @@ export default async function Home() {
   // Fetch all homepage content server-side
   const [homepageData, events, articles, media] = await Promise.all([
     getHomepageContent(),
-    getLatestEvents(6),
+    getLatestEvents(36),
     getLatestBlogPosts(6),
     getMedia(10),
   ]);
 
   return (
     <div className="min-h-screen bg-background text-foreground relative">
-      <Header />
+      <Header ticketsButtonLocation={homepageData?.ticketsButtonLocation} />
       {/* Use HeroSection with combined videos and featured events */}
       <HeroSection
         sanityHeroItems={homepageData?.heroContent}
         featuredEvents={homepageData?.featuredEvents}
+        ticketsButtonLocation={homepageData?.ticketsButtonLocation}
       />
       <EventShowcase events={events} />
       <MediaShowcase media={media} />

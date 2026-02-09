@@ -2,9 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Loader2, Check, X } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { IG } from '@/components/icons/IG';
 import { WhatsappIcon } from '@/components/icons/WhatsappIcon';
 import { FacebookIcon } from '@/components/icons/FacebookIcon';
@@ -20,17 +19,18 @@ import {
 import { toast } from '@/components/ui/sonner';
 import { sendEmail } from '@/lib/actions/send-email';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import { t } from '@/lib/i18n/translations';
 
 // Contact Form Component
 function ContactForm({ onClose }: { onClose: () => void }) {
   const [isPending, setIsPending] = useState(false);
   const { currentLanguage } = useTranslation();
+  const { button } = useTheme();
 
   async function handleSubmit(formData: FormData) {
     setIsPending(true);
     try {
-      // Construct proper FormData like newsletter subscription
       const contactData = new FormData();
       contactData.append('email', formData.get('email') as string);
       contactData.append('subject', 'New Contact Form Message');
@@ -86,7 +86,7 @@ function ContactForm({ onClose }: { onClose: () => void }) {
         <button
           type="submit"
           disabled={isPending}
-          className="bg-teal-800 hover:bg-teal-700 text-teal-200 px-4 py-2 rounded-sm text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors disabled:opacity-50 min-w-[120px]"
+          className={`${button.secondary} px-4 py-2 rounded-sm text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors disabled:opacity-50 min-w-[120px]`}
         >
           {isPending ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -104,10 +104,6 @@ function ContactForm({ onClose }: { onClose: () => void }) {
 
 export function Footer() {
   const [isContactOpen, setIsContactOpen] = useState(false);
-  const [isNewsletterFocused, setIsNewsletterFocused] = useState(false);
-  const [newsletterStatus, setNewsletterStatus] = useState<
-    'idle' | 'loading' | 'success' | 'error'
-  >('idle');
   const { currentLanguage } = useTranslation();
 
   return (
@@ -136,7 +132,7 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="WhatsApp"
-                    className="inline-flex items-center justify-center h-9 w-9 rounded-sm text-white/70 transition-colors hover:text-[#25D366]"
+                    className="inline-flex items-center justify-center h-9 w-9 rounded-sm text-white/70 transition-colors hover:text-[#25D366] [&_svg]:transition-colors [&:hover_svg]:fill-[#25D366]"
                   >
                     <WhatsappIcon className="h-[22px] w-[22px]" />
                   </Link>
@@ -148,7 +144,7 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Soundcloud"
-                    className="inline-flex items-center justify-center h-9 w-9 rounded-sm text-white/70 transition-colors hover:text-[#ff5500]"
+                    className="inline-flex items-center justify-center h-9 w-9 rounded-sm text-white/70 transition-colors hover:text-[#ff5500] [&_svg]:transition-colors [&:hover_svg]:fill-[#ff5500]"
                   >
                     <Soundcloud className="h-[20px] w-[20px]" />
                   </Link>
@@ -160,7 +156,7 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Facebook"
-                    className="inline-flex items-center justify-center h-9 w-9 rounded-sm transition-colors text-white/70 hover:text-[#1877F2]"
+                    className="inline-flex items-center justify-center h-9 w-9 rounded-sm transition-colors text-white/70 hover:text-[#1877F2] [&_svg]:transition-colors [&:hover_svg]:fill-[#1877F2]"
                   >
                     <FacebookIcon className="h-[19.5px] w-[19.5px]" />
                   </Link>
@@ -172,7 +168,7 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Instagram"
-                    className="inline-flex items-center justify-center h-9 w-9 rounded-sm transition-colors text-white/70 hover:text-[#E4405F]"
+                    className="inline-flex items-center justify-center h-9 w-9 rounded-sm transition-colors text-white/70 hover:text-[#E4405F] [&_svg]:transition-colors [&:hover_svg]:fill-[#E4405F]"
                   >
                     <IG className="h-[23px] w-[23px]" />
                   </Link>
@@ -192,7 +188,7 @@ export function Footer() {
                 <li>
                   <Link
                     href="/events"
-                    className="text-white/70 hover:text-white transition-colors text-sm font-bold"
+                    className="text-white/70 hover:text-white transition-colors duration-200 ease-in-out text-sm font-bold"
                   >
                     {t(currentLanguage, 'footer.navigation.events')}
                   </Link>
@@ -200,7 +196,7 @@ export function Footer() {
                 <li>
                   <Link
                     href="/stories"
-                    className="text-white/70 hover:text-white transition-colors text-sm font-light"
+                    className="text-white/70 hover:text-white transition-colors duration-200 ease-in-out text-sm font-light"
                   >
                     {t(currentLanguage, 'footer.navigation.stories')}
                   </Link>
@@ -208,7 +204,7 @@ export function Footer() {
                 <li>
                   <Link
                     href="/merch"
-                    className="text-white/70 hover:text-white transition-colors text-sm font-light"
+                    className="text-white/70 hover:text-white transition-colors duration-200 ease-in-out text-sm font-light"
                   >
                     {t(currentLanguage, 'footer.navigation.merch')}
                   </Link>
@@ -226,7 +222,7 @@ export function Footer() {
                 <li>
                   <Link
                     href="/artists"
-                    className="text-white/70 hover:text-white transition-colors text-sm font-light"
+                    className="text-white/70 hover:text-white transition-colors duration-200 ease-in-out text-sm font-light"
                   >
                     {t(currentLanguage, 'footer.navigation.artists')}
                   </Link>
@@ -234,7 +230,7 @@ export function Footer() {
                 <li>
                   <Link
                     href="/archives"
-                    className="text-white/70 hover:text-white transition-colors text-sm font-light"
+                    className="text-white/70 hover:text-white transition-colors duration-200 ease-in-out text-sm font-light"
                   >
                     {t(currentLanguage, 'footer.navigation.archive')}
                   </Link>
@@ -242,7 +238,7 @@ export function Footer() {
                 <li>
                   <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
                     <DialogTrigger asChild>
-                      <button className="text-white/70 hover:text-white transition-colors text-sm font-light text-left">
+                      <button className="text-white/70 hover:text-white transition-colors duration-200 ease-in-out text-sm font-light text-left">
                         {t(currentLanguage, 'footer.navigation.contact')}
                       </button>
                     </DialogTrigger>
@@ -271,7 +267,7 @@ export function Footer() {
                 <li>
                   <Link
                     href="/privacy"
-                    className="text-white/70 hover:text-white transition-colors text-sm font-light"
+                    className="text-white/70 hover:text-white transition-colors duration-200 ease-in-out text-sm font-light"
                   >
                     {t(currentLanguage, 'footer.links.privacy')}
                   </Link>
@@ -279,7 +275,7 @@ export function Footer() {
                 <li>
                   <Link
                     href="/terms"
-                    className="text-white/70 hover:text-white transition-colors text-sm font-light"
+                    className="text-white/70 hover:text-white transition-colors duration-200 ease-in-out text-sm font-light"
                   >
                     {t(currentLanguage, 'footer.links.terms')}
                   </Link>
@@ -302,120 +298,8 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Desktop: Newsletter + Language Switcher, Mobile: Social Icons and Language Switcher */}
+          {/* Desktop: Language Switcher, Mobile: Social Icons and Language Switcher */}
           <div className="flex items-center gap-2 translate-x-0 md:translate-x-8">
-            <div className="hidden md:block">
-              <motion.div
-                className="flex items-center"
-                animate={{
-                  width: isNewsletterFocused ? '180px' : '130px',
-                }}
-                transition={{
-                  duration: 0.4,
-                  ease: [0.4, 0.0, 0.2, 1],
-                  type: 'tween',
-                }}
-                style={{ justifyContent: 'flex-end' }}
-              >
-                <motion.form
-                  onSubmit={async e => {
-                    e.preventDefault();
-                    const formData = new FormData(e.target as HTMLFormElement);
-                    const email = formData.get('email') as string;
-
-                    if (!email) return;
-
-                    setNewsletterStatus('loading');
-
-                    const newsletterData = new FormData();
-                    newsletterData.append('email', email);
-                    newsletterData.append(
-                      'subject',
-                      'New Newsletter Subscription'
-                    );
-                    newsletterData.append(
-                      'message',
-                      `New person subscribed to newsletter: ${email}`
-                    );
-                    newsletterData.append('type', 'newsletter');
-
-                    const result = await sendEmail(newsletterData);
-                    if (result.success) {
-                      setNewsletterStatus('success');
-                      (e.target as HTMLFormElement).reset();
-                      setIsNewsletterFocused(false);
-                      // Reset status after 3 seconds
-                      setTimeout(() => setNewsletterStatus('idle'), 3000);
-                    } else {
-                      setNewsletterStatus('error');
-                      // Reset status after 3 seconds
-                      setTimeout(() => setNewsletterStatus('idle'), 3000);
-                    }
-                  }}
-                  className="flex"
-                >
-                  <motion.input
-                    type="email"
-                    name="email"
-                    placeholder={t(
-                      currentLanguage,
-                      'footer.newsletter.placeholder'
-                    )}
-                    required
-                    animate={{
-                      x: isNewsletterFocused ? -45 : 0,
-                    }}
-                    transition={{
-                      duration: 0.4,
-                      ease: [0.4, 0.0, 0.2, 1],
-                      type: 'tween',
-                    }}
-                    onFocus={() => setIsNewsletterFocused(true)}
-                    onBlur={() => {
-                      // Longer delay to prevent flickering when clicking button
-                      setTimeout(() => setIsNewsletterFocused(false), 300);
-                    }}
-                    className="bg-transparent rounded-sm px-2 py-1 text-xs border border-gray-700 focus:ring-1 focus:ring-gray-400 placeholder:text-gray-400 text-white transition-colors focus:outline-none focus:bg-transparent h-6 w-39"
-                  />
-                  <motion.button
-                    type="submit"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{
-                      opacity: isNewsletterFocused ? 1 : 0,
-                      scale: isNewsletterFocused ? 1 : 0.8,
-                    }}
-                    transition={{
-                      duration: 0.4,
-                      ease: [0.4, 0.0, 0.2, 1],
-                      type: 'tween',
-                    }}
-                    style={{
-                      pointerEvents: isNewsletterFocused ? 'auto' : 'none',
-                    }}
-                    className={`px-2 py-1 rounded-sm text-xs font-medium transition-colors h-6 -ml-8 flex items-center justify-center min-w-[50px] ${
-                      isNewsletterFocused ? '' : 'invisible'
-                    } ${
-                      newsletterStatus === 'success'
-                        ? 'bg-green-800 text-green-100'
-                        : newsletterStatus === 'error'
-                          ? 'bg-red-800 text-red-100'
-                          : 'bg-teal-800 hover:bg-teal-700 text-teal-100'
-                    }`}
-                    disabled={newsletterStatus === 'loading'}
-                  >
-                    {newsletterStatus === 'loading' ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : newsletterStatus === 'success' ? (
-                      <Check className="w-4 h-4" />
-                    ) : newsletterStatus === 'error' ? (
-                      <X className="w-4 h-4" />
-                    ) : (
-                      t(currentLanguage, 'footer.newsletter.sendButton')
-                    )}
-                  </motion.button>
-                </motion.form>
-              </motion.div>
-            </div>
             <div className="hidden md:block">
               <LanguageSwitcher />
             </div>
@@ -425,7 +309,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="WhatsApp"
-                className="inline-flex items-center justify-center h-6 w-6 rounded-sm text-white/70 transition-colors hover:text-[#25D366] md:hidden"
+                className="inline-flex items-center justify-center h-6 w-6 rounded-sm text-white/70 transition-colors hover:text-[#25D366] [&_svg]:transition-colors [&:hover_svg]:fill-[#25D366] md:hidden"
               >
                 <WhatsappIcon className="h-[16px] w-[16px]" />
               </Link>
@@ -434,7 +318,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Soundcloud"
-                className="inline-flex items-center justify-center h-6 w-6 rounded-sm text-white/70 transition-colors hover:text-[#ff5500] md:hidden"
+                className="inline-flex items-center justify-center h-6 w-6 rounded-sm text-white/70 transition-colors hover:text-[#ff5500] [&_svg]:transition-colors [&:hover_svg]:fill-[#ff5500] md:hidden"
               >
                 <Soundcloud className="h-[15px] w-[15px]" />
               </Link>
@@ -443,7 +327,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
-                className="inline-flex items-center justify-center h-6 w-6 rounded-sm transition-colors text-white/70 hover:text-[#1877F2] md:hidden"
+                className="inline-flex items-center justify-center h-6 w-6 rounded-sm transition-colors text-white/70 hover:text-[#1877F2] [&_svg]:transition-colors [&:hover_svg]:fill-[#1877F2] md:hidden"
               >
                 <FacebookIcon className="h-[14.5px] w-[14.5px]" />
               </Link>
@@ -452,7 +336,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="inline-flex items-center justify-center h-6 w-6 rounded-sm transition-colors text-white/70 hover:text-[#E4405F] md:hidden"
+                className="inline-flex items-center justify-center h-6 w-6 rounded-sm transition-colors text-white/70 hover:text-[#E4405F] [&_svg]:transition-colors [&:hover_svg]:fill-[#E4405F] md:hidden"
               >
                 <IG className="h-[17px] w-[17px]" />
               </Link>

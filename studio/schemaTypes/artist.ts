@@ -1,11 +1,11 @@
 import {defineType, defineField} from 'sanity'
-import {UsersIcon} from '@sanity/icons' // Optional: Add an icon
+import { UserIcon } from '@sanity/icons'
 
 export default defineType({
   name: 'artist',
   title: 'Artists',
   type: 'document',
-  icon: UsersIcon, // Optional icon
+  icon: UserIcon as any,
   fields: [
     defineField({
       name: 'name',
@@ -86,23 +86,6 @@ export default defineType({
           title: 'Français',
           type: 'text',
           rows: 8,
-        },
-      ],
-    }),
-    defineField({
-      name: 'video',
-      title: 'Artist Video',
-      type: 'file',
-      description: 'Optional video showcasing the artist (supports MP4, WebM, etc.)',
-      options: {
-        accept: 'video/*',
-      },
-      fields: [
-        {
-          name: 'caption',
-          title: 'Video Caption',
-          type: 'string',
-          description: 'Optional caption for the video',
         },
       ],
     }),

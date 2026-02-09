@@ -1,28 +1,25 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 import {
   Loader2,
   CheckCircle,
   XCircle,
   Shield,
-  User,
   Calendar,
-  MapPin,
   Ticket,
   AlertCircle,
   QrCode,
-  Users,
   Tag,
-} from "lucide-react";
-import { supabase } from "@/lib/supabase/client";
-import Link from "next/link";
-import { useTranslation } from "@/lib/contexts/TranslationContext";
-import { t } from "@/lib/i18n/translations";
+} from 'lucide-react';
+import { supabase } from '@/lib/supabase/client';
+import Link from 'next/link';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
 
 interface TicketData {
   purchase_id: string;
@@ -49,7 +46,7 @@ interface TicketData {
   remaining_tickets?: number; // Calculated remaining admissions
 }
 
-const PIN_CACHE_KEY = "staff_verification_pin";
+const PIN_CACHE_KEY = 'staff_verification_pin';
 const PIN_CACHE_DURATION = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
 
 const DUPLICATE_SCAN_WINDOW = 2000; // 2 seconds in milliseconds
@@ -87,12 +84,12 @@ const playSuccessSound = () => {
     gainNode.connect(audioContext.destination);
 
     oscillator.frequency.value = 800; // Higher pitch for success
-    oscillator.type = "sine";
+    oscillator.type = 'sine';
 
     gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(
       0.01,
-      audioContext.currentTime + 0.1,
+      audioContext.currentTime + 0.1
     );
 
     oscillator.start(audioContext.currentTime);
@@ -116,12 +113,12 @@ const playErrorSound = () => {
     gainNode.connect(audioContext.destination);
 
     oscillator.frequency.value = 200; // Lower pitch for error
-    oscillator.type = "sawtooth";
+    oscillator.type = 'sawtooth';
 
     gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(
       0.01,
-      audioContext.currentTime + 0.2,
+      audioContext.currentTime + 0.2
     );
 
     oscillator.start(audioContext.currentTime);
@@ -217,7 +214,7 @@ interface VerifyClientProps {
 const retryWithBackoff = async <T,>(
   fn: () => Promise<T>,
   retries: number = MAX_RETRY_ATTEMPTS,
-  delay: number = RETRY_DELAY_MS,
+  delay: number = RETRY_DELAY_MS
 ): Promise<T> => {
   try {
     return await fn();
@@ -227,10 +224,10 @@ const retryWithBackoff = async <T,>(
     // Check if it's a network error (worth retrying)
     const errorMessage = error instanceof Error ? error.message : String(error);
     const isNetworkError =
-      errorMessage.includes("network") ||
-      errorMessage.includes("timeout") ||
-      errorMessage.includes("fetch") ||
-      errorMessage.includes("connection");
+      errorMessage.includes('network') ||
+      errorMessage.includes('timeout') ||
+      errorMessage.includes('fetch') ||
+      errorMessage.includes('connection');
 
     if (!isNetworkError) {
       // Don't retry validation errors like TICKET_NOT_FOUND
@@ -238,21 +235,21 @@ const retryWithBackoff = async <T,>(
     }
 
     // Wait before retrying
-    await new Promise((resolve) => setTimeout(resolve, delay));
+    await new Promise(resolve => setTimeout(resolve, delay));
     return retryWithBackoff(fn, retries - 1, delay * 1.5); // Exponential backoff
   }
 };
 
 export function VerifyClient({ ticketId }: VerifyClientProps) {
   const { currentLanguage } = useTranslation();
-  const [pin, setPin] = useState("");
+  const [pin, setPin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [ticketData, setTicketData] = useState<TicketData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null); // Track error type for UI differentiation
   const [isVerified, setIsVerified] = useState(false);
   const [wasJustAdmitted, setWasJustAdmitted] = useState(false);
-  const [flashColor, setFlashColor] = useState<"green" | "red" | null>(null);
+  const [flashColor, setFlashColor] = useState<'green' | 'red' | null>(null);
 
   // Check for cached PIN on component mount
   useEffect(() => {
@@ -302,13 +299,13 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
 
   // Helper to parse error codes from database exceptions
   const parseErrorMessage = (
-    errorMessage: string,
+    errorMessage: string
   ): { code: string; message: string } => {
     const match = errorMessage.match(/^([A-Z_]+):\s*(.+)$/);
     if (match) {
       return { code: match[1], message: match[2] };
     }
-    return { code: "UNKNOWN_ERROR", message: errorMessage };
+    return { code: 'UNKNOWN_ERROR', message: errorMessage };
   };
 
   // Helper to get user-friendly error message
@@ -317,27 +314,27 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
       const errorMap: Record<string, string> = {
         TICKET_NOT_FOUND: t(
           currentLanguage,
-          "ticketVerification.errors.ticketNotFound",
+          'ticketVerification.errors.ticketNotFound'
         ),
         INVALID_INPUT: t(
           currentLanguage,
-          "ticketVerification.errors.ticketNotFound",
+          'ticketVerification.errors.ticketNotFound'
         ),
-        VERIFICATION_FAILED: "Ticket verification failed. Please try again.",
-        PROCESSING: "This ticket is currently being processed. Please wait.",
-        ORPHANED_TICKET: "Ticket data is incomplete. Please contact support.",
+        VERIFICATION_FAILED: 'Ticket verification failed. Please try again.',
+        PROCESSING: 'This ticket is currently being processed. Please wait.',
+        ORPHANED_TICKET: 'Ticket data is incomplete. Please contact support.',
         ALREADY_USED: t(
           currentLanguage,
-          "ticketVerification.warnings.alreadyUsed",
+          'ticketVerification.warnings.alreadyUsed'
         ),
-        DUPLICATE_SCAN: "Please wait a moment before scanning again.",
+        DUPLICATE_SCAN: 'Please wait a moment before scanning again.',
         ADMISSION_FAILED:
-          "Ticket verified but admission failed. Please try again.",
-        INTERNAL_ERROR: "System error. Please contact support.",
+          'Ticket verified but admission failed. Please try again.',
+        INTERNAL_ERROR: 'System error. Please contact support.',
       };
       return errorMap[errorCode] || defaultMessage;
     },
-    [currentLanguage],
+    [currentLanguage]
   );
 
   const verifyTicket = useCallback(
@@ -360,7 +357,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
 
         if (lastScanTime && now - lastScanTime < DUPLICATE_SCAN_WINDOW) {
           setError(
-            "This ticket was just scanned. Please wait before scanning again.",
+            'This ticket was just scanned. Please wait before scanning again.'
           );
           setIsLoading(false);
           return;
@@ -371,10 +368,10 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
         const result = await retryWithBackoff(async () => {
           // Call the edge function for atomic verification and admission
           const { data: response, error: edgeError } =
-            await supabase.functions.invoke("verify-ticket", {
+            await supabase.functions.invoke('verify-ticket', {
               body: {
                 ticket_identifier: trimmedId,
-                verified_by: "staff_portal",
+                verified_by: 'staff_portal',
                 auto_admit: true, // Always auto-admit valid tickets
               },
             });
@@ -383,8 +380,8 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
             throw new Error(`Edge function error: ${edgeError.message}`);
           }
 
-          if (!response || typeof response !== "object") {
-            throw new Error("Invalid response from verification service");
+          if (!response || typeof response !== 'object') {
+            throw new Error('Invalid response from verification service');
           }
 
           return response;
@@ -414,20 +411,20 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
 
         if (!typedResult.success) {
           // Handle verification failure
-          const errorCode = typedResult.error_code || "UNKNOWN_ERROR";
+          const errorCode = typedResult.error_code || 'UNKNOWN_ERROR';
           const errorMessage =
-            typedResult.error_message || "Verification failed";
+            typedResult.error_message || 'Verification failed';
 
           const friendlyMessage = getUserFriendlyError(errorCode, errorMessage);
           setError(friendlyMessage);
           setErrorCode(errorCode);
 
           // Error feedback - use orange flash for ALREADY_USED, red for other errors
-          if (errorCode === "ALREADY_USED") {
-            setFlashColor("red"); // Still flash to get attention
+          if (errorCode === 'ALREADY_USED') {
+            setFlashColor('red'); // Still flash to get attention
           } else {
             playErrorSound();
-            setFlashColor("red");
+            setFlashColor('red');
           }
           setTimeout(() => setFlashColor(null), 500);
           return;
@@ -440,19 +437,19 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
           typedResult.error_code
         ) {
           const errorCode = typedResult.error_code;
-          const errorMessage = typedResult.error_message || "Admission failed";
+          const errorMessage = typedResult.error_message || 'Admission failed';
 
           const friendlyMessage = getUserFriendlyError(errorCode, errorMessage);
           setError(friendlyMessage);
           setErrorCode(errorCode);
 
-          if (errorCode === "ALREADY_USED") {
+          if (errorCode === 'ALREADY_USED') {
             // For already used tickets, we show them as orange/warning but with ticket data
             // No need for loud error sound, maybe a softer warning sound if we had one
-            setFlashColor("red");
+            setFlashColor('red');
           } else {
             playErrorSound();
-            setFlashColor("red");
+            setFlashColor('red');
           }
           setTimeout(() => setFlashColor(null), 500);
           return;
@@ -466,23 +463,36 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
 
           if (!isRefreshCall) {
             playSuccessSound();
-            setFlashColor("green");
+            setFlashColor('green');
             setTimeout(() => setFlashColor(null), 300);
           }
         }
       } catch (err) {
-        console.error("Verification error:", err);
+        // Skip logging timeout/abort errors to avoid noisy DOMException output
+        const isTimeoutOrAbort =
+          (err instanceof Error &&
+            (err.name === 'TimeoutError' ||
+              err.name === 'AbortError' ||
+              err.message.includes('timeout') ||
+              err.message.includes('aborted'))) ||
+          (typeof err === 'object' &&
+            err !== null &&
+            'code' in err &&
+            (err as { code: number }).code === 23);
+        if (!isTimeoutOrAbort) {
+          console.error('Verification error:', err);
+        }
         // Only set error if this is not a refresh call or if wasJustAdmitted is not true
         if (!isRefreshCall || !wasJustAdmitted) {
           const errorMessage =
-            err instanceof Error ? err.message : "Verification failed";
+            err instanceof Error ? err.message : 'Verification failed';
           const { code, message } = parseErrorMessage(errorMessage);
           const friendlyMessage = getUserFriendlyError(code, message);
           setError(friendlyMessage);
           setErrorCode(code);
 
           playErrorSound();
-          setFlashColor("red");
+          setFlashColor('red');
           setTimeout(() => setFlashColor(null), 500);
         }
       } finally {
@@ -497,7 +507,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
       setTicketData,
       getUserFriendlyError,
       wasJustAdmitted,
-    ],
+    ]
   );
 
   const handlePinSubmit = async (e: React.FormEvent) => {
@@ -508,10 +518,10 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
     try {
       // Call RPC function to verify PIN
       const { data: isValidPin, error: pinError } = await supabase.rpc(
-        "verify_staff_pin",
+        'verify_staff_pin',
         {
           p_pin: pin,
-        },
+        }
       );
 
       if (pinError) {
@@ -527,19 +537,19 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
           storage.set(PIN_CACHE_KEY, cacheData);
         } catch {
           // If storage fails, continue anyway
-          console.warn("Failed to cache PIN, but continuing...");
+          console.warn('Failed to cache PIN, but continuing...');
         }
 
         setIsVerified(true);
         setError(null);
-        setPin("");
+        setPin('');
       } else {
-        setError(t(currentLanguage, "ticketVerification.errors.invalidPin"));
-        setPin("");
+        setError(t(currentLanguage, 'ticketVerification.errors.invalidPin'));
+        setPin('');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "PIN verification failed");
-      setPin("");
+      setError(err instanceof Error ? err.message : 'PIN verification failed');
+      setPin('');
     } finally {
       setIsLoading(false);
     }
@@ -554,44 +564,44 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
   // Get status colors and icons based on ticket state
   const getTicketStatus = () => {
     // Show orange styling for ALREADY_USED errors (ticket is valid but was already admitted)
-    if (error && errorCode === "ALREADY_USED") {
+    if (error && errorCode === 'ALREADY_USED') {
       return {
-        bgColor: "bg-orange-50/30 dark:bg-orange-900/20",
-        borderColor: "border-orange-300 dark:border-orange-700",
-        textColor: "text-orange-800 dark:text-orange-200",
+        bgColor: 'bg-orange-50/30 dark:bg-orange-900/20',
+        borderColor: 'border-orange-300 dark:border-orange-700',
+        textColor: 'text-orange-800 dark:text-orange-200',
         icon: (
           <AlertCircle className="h-8 w-8 text-orange-600 dark:text-orange-400" />
         ),
-        badgeVariant: "secondary" as const,
-        badgeText: t(currentLanguage, "ticketVerification.badges.alreadyUsed"),
-        statusText: t(currentLanguage, "ticketVerification.status.alreadyUsed"),
+        badgeVariant: 'secondary' as const,
+        badgeText: t(currentLanguage, 'ticketVerification.badges.alreadyUsed'),
+        statusText: t(currentLanguage, 'ticketVerification.status.alreadyUsed'),
       };
     }
 
     // Show red styling for actual errors (ticket not found, invalid, unpaid, etc.)
     if (error) {
       return {
-        bgColor: "bg-red-50/30 dark:bg-red-900/20",
-        borderColor: "border-red-300 dark:border-red-700",
-        textColor: "text-red-800 dark:text-red-200",
+        bgColor: 'bg-red-50/30 dark:bg-red-900/20',
+        borderColor: 'border-red-300 dark:border-red-700',
+        textColor: 'text-red-800 dark:text-red-200',
         icon: <XCircle className="h-8 w-8 text-red-600 dark:text-red-400" />,
-        badgeVariant: "destructive" as const,
-        badgeText: t(currentLanguage, "ticketVerification.badges.invalid"),
-        statusText: t(currentLanguage, "ticketVerification.status.invalid"),
+        badgeVariant: 'destructive' as const,
+        badgeText: t(currentLanguage, 'ticketVerification.badges.invalid'),
+        statusText: t(currentLanguage, 'ticketVerification.status.invalid'),
       };
     }
 
     if (ticketData?.remaining_tickets === 0) {
       return {
-        bgColor: "bg-orange-50/30 dark:bg-orange-900/20",
-        borderColor: "border-orange-300 dark:border-orange-700",
-        textColor: "text-orange-800 dark:text-orange-200",
+        bgColor: 'bg-orange-50/30 dark:bg-orange-900/20',
+        borderColor: 'border-orange-300 dark:border-orange-700',
+        textColor: 'text-orange-800 dark:text-orange-200',
         icon: (
           <AlertCircle className="h-8 w-8 text-orange-600 dark:text-orange-400" />
         ),
-        badgeVariant: "secondary" as const,
-        badgeText: t(currentLanguage, "ticketVerification.badges.fullyUsed"),
-        statusText: t(currentLanguage, "ticketVerification.status.fullyUsed"),
+        badgeVariant: 'secondary' as const,
+        badgeText: t(currentLanguage, 'ticketVerification.badges.fullyUsed'),
+        statusText: t(currentLanguage, 'ticketVerification.status.fullyUsed'),
       };
     }
 
@@ -600,43 +610,43 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
       if (remaining <= 0) {
         // Fallback for logic consistency
         return {
-          bgColor: "bg-orange-50/30 dark:bg-orange-900/20",
-          borderColor: "border-orange-300 dark:border-orange-700",
-          textColor: "text-orange-800 dark:text-orange-200",
+          bgColor: 'bg-orange-50/30 dark:bg-orange-900/20',
+          borderColor: 'border-orange-300 dark:border-orange-700',
+          textColor: 'text-orange-800 dark:text-orange-200',
           icon: (
             <AlertCircle className="h-8 w-8 text-orange-600 dark:text-orange-400" />
           ),
-          badgeVariant: "secondary" as const,
-          badgeText: t(currentLanguage, "ticketVerification.badges.fullyUsed"),
-          statusText: t(currentLanguage, "ticketVerification.status.fullyUsed"),
+          badgeVariant: 'secondary' as const,
+          badgeText: t(currentLanguage, 'ticketVerification.badges.fullyUsed'),
+          statusText: t(currentLanguage, 'ticketVerification.status.fullyUsed'),
         };
       }
     } else if (ticketData?.is_used) {
       // Fallback for legacy / simple tickets
       return {
-        bgColor: "bg-orange-50/30 dark:bg-orange-900/20",
-        borderColor: "border-orange-300 dark:border-orange-700",
-        textColor: "text-orange-800 dark:text-orange-200",
+        bgColor: 'bg-orange-50/30 dark:bg-orange-900/20',
+        borderColor: 'border-orange-300 dark:border-orange-700',
+        textColor: 'text-orange-800 dark:text-orange-200',
         icon: (
           <AlertCircle className="h-8 w-8 text-orange-600 dark:text-orange-400" />
         ),
-        badgeVariant: "secondary" as const,
-        badgeText: t(currentLanguage, "ticketVerification.badges.alreadyUsed"),
-        statusText: t(currentLanguage, "ticketVerification.status.alreadyUsed"),
+        badgeVariant: 'secondary' as const,
+        badgeText: t(currentLanguage, 'ticketVerification.badges.alreadyUsed'),
+        statusText: t(currentLanguage, 'ticketVerification.status.alreadyUsed'),
       };
     }
 
     if (ticketData) {
       return {
-        bgColor: "bg-green-50/30 dark:bg-green-900/20",
-        borderColor: "border-green-300 dark:border-green-700",
-        textColor: "text-green-800 dark:text-green-200",
+        bgColor: 'bg-green-50/30 dark:bg-green-900/20',
+        borderColor: 'border-green-300 dark:border-green-700',
+        textColor: 'text-green-800 dark:text-green-200',
         icon: (
           <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
         ),
-        badgeVariant: "default" as const,
-        badgeText: t(currentLanguage, "ticketVerification.badges.valid"),
-        statusText: t(currentLanguage, "ticketVerification.status.valid"),
+        badgeVariant: 'default' as const,
+        badgeText: t(currentLanguage, 'ticketVerification.badges.valid'),
+        statusText: t(currentLanguage, 'ticketVerification.status.valid'),
       };
     }
 
@@ -655,7 +665,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                   <QrCode className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                 </div>
                 <CardTitle className="text-2xl font-bold text-blue-800 dark:text-blue-200">
-                  {t(currentLanguage, "ticketVerification.pageTitle")}
+                  {t(currentLanguage, 'ticketVerification.pageTitle')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -663,7 +673,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                   <p className="text-sm">
                     {t(
                       currentLanguage,
-                      "ticketVerification.noTicketId.description",
+                      'ticketVerification.noTicketId.description'
                     )}
                   </p>
                 </div>
@@ -674,30 +684,30 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                     <h3 className="font-semibold text-blue-800 dark:text-blue-200">
                       {t(
                         currentLanguage,
-                        "ticketVerification.noTicketId.howToVerify.title",
+                        'ticketVerification.noTicketId.howToVerify.title'
                       )}
                     </h3>
                   </div>
                   <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
                     <li>
-                      •{" "}
+                      •{' '}
                       {t(
                         currentLanguage,
-                        "ticketVerification.noTicketId.howToVerify.scanQr",
+                        'ticketVerification.noTicketId.howToVerify.scanQr'
                       )}
                     </li>
                     <li>
-                      •{" "}
+                      •{' '}
                       {t(
                         currentLanguage,
-                        "ticketVerification.noTicketId.howToVerify.enterPin",
+                        'ticketVerification.noTicketId.howToVerify.enterPin'
                       )}
                     </li>
                     <li>
-                      •{" "}
+                      •{' '}
                       {t(
                         currentLanguage,
-                        "ticketVerification.noTicketId.howToVerify.reviewDetails",
+                        'ticketVerification.noTicketId.howToVerify.reviewDetails'
                       )}
                     </li>
                   </ul>
@@ -709,14 +719,14 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                       <Calendar className="w-4 h-4 mr-2" />
                       {t(
                         currentLanguage,
-                        "ticketVerification.noTicketId.backToEvents",
+                        'ticketVerification.noTicketId.backToEvents'
                       )}
                     </Link>
                   </Button>
                 </div>
 
                 <div className="text-center text-xs text-gray-500 dark:text-gray-400">
-                  {t(currentLanguage, "ticketVerification.noTicketId.needHelp")}
+                  {t(currentLanguage, 'ticketVerification.noTicketId.needHelp')}
                 </div>
               </CardContent>
             </Card>
@@ -738,7 +748,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                   <Shield className="w-8 h-8 text-amber-600 dark:text-amber-400" />
                 </div>
                 <CardTitle className="text-2xl font-bold text-amber-800 dark:text-amber-200">
-                  {t(currentLanguage, "ticketVerification.staffVerification")}
+                  {t(currentLanguage, 'ticketVerification.staffVerification')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -746,14 +756,14 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                   <p className="text-lg mb-2">
                     {t(
                       currentLanguage,
-                      "ticketVerification.pinEntry.description",
+                      'ticketVerification.pinEntry.description'
                     )}
                   </p>
                   <p className="text-sm font-mono bg-gray-800 p-2 rounded-sm">
                     {t(
                       currentLanguage,
-                      "ticketVerification.pinEntry.ticketIdLabel",
-                    )}{" "}
+                      'ticketVerification.pinEntry.ticketIdLabel'
+                    )}{' '}
                     {ticketId.substring(0, 8)}...
                   </p>
                 </div>
@@ -763,10 +773,10 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                     type="password"
                     placeholder={t(
                       currentLanguage,
-                      "ticketVerification.pinEntry.pinPlaceholder",
+                      'ticketVerification.pinEntry.pinPlaceholder'
                     )}
                     value={pin}
-                    onChange={(e) => setPin(e.target.value)}
+                    onChange={e => setPin(e.target.value)}
                     maxLength={4}
                     className="text-center text-2xl tracking-widest h-12 rounded-sm bg-background border border-border"
                     disabled={isLoading}
@@ -782,7 +792,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         {t(
                           currentLanguage,
-                          "ticketVerification.pinEntry.verifying",
+                          'ticketVerification.pinEntry.verifying'
                         )}
                       </>
                     ) : (
@@ -790,7 +800,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                         <Shield className="mr-2 h-4 w-4" />
                         {t(
                           currentLanguage,
-                          "ticketVerification.pinEntry.verifyButton",
+                          'ticketVerification.pinEntry.verifyButton'
                         )}
                       </>
                     )}
@@ -806,7 +816,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                 )}
 
                 <div className="text-center text-xs text-gray-500 dark:text-gray-400">
-                  {t(currentLanguage, "ticketVerification.pinEntry.staffOnly")}
+                  {t(currentLanguage, 'ticketVerification.pinEntry.staffOnly')}
                 </div>
               </CardContent>
             </Card>
@@ -824,9 +834,10 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
       {/* Flash Feedback Overlay */}
       {flashColor && (
         <div
-          className={`fixed inset-0 pointer-events-none z-50 ${flashColor === "green" ? "bg-green-500/30" : "bg-red-500/30"
-            }`}
-          style={{ animation: "flash 0.4s ease-out" }}
+          className={`fixed inset-0 pointer-events-none z-50 ${
+            flashColor === 'green' ? 'bg-green-500/30' : 'bg-red-500/30'
+          }`}
+          style={{ animation: 'flash 0.4s ease-out' }}
         />
       )}
 
@@ -840,7 +851,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                 <p>
                   {t(
                     currentLanguage,
-                    "ticketVerification.loading.ticketDetails",
+                    'ticketVerification.loading.ticketDetails'
                   )}
                 </p>
               </CardContent>
@@ -878,43 +889,43 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                         <p className="text-sm text-gray-400">
                           {ticketData.remaining_tickets !== undefined ? (
                             <span>
-                              {ticketData.remaining_tickets}{" "}
+                              {ticketData.remaining_tickets}{' '}
                               {t(
                                 currentLanguage,
-                                "ticketVerification.quantity.remaining",
+                                'ticketVerification.quantity.remaining'
                               )}
                               <span className="mx-2">/</span>
-                              {ticketData.total_quantity || 1}{" "}
+                              {ticketData.total_quantity || 1}{' '}
                               {t(
                                 currentLanguage,
-                                "ticketVerification.quantity.people",
+                                'ticketVerification.quantity.people'
                               )}
                             </span>
                           ) : /* Fallback older logic */
-                            ticketData.use_count !== undefined &&
-                              ticketData.total_quantity ? (
-                              <span>
-                                {ticketData.use_count} /{" "}
-                                {ticketData.total_quantity}{" "}
-                                {t(
-                                  currentLanguage,
-                                  "ticketVerification.quantity.scanned",
-                                )}
-                              </span>
-                            ) : (
-                              <span>
-                                {ticketData.quantity}{" "}
-                                {ticketData.quantity > 1
-                                  ? t(
+                          ticketData.use_count !== undefined &&
+                            ticketData.total_quantity ? (
+                            <span>
+                              {ticketData.use_count} /{' '}
+                              {ticketData.total_quantity}{' '}
+                              {t(
+                                currentLanguage,
+                                'ticketVerification.quantity.scanned'
+                              )}
+                            </span>
+                          ) : (
+                            <span>
+                              {ticketData.quantity}{' '}
+                              {ticketData.quantity > 1
+                                ? t(
                                     currentLanguage,
-                                    "ticketVerification.quantity.people",
+                                    'ticketVerification.quantity.people'
                                   )
-                                  : t(
+                                : t(
                                     currentLanguage,
-                                    "ticketVerification.quantity.person",
+                                    'ticketVerification.quantity.person'
                                   )}
-                              </span>
-                            )}
+                            </span>
+                          )}
                         </p>
                       </div>
                     </div>
@@ -936,7 +947,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                 <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
                   <Ticket className="h-5 w-5" />
                   <CardTitle className="text-lg font-semibold">
-                    {t(currentLanguage, "ticketVerification.eventDetails")}
+                    {t(currentLanguage, 'ticketVerification.eventDetails')}
                   </CardTitle>
                 </div>
               </CardHeader>
@@ -953,12 +964,12 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                   <div className="flex justify-between mt-2 pt-2 border-t border-gray-800 text-sm">
                     <span className="text-gray-400">
                       Quantity: {ticketData.total_quantity || 1} ticket
-                      {(ticketData.total_quantity || 1) > 1 ? "s" : ""}
+                      {(ticketData.total_quantity || 1) > 1 ? 's' : ''}
                     </span>
                     <span className="font-mono">
-                      {new Intl.NumberFormat("fr-FR").format(
-                        ticketData.price_per_ticket,
-                      )}{" "}
+                      {new Intl.NumberFormat('fr-FR').format(
+                        ticketData.price_per_ticket
+                      )}{' '}
                       {ticketData.currency_code} each
                     </span>
                   </div>
@@ -967,10 +978,10 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                       ID: {ticketId.substring(0, 12)}
                     </span>
                     <span className="font-bold">
-                      Total{" "}
-                      {new Intl.NumberFormat("fr-FR").format(
-                        ticketData.total_amount,
-                      )}{" "}
+                      Total{' '}
+                      {new Intl.NumberFormat('fr-FR').format(
+                        ticketData.total_amount
+                      )}{' '}
                       {ticketData.currency_code}
                     </span>
                   </div>

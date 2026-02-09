@@ -17,19 +17,19 @@
   --modal-sides: 1.5rem;
   --top-spacing: 2rem;
   --height-fold: 100vh;
-  --background: #0f0f0f;
+  --background: #1f1f1f;
   --foreground: #ffffff;
-  --card: #1a1a1a;
+  --card: #2b2b2b;
   --card-foreground: #ffffff;
-  --popover: #1a1a1a;
+  --popover: #2b2b2b;
   --popover-foreground: #ffffff;
   --primary: #ffffff;
   --primary-foreground: #0f0f0f;
-  --secondary: #262626;
+  --secondary: #303030;
   --secondary-foreground: #ffffff;
-  --muted: #262626;
+  --muted: #303030;
   --muted-foreground: #a3a3a3;
-  --accent: #262626;
+  --accent: #303030;
   --accent-foreground: #ffffff;
   --destructive: #ff4948;
   --border: #404040;
@@ -119,6 +119,12 @@
   [role='button']:hover {
     opacity: 0.7 !important;
     color: inherit !important;
+  }
+
+  /* Footer links should have smooth color transitions, not opacity changes */
+  footer a:hover,
+  footer button:hover {
+    opacity: 1 !important;
   }
 
   /* Remove borders on hover and focus for non-form elements */

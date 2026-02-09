@@ -85,7 +85,7 @@ function EventCard({ event }: { event: ShowcaseEvent }) {
   };
 
   return (
-    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0 mb-6">
+    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 rounded-sm border-border/40 bg-card p-0">
       <div className="relative rounded-t-sm overflow-hidden">
         <Link
           href={`/events/${event.slug.current}`}
@@ -169,10 +169,12 @@ export function EventShowcase({ events }: EventShowcaseProps) {
 
         {hasEvents ? (
           <>
-            {/* Events Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-              {events.slice(0, 6).map((event: ShowcaseEvent) => (
-                <EventCard key={event._id} event={event} />
+            {/* Single row, horizontal scroll */}
+            <div className="flex gap-6 overflow-x-auto pb-4 mb-12 scrollbar-hide -mx-4 px-4 md:-mx-8 md:px-8">
+              {events.map((event: ShowcaseEvent) => (
+                <div key={event._id} className="flex-shrink-0 w-[280px]">
+                  <EventCard event={event} />
+                </div>
               ))}
             </div>
           </>

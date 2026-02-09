@@ -9,12 +9,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useWishlist } from './wishlist-context';
 import { useCart } from '../cart/cart-context';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import { createPortal } from 'react-dom';
 import { SanityProduct } from '../types';
 
 export default function WishlistModal() {
   const { wishlist, removeFromWishlist, wishlistCount } = useWishlist();
   const { addItem } = useCart();
+  const { button } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -193,7 +195,7 @@ export default function WishlistModal() {
                                       </Button>
                                       <Button
                                         size="sm"
-                                        className="flex-1 bg-teal-800 hover:bg-teal-700 text-teal-200 h-8 text-xs"
+                                        className={`flex-1 ${button.secondary} h-8 text-xs`}
                                         onClick={() =>
                                           handleAddToCart(item.product)
                                         }

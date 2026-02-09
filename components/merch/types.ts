@@ -15,7 +15,6 @@ export interface SanityProduct {
   _id: string;
   name: string;
   slug: string | { current: string };
-  productId?: string;
   mainImage?: string;
   price: number;
   stock?: number;

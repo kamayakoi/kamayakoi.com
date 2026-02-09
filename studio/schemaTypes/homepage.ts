@@ -5,84 +5,22 @@ export default defineType({
   name: 'homepage',
   title: 'Homepage',
   type: 'document',
-  icon: HomeIcon,
+  icon: HomeIcon as any,
   // Uncomment limiter if using @sanity/document-internationalization
   // __experimental_actions: [/* 'create', */ 'update', /* 'delete', */ 'publish'],
   fields: [
-    defineField({
-      name: 'title',
-      title: 'Title',
-      type: 'string',
-      initialValue: 'Homepage',
-      readOnly: true, // Make title read-only for singleton
-    }),
     defineField({
       name: 'defaultShippingCost',
       title: 'Default shipping cost (F CFA)',
       type: 'number',
       description:
-        'Set the default shipping cost for products that do not have a specific shipping fee linked ot the product. Leave at 0 if shipping is free or if the product got a product ID and a shipping fee linked to it.',
+        'Set the default shipping costs. Leave at 0 if shipping is free.',
       initialValue: 3000,
       validation: (Rule) => Rule.min(0),
     }),
     defineField({
-      name: 'musicTracks',
-      title: 'Music Tracks',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            defineField({
-              name: 'title',
-              title: 'Track Title',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'artist',
-              title: 'Artist',
-              type: 'string',
-            }),
-            defineField({
-              name: 'audioFile',
-              title: 'Audio File',
-              type: 'file',
-              options: {accept: 'audio/*'},
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'coverImage',
-              title: 'Cover Image',
-              type: 'image',
-              options: {
-                hotspot: true,
-              },
-            }),
-          ],
-          preview: {
-            select: {
-              title: 'title',
-              artist: 'artist',
-              media: 'coverImage',
-            },
-            prepare({title, artist, media}) {
-              return {
-                title: title || 'Untitled Track',
-                subtitle: artist || 'Unknown Artist',
-                media,
-              }
-            },
-          },
-        },
-      ],
-      validation: (Rule) => Rule.max(10),
-      description:
-        'Upload up to 10 music tracks to play on the homepage. Each track should have a title, audio file, and optionally an artist name and cover image.',
-    }),
-    defineField({
       name: 'promoEvent',
-      title: 'Promoted Event (for Homepage Floating flyer)',
+      title: 'Promoted Event',
       type: 'reference',
       to: [{type: 'event'}],
       description:
@@ -99,22 +37,58 @@ export default defineType({
         },
       ],
       description:
-        'Select events to feature in the hero section carousel. These will appear alongside videos and images.',
+        'Select events to feature in the hero section carousel. These will appear alongside videos and images that visitors can navigate through.',
       validation: (Rule) => Rule.max(5),
     }),
     defineField({
-      name: 'audioPlayerEnabled',
-      title: 'Enable Audio Player',
-      type: 'boolean',
-      initialValue: true,
-      description: 'Show/hide the mini audio player in the header',
+      name: 'primaryButtonColor',
+      title: 'Primary button color',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Red', value: 'red'},
+          {title: 'Rose', value: 'rose'},
+          {title: 'Pink', value: 'pink'},
+          {title: 'Fuchsia', value: 'fuchsia'},
+          {title: 'Purple', value: 'purple'},
+          {title: 'Violet', value: 'violet'},
+          {title: 'Indigo', value: 'indigo'},
+          {title: 'Blue', value: 'blue'},
+          {title: 'Sky', value: 'sky'},
+          {title: 'Cyan', value: 'cyan'},
+          {title: 'Teal', value: 'teal'},
+          {title: 'Emerald', value: 'emerald'},
+          {title: 'Green', value: 'green'},
+          {title: 'Lime', value: 'lime'},
+          {title: 'Yellow', value: 'yellow'},
+          {title: 'Amber', value: 'amber'},
+          {title: 'Orange', value: 'orange'},
+          {title: 'Stone', value: 'stone'},
+          {title: 'Neutral', value: 'neutral'},
+          {title: 'Zinc', value: 'zinc'},
+          {title: 'Gray', value: 'gray'},
+          {title: 'Slate', value: 'slate'},
+        ],
+        layout: 'dropdown',
+      },
+      initialValue: 'teal',
+      description:
+        'Site-wide color for all primary buttons (hero, footer, cart, checkout, etc.). Changing this updates every button color in the site.',
     }),
     defineField({
-      name: 'autoPlayMusic',
-      title: 'Auto-play Music on Page Load',
-      type: 'boolean',
-      initialValue: false,
-      description: 'Automatically start playing music when visitors land on the site',
+      name: 'ticketsButtonLocation',
+      title: 'Tickets Button Location',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Header', value: 'header'},
+          {title: 'Hero Section', value: 'hero'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'header',
+      description:
+        'Choose where to display the tickets button: in the header (next to cart/wishlist) or in the hero section (floating button)',
     }),
     defineField({
       name: 'heroContent',
@@ -217,14 +191,12 @@ export default defineType({
   ],
   preview: {
     select: {
-      title: 'title',
-      firstTrack: 'musicTracks.0.title',
       promoEventTitle: 'promoEvent.title',
       heroItems: 'heroContent',
       featuredEvents: 'featuredEvents',
     },
-    prepare({title, firstTrack, promoEventTitle, heroItems, featuredEvents}) {
-      let previewTitle = title || 'Homepage Settings'
+    prepare({promoEventTitle, heroItems, featuredEvents}) {
+      let previewTitle = 'Homepage'
 
       const counts = []
       if (heroItems?.length) counts.push(`${heroItems.length} hero`)
@@ -234,16 +206,13 @@ export default defineType({
         previewTitle += ` (${counts.join(', ')})`
       }
 
-      if (firstTrack) {
-        previewTitle += ` • ♪ ${firstTrack}`
-      }
       if (promoEventTitle) {
         previewTitle += ` • Promo: ${promoEventTitle}`
       }
 
       return {
         title: previewTitle,
-        media: HomeIcon,
+        media: HomeIcon as any,
       }
     },
   },

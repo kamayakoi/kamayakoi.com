@@ -5,7 +5,16 @@ export const getLocalStorageItem = (key: string): string | null => {
   try {
     return localStorage.getItem(key);
   } catch (error) {
-    console.error(`Error getting item ${key} from localStorage`, error);
+    // Skip logging timeout/abort to avoid noisy DOMException output
+    const isTimeoutOrAbort =
+      error instanceof Error &&
+      (error.name === 'TimeoutError' ||
+        error.name === 'AbortError' ||
+        error.message.includes('timeout') ||
+        error.message.includes('aborted'));
+    if (!isTimeoutOrAbort) {
+      console.error(`Error getting item ${key} from localStorage`, error);
+    }
     return null;
   }
 };
@@ -17,6 +26,15 @@ export const setLocalStorageItem = (key: string, value: string): void => {
   try {
     localStorage.setItem(key, value);
   } catch (error) {
-    console.error(`Error setting item ${key} in localStorage`, error);
+    // Skip logging timeout/abort to avoid noisy DOMException output
+    const isTimeoutOrAbort =
+      error instanceof Error &&
+      (error.name === 'TimeoutError' ||
+        error.name === 'AbortError' ||
+        error.message.includes('timeout') ||
+        error.message.includes('aborted'));
+    if (!isTimeoutOrAbort) {
+      console.error(`Error setting item ${key} in localStorage`, error);
+    }
   }
 };

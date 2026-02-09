@@ -31,13 +31,6 @@ export default {
       validation: (Rule: Rule) => Rule.required(),
     },
     {
-      name: 'productId',
-      title: 'lomi. Product ID',
-      type: 'string',
-      description:
-        'Optional lomi.africa product ID for this product (UUID format). Leave empty if not this product is not tied to a specific lomi product.',
-    },
-    {
       name: 'description',
       title: 'Description',
       type: 'array',
@@ -225,18 +218,6 @@ export default {
       type: 'number',
       group: 'shipping',
       hidden: ({document}: {document: {requiresShipping?: boolean}}) => !document?.requiresShipping,
-    },
-    {
-      name: 'dimensions',
-      title: 'Dimensions (cm)',
-      type: 'object',
-      group: 'shipping',
-      hidden: ({document}: {document: {requiresShipping?: boolean}}) => !document?.requiresShipping,
-      fields: [
-        {name: 'length', title: 'Length', type: 'number'},
-        {name: 'width', title: 'Width', type: 'number'},
-        {name: 'height', title: 'Height', type: 'number'},
-      ],
     },
     {
       name: 'shippingFee',

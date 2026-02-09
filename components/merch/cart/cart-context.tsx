@@ -255,12 +255,51 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (savedCart) {
       try {
         const parsedCart = JSON.parse(savedCart);
-        setCart(parsedCart);
+        // Recalculate totals with current shipping settings if they're already loaded
+        // This handles the case where shipping settings were fetched before cart load
+        if (
+          parsedCart.lines &&
+          parsedCart.lines.length > 0 &&
+          shippingSettings.defaultShippingCost > 0
+        ) {
+          const updatedTotals = updateCartTotals(
+            parsedCart.lines,
+            shippingSettings.defaultShippingCost
+          );
+          setCart({
+            ...parsedCart,
+            ...updatedTotals,
+          });
+        } else {
+          setCart(parsedCart);
+        }
       } catch (error) {
         console.error('Error parsing saved cart:', error);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Recalculate cart totals when shipping settings change
+  // This ensures carts loaded from localStorage get updated shipping costs
+  useEffect(() => {
+    if (cart && cart.lines.length > 0) {
+      const updatedTotals = updateCartTotals(
+        cart.lines,
+        shippingSettings.defaultShippingCost
+      );
+      // Only update if shipping cost actually changed to avoid infinite loops
+      const currentShipping = Number(cart.cost.shippingAmount.amount);
+      const newShipping = Number(updatedTotals.cost.shippingAmount.amount);
+      if (currentShipping !== newShipping) {
+        setCart({
+          ...cart,
+          ...updatedTotals,
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shippingSettings.defaultShippingCost]);
 
   // Save cart to localStorage whenever it changes (async, non-blocking)
   useEffect(() => {

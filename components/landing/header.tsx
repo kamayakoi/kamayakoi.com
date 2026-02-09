@@ -18,8 +18,6 @@ import { useTheme } from '@/lib/contexts/ThemeContext';
 import { t } from '@/lib/i18n/translations';
 import CartModal from '@/components/merch/cart/cart-modal';
 import WishlistModal from '@/components/merch/wishlist/wishlist-modal';
-import MiniAudioPlayer from '@/components/landing/mini-audio-player';
-import { useMusic } from '@/lib/contexts/MusicContext';
 
 interface NavItem {
   nameKey: string;
@@ -30,16 +28,19 @@ interface NavItem {
 
 interface HeaderProps {
   ticketsButtonLocation?: 'header' | 'hero';
+  showBlogInNavigation?: boolean;
+  showArchivesInNavigation?: boolean;
 }
 
 export default function Header({
   ticketsButtonLocation = 'header',
+  showBlogInNavigation = true,
+  showArchivesInNavigation = true,
 }: HeaderProps) {
   const [isScrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const { currentLanguage } = useTranslation();
   const { button } = useTheme();
-  const { audioPlayerEnabled } = useMusic();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,8 +61,12 @@ export default function Header({
     { nameKey: 'header.nav.home', path: '/' },
     { nameKey: 'header.nav.events', path: '/events' },
     { nameKey: 'header.nav.room', path: '/artists' },
-    { nameKey: 'header.nav.blog', path: '/stories' },
-    { nameKey: 'header.nav.gallery', path: '/archives' },
+    ...(showBlogInNavigation
+      ? [{ nameKey: 'header.nav.blog', path: '/stories' }]
+      : []),
+    ...(showArchivesInNavigation
+      ? [{ nameKey: 'header.nav.gallery', path: '/archives' }]
+      : []),
     { nameKey: 'header.nav.shop', path: '/merch' },
   ];
 
@@ -69,19 +74,9 @@ export default function Header({
 
   return (
     <header className={`${styles.header} ${isScrolled ? styles.scrolled : ''}`}>
-      {/* Mini Audio Player - positioned relative to header */}
-      {audioPlayerEnabled && (
-        <div className="absolute top-[14px] left-[19px] md:top-[12px] md:left-4 z-60 pointer-events-auto">
-          <MiniAudioPlayer />
-        </div>
-      )}
-
       <div className={styles.headerContent}>
-        {/* Empty space for both mobile and desktop - adjusted for MiniAudioPlayer */}
-        <div
-          className="flex items-center"
-          style={{ width: audioPlayerEnabled ? '140px' : '20px' }}
-        ></div>
+        {/* Empty space for both mobile and desktop */}
+        <div className="flex items-center" style={{ width: '20px' }}></div>
 
         <nav className="hidden md:flex items-center gap-6">
           {navItems.map((item: NavItem) => {

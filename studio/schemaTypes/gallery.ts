@@ -7,16 +7,21 @@ export default defineType({
   fields: [
     defineField({
       name: 'title',
-      title: 'Title (Category)',
+      title: 'Title',
       type: 'string',
-      description: 'This title acts as the category/group name for all images below (e.g., "Event November", "Live Shows", "Backstage")',
+      description:
+        'This title acts as the category/group name for all images you are going to add below (e.g., "Event November", "Kama December", "Backstage")',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'images',
       title: 'Images',
       type: 'array',
-      description: '💡 Tip: Click "Add item" and select multiple images at once (hold Ctrl/Cmd or Shift), or drag and drop multiple files directly here. You can upload 100+ images in one go!',
+      description:
+        'Click "Add item" and select multiple images at once, or drag and drop multiple files directly here. You can upload 100+ images in one go!',
+      options: {
+        layout: 'grid',
+      },
       of: [
         defineArrayMember({
           type: 'image',

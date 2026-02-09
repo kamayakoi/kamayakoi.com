@@ -19,7 +19,8 @@ export interface SanityProduct {
   price: number;
   stock?: number;
   description?: string | PortableTextBlock[];
-  shippingFee?: number;
+  shippingFee?: number; // deprecated: shipping is now global, kept for backwards compatibility
+  requiresShipping?: boolean;
   categories?: Array<{
     title: string;
     slug: string;
@@ -38,5 +39,14 @@ export interface SanityProduct {
     };
     alt?: string;
     caption?: string;
+  }>;
+  colors?: Array<{
+    name: string;
+    image?: string;
+    available: boolean;
+  }>;
+  sizes?: Array<{
+    name: string;
+    available: boolean;
   }>;
 }

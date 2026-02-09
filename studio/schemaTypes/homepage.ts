@@ -13,8 +13,7 @@ export default defineType({
       name: 'defaultShippingCost',
       title: 'Default shipping cost (F CFA)',
       type: 'number',
-      description:
-        'Set the default shipping costs. Leave at 0 if shipping is free.',
+      description: 'Set the default shipping costs. Leave at 0 if shipping is free.',
       initialValue: 3000,
       validation: (Rule) => Rule.min(0),
     }),
@@ -89,6 +88,20 @@ export default defineType({
       initialValue: 'header',
       description:
         'Choose where to display the tickets button: in the header (next to cart/wishlist) or in the hero section (floating button)',
+    }),
+    defineField({
+      name: 'showBlogInNavigation',
+      title: 'Show Blog in Navigation',
+      type: 'boolean',
+      initialValue: true,
+      description: 'Show or hide the blog/stories page link in the navigation menu',
+    }),
+    defineField({
+      name: 'showArchivesInNavigation',
+      title: 'Show Archives in Navigation',
+      type: 'boolean',
+      initialValue: true,
+      description: 'Show or hide the archives/gallery page link in the navigation menu',
     }),
     defineField({
       name: 'heroContent',

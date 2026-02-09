@@ -1,5 +1,5 @@
 import {defineType, defineField} from 'sanity'
-import { UserIcon } from '@sanity/icons'
+import {UserIcon} from '@sanity/icons'
 
 export default defineType({
   name: 'artist',

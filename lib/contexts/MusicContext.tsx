@@ -330,7 +330,6 @@ export function MusicProvider({
         onLoadedMetadata={handleLoadedMetadata}
         className="hidden"
         preload="metadata"
-        playsInline
       />
     </MusicContext.Provider>
   );

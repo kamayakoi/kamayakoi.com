@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     // Revalidate specific tags
     if (tags && Array.isArray(tags)) {
       tags.forEach((tag: string) => {
-        revalidateTag(tag);
+        revalidateTag(tag, {});
         console.log(`Revalidated tag: ${tag}`);
       });
     }
@@ -23,12 +23,12 @@ export async function POST(request: NextRequest) {
 
     // Default revalidation for common content
     if (!tags && !paths) {
-      revalidateTag('events');
-      revalidateTag('posts');
-      revalidateTag('products');
-      revalidateTag('homepage');
-      revalidateTag('artists');
-      revalidateTag('media');
+      revalidateTag('events', {});
+      revalidateTag('posts', {});
+      revalidateTag('products', {});
+      revalidateTag('homepage', {});
+      revalidateTag('artists', {});
+      revalidateTag('media', {});
       revalidatePath('/');
       console.log('Revalidated all common content');
     }

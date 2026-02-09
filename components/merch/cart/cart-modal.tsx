@@ -38,6 +38,10 @@ const CartItems = ({
 
   if (!cart) return <></>;
 
+  const hasShippableItems = cart.lines.some(
+    line => line.product.requiresShipping !== false
+  );
+
   return (
     <div className="flex flex-col justify-between h-full overflow-hidden">
       <CartContainer className="flex justify-between items-center px-2 text-sm text-muted-foreground mb-4">
@@ -73,17 +77,19 @@ const CartItems = ({
       <CartContainer>
         <div className="py-3 text-sm shrink-0">
           <CartContainer className="space-y-2">
-            <div className="flex justify-between items-center py-3">
-              <p className="font-medium text-foreground">
-                {t(currentLanguage, 'cartModal.shipping')}
-              </p>
-              <p className="text-muted-foreground">
-                {cart.cost.shippingAmount &&
-                Number(cart.cost.shippingAmount.amount) > 0
-                  ? `${Number(cart.cost.shippingAmount.amount).toLocaleString('fr-FR')} F CFA`
-                  : t(currentLanguage, 'cartModal.calculatedAtCheckout')}
-              </p>
-            </div>
+            {hasShippableItems && (
+              <div className="flex justify-between items-center py-3">
+                <p className="font-medium text-foreground">
+                  {t(currentLanguage, 'cartModal.shipping')}
+                </p>
+                <p className="text-muted-foreground">
+                  {cart.cost.shippingAmount &&
+                  Number(cart.cost.shippingAmount.amount) > 0
+                    ? `${Number(cart.cost.shippingAmount.amount).toLocaleString('fr-FR')} F CFA`
+                    : t(currentLanguage, 'cartModal.calculatedAtCheckout')}
+                </p>
+              </div>
+            )}
             <div className="flex justify-between items-center py-2">
               <p className="text-lg font-bold text-foreground">
                 {t(currentLanguage, 'cartModal.total')}
@@ -110,6 +116,32 @@ const serializeCart = (cart: { lines: { id: string; quantity: number }[] }) => {
   );
 };
 
+// Shared state to prevent duplicate cart opens across multiple CartModal instances
+let lastCartOpenTime = 0;
+let cartOpenLock: string | null = null;
+let activePortalInstance: string | null = null;
+const CART_OPEN_DEBOUNCE_MS = 500; // Prevent duplicate opens within 500ms
+const CART_PORTAL_ID = 'cart-modal-portal';
+
+// Helper to check if a cart drawer is already visible in the DOM
+const isCartDrawerVisible = (): boolean => {
+  if (typeof document === 'undefined') return false;
+  // Check for the cart portal container
+  const portal = document.getElementById(CART_PORTAL_ID);
+  if (portal) {
+    const style = window.getComputedStyle(portal);
+    const rect = portal.getBoundingClientRect();
+    return (
+      style.display !== 'none' &&
+      style.visibility !== 'hidden' &&
+      style.opacity !== '0' &&
+      rect.width > 0 &&
+      rect.height > 0
+    );
+  }
+  return false;
+};
+
 export default function CartModal() {
   const { cart } = useCart();
   const { currentLanguage } = useTranslation();
@@ -117,18 +149,48 @@ export default function CartModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
+  const [shouldRenderPortal, setShouldRenderPortal] = useState(false);
   const serializedCart = useRef(cart ? serializeCart(cart) : undefined);
+  const instanceIdRef = useRef<string>(
+    `cart-${Math.random().toString(36).substring(7)}`
+  );
+  const portalContainerRef = useRef<HTMLElement | null>(null);
 
   // Ensure component is mounted before rendering portal
   useEffect(() => {
     setIsMounted(true);
-    return () => setIsMounted(false);
+    // Create portal container if it doesn't exist
+    if (typeof document !== 'undefined') {
+      let portalContainer = document.getElementById(CART_PORTAL_ID);
+      if (!portalContainer) {
+        portalContainer = document.createElement('div');
+        portalContainer.id = CART_PORTAL_ID;
+        document.body.appendChild(portalContainer);
+      }
+      portalContainerRef.current = portalContainer;
+    }
+    // Capture instanceId for cleanup
+    const instanceId = instanceIdRef.current;
+    return () => {
+      setIsMounted(false);
+      // Release lock when this instance unmounts
+      if (cartOpenLock === instanceId) {
+        cartOpenLock = null;
+      }
+      if (activePortalInstance === instanceId) {
+        activePortalInstance = null;
+      }
+    };
   }, []);
 
   useEffect(() => {
     if (!cart) return;
 
     const newSerializedCart = serializeCart(cart);
+    const previousCartLinesCount = serializedCart.current
+      ? JSON.parse(serializedCart.current).length
+      : 0;
+    const newCartLinesCount = cart.lines.length;
 
     // Initialize on first load
     if (serializedCart.current === undefined) {
@@ -136,19 +198,65 @@ export default function CartModal() {
       return;
     }
 
-    // Only auto-open cart if items were added (not just quantity changes) and cart has items
+    // Only auto-open cart if items were ADDED (not removed or quantity changed) and cart has items
+    const itemsWereAdded = newCartLinesCount > previousCartLinesCount;
+
     if (
       serializedCart.current !== newSerializedCart &&
-      cart.totalQuantity > 0
+      cart.totalQuantity > 0 &&
+      itemsWereAdded // Only auto-open when items are added, not removed
     ) {
       serializedCart.current = newSerializedCart;
-      // Open cart instantly when items are added
-      setIsOpen(true);
+
+      // Prevent duplicate opens: use atomic lock check-and-set
+      const now = Date.now();
+      const timeSinceLastOpen = now - lastCartOpenTime;
+      const drawerAlreadyVisible = isCartDrawerVisible();
+      const canOpen =
+        timeSinceLastOpen > CART_OPEN_DEBOUNCE_MS &&
+        (cartOpenLock === null || cartOpenLock === instanceIdRef.current) &&
+        !isOpen &&
+        !drawerAlreadyVisible;
+
+      if (canOpen) {
+        // Atomically claim the lock and portal ownership
+        cartOpenLock = instanceIdRef.current;
+        activePortalInstance = instanceIdRef.current;
+        lastCartOpenTime = now;
+        // Open cart instantly when items are added
+        setShouldRenderPortal(true);
+        setIsOpen(true);
+        // Release lock after debounce period (but keep portal ownership until closed)
+        setTimeout(() => {
+          if (cartOpenLock === instanceIdRef.current) {
+            cartOpenLock = null;
+          }
+        }, CART_OPEN_DEBOUNCE_MS);
+      }
     } else {
       // Update the serialized cart reference even if we don't open
       serializedCart.current = newSerializedCart;
     }
-  }, [cart]);
+  }, [cart, isOpen]);
+
+  // Sync lock with isOpen state - release lock when closed
+  // Note: We don't clear activePortalInstance here immediately to allow exit animation
+  useEffect(() => {
+    if (!isOpen) {
+      if (cartOpenLock === instanceIdRef.current) {
+        cartOpenLock = null;
+      }
+      // Don't clear activePortalInstance here - let closeCart handle it with delay
+    } else {
+      // Ensure portal ownership when opening (backup in case openCart wasn't called)
+      if (
+        activePortalInstance === null ||
+        activePortalInstance === instanceIdRef.current
+      ) {
+        activePortalInstance = instanceIdRef.current;
+      }
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
@@ -166,10 +274,29 @@ export default function CartModal() {
     };
   }, [isOpen]);
 
-  const openCart = () => setIsOpen(true);
+  const openCart = () => {
+    // For manual opens (button click), always allow opening
+    // Claim both lock and portal ownership
+    cartOpenLock = instanceIdRef.current;
+    activePortalInstance = instanceIdRef.current;
+    setShouldRenderPortal(true);
+    setIsOpen(true);
+  };
+
   const closeCart = () => {
     setIsOpen(false);
     setShowPurchaseForm(false);
+    // Release lock when closing
+    if (cartOpenLock === instanceIdRef.current) {
+      cartOpenLock = null;
+    }
+    // Delay releasing portal ownership to allow exit animation to complete (300ms)
+    setTimeout(() => {
+      if (activePortalInstance === instanceIdRef.current) {
+        activePortalInstance = null;
+        setShouldRenderPortal(false);
+      }
+    }, 300); // Match the animation duration
   };
 
   const renderCartContent = () => {
@@ -238,13 +365,18 @@ export default function CartModal() {
       </Button>
 
       {/* Render modal at document body level using portal */}
+      {/* Only render portal if this instance owns the portal and should render */}
       {isMounted &&
+        shouldRenderPortal &&
+        activePortalInstance === instanceIdRef.current &&
+        portalContainerRef.current &&
         createPortal(
           <AnimatePresence>
             {isOpen && (
               <>
                 {/* Backdrop */}
                 <motion.div
+                  key="cart-backdrop"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -263,6 +395,7 @@ export default function CartModal() {
 
                 {/* Panel */}
                 <motion.div
+                  key="cart-panel"
                   initial={{ x: '100%' }}
                   animate={{ x: 0 }}
                   exit={{ x: '100%' }}
@@ -295,7 +428,7 @@ export default function CartModal() {
               </>
             )}
           </AnimatePresence>,
-          document.body
+          portalContainerRef.current
         )}
     </>
   );

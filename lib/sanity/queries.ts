@@ -419,9 +419,15 @@ export async function getProductBySlug(slug: string) {
       },
       "price": basePrice,
       "stock": baseStock,
-      manageVariants,
-      variantOptions,
-      variantInventory,
+      "colors": colors[]{
+        name,
+        "image": image.asset->url,
+        available
+      },
+      "sizes": sizes[]{
+        name,
+        available
+      },
       "categories": categories[]->{
         title,
         "slug": slug.current
@@ -684,6 +690,29 @@ export const getHomepagePromoEvent =
     return result?.promoEvent ?? null;
   };
 
+// ================================= Navigation Settings ================================
+export interface NavigationSettings {
+  showBlogInNavigation?: boolean;
+  showArchivesInNavigation?: boolean;
+}
+
+export const getNavigationSettings =
+  async (): Promise<NavigationSettings> => {
+    const query = `*[_type == "homepage"][0] {
+      showBlogInNavigation,
+      showArchivesInNavigation,
+    }`;
+    const result = await client.fetch<NavigationSettings>(
+      query,
+      {},
+      getCacheConfig(['homepage', 'navigation'])
+    );
+    return {
+      showBlogInNavigation: result?.showBlogInNavigation ?? true,
+      showArchivesInNavigation: result?.showArchivesInNavigation ?? true,
+    };
+  };
+
 // ================================= Homepage Content ================================
 
 // Interface for homepage hero content
@@ -707,6 +736,8 @@ export interface HomepageHeroItem {
 // Interface for homepage data
 export interface HomepageData {
   ticketsButtonLocation?: 'header' | 'hero';
+  showBlogInNavigation?: boolean;
+  showArchivesInNavigation?: boolean;
   heroContent?: HomepageHeroItem[];
   featuredEvents?: {
     _id: string;
@@ -735,6 +766,8 @@ export interface HomepageData {
 export const getHomepageContent = async (): Promise<HomepageData | null> => {
   const query = `*[_type == "homepage"][0] {
     ticketsButtonLocation,
+    showBlogInNavigation,
+    showArchivesInNavigation,
     heroContent[]{
       _key,
       title,
@@ -800,25 +833,23 @@ export const getArchiveImages = async (): Promise<ArchiveImageData[]> => {
     }
   }`;
 
-  const galleries = await client.fetch<Array<{
-    _id: string;
-    title: string;
-    images: Array<{
-      _key: string;
-      imageUrl: string;
-      width?: number;
-      height?: number;
-    }>;
-  }>>(
-    query,
-    {},
-    getCacheConfig(['archives'])
-  );
+  const galleries = await client.fetch<
+    Array<{
+      _id: string;
+      title: string;
+      images: Array<{
+        _key: string;
+        imageUrl: string;
+        width?: number;
+        height?: number;
+      }>;
+    }>
+  >(query, {}, getCacheConfig(['archives']));
 
   // Flatten the structure: each image becomes a separate entry with title as category
   const flattened: ArchiveImageData[] = [];
-  galleries.forEach((gallery) => {
-    gallery.images.forEach((image) => {
+  galleries.forEach(gallery => {
+    gallery.images.forEach(image => {
       flattened.push({
         _id: `${gallery._id}-${image._key}`, // Use gallery _id and image _key for unique ID
         imageUrl: image.imageUrl,

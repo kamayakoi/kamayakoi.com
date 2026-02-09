@@ -81,87 +81,114 @@ export default {
       validation: (Rule: Rule) => Rule.required().min(0),
     },
     {
-      name: 'manageVariants',
-      title: 'Manage variants (e.g., Size, Color)',
-      type: 'boolean',
-      group: 'variants',
-      initialValue: false,
-    },
-    {
-      name: 'variantOptions',
-      title: 'Variant options',
+      name: 'colors',
+      title: 'Colors',
       type: 'array',
       group: 'variants',
-      hidden: ({document}: {document: {manageVariants?: boolean}}) => !document?.manageVariants,
+      description: 'Available colors for this product',
+      initialValue: () => [
+        {name: 'Noir', available: true},
+        {name: 'Blanc', available: true},
+      ],
       of: [
         {
-          name: 'option',
-          title: 'Type',
           type: 'object',
           fields: [
             {
               name: 'name',
-              title: 'Option name (e.g., Size, Color)',
+              title: 'Color name',
               type: 'string',
+              description:
+                'The color name automatically determines the color display. Use CSS color names (e.g., black, white, red, blue, noir, blanc) or "mix" for a half-white, half-black display. French and English color names are supported. Examples: noir, blanc, black, white, red, blue, mix, etc.',
               validation: (Rule: Rule) => Rule.required(),
             },
             {
-              name: 'values',
-              title: 'Option values (e.g., S, M, L or Red, Blue, Green)',
-              type: 'array',
-              of: [{type: 'string'}],
-              validation: (Rule: Rule) => Rule.required().min(1),
+              name: 'image',
+              title: 'Color image',
+              type: 'image',
+              description: 'Image to show when this color is selected',
+              options: {
+                hotspot: true,
+              },
+            },
+            {
+              name: 'available',
+              title: 'Available',
+              type: 'boolean',
+              description: 'Whether this color is currently available',
+              initialValue: true,
             },
           ],
+          preview: {
+            select: {
+              name: 'name',
+              available: 'available',
+            },
+            prepare({name, available}: {name: string; available: boolean}) {
+              return {
+                title: name || 'Unnamed Color',
+                subtitle: available ? 'Available' : 'Unavailable',
+              }
+            },
+          },
         },
       ],
     },
     {
-      name: 'variantInventory',
-      title: 'Variant & Pricing',
+      name: 'sizes',
+      title: 'Product sizes',
       type: 'array',
       group: 'variants',
       description:
-        'Define stock and specific pricing for each combination of variants. If empty, base price and stock are used.',
-      hidden: ({document}: {document: {manageVariants?: boolean}}) => !document?.manageVariants,
+        'Select sizes for this product. Mark as available if in stock, or uncheck to mark as out of stock (rupture). Sizes not listed are not available.',
+      initialValue: () => [
+        {name: 'S', available: true},
+        {name: 'M', available: true},
+        {name: 'L', available: true},
+        {name: 'XL', available: true},
+      ],
       of: [
         {
-          name: 'variantEntry',
-          title: 'Variant combination',
           type: 'object',
           fields: [
             {
-              name: 'variantName',
-              title: 'Variant combination (e.g., Medium / Red)',
+              name: 'name',
+              title: 'Size name',
               type: 'string',
+              options: {
+                list: [
+                  {title: 'XXS', value: 'XXS'},
+                  {title: 'XS', value: 'XS'},
+                  {title: 'S', value: 'S'},
+                  {title: 'M', value: 'M'},
+                  {title: 'L', value: 'L'},
+                  {title: 'XL', value: 'XL'},
+                  {title: 'XXL', value: 'XXL'},
+                  {title: '2XL', value: '2XL'},
+                ],
+              },
               validation: (Rule: Rule) => Rule.required(),
-              description: 'Auto-generated or manually set',
             },
             {
-              name: 'sku',
-              title: 'V-ID',
-              type: 'string',
-              description: 'Optional unique identifier for this specific variant',
-            },
-            {
-              name: 'price',
-              title: 'Price',
-              type: 'number',
-              description: 'Leave blank to use base price',
-            },
-            {
-              name: 'stock',
-              title: 'Stock',
-              type: 'number',
-              validation: (Rule: Rule) => Rule.required().integer().min(0),
+              name: 'available',
+              title: 'Available (in stock)',
+              type: 'boolean',
+              description:
+                'Check if this size is in stock. Uncheck to mark as out of stock (rupture de stock) - it will appear with a vertical slash.',
+              initialValue: true,
             },
           ],
           preview: {
-            select: {title: 'variantName', sku: 'sku', price: 'price', stock: 'stock'},
-            prepare: (value: any) => ({
-              title: `${value.title} (SKU: ${value.sku})`,
-              subtitle: `${value.price ? value.price + ' XOF' : 'Base Price'} - ${value.stock} in stock`,
-            }),
+            select: {
+              name: 'name',
+              available: 'available',
+            },
+            prepare({name, available}: {name: string; available: boolean}) {
+              return {
+                title: name || 'Unnamed Size',
+                subtitle: available ? 'In stock' : 'Out of stock (rupture)',
+              }
+            },
           },
         },
       ],
@@ -172,7 +199,6 @@ export default {
       type: 'number',
       group: 'variants',
       description: 'Number of items available if not using variants. Set 0 for Sold Out.',
-      hidden: ({document}: {document: {manageVariants?: boolean}}) => document?.manageVariants,
       validation: (Rule: Rule) => Rule.integer().min(0),
     },
     {
@@ -180,7 +206,6 @@ export default {
       title: 'Product ID (if not managing variants)',
       type: 'string',
       group: 'variants',
-      hidden: ({document}: {document: {manageVariants?: boolean}}) => document?.manageVariants,
       validation: (Rule: Rule) => Rule.required(),
     },
     {
@@ -219,16 +244,6 @@ export default {
       group: 'shipping',
       hidden: ({document}: {document: {requiresShipping?: boolean}}) => !document?.requiresShipping,
     },
-    {
-      name: 'shippingFee',
-      title: 'Shipping fee (F CFA)',
-      type: 'number',
-      group: 'shipping',
-      description:
-        'Optional: Set a specific shipping fee for this product. If not set, the default shipping cost will be used.',
-      hidden: ({document}: {document: {requiresShipping?: boolean}}) => !document?.requiresShipping,
-      validation: (Rule: Rule) => Rule.min(0),
-    },
   ],
   preview: {
     select: {
@@ -236,13 +251,10 @@ export default {
       price: 'basePrice',
       stock: 'baseStock',
       media: 'images.0.asset',
-      manageVariants: 'manageVariants',
     },
     prepare: (value: any) => {
       let subtitle = `${value.price} XOF`
-      if (value.manageVariants) {
-        subtitle += ' - Manages Variants'
-      } else if (value.stock !== undefined && value.stock !== null) {
+      if (value.stock !== undefined && value.stock !== null) {
         subtitle += ` - ${value.stock} in stock`
       } else {
         subtitle += ` - Stock Undefined`

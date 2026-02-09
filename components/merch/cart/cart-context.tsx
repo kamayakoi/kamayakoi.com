@@ -80,21 +80,18 @@ function updateCartTotals(
   defaultShippingCost: number
 ): Pick<Cart, 'totalQuantity' | 'cost'> {
   const totalQuantity = lines.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotalAmount = lines.reduce(
-    (sum, item) => sum + Number(item.cost.totalAmount.amount),
-    0
-  );
+  const subtotalAmount = lines.reduce((sum, item) => {
+    return sum + Number(item.cost.totalAmount.amount);
+  }, 0);
   const currencyCode = 'XOF';
 
-  // Calculate shipping: sum of individual fees, or default if not specified
+  // Global shipping: apply one default shipping cost per order
+  // if there is at least one shippable item in the cart.
+  const hasShippableItems = lines.some(
+    item => item.product.requiresShipping !== false
+  );
   const shippingAmount =
-    subtotalAmount > 0
-      ? lines.reduce((sum, item) => {
-          // Use product's shippingFee if it exists, otherwise use the default
-          const fee = item.product.shippingFee ?? defaultShippingCost;
-          return sum + fee * item.quantity; // Multiply by quantity
-        }, 0)
-      : 0;
+    subtotalAmount > 0 && hasShippableItems ? defaultShippingCost : 0;
 
   const totalAmount = subtotalAmount + shippingAmount;
 

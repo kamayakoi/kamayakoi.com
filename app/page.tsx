@@ -29,7 +29,11 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground relative">
-      <Header ticketsButtonLocation={homepageData?.ticketsButtonLocation} />
+      <Header
+        ticketsButtonLocation={homepageData?.ticketsButtonLocation}
+        showBlogInNavigation={homepageData?.showBlogInNavigation}
+        showArchivesInNavigation={homepageData?.showArchivesInNavigation}
+      />
       {/* Use HeroSection with combined videos and featured events */}
       <HeroSection
         sanityHeroItems={homepageData?.heroContent}

@@ -18,7 +18,9 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from '@/components/ui/carousel';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { normalizeColorName } from '@/lib/utils/color';
+import { cn } from '@/lib/actions/utils';
 
 interface ProductImageCarouselProps {
   images: Array<{ url: string }>;
@@ -63,24 +65,109 @@ interface ProductDetailContentProps {
   product: SanityProduct;
 }
 
+// Helper function to capitalize first letter of color name for display
+const capitalizeColorName = (name: string): string => {
+  if (!name) return '';
+  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+};
+
 function ProductDetail({ product }: ProductDetailContentProps) {
   const { currentLanguage } = useTranslation();
   const { button } = useTheme();
   const [quantity, setQuantity] = useState(1);
+  const [selectedColor, setSelectedColor] = useState(
+    product.colors?.[0]?.name || ''
+  );
+  const [selectedSize, setSelectedSize] = useState(
+    product.sizes?.find(s => s.available)?.name || ''
+  );
 
   const { addItem } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
-  const allImages = product.images || [];
-  const carouselImages = allImages
-    .map(image => image.asset?.url)
-    .filter((url): url is string => !!url)
-    .map(url => ({ url }));
+  // Get color image if available, otherwise use main images
+  // Make it reactive so it updates when selectedColor changes
+  const displayImages = useMemo(() => {
+    const allImages = product.images || [];
+    const selectedColorObj = product.colors?.find(
+      c => c.name === selectedColor
+    );
+    if (selectedColorObj?.image) {
+      // If color has an image, use it as the main image
+      // Filter out duplicates - remove the color image from product images if it exists there
+      const colorImageUrl = selectedColorObj.image;
 
+      const mainImages = allImages
+        .map(image => image.asset?.url)
+        .filter((url): url is string => !!url && url !== colorImageUrl)
+        .map(url => ({ url }));
+
+      return colorImageUrl
+        ? [{ url: colorImageUrl }, ...mainImages]
+        : mainImages;
+    }
+    return allImages
+      .map(image => image.asset?.url)
+      .filter((url): url is string => !!url)
+      .map(url => ({ url }));
+  }, [selectedColor, product.colors, product.images]);
+
+  const carouselImages = displayImages;
   const mainImage = product.mainImage || carouselImages[0]?.url;
 
-  const handleAddToCart = () => {
-    addItem(product);
+  // Check if sizes are required and if a valid size is selected
+  const hasAvailableSizes = useMemo(() => {
+    if (!product.sizes || product.sizes.length === 0) {
+      return true; // No sizes required, so it's valid
+    }
+    // Check if there are any available sizes
+    return product.sizes.some(size => size.available);
+  }, [product.sizes]);
+
+  const hasValidSizeSelection = useMemo(() => {
+    if (!product.sizes || product.sizes.length === 0) {
+      return true; // No sizes required, so selection is valid
+    }
+    // If sizes exist, we need a selected size that is available
+    if (!selectedSize) return false;
+    const selectedSizeObj = product.sizes.find(s => s.name === selectedSize);
+    return selectedSizeObj?.available === true;
+  }, [product.sizes, selectedSize]);
+
+  // Product is out of stock if explicitly marked as soldOut OR if sizes exist but none are available
+  const isOutOfStock = useMemo(() => {
+    if (product.stock === 0) return true;
+    // If product has sizes but none are available, it's out of stock
+    if (product.sizes && product.sizes.length > 0 && !hasAvailableSizes) {
+      return true;
+    }
+    return false;
+  }, [product.stock, product.sizes, hasAvailableSizes]);
+
+  // Buttons should be disabled if sizes are required but none are available or none selected
+  const isAddToCartDisabled =
+    isOutOfStock || !hasAvailableSizes || !hasValidSizeSelection;
+
+  // Reset selected image when color changes
+  const handleColorChange = (colorName: string) => {
+    setSelectedColor(colorName);
+  };
+
+  const handleAddToCart = async () => {
+    // Prevent adding to cart if sizes are required but none are available or selected
+    if (product.sizes && product.sizes.length > 0) {
+      if (!hasAvailableSizes || !hasValidSizeSelection) {
+        // Could add toast notification here for error
+        return;
+      }
+    }
+
+    // Note: Currently the cart context doesn't support variants/quantity parameters
+    // For now, we'll add the item multiple times based on quantity
+    // TODO: Update cart context to support variants (size/color) and quantity parameter
+    for (let i = 0; i < quantity; i++) {
+      await addItem(product);
+    }
     // Could add toast notification here
   };
 
@@ -176,6 +263,118 @@ function ProductDetail({ product }: ProductDetailContentProps) {
               </div>
             </div>
 
+            {/* Color Selector */}
+            {product.colors && product.colors.length > 1 && (
+              <motion.div
+                className="mb-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+              >
+                <div className="flex gap-2 mb-3">
+                  {product.colors.map((color, index) => {
+                    const normalizedColor = normalizeColorName(color.name);
+                    const isMix = normalizedColor === 'mix';
+                    const isWhite =
+                      normalizedColor === 'white' ||
+                      color.name.toLowerCase() === 'blanc';
+
+                    return (
+                      <button
+                        key={`${color.name}-${index}`}
+                        onClick={() => handleColorChange(color.name)}
+                        disabled={!color.available}
+                        className={cn(
+                          'relative h-8 w-8 rounded-full border-2 transition-all overflow-hidden',
+                          selectedColor === color.name
+                            ? isWhite
+                              ? 'border-gray-900'
+                              : 'border-gray-900'
+                            : isWhite
+                              ? 'border-gray-300'
+                              : 'border-gray-200',
+                          !color.available && 'opacity-40',
+                          isMix && 'bg-white'
+                        )}
+                        style={
+                          !isMix
+                            ? { backgroundColor: normalizedColor }
+                            : undefined
+                        }
+                        aria-label={color.name}
+                      >
+                        {isMix && (
+                          <>
+                            {/* Half white, half black circle */}
+                            <div className="absolute inset-0 bg-white" />
+                            <div
+                              className="absolute inset-0 bg-black"
+                              style={{
+                                clipPath:
+                                  'polygon(0 0, 50% 0, 50% 100%, 0 100%)',
+                              }}
+                            />
+                          </>
+                        )}
+                        {!color.available && (
+                          <span className="absolute inset-0 flex items-center justify-center z-10">
+                            <span className="h-px w-8 rotate-45 bg-gray-500" />
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                  <span>
+                    {capitalizeColorName(
+                      selectedColor || product.colors[0]?.name || ''
+                    )}
+                  </span>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Size Selector */}
+            {product.sizes && product.sizes.length > 0 && (
+              <motion.div
+                className="mb-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+              >
+                <p className="text-sm font-medium text-foreground mb-3">
+                  {t(currentLanguage, 'merchPage.productDetail.size') || 'Size'}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {product.sizes.map((size, index) => (
+                    <button
+                      key={`${size.name}-${index}`}
+                      onClick={() =>
+                        size.available && setSelectedSize(size.name)
+                      }
+                      disabled={!size.available}
+                      className={cn(
+                        'relative flex h-10 min-w-[48px] items-center justify-center rounded-sm border px-4 text-sm font-medium transition-colors',
+                        selectedSize === size.name
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-border bg-card text-foreground hover:border-primary',
+                        !size.available &&
+                          'cursor-not-allowed border-border text-muted-foreground opacity-50'
+                      )}
+                    >
+                      {size.name}
+                      {!size.available && (
+                        <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <span className="h-px w-full rotate-45 bg-gray-500" />
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             {/* Product Description */}
             {product.description && (
               <motion.div
@@ -191,12 +390,16 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                   {product.stock !== undefined && (
                     <div
                       className={`px-4 py-2 rounded-sm text-sm font-medium ${
-                        typeof product.stock === 'number' && product.stock > 0
+                        typeof product.stock === 'number' &&
+                        product.stock > 0 &&
+                        !isOutOfStock
                           ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                           : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                       }`}
                     >
-                      {typeof product.stock === 'number' && product.stock > 0
+                      {typeof product.stock === 'number' &&
+                      product.stock > 0 &&
+                      !isOutOfStock
                         ? `${product.stock} in stock`
                         : 'Out of Stock'}
                     </div>
@@ -223,7 +426,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
               transition={{ duration: 0.5, delay: 0.6 }}
             >
               {/* In Stock Actions */}
-              {product.stock !== 0 && (
+              {!isOutOfStock && (
                 <>
                   {/* Quantity Selector */}
                   <div className="bg-card/30 backdrop-blur-sm rounded-sm p-6 border border-border/20">
@@ -284,8 +487,22 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                     className={`w-full ${button.secondaryBorder} h-14 text-lg font-semibold rounded-sm`}
                     size="lg"
                     onClick={handleAddToCart}
+                    disabled={isAddToCartDisabled}
                   >
-                    {t(currentLanguage, 'merchPage.productDetail.addToCart')}
+                    {isOutOfStock
+                      ? t(
+                          currentLanguage,
+                          'merchPage.productDetail.outOfStock'
+                        ) || 'Out of Stock'
+                      : !hasAvailableSizes || !hasValidSizeSelection
+                        ? t(
+                            currentLanguage,
+                            'merchPage.productDetail.noSizeAvailable'
+                          ) || 'No size available'
+                        : t(
+                            currentLanguage,
+                            'merchPage.productDetail.addToCart'
+                          )}
                   </Button>
                 </>
               )}

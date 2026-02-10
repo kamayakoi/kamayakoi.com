@@ -845,17 +845,19 @@ export const getArchiveImages = async (): Promise<ArchiveImageData[]> => {
     }>
   >(query, {}, getCacheConfig(['archives']));
 
-  // Flatten the structure: each image becomes a separate entry with title as category
+  // Flatten: each image gets gallery title as category (section title in UI)
   const flattened: ArchiveImageData[] = [];
   galleries.forEach(gallery => {
     gallery.images.forEach(image => {
-      flattened.push({
-        _id: `${gallery._id}-${image._key}`, // Use gallery _id and image _key for unique ID
-        imageUrl: image.imageUrl,
-        width: image.width,
-        height: image.height,
-        category: gallery.title, // Use title as category
-      });
+      if (image.imageUrl) {
+        flattened.push({
+          _id: `${gallery._id}-${image._key}`,
+          imageUrl: image.imageUrl,
+          width: image.width,
+          height: image.height,
+          category: gallery.title,
+        });
+      }
     });
   });
 

@@ -18,8 +18,7 @@ const supabase = createClient(supabaseUrl || '', supabaseServiceRoleKey || '');
 
 // lomi. API Config
 const LOMI_SECRET_KEY = Deno.env.get('LOMI_SECRET_KEY');
-const LOMI_API_URL =
-  Deno.env.get('LOMI_API_URL') || 'https://api.lomi.africa';
+const LOMI_API_URL = Deno.env.get('LOMI_API_URL') || 'https://api.lomi.africa';
 const APP_BASE_URL = (
   Deno.env.get('APP_BASE_URL') || 'http://localhost:3000'
 ).replace(/\/$/, ''); // Remove trailing slash
@@ -159,7 +158,9 @@ serve(async (req: Request) => {
     let currencyCode = (payload.currencyCode || 'XOF').toUpperCase();
     const validCurrencies = ['XOF', 'EUR', 'USD'];
     if (!validCurrencies.includes(currencyCode)) {
-      console.warn(`Invalid currency code "${currencyCode}", defaulting to XOF`);
+      console.warn(
+        `Invalid currency code "${currencyCode}", defaulting to XOF`
+      );
       currencyCode = 'XOF';
     }
 

@@ -13,6 +13,23 @@ function uint8ArrayToBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
+// Treat TBA / placeholders as empty so we don't show them in email or PDF
+const PLACEHOLDER_VALUES = [
+  'tba',
+  'to be announced',
+  'soon',
+  'secret location',
+];
+function normalizeEventDetail(
+  val: string | null | undefined
+): string {
+  const s = (val || '').trim();
+  if (!s) return '';
+  const lower = s.toLowerCase();
+  if (PLACEHOLDER_VALUES.includes(lower)) return '';
+  return s;
+}
+
 interface IndividualTicket {
   ticket_identifier: string;
 }
@@ -27,7 +44,7 @@ const resendApiKey = Deno.env.get('RESEND_API_KEY');
 const fromEmail = Deno.env.get('FROM_EMAIL') || 'tickets@updates.kamayakoi.com';
 const APP_BASE_URL =
   Deno.env.get('APP_BASE_URL') || 'https://www.kamayakoi.com';
-const defaultLogoUrl = `${supabaseUrl}/storage/v1/object/public/assets/logo.png`;
+const defaultLogoUrl = 'https://www.kamayakoi.com/icon.png';
 
 // --- Environment Validation ---
 if (!supabaseUrl || supabaseUrl.trim() === '') {
@@ -45,6 +62,13 @@ if (!supabaseServiceRoleKey || supabaseServiceRoleKey.trim() === '') {
 if (!resendApiKey || resendApiKey.trim() === '') {
   console.error('RESEND_API_KEY environment variable is missing or empty');
   throw new Error('RESEND_API_KEY environment variable is required');
+}
+
+// Validate API key format (Resend API keys typically start with "re_")
+if (!resendApiKey.startsWith('re_')) {
+  console.warn(
+    'RESEND_API_KEY does not appear to be in the correct format (should start with "re_"). This may cause authentication errors.'
+  );
 }
 
 // --- Main Serve Function ---
@@ -190,12 +214,12 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Event data for ticket
+    // Event data for ticket (empty string when not set or placeholder like TBA)
     const eventDataForTicket = {
       eventName: purchaseData.event_title || 'Amazing Event',
-      eventDate: purchaseData.event_date_text || 'To Be Announced',
-      eventTime: purchaseData.event_time_text || 'Soon',
-      eventVenue: purchaseData.event_venue_name || 'Secret Location',
+      eventDate: normalizeEventDetail(purchaseData.event_date_text),
+      eventTime: normalizeEventDetail(purchaseData.event_time_text),
+      eventVenue: normalizeEventDetail(purchaseData.event_venue_name),
     };
 
     // Calculate actual ticket quantity for bundles
@@ -467,59 +491,65 @@ Deno.serve(async (req: Request) => {
         });
         y -= 12;
 
-        page.drawText('DATE', {
-          x: 10,
-          y: y,
-          size: 7,
-          font: helveticaBold,
-          color: blackColor,
-        });
-        const dateWidth = helvetica.widthOfTextAtSize(ticketProps.eventDate, 7);
-        page.drawText(`${ticketProps.eventDate}`, {
-          x: rightAlignX - dateWidth,
-          y: y,
-          size: 7,
-          font: helvetica,
-          color: blackColor,
-        });
-        y -= 12;
+        if (ticketProps.eventDate) {
+          page.drawText('DATE', {
+            x: 10,
+            y: y,
+            size: 7,
+            font: helveticaBold,
+            color: blackColor,
+          });
+          const dateWidth = helvetica.widthOfTextAtSize(ticketProps.eventDate, 7);
+          page.drawText(`${ticketProps.eventDate}`, {
+            x: rightAlignX - dateWidth,
+            y: y,
+            size: 7,
+            font: helvetica,
+            color: blackColor,
+          });
+          y -= 12;
+        }
 
-        page.drawText('HEURE', {
-          x: 10,
-          y: y,
-          size: 7,
-          font: helveticaBold,
-          color: blackColor,
-        });
-        const timeWidth = helvetica.widthOfTextAtSize(ticketProps.eventTime, 7);
-        page.drawText(`${ticketProps.eventTime}`, {
-          x: rightAlignX - timeWidth,
-          y: y,
-          size: 7,
-          font: helvetica,
-          color: blackColor,
-        });
-        y -= 12;
+        if (ticketProps.eventTime) {
+          page.drawText('HEURE', {
+            x: 10,
+            y: y,
+            size: 7,
+            font: helveticaBold,
+            color: blackColor,
+          });
+          const timeWidth = helvetica.widthOfTextAtSize(ticketProps.eventTime, 7);
+          page.drawText(`${ticketProps.eventTime}`, {
+            x: rightAlignX - timeWidth,
+            y: y,
+            size: 7,
+            font: helvetica,
+            color: blackColor,
+          });
+          y -= 12;
+        }
 
-        page.drawText('LIEU', {
-          x: 10,
-          y: y,
-          size: 7,
-          font: helveticaBold,
-          color: blackColor,
-        });
-        const venueWidth = helvetica.widthOfTextAtSize(
-          ticketProps.eventVenue,
-          7
-        );
-        page.drawText(ticketProps.eventVenue, {
-          x: rightAlignX - venueWidth,
-          y: y,
-          size: 7,
-          font: helvetica,
-          color: blackColor,
-        });
-        y -= 12;
+        if (ticketProps.eventVenue) {
+          page.drawText('LIEU', {
+            x: 10,
+            y: y,
+            size: 7,
+            font: helveticaBold,
+            color: blackColor,
+          });
+          const venueWidth = helvetica.widthOfTextAtSize(
+            ticketProps.eventVenue,
+            7
+          );
+          page.drawText(ticketProps.eventVenue, {
+            x: rightAlignX - venueWidth,
+            y: y,
+            size: 7,
+            font: helvetica,
+            color: blackColor,
+          });
+          y -= 12;
+        }
 
         page.drawText('TITULAIRE', {
           x: 10,
@@ -714,65 +744,71 @@ Deno.serve(async (req: Request) => {
       });
       y -= 12;
 
-      page.drawText('DATE', {
-        x: 10,
-        y: y,
-        size: 7,
-        font: helveticaBold,
-        color: blackColor,
-      });
-      const legacyDateWidth = helvetica.widthOfTextAtSize(
-        ticketProps.eventDate,
-        7
-      );
-      page.drawText(`${ticketProps.eventDate}`, {
-        x: legacyRightAlignX - legacyDateWidth,
-        y: y,
-        size: 7,
-        font: helvetica,
-        color: blackColor,
-      });
-      y -= 12;
+      if (ticketProps.eventDate) {
+        page.drawText('DATE', {
+          x: 10,
+          y: y,
+          size: 7,
+          font: helveticaBold,
+          color: blackColor,
+        });
+        const legacyDateWidth = helvetica.widthOfTextAtSize(
+          ticketProps.eventDate,
+          7
+        );
+        page.drawText(`${ticketProps.eventDate}`, {
+          x: legacyRightAlignX - legacyDateWidth,
+          y: y,
+          size: 7,
+          font: helvetica,
+          color: blackColor,
+        });
+        y -= 12;
+      }
 
-      page.drawText('HEURE', {
-        x: 10,
-        y: y,
-        size: 7,
-        font: helveticaBold,
-        color: blackColor,
-      });
-      const legacyTimeWidth = helvetica.widthOfTextAtSize(
-        ticketProps.eventTime,
-        7
-      );
-      page.drawText(`${ticketProps.eventTime}`, {
-        x: legacyRightAlignX - legacyTimeWidth,
-        y: y,
-        size: 7,
-        font: helvetica,
-        color: blackColor,
-      });
-      y -= 12;
+      if (ticketProps.eventTime) {
+        page.drawText('HEURE', {
+          x: 10,
+          y: y,
+          size: 7,
+          font: helveticaBold,
+          color: blackColor,
+        });
+        const legacyTimeWidth = helvetica.widthOfTextAtSize(
+          ticketProps.eventTime,
+          7
+        );
+        page.drawText(`${ticketProps.eventTime}`, {
+          x: legacyRightAlignX - legacyTimeWidth,
+          y: y,
+          size: 7,
+          font: helvetica,
+          color: blackColor,
+        });
+        y -= 12;
+      }
 
-      page.drawText('LIEU', {
-        x: 10,
-        y: y,
-        size: 7,
-        font: helveticaBold,
-        color: blackColor,
-      });
-      const legacyVenueWidth = helvetica.widthOfTextAtSize(
-        ticketProps.eventVenue,
-        7
-      );
-      page.drawText(ticketProps.eventVenue, {
-        x: legacyRightAlignX - legacyVenueWidth,
-        y: y,
-        size: 7,
-        font: helvetica,
-        color: blackColor,
-      });
-      y -= 12;
+      if (ticketProps.eventVenue) {
+        page.drawText('LIEU', {
+          x: 10,
+          y: y,
+          size: 7,
+          font: helveticaBold,
+          color: blackColor,
+        });
+        const legacyVenueWidth = helvetica.widthOfTextAtSize(
+          ticketProps.eventVenue,
+          7
+        );
+        page.drawText(ticketProps.eventVenue, {
+          x: legacyRightAlignX - legacyVenueWidth,
+          y: y,
+          size: 7,
+          font: helvetica,
+          color: blackColor,
+        });
+        y -= 12;
+      }
 
       page.drawText('TITULAIRE', {
         x: 10,
@@ -911,57 +947,23 @@ Deno.serve(async (req: Request) => {
     let logoSrc = defaultLogoUrl; // Always have a fallback URL
 
     try {
-      console.log('Fetching logo from Supabase Storage...');
+      console.log('Fetching logo from website...');
 
-      // First, try to get the image from Supabase Storage
-      const { data: logoData, error: logoError } = await supabase.storage
-        .from('assets')
-        .download('logo.png');
-
-      if (logoData && !logoError) {
-        try {
-          const logoBytes = new Uint8Array(await logoData.arrayBuffer());
-          const logoBase64 = uint8ArrayToBase64(logoBytes);
-          logoSrc = `data:image/png;base64,${logoBase64}`;
-          console.log(
-            'Successfully fetched and encoded logo from Supabase Storage.'
-          );
-        } catch (conversionError) {
-          console.warn(
-            'Failed to convert Supabase logo to Base64, using URL fallback:',
-            conversionError
-          );
-        }
+      // Fetch logo from the website URL
+      const logoResponse = await fetch(defaultLogoUrl);
+      if (logoResponse.ok) {
+        const logoBytes = new Uint8Array(await logoResponse.arrayBuffer());
+        const logoBase64 = uint8ArrayToBase64(logoBytes);
+        logoSrc = `data:image/png;base64,${logoBase64}`;
+        console.log('Successfully fetched and encoded logo from website.');
       } else {
         console.warn(
-          'Logo not found in Supabase Storage, trying direct URL fetch...'
+          `Failed to fetch logo (status: ${logoResponse.status}), using URL as fallback.`
         );
-
-        // Fallback: try direct fetch from the URL
-        try {
-          const logoResponse = await fetch(defaultLogoUrl);
-          if (logoResponse.ok) {
-            const logoBytes = new Uint8Array(await logoResponse.arrayBuffer());
-            const logoBase64 = uint8ArrayToBase64(logoBytes);
-            logoSrc = `data:image/png;base64,${logoBase64}`;
-            console.log('Successfully fetched logo via direct URL.');
-          } else {
-            console.warn(
-              `Failed to fetch logo (status: ${logoResponse.status}), using URL as final fallback.`
-            );
-          }
-        } catch (urlFetchError) {
-          console.warn(
-            'Failed to fetch logo via URL, using URL as final fallback:',
-            urlFetchError
-          );
-        }
       }
     } catch (logoError) {
-      // This catch block should NEVER be reached due to nested try-catches above
-      // But it's here as a final safety net
-      console.error(
-        'Unexpected error in logo fetching, using URL fallback:',
+      console.warn(
+        'Failed to fetch logo, using URL as fallback:',
         logoError
       );
     }
@@ -987,7 +989,7 @@ Deno.serve(async (req: Request) => {
           </div>
           
           <div style="padding: 30px;">
-            <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;"><strong>${ticketProps.eventName} ${ticketProps.eventVenue}</strong></h1>
+            <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;"><strong>${ticketProps.eventName}${ticketProps.eventVenue ? ` — ${ticketProps.eventVenue}` : ''}</strong></h1>
 
           <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
             Bonjour ${ticketProps.firstName}, votre billet pour ${ticketProps.eventName} est prêt et vous attend.
@@ -1005,11 +1007,13 @@ Deno.serve(async (req: Request) => {
             <p style="margin: 8px 0; font-size: 14px;">
               <strong>Référence :</strong> ${ticketProps.ticketIdentifier}
             </p>
-
-            <p style="margin: 8px 0; font-size: 14px;">
-              <strong>Date :</strong> ${ticketProps.eventDate} à ${ticketProps.eventTime}
+${ticketProps.eventDate || ticketProps.eventTime ? `            <p style="margin: 8px 0; font-size: 14px;">
+              <strong>${ticketProps.eventDate ? 'Date :' : 'Heure :'}</strong> ${ticketProps.eventDate && ticketProps.eventTime ? `${ticketProps.eventDate} à ${ticketProps.eventTime}` : (ticketProps.eventDate || ticketProps.eventTime)}
             </p>
-          </div>
+` : ''}${ticketProps.eventVenue ? `            <p style="margin: 8px 0; font-size: 14px;">
+              <strong>Lieu :</strong> ${ticketProps.eventVenue}
+            </p>
+` : ''}          </div>
 
           <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
             ${
@@ -1049,19 +1053,42 @@ Deno.serve(async (req: Request) => {
         emailError instanceof Error
           ? emailError.message
           : JSON.stringify(emailError);
+      
+      // Parse error details for better error messages
+      let errorDetails = resendErrorMsg;
+      let errorHint = '';
+      
+      try {
+        const errorObj = typeof emailError === 'object' ? emailError : JSON.parse(resendErrorMsg);
+        if (errorObj.statusCode === 401 || errorObj.message?.includes('API key is invalid')) {
+          errorHint = ' The Resend API key appears to be invalid or expired. Please check your RESEND_API_KEY environment variable in Supabase dashboard.';
+        } else if (errorObj.statusCode === 403) {
+          errorHint = ' The Resend API key does not have the required permissions.';
+        } else if (errorObj.statusCode === 429) {
+          errorHint = ' Rate limit exceeded. Please try again later.';
+        }
+      } catch {
+        // If parsing fails, use the original error message
+      }
+      
       console.error(
         `Resend error for purchase ${purchaseIdFromRequest}:`,
         resendErrorMsg
       );
+      if (errorHint) {
+        console.error(`Error hint:${errorHint}`);
+      }
+      
       await supabase.rpc('update_email_dispatch_status', {
         p_purchase_id: purchaseIdFromRequest,
         p_email_dispatch_status: 'DISPATCH_FAILED',
-        p_email_dispatch_error: `Resend API error: ${resendErrorMsg}`,
+        p_email_dispatch_error: `Resend API error: ${resendErrorMsg}${errorHint}`,
       });
       return new Response(
         JSON.stringify({
           error: 'Failed to send email',
           details: resendErrorMsg,
+          hint: errorHint || undefined,
         }),
         {
           status: 500,

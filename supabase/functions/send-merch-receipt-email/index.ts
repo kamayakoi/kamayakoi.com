@@ -24,12 +24,19 @@ const fromEmail = Deno.env.get('FROM_EMAIL') || 'orders@updates.kamayakoi.com';
 const APP_BASE_URL = (
   Deno.env.get('APP_BASE_URL') || 'https://www.kamayakoi.com'
 ).replace(/\/$/, '');
-const defaultLogoUrl = `${supabaseUrl}/storage/v1/object/public/assets/logo.png`;
+const defaultLogoUrl = 'https://www.kamayakoi.com/icon.png';
 
 // --- Environment Validation ---
 if (!supabaseUrl || !supabaseServiceRoleKey || !resendApiKey) {
   throw new Error(
     'Missing required environment variables (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY)'
+  );
+}
+
+// Validate API key format (Resend API keys typically start with "re_")
+if (!resendApiKey.startsWith('re_')) {
+  console.warn(
+    'RESEND_API_KEY does not appear to be in the correct format (should start with "re_"). This may cause authentication errors.'
   );
 }
 
@@ -111,13 +118,17 @@ serve(async (req: Request) => {
     // --- 3. Fetch Logo ---
     let logoSrc = defaultLogoUrl;
     try {
-      const { data: logoData, error: logoError } = await supabase.storage
-        .from('assets')
-        .download('logo.png');
-      if (logoData && !logoError) {
-        const logoBytes = new Uint8Array(await logoData.arrayBuffer());
+      console.log('Fetching logo from website...');
+      const logoResponse = await fetch(defaultLogoUrl);
+      if (logoResponse.ok) {
+        const logoBytes = new Uint8Array(await logoResponse.arrayBuffer());
         const logoBase64 = uint8ArrayToBase64(logoBytes);
         logoSrc = `data:image/png;base64,${logoBase64}`;
+        console.log('Successfully fetched and encoded logo from website.');
+      } else {
+        console.warn(
+          `Failed to fetch logo (status: ${logoResponse.status}), using URL as fallback.`
+        );
       }
     } catch (logoError) {
       console.warn(
@@ -202,7 +213,31 @@ serve(async (req: Request) => {
     });
 
     if (emailError) {
-      throw emailError; // Will be caught by the main try-catch
+      // Parse error details for better error messages
+      let errorDetails = emailError instanceof Error 
+        ? emailError.message 
+        : JSON.stringify(emailError);
+      let errorHint = '';
+      
+      try {
+        const errorObj = typeof emailError === 'object' ? emailError : JSON.parse(errorDetails);
+        if (errorObj.statusCode === 401 || errorObj.message?.includes('API key is invalid')) {
+          errorHint = ' The Resend API key appears to be invalid or expired. Please check your RESEND_API_KEY environment variable in Supabase dashboard.';
+        } else if (errorObj.statusCode === 403) {
+          errorHint = ' The Resend API key does not have the required permissions.';
+        } else if (errorObj.statusCode === 429) {
+          errorHint = ' Rate limit exceeded. Please try again later.';
+        }
+      } catch {
+        // If parsing fails, use the original error message
+      }
+      
+      console.error('Resend error:', errorDetails);
+      if (errorHint) {
+        console.error(`Error hint:${errorHint}`);
+      }
+      
+      throw new Error(`Failed to send email: ${errorDetails}${errorHint}`);
     }
 
     // --- 5. Update Purchase Records on Success ---
@@ -229,8 +264,16 @@ serve(async (req: Request) => {
       e
     );
 
+    // Check if it's a Resend API error
+    const isResendError = errorMessage.includes('Resend') || 
+                         errorMessage.includes('API key') ||
+                         errorMessage.includes('401');
+
     return new Response(
-      JSON.stringify({ error: 'Internal server error', details: errorMessage }),
+      JSON.stringify({ 
+        error: isResendError ? 'Email service error' : 'Internal server error', 
+        details: errorMessage 
+      }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

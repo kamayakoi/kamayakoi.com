@@ -214,29 +214,38 @@ serve(async (req: Request) => {
 
     if (emailError) {
       // Parse error details for better error messages
-      let errorDetails = emailError instanceof Error 
-        ? emailError.message 
-        : JSON.stringify(emailError);
+      let errorDetails =
+        emailError instanceof Error
+          ? emailError.message
+          : JSON.stringify(emailError);
       let errorHint = '';
-      
+
       try {
-        const errorObj = typeof emailError === 'object' ? emailError : JSON.parse(errorDetails);
-        if (errorObj.statusCode === 401 || errorObj.message?.includes('API key is invalid')) {
-          errorHint = ' The Resend API key appears to be invalid or expired. Please check your RESEND_API_KEY environment variable in Supabase dashboard.';
+        const errorObj =
+          typeof emailError === 'object'
+            ? emailError
+            : JSON.parse(errorDetails);
+        if (
+          errorObj.statusCode === 401 ||
+          errorObj.message?.includes('API key is invalid')
+        ) {
+          errorHint =
+            ' The Resend API key appears to be invalid or expired. Please check your RESEND_API_KEY environment variable in Supabase dashboard.';
         } else if (errorObj.statusCode === 403) {
-          errorHint = ' The Resend API key does not have the required permissions.';
+          errorHint =
+            ' The Resend API key does not have the required permissions.';
         } else if (errorObj.statusCode === 429) {
           errorHint = ' Rate limit exceeded. Please try again later.';
         }
       } catch {
         // If parsing fails, use the original error message
       }
-      
+
       console.error('Resend error:', errorDetails);
       if (errorHint) {
         console.error(`Error hint:${errorHint}`);
       }
-      
+
       throw new Error(`Failed to send email: ${errorDetails}${errorHint}`);
     }
 
@@ -265,14 +274,15 @@ serve(async (req: Request) => {
     );
 
     // Check if it's a Resend API error
-    const isResendError = errorMessage.includes('Resend') || 
-                         errorMessage.includes('API key') ||
-                         errorMessage.includes('401');
+    const isResendError =
+      errorMessage.includes('Resend') ||
+      errorMessage.includes('API key') ||
+      errorMessage.includes('401');
 
     return new Response(
-      JSON.stringify({ 
-        error: isResendError ? 'Email service error' : 'Internal server error', 
-        details: errorMessage 
+      JSON.stringify({
+        error: isResendError ? 'Email service error' : 'Internal server error',
+        details: errorMessage,
       }),
       {
         status: 500,

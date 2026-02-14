@@ -32,8 +32,10 @@ if (!supabaseServiceRoleKey || supabaseServiceRoleKey.trim() === '') {
   throw new Error('SUPABASE_SERVICE_ROLE_KEY environment variable is required');
 }
 
-// The edge function's single-threaded nature prevents race conditions
-// No additional locking mechanism needed
+// Race condition prevention strategy:
+// When auto_admit=true, we call mark_ticket_used FIRST (which holds a FOR UPDATE row lock),
+// then verify_ticket to get display data. This prevents the TOCTOU race where two simultaneous
+// scans both see the ticket as unused.
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -69,8 +71,127 @@ Deno.serve(async (req: Request) => {
 
     const trimmedId = ticket_identifier.trim();
 
-    // Step 1: Verify the ticket (atomic operation)
-    console.log(`Verifying ticket: ${trimmedId}`);
+    // When auto_admit is true, we use a mark-first-verify-second strategy
+    // to prevent race conditions on simultaneous scans.
+    if (auto_admit) {
+      console.log(`Auto-admit flow for ticket: ${trimmedId}`);
+
+      // Step 1: Try to mark the ticket as used FIRST (this holds a row lock via FOR UPDATE)
+      const { data: admitResult, error: admitError } = await supabase.rpc(
+        'mark_ticket_used',
+        {
+          p_ticket_identifier: trimmedId,
+          p_verified_by: verified_by || 'edge_function',
+        }
+      );
+
+      if (admitError) {
+        console.error('Admission error:', admitError);
+        // If mark fails entirely, the ticket may not exist - try verify for better error
+        const { data: ticketData } = await supabase.rpc('verify_ticket', {
+          p_ticket_identifier: trimmedId,
+        });
+
+        return new Response(
+          JSON.stringify({
+            success: false,
+            ticket_data: ticketData?.[0] || null,
+            admitted: false,
+            error_code: 'ADMISSION_FAILED',
+            error_message: admitError.message,
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+
+      // Step 2: Now get the full ticket data for display (after the lock is released)
+      const { data: ticketData, error: verifyError } = await supabase.rpc(
+        'verify_ticket',
+        { p_ticket_identifier: trimmedId }
+      );
+
+      if (verifyError || !ticketData || ticketData.length === 0) {
+        console.error('Verification error after mark:', verifyError);
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error_code: 'TICKET_NOT_FOUND',
+            error_message: 'Ticket not found in system',
+          }),
+          {
+            status: 404,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+
+      const ticket = ticketData[0];
+      const isLegacyTicket =
+        ticket.use_count !== undefined &&
+        ticket.use_count !== null &&
+        ticket.total_quantity !== undefined;
+
+      // Calculate remaining tickets from the now-updated data
+      let remainingTickets = 0;
+      if (isLegacyTicket) {
+        remainingTickets = Math.max(
+          0,
+          ticket.total_quantity - ticket.use_count
+        );
+      } else {
+        remainingTickets = ticket.is_used ? 0 : 1;
+      }
+
+      const ticketWithRemaining = {
+        ...ticket,
+        remaining_tickets: remainingTickets,
+      };
+
+      // Handle the result of mark_ticket_used
+      if (admitResult === 'SUCCESS') {
+        console.log(
+          `Ticket successfully admitted: ${trimmedId} (${ticket.customer_name})`
+        );
+        return new Response(
+          JSON.stringify({
+            success: true,
+            ticket_data: ticketWithRemaining,
+            admitted: true,
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+
+      // DUPLICATE_SCAN or ALREADY_USED or NOT_FOUND
+      console.log(`Admission result: ${admitResult} for ${trimmedId}`);
+      return new Response(
+        JSON.stringify({
+          success: true, // Ticket exists and was verified
+          ticket_data: ticketWithRemaining,
+          admitted: false,
+          error_code: admitResult,
+          error_message:
+            admitResult === 'ALREADY_USED'
+              ? 'Ticket has already been used for entry'
+              : admitResult === 'DUPLICATE_SCAN'
+                ? 'Ticket scanned again too quickly'
+                : admitResult === 'NOT_FOUND'
+                  ? 'Ticket not found in system'
+                  : 'Admission failed',
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    // Non-auto-admit flow: verify only (no race condition concern since we're just reading)
+    console.log(`Verify-only flow for ticket: ${trimmedId}`);
 
     const { data: ticketData, error: verifyError } = await supabase.rpc(
       'verify_ticket',
@@ -107,22 +228,11 @@ Deno.serve(async (req: Request) => {
     }
 
     const ticket = ticketData[0];
-    console.log(
-      `Ticket verified: ${ticket.customer_name} - ${ticket.event_title}`
-    );
-
-    // Step 2: Check if ticket can be admitted
-    // Fix: Ensure strict checking for use_count vs total_quantity for legacy tickets
     const isLegacyTicket =
       ticket.use_count !== undefined &&
       ticket.use_count !== null &&
       ticket.total_quantity !== undefined;
 
-    const canBeAdmitted = isLegacyTicket
-      ? ticket.use_count < ticket.total_quantity
-      : !ticket.is_used;
-
-    // Calculate remaining tickets
     let remainingTickets = 0;
     if (isLegacyTicket) {
       remainingTickets = Math.max(0, ticket.total_quantity - ticket.use_count);
@@ -130,103 +240,21 @@ Deno.serve(async (req: Request) => {
       remainingTickets = ticket.is_used ? 0 : 1;
     }
 
-    // Add remaining tickets to ticket data for response
     const ticketWithRemaining = {
       ...ticket,
       remaining_tickets: remainingTickets,
     };
 
-    if (!canBeAdmitted) {
-      console.log(`Ticket cannot be admitted: already used`);
-      return new Response(
-        JSON.stringify({
-          success: true, // Verification succeeded (ticket exists and is valid)
-          ticket_data: ticketWithRemaining,
-          admitted: false,
-          error_code: 'ALREADY_USED',
-          error_message: ticket.is_used
-            ? 'Ticket has already been used for entry'
-            : 'Legacy ticket fully used (all admissions consumed)',
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
-    }
-
-    // Step 3: Auto-admit if requested and possible
-    let admitted = false;
-    if (auto_admit && canBeAdmitted) {
-      console.log(`Auto-admitting ticket: ${trimmedId}`);
-
-      const { data: admitResult, error: admitError } = await supabase.rpc(
-        'mark_ticket_used',
-        {
-          p_ticket_identifier: trimmedId,
-          p_verified_by: verified_by || 'edge_function',
-        }
-      );
-
-      if (admitError) {
-        console.error('Admission error:', admitError);
-        return new Response(
-          JSON.stringify({
-            success: true, // Verification succeeded, but admission failed
-            ticket_data: ticketWithRemaining,
-            admitted: false,
-            error_code: 'ADMISSION_FAILED',
-            error_message: admitError.message,
-          }),
-          {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
+    return new Response(
+      JSON.stringify({
+        success: true,
+        ticket_data: ticketWithRemaining,
+        admitted: false,
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
-
-      if (admitResult === 'SUCCESS') {
-        admitted = true;
-        // Decrement remaining tickets for the response since we just used one
-        ticketWithRemaining.remaining_tickets = Math.max(
-          0,
-          ticketWithRemaining.remaining_tickets - 1
-        );
-        console.log(`Ticket successfully admitted: ${trimmedId}`);
-      } else {
-        console.log(`Admission rejected: ${admitResult}`);
-        return new Response(
-          JSON.stringify({
-            success: true,
-            ticket_data: ticketWithRemaining,
-            admitted: false,
-            error_code: admitResult,
-            error_message:
-              admitResult === 'ALREADY_USED'
-                ? 'Ticket has already been used for entry'
-                : admitResult === 'DUPLICATE_SCAN'
-                  ? 'Ticket scanned again too quickly'
-                  : 'Admission failed',
-          }),
-          {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
-      }
-    }
-
-    // Success response
-    const response: TicketVerificationResponse = {
-      success: true,
-      ticket_data: ticketWithRemaining,
-      admitted: admitted,
-    };
-
-    console.log(
-      `Verification complete: success=${response.success}, admitted=${admitted}`
     );
-
-    return new Response(JSON.stringify(response), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
   } catch (error) {
     console.error('Unexpected error:', error);
 

@@ -20,9 +20,7 @@ const PLACEHOLDER_VALUES = [
   'soon',
   'secret location',
 ];
-function normalizeEventDetail(
-  val: string | null | undefined
-): string {
+function normalizeEventDetail(val: string | null | undefined): string {
   const s = (val || '').trim();
   if (!s) return '';
   const lower = s.toLowerCase();
@@ -499,7 +497,10 @@ Deno.serve(async (req: Request) => {
             font: helveticaBold,
             color: blackColor,
           });
-          const dateWidth = helvetica.widthOfTextAtSize(ticketProps.eventDate, 7);
+          const dateWidth = helvetica.widthOfTextAtSize(
+            ticketProps.eventDate,
+            7
+          );
           page.drawText(`${ticketProps.eventDate}`, {
             x: rightAlignX - dateWidth,
             y: y,
@@ -518,7 +519,10 @@ Deno.serve(async (req: Request) => {
             font: helveticaBold,
             color: blackColor,
           });
-          const timeWidth = helvetica.widthOfTextAtSize(ticketProps.eventTime, 7);
+          const timeWidth = helvetica.widthOfTextAtSize(
+            ticketProps.eventTime,
+            7
+          );
           page.drawText(`${ticketProps.eventTime}`, {
             x: rightAlignX - timeWidth,
             y: y,
@@ -962,10 +966,7 @@ Deno.serve(async (req: Request) => {
         );
       }
     } catch (logoError) {
-      console.warn(
-        'Failed to fetch logo, using URL as fallback:',
-        logoError
-      );
+      console.warn('Failed to fetch logo, using URL as fallback:', logoError);
     }
 
     const emailHtmlBody = `
@@ -1007,13 +1008,21 @@ Deno.serve(async (req: Request) => {
             <p style="margin: 8px 0; font-size: 14px;">
               <strong>Référence :</strong> ${ticketProps.ticketIdentifier}
             </p>
-${ticketProps.eventDate || ticketProps.eventTime ? `            <p style="margin: 8px 0; font-size: 14px;">
-              <strong>${ticketProps.eventDate ? 'Date :' : 'Heure :'}</strong> ${ticketProps.eventDate && ticketProps.eventTime ? `${ticketProps.eventDate} à ${ticketProps.eventTime}` : (ticketProps.eventDate || ticketProps.eventTime)}
+${
+  ticketProps.eventDate || ticketProps.eventTime
+    ? `            <p style="margin: 8px 0; font-size: 14px;">
+              <strong>${ticketProps.eventDate ? 'Date :' : 'Heure :'}</strong> ${ticketProps.eventDate && ticketProps.eventTime ? `${ticketProps.eventDate} à ${ticketProps.eventTime}` : ticketProps.eventDate || ticketProps.eventTime}
             </p>
-` : ''}${ticketProps.eventVenue ? `            <p style="margin: 8px 0; font-size: 14px;">
+`
+    : ''
+}${
+      ticketProps.eventVenue
+        ? `            <p style="margin: 8px 0; font-size: 14px;">
               <strong>Lieu :</strong> ${ticketProps.eventVenue}
             </p>
-` : ''}          </div>
+`
+        : ''
+    }          </div>
 
           <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
             ${
@@ -1053,24 +1062,32 @@ ${ticketProps.eventDate || ticketProps.eventTime ? `            <p style="margin
         emailError instanceof Error
           ? emailError.message
           : JSON.stringify(emailError);
-      
+
       // Parse error details for better error messages
       let errorDetails = resendErrorMsg;
       let errorHint = '';
-      
+
       try {
-        const errorObj = typeof emailError === 'object' ? emailError : JSON.parse(resendErrorMsg);
-        if (errorObj.statusCode === 401 || errorObj.message?.includes('API key is invalid')) {
-          errorHint = ' The Resend API key appears to be invalid or expired. Please check your RESEND_API_KEY environment variable in Supabase dashboard.';
+        const errorObj =
+          typeof emailError === 'object'
+            ? emailError
+            : JSON.parse(resendErrorMsg);
+        if (
+          errorObj.statusCode === 401 ||
+          errorObj.message?.includes('API key is invalid')
+        ) {
+          errorHint =
+            ' The Resend API key appears to be invalid or expired. Please check your RESEND_API_KEY environment variable in Supabase dashboard.';
         } else if (errorObj.statusCode === 403) {
-          errorHint = ' The Resend API key does not have the required permissions.';
+          errorHint =
+            ' The Resend API key does not have the required permissions.';
         } else if (errorObj.statusCode === 429) {
           errorHint = ' Rate limit exceeded. Please try again later.';
         }
       } catch {
         // If parsing fails, use the original error message
       }
-      
+
       console.error(
         `Resend error for purchase ${purchaseIdFromRequest}:`,
         resendErrorMsg
@@ -1078,7 +1095,7 @@ ${ticketProps.eventDate || ticketProps.eventTime ? `            <p style="margin
       if (errorHint) {
         console.error(`Error hint:${errorHint}`);
       }
-      
+
       await supabase.rpc('update_email_dispatch_status', {
         p_purchase_id: purchaseIdFromRequest,
         p_email_dispatch_status: 'DISPATCH_FAILED',

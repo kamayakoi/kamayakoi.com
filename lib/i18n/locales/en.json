@@ -402,11 +402,15 @@
     "status": {
       "invalid": "Invalid ticket",
       "alreadyUsed": "Already checked in",
+      "welcome": "Ticket Verified - Welcome!",
+      "fullyUsed": "All admissions used",
       "valid": "Ready for entry"
     },
     "badges": {
       "invalid": "❌ INVALID",
       "alreadyUsed": "⚠️ ALREADY USED",
+      "welcome": "✅ VERIFIED",
+      "fullyUsed": "⚠️ FULLY USED",
       "valid": "✅ VALID"
     },
     "loading": {
@@ -427,7 +431,9 @@
     },
     "quantity": {
       "people": "people",
-      "person": "person"
+      "person": "person",
+      "remaining": "remaining",
+      "scanned": "scanned"
     },
     "checkedInLabel": "Checked in:"
   },

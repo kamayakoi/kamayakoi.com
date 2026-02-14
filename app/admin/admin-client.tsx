@@ -1189,8 +1189,10 @@ export default function AdminClient() {
                                     {log.error_message}
                                   </div>
                                 ) : (
-                                  <div className="text-slate-500 text-xs">
-                                    Verified successfully
+                                  <div className="text-green-400 text-xs">
+                                    {log.success
+                                      ? '✓ Verified successfully'
+                                      : 'No details'}
                                   </div>
                                 )}
                               </td>

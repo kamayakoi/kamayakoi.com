@@ -402,11 +402,15 @@
     "status": {
       "invalid": "Ticket invalide",
       "alreadyUsed": "Déjà enregistré",
+      "welcome": "Ticket Vérifié - Bienvenue!",
+      "fullyUsed": "Toutes les admissions utilisées",
       "valid": "Prêt pour l'entrée"
     },
     "badges": {
       "invalid": "❌ INVALIDE",
       "alreadyUsed": "⚠️ DÉJÀ UTILISÉ",
+      "welcome": "✅ VÉRIFIÉ",
+      "fullyUsed": "⚠️ ÉPUISÉ",
       "valid": "✅ VALIDE"
     },
     "loading": {
@@ -427,7 +431,9 @@
     },
     "quantity": {
       "people": "personnes",
-      "person": "personne"
+      "person": "personne",
+      "remaining": "restant(s)",
+      "scanned": "scanné(s)"
     },
     "checkedInLabel": "Enregistré :"
   },

@@ -298,12 +298,14 @@ END;
 $$;
 
 
--- 5. Unified Function to Mark Ticket as Used (Enhanced with duplicate protection and logging)
+-- 5. Unified Function to Mark Ticket as Used (with row locking to prevent race conditions)
+-- Uses SELECT ... FOR UPDATE SKIP LOCKED so concurrent scans of the same ticket don't both succeed.
+-- Duplicate scan window is 5 seconds to absorb rapid double-scans.
 CREATE OR REPLACE FUNCTION public.mark_ticket_used(
     p_ticket_identifier TEXT,
     p_verified_by TEXT
 )
-RETURNS TEXT -- Returns a status message like 'SUCCESS', 'ALREADY_USED', 'NOT_FOUND', 'DUPLICATE_SCAN'
+RETURNS TEXT -- Returns 'SUCCESS', 'ALREADY_USED', 'NOT_FOUND', 'DUPLICATE_SCAN'
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = ''
@@ -311,32 +313,42 @@ AS $$
 DECLARE
     individual_ticket RECORD;
     purchase_record RECORD;
-    last_scan_time TIMESTAMPTZ;
     time_since_last_scan INTERVAL;
 BEGIN
-    -- Try to find and mark in individual_tickets table
-    SELECT * INTO individual_ticket FROM public.individual_tickets WHERE ticket_identifier = p_ticket_identifier;
+    -- Try to find and LOCK the row in individual_tickets table
+    -- FOR UPDATE SKIP LOCKED: if another transaction holds the lock, we skip and return DUPLICATE_SCAN
+    SELECT * INTO individual_ticket 
+    FROM public.individual_tickets 
+    WHERE ticket_identifier = p_ticket_identifier
+    FOR UPDATE SKIP LOCKED;
 
-    IF FOUND THEN
-        -- Check for duplicate scan (within 2 seconds)
+    -- If SKIP LOCKED skipped this row, another transaction is already processing it
+    IF NOT FOUND THEN
+        PERFORM 1 FROM public.individual_tickets WHERE ticket_identifier = p_ticket_identifier;
+        IF FOUND THEN
+            RETURN 'DUPLICATE_SCAN';
+        END IF;
+        individual_ticket := NULL;
+    END IF;
+
+    IF individual_ticket IS NOT NULL THEN
+        -- Check for duplicate scan (within 5 seconds)
         IF individual_ticket.used_at IS NOT NULL THEN
             time_since_last_scan := NOW() - individual_ticket.used_at;
-            IF time_since_last_scan < INTERVAL '2 seconds' THEN
-                -- Log duplicate scan attempt
+            IF time_since_last_scan < INTERVAL '5 seconds' THEN
                 PERFORM public.log_verification_attempt(
                     p_ticket_identifier,
-                    NULL, -- We'll fetch event_id below if needed
+                    NULL,
                     NULL,
                     FALSE,
                     'DUPLICATE_SCAN',
-                    'Ticket scanned again within 2 seconds of last scan'
+                    'Ticket scanned again within 5 seconds of last scan'
                 );
                 RETURN 'DUPLICATE_SCAN';
             END IF;
         END IF;
 
         IF individual_ticket.is_used THEN
-            -- Log already used attempt
             SELECT p.event_id, p.event_title INTO purchase_record 
             FROM public.purchases p 
             WHERE p.id = individual_ticket.purchase_id;
@@ -357,7 +369,6 @@ BEGIN
         SET is_used = TRUE, used_at = NOW(), verified_by = p_verified_by, status = 'used', updated_at = NOW()
         WHERE id = individual_ticket.id;
         
-        -- Log successful admission
         SELECT p.event_id, p.event_title INTO purchase_record 
         FROM public.purchases p 
         WHERE p.id = individual_ticket.purchase_id;
@@ -374,72 +385,77 @@ BEGIN
         RETURN 'SUCCESS';
     END IF;
 
-    -- If not an individual ticket, handle legacy tickets
-    SELECT * INTO purchase_record FROM public.purchases WHERE unique_ticket_identifier = p_ticket_identifier;
+    -- Legacy tickets: same locking strategy
+    SELECT * INTO purchase_record 
+    FROM public.purchases 
+    WHERE unique_ticket_identifier = p_ticket_identifier
+    FOR UPDATE SKIP LOCKED;
 
-    IF FOUND THEN
-        -- Check for duplicate scan (within 2 seconds)
-        IF purchase_record.used_at IS NOT NULL THEN
-            time_since_last_scan := NOW() - purchase_record.used_at;
-            IF time_since_last_scan < INTERVAL '2 seconds' THEN
-                PERFORM public.log_verification_attempt(
-                    p_ticket_identifier,
-                    purchase_record.event_id,
-                    purchase_record.event_title,
-                    FALSE,
-                    'DUPLICATE_SCAN',
-                    'Ticket scanned again within 2 seconds of last scan'
-                );
-                RETURN 'DUPLICATE_SCAN';
-            END IF;
+    IF NOT FOUND THEN
+        PERFORM 1 FROM public.purchases WHERE unique_ticket_identifier = p_ticket_identifier;
+        IF FOUND THEN
+            RETURN 'DUPLICATE_SCAN';
         END IF;
 
-        IF purchase_record.use_count >= purchase_record.quantity THEN
+        PERFORM public.log_verification_attempt(
+            p_ticket_identifier,
+            NULL,
+            NULL,
+            FALSE,
+            'NOT_FOUND',
+            'Ticket identifier not found in system'
+        );
+        RETURN 'NOT_FOUND';
+    END IF;
+
+    -- Check for duplicate scan (within 5 seconds)
+    IF purchase_record.used_at IS NOT NULL THEN
+        time_since_last_scan := NOW() - purchase_record.used_at;
+        IF time_since_last_scan < INTERVAL '5 seconds' THEN
             PERFORM public.log_verification_attempt(
                 p_ticket_identifier,
                 purchase_record.event_id,
                 purchase_record.event_title,
                 FALSE,
-                'ALREADY_USED',
-                'Legacy ticket fully used (all admissions consumed)'
+                'DUPLICATE_SCAN',
+                'Ticket scanned again within 5 seconds of last scan'
             );
-            RETURN 'ALREADY_USED';
+            RETURN 'DUPLICATE_SCAN';
         END IF;
+    END IF;
 
-        -- Mark one admission as used
-        UPDATE public.purchases
-        SET
-            use_count = purchase_record.use_count + 1,
-            used_at = NOW(), -- Update timestamp on each scan
-            verified_by = p_verified_by,
-            is_used = (purchase_record.use_count + 1) >= purchase_record.quantity, -- Set is_used to true only on the last scan
-            updated_at = NOW()
-        WHERE id = purchase_record.id;
-        
-        -- Log successful admission
+    IF purchase_record.use_count >= purchase_record.quantity THEN
         PERFORM public.log_verification_attempt(
             p_ticket_identifier,
             purchase_record.event_id,
             purchase_record.event_title,
-            TRUE,
-            NULL,
-            'Legacy ticket admission recorded'
+            FALSE,
+            'ALREADY_USED',
+            'Legacy ticket fully used (all admissions consumed)'
         );
-        
-        RETURN 'SUCCESS';
+        RETURN 'ALREADY_USED';
     END IF;
 
-    -- Ticket not found
+    -- Mark one admission as used
+    UPDATE public.purchases
+    SET
+        use_count = purchase_record.use_count + 1,
+        used_at = NOW(),
+        verified_by = p_verified_by,
+        is_used = (purchase_record.use_count + 1) >= purchase_record.quantity,
+        updated_at = NOW()
+    WHERE id = purchase_record.id;
+    
     PERFORM public.log_verification_attempt(
         p_ticket_identifier,
+        purchase_record.event_id,
+        purchase_record.event_title,
+        TRUE,
         NULL,
-        NULL,
-        FALSE,
-        'NOT_FOUND',
-        'Ticket identifier not found in system'
+        'Legacy ticket admission recorded'
     );
     
-    RETURN 'NOT_FOUND';
+    RETURN 'SUCCESS';
 END;
 $$;
 

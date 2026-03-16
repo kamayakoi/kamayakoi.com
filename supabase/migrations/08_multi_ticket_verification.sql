@@ -112,7 +112,8 @@ DROP FUNCTION IF EXISTS public.mark_ticket_used(TEXT, TEXT);
 
 -- 4. Unified Ticket Verification Function (Enhanced with error handling)
 CREATE OR REPLACE FUNCTION public.verify_ticket(
-    p_ticket_identifier TEXT
+    p_ticket_identifier TEXT,
+    p_scanner_email TEXT DEFAULT NULL
 )
 RETURNS TABLE(
     -- Return columns (same as before, but with quantity always being 1 for individual tickets)
@@ -173,7 +174,8 @@ BEGIN
                 NULL,
                 FALSE,
                 'ORPHANED_TICKET',
-                'Individual ticket found but associated purchase not found'
+                'Individual ticket found but associated purchase not found',
+                p_scanner_email
             );
             RAISE EXCEPTION 'ORPHANED_TICKET: Ticket found but purchase record missing';
         END IF;
@@ -186,7 +188,8 @@ BEGIN
                 purchase_record.event_title,
                 FALSE,
                 'UNPAID_TICKET',
-                'Ticket belongs to unpaid purchase'
+                'Ticket belongs to unpaid purchase',
+                p_scanner_email
             );
             RAISE EXCEPTION 'UNPAID_TICKET: This ticket has not been paid for';
         END IF;
@@ -198,7 +201,8 @@ BEGIN
             purchase_record.event_title,
             TRUE,
             NULL,
-            NULL
+            NULL,
+            p_scanner_email
         );
         
         RETURN QUERY SELECT
@@ -242,7 +246,8 @@ BEGIN
                 purchase_record.event_title,
                 FALSE,
                 'UNPAID_TICKET',
-                'Ticket belongs to unpaid purchase'
+                'Ticket belongs to unpaid purchase',
+                p_scanner_email
             );
             RAISE EXCEPTION 'UNPAID_TICKET: This ticket has not been paid for';
         END IF;
@@ -254,7 +259,8 @@ BEGIN
             purchase_record.event_title,
             TRUE,
             NULL,
-            NULL
+            NULL,
+            p_scanner_email
         );
 
         -- It's a legacy ticket
@@ -290,7 +296,8 @@ BEGIN
         NULL,
         FALSE,
         'TICKET_NOT_FOUND',
-        'No ticket found with this identifier'
+        'No ticket found with this identifier',
+        p_scanner_email
     );
     
     RAISE EXCEPTION 'TICKET_NOT_FOUND: Ticket not found in system';
@@ -342,7 +349,8 @@ BEGIN
                     NULL,
                     FALSE,
                     'DUPLICATE_SCAN',
-                    'Ticket scanned again within 5 seconds of last scan'
+                    'Ticket scanned again within 5 seconds of last scan',
+                    p_verified_by
                 );
                 RETURN 'DUPLICATE_SCAN';
             END IF;
@@ -359,7 +367,8 @@ BEGIN
                 purchase_record.event_title,
                 FALSE,
                 'ALREADY_USED',
-                'Ticket has already been used for entry'
+                'Ticket has already been used for entry',
+                p_verified_by
             );
             RETURN 'ALREADY_USED';
         END IF;
@@ -379,7 +388,8 @@ BEGIN
             purchase_record.event_title,
             TRUE,
             NULL,
-            'Individual ticket marked as used'
+            'Individual ticket marked as used',
+            p_verified_by
         );
         
         RETURN 'SUCCESS';
@@ -403,7 +413,8 @@ BEGIN
             NULL,
             FALSE,
             'NOT_FOUND',
-            'Ticket identifier not found in system'
+            'Ticket identifier not found in system',
+            p_verified_by
         );
         RETURN 'NOT_FOUND';
     END IF;
@@ -418,7 +429,8 @@ BEGIN
                 purchase_record.event_title,
                 FALSE,
                 'DUPLICATE_SCAN',
-                'Ticket scanned again within 5 seconds of last scan'
+                'Ticket scanned again within 5 seconds of last scan',
+                p_verified_by
             );
             RETURN 'DUPLICATE_SCAN';
         END IF;
@@ -431,7 +443,8 @@ BEGIN
             purchase_record.event_title,
             FALSE,
             'ALREADY_USED',
-            'Legacy ticket fully used (all admissions consumed)'
+            'Legacy ticket fully used (all admissions consumed)',
+            p_verified_by
         );
         RETURN 'ALREADY_USED';
     END IF;
@@ -452,7 +465,8 @@ BEGIN
         purchase_record.event_title,
         TRUE,
         NULL,
-        'Legacy ticket admission recorded'
+        'Legacy ticket admission recorded',
+        p_verified_by
     );
     
     RETURN 'SUCCESS';

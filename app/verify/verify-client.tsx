@@ -253,6 +253,80 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
   const [isVerified, setIsVerified] = useState(false);
   const [wasJustAdmitted, setWasJustAdmitted] = useState(false);
   const [flashColor, setFlashColor] = useState<'green' | 'red' | null>(null);
+  const [offlineQueueLength, setOfflineQueueLength] = useState(0);
+
+  // --- Offline Queue Logic ---
+  const OFFLINE_QUEUE_KEY = 'verify_offline_queue';
+
+  const getOfflineQueue = (): string[] => {
+    try {
+      const q = localStorage.getItem(OFFLINE_QUEUE_KEY);
+      return q ? JSON.parse(q) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const addToOfflineQueue = (ticketId: string) => {
+    try {
+      const queue = getOfflineQueue();
+      if (!queue.includes(ticketId)) {
+        queue.push(ticketId);
+        localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
+        setOfflineQueueLength(queue.length);
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  const removeFromOfflineQueue = (ticketId: string) => {
+    try {
+      const queue = getOfflineQueue();
+      const newQueue = queue.filter((id) => id !== ticketId);
+      localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(newQueue));
+      setOfflineQueueLength(newQueue.length);
+    } catch {
+      // ignore
+    }
+  };
+
+  const processOfflineQueue = useCallback(async () => {
+    const queue = getOfflineQueue();
+    if (queue.length === 0) return;
+
+    for (const id of queue) {
+      try {
+        const { data: response, error: edgeError } =
+          await supabase.functions.invoke('verify-ticket', {
+            body: {
+              ticket_identifier: id,
+              verified_by: 'staff_portal_offline_sync',
+              auto_admit: true,
+            },
+          });
+
+        if (!edgeError && response) {
+          if (response.success || response.error_code === 'ALREADY_USED') {
+            removeFromOfflineQueue(id);
+          }
+        }
+      } catch (err) {
+        // Network error, leave in queue for later
+        console.error('Offline sync failed for', id, err);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Sync offline queue periodically and on mount
+  useEffect(() => {
+    setOfflineQueueLength(getOfflineQueue().length);
+    processOfflineQueue();
+    const interval = setInterval(processOfflineQueue, 10000); // Check every 10s
+    return () => clearInterval(interval);
+  }, [processOfflineQueue]);
+  // ---------------------------
 
   // Check for cached PIN on component mount
   useEffect(() => {
@@ -376,6 +450,9 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
         }
 
         inFlightTickets.add(trimmedId);
+
+        // Save to queue immediately so it's not lost if browser closes
+        addToOfflineQueue(trimmedId);
       }
 
       try {
@@ -421,6 +498,11 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
               cleanupOldScanRecords();
             }
           }
+        }
+
+        // If we got a valid response from server, we can remove from offline queue
+        if (!isRefreshCall) {
+          removeFromOfflineQueue(trimmedId);
         }
 
         if (!typedResult.success) {
@@ -861,6 +943,13 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
 
       <div className="min-h-screen bg-background py-8 px-4">
         <div className="max-w-md mx-auto space-y-6">
+          {/* Offline Queue Indicator */}
+          {offlineQueueLength > 0 && (
+            <div className="rounded-sm border border-amber-700 bg-amber-900/20 p-3 text-amber-300 text-sm flex items-center gap-2">
+              <span className="font-bold">{offlineQueueLength}</span> scan{offlineQueueLength > 1 ? 's' : ''} pending sync — will retry automatically
+            </div>
+          )}
+
           {/* Loading State */}
           {isLoading && !ticketData && (
             <Card className="rounded-sm border-slate-700 bg-card/30 backdrop-blur-sm">

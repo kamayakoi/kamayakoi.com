@@ -20,7 +20,8 @@ RETURNS TABLE(
     attempt_timestamp TIMESTAMPTZ,
     success BOOLEAN,
     error_code TEXT,
-    error_message TEXT
+    error_message TEXT,
+    scanner_email TEXT
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -38,7 +39,8 @@ BEGIN
         va.attempt_timestamp,
         va.success,
         va.error_code,
-        va.error_message
+        va.error_message,
+        va.scanner_email
     FROM public.verification_attempts va
     -- First try to join through individual_tickets (for new tickets)
     LEFT JOIN public.individual_tickets it ON va.ticket_identifier = it.ticket_identifier
@@ -60,4 +62,4 @@ $$;
 GRANT EXECUTE ON FUNCTION public.get_admin_verification_logs(TEXT, INTEGER, INTEGER) TO service_role;
 GRANT EXECUTE ON FUNCTION public.get_admin_verification_logs(TEXT, INTEGER, INTEGER) TO authenticated;
 
-COMMENT ON FUNCTION public.get_admin_verification_logs(TEXT, INTEGER, INTEGER) IS 'Returns paginated verification logs for admin review with proper customer data for both individual and legacy tickets';
+COMMENT ON FUNCTION public.get_admin_verification_logs(TEXT, INTEGER, INTEGER) IS 'Returns paginated verification logs for admin review with proper customer data for both individual and legacy tickets, including scanner email';

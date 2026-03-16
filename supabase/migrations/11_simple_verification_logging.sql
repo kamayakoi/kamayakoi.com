@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS public.verification_attempts (
     success BOOLEAN NOT NULL,
     error_code TEXT,
     error_message TEXT,
+    scanner_email TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
@@ -55,7 +56,8 @@ CREATE OR REPLACE FUNCTION public.log_verification_attempt(
     p_event_title TEXT,
     p_success BOOLEAN,
     p_error_code TEXT DEFAULT NULL,
-    p_error_message TEXT DEFAULT NULL
+    p_error_message TEXT DEFAULT NULL,
+    p_scanner_email TEXT DEFAULT NULL
 )
 RETURNS UUID
 LANGUAGE plpgsql
@@ -71,14 +73,16 @@ BEGIN
         event_title,
         success,
         error_code,
-        error_message
+        error_message,
+        scanner_email
     ) VALUES (
         p_ticket_identifier,
         p_event_id,
         p_event_title,
         p_success,
         p_error_code,
-        p_error_message
+        p_error_message,
+        p_scanner_email
     ) RETURNING id INTO log_id;
     
     RETURN log_id;
@@ -86,8 +90,8 @@ END;
 $$;
 
 -- Grant execute permissions
-GRANT EXECUTE ON FUNCTION public.log_verification_attempt(TEXT, TEXT, TEXT, BOOLEAN, TEXT, TEXT) TO service_role;
-GRANT EXECUTE ON FUNCTION public.log_verification_attempt(TEXT, TEXT, TEXT, BOOLEAN, TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.log_verification_attempt(TEXT, TEXT, TEXT, BOOLEAN, TEXT, TEXT, TEXT) TO service_role;
+GRANT EXECUTE ON FUNCTION public.log_verification_attempt(TEXT, TEXT, TEXT, BOOLEAN, TEXT, TEXT, TEXT) TO authenticated;
 
 -- Function to get recent verification errors
 CREATE OR REPLACE FUNCTION public.get_recent_verification_errors(
@@ -153,6 +157,6 @@ GRANT EXECUTE ON FUNCTION public.cleanup_old_verification_logs() TO service_role
 
 -- Comments
 COMMENT ON TABLE public.verification_attempts IS 'Logs all ticket verification attempts for troubleshooting. Retains last 30 days.';
-COMMENT ON FUNCTION public.log_verification_attempt(TEXT, TEXT, TEXT, BOOLEAN, TEXT, TEXT) IS 'Logs a verification attempt with success status and optional error details';
+COMMENT ON FUNCTION public.log_verification_attempt(TEXT, TEXT, TEXT, BOOLEAN, TEXT, TEXT, TEXT) IS 'Logs a verification attempt with success status, optional error details, and scanner email';
 COMMENT ON FUNCTION public.get_recent_verification_errors(INTEGER, TEXT) IS 'Returns recent failed verification attempts, optionally filtered by event';
 COMMENT ON FUNCTION public.cleanup_old_verification_logs() IS 'Deletes verification logs older than 30 days';

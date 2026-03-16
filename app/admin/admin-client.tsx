@@ -71,6 +71,7 @@ interface Purchase {
   used_at: string | null;
   is_used: boolean;
   verified_by: string | null;
+  scanned_count?: number;
 }
 
 interface EventInfo {
@@ -94,6 +95,7 @@ interface ScanLog {
   success: boolean;
   error_code: string | null;
   error_message: string | null;
+  scanner_email: string | null;
 }
 
 export default function AdminClient() {
@@ -118,6 +120,7 @@ export default function AdminClient() {
 
   // New: Status filter (defaults to 'paid' only)
   const [statusFilter, setStatusFilter] = useState<string>('paid');
+  const [admissionFilter, setAdmissionFilter] = useState<string>('all'); // 'all', 'scanned', 'unscanned'
   const [showFilters, setShowFilters] = useState(false);
 
   // Guest invitation state
@@ -321,7 +324,7 @@ export default function AdminClient() {
   const loadEvents = async () => {
     try {
       const { data, error } = await supabase.rpc('get_admin_events_list', {
-        p_status_filter: statusFilter,
+        p_status_filter: 'all', // Always show all events regardless of payment status filter
       });
       if (error) {
         console.error('Error loading events:', error);
@@ -618,6 +621,11 @@ export default function AdminClient() {
 
   // Filter purchases by status AND search (for table display)
   const filteredPurchases = statusFilteredPurchases.filter(purchase => {
+    // Admission filter
+    if (admissionFilter === 'scanned' && !purchase.is_used) return false;
+    if (admissionFilter === 'unscanned' && purchase.is_used) return false;
+
+    // Search query
     if (!searchQuery.trim()) return true;
 
     const query = searchQuery.toLowerCase();
@@ -921,8 +929,50 @@ export default function AdminClient() {
                       </Button>
                     </div>
 
+                    {/* Admission Filter */}
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                       <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setAdmissionFilter('all')}
+                        className={`rounded-sm text-xs sm:text-sm ${
+                          admissionFilter === 'all'
+                            ? 'bg-slate-700 text-white hover:bg-slate-600'
+                            : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                        }`}
+                      >
+                        All Admission
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setAdmissionFilter('scanned')}
+                        className={`rounded-sm text-xs sm:text-sm ${
+                          admissionFilter === 'scanned'
+                            ? 'bg-slate-700 text-white hover:bg-slate-600'
+                            : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                        }`}
+                      >
+                        <QrCode className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        Scanned
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setAdmissionFilter('unscanned')}
+                        className={`rounded-sm text-xs sm:text-sm ${
+                          admissionFilter === 'unscanned'
+                            ? 'bg-slate-700 text-white hover:bg-slate-600'
+                            : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                        }`}
+                      >
+                        <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        Not Scanned
+                      </Button>
+                    </div>
+
                     {/* Search and Actions */}
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-2">
                       <div className="flex-1 flex gap-2">
                         <Input
                           id="search"
@@ -1003,12 +1053,15 @@ export default function AdminClient() {
                             Tickets
                           </TableHead>
                           <TableHead className="text-center w-[12%]">
-                            Status
+                            Admission
                           </TableHead>
-                          <TableHead className="text-center w-[15%]">
+                          <TableHead className="text-center w-[12%]">
+                            Payment
+                          </TableHead>
+                          <TableHead className="text-center w-[14%]">
                             Email
                           </TableHead>
-                          <TableHead className="text-center w-[18%]">
+                          <TableHead className="text-center w-[14%]">
                             Actions
                           </TableHead>
                         </TableRow>
@@ -1043,16 +1096,28 @@ export default function AdminClient() {
                               {/* Tickets & Amount */}
                               <TableCell className="text-center w-[10%]">
                                 <div className="text-sm font-medium text-gray-100">
+                                  {purchase.scanned_count !== undefined
+                                    ? <span className="text-green-400">{purchase.scanned_count}</span>
+                                    : purchase.is_used ? purchase.quantity : 0}
+                                  <span className="text-gray-500 mx-1">/</span>
                                   {purchase.quantity}
                                 </div>
                                 <div className="text-xs text-gray-400">
                                   {purchase.total_amount}{' '}
                                   {purchase.currency_code}
                                 </div>
-                                {purchase.is_used && (
-                                  <Badge className="bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700 rounded-sm text-xs mt-1">
-                                    <QrCode className="h-2 w-2 mr-1" />
-                                    Used
+                              </TableCell>
+
+                              {/* Admission Status */}
+                              <TableCell className="text-center w-[12%]">
+                                {purchase.is_used ? (
+                                  <Badge className="bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700 rounded-sm text-xs">
+                                    <QrCode className="h-3 w-3 mr-1" />
+                                    Scanned
+                                  </Badge>
+                                ) : (
+                                  <Badge className="bg-slate-800/50 text-slate-300 border-slate-700 rounded-sm text-xs">
+                                    Not Scanned
                                   </Badge>
                                 )}
                               </TableCell>
@@ -1126,6 +1191,7 @@ export default function AdminClient() {
                           <th className="px-4 py-3">Status</th>
                           <th className="px-4 py-3">Customer</th>
                           <th className="px-4 py-3">Event</th>
+                          <th className="px-4 py-3">Scanner</th>
                           <th className="px-4 py-3">Details</th>
                         </tr>
                       </thead>
@@ -1133,7 +1199,7 @@ export default function AdminClient() {
                         {scanLogs.length === 0 ? (
                           <tr>
                             <td
-                              colSpan={5}
+                              colSpan={6}
                               className="px-4 py-8 text-center text-slate-500"
                             >
                               No scan logs found
@@ -1181,6 +1247,11 @@ export default function AdminClient() {
                                   title={log.event_title}
                                 >
                                   {log.event_title || 'Unknown Event'}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-slate-300">
+                                <div className="text-xs text-slate-400 truncate max-w-[120px]">
+                                  {log.scanner_email || 'System'}
                                 </div>
                               </td>
                               <td className="px-4 py-3 text-slate-300">

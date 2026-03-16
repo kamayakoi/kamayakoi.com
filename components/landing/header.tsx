@@ -42,6 +42,12 @@ export default function Header({
   const { currentLanguage } = useTranslation();
   const { button } = useTheme();
 
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -142,53 +148,65 @@ export default function Header({
               </Button>
             </Link>
           )}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                className={`${styles.mobileMenuButton} bg-transparent hover:bg-transparent focus:ring-0 border-0 translate-x-[6px]`}
+          {hasMounted && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  className={`${styles.mobileMenuButton} bg-transparent hover:bg-transparent focus:ring-0 border-0 translate-x-[6px]`}
+                >
+                  <Menu className="h-5 w-5 text-foreground" />
+                  <span className="sr-only">
+                    {t(currentLanguage, 'header.mobileMenu.toggle')}
+                  </span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent
+                side="top"
+                className={`${styles.customSheetContent} bg-background text-foreground h-screen w-screen p-16 duration-200 flex flex-col items-center justify-center`}
               >
-                <Menu className="h-5 w-5 text-foreground" />
-                <span className="sr-only">
-                  {t(currentLanguage, 'header.mobileMenu.toggle')}
-                </span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent
-              side="top"
-              className={`${styles.customSheetContent} bg-background text-foreground h-screen w-screen p-16 duration-200 flex flex-col items-center justify-center`}
-            >
-              <SheetTitle className="sr-only">
-                {t(currentLanguage, 'header.mobileMenu.title')}
-              </SheetTitle>
+                <SheetTitle className="sr-only">
+                  {t(currentLanguage, 'header.mobileMenu.title')}
+                </SheetTitle>
 
-              <div className="absolute top-4 right-4">
-                <SheetClose asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-white hover:bg-zinc-800 hover:text-white"
-                  >
-                    <X className="h-6 w-6" />
-                    <span className="sr-only">
-                      {t(currentLanguage, 'header.mobileMenu.close')}
-                    </span>
-                  </Button>
-                </SheetClose>
-              </div>
+                <div className="absolute top-4 right-4">
+                  <SheetClose asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-white hover:bg-zinc-800 hover:text-white"
+                    >
+                      <X className="h-6 w-6" />
+                      <span className="sr-only">
+                        {t(currentLanguage, 'header.mobileMenu.close')}
+                      </span>
+                    </Button>
+                  </SheetClose>
+                </div>
 
-              <div className="flex flex-col gap-8 text-center w-auto">
-                {navItems.map((item: NavItem) => {
-                  if (item.isComingSoon) {
-                    return (
-                      <div
-                        key={item.path}
-                        className={`${styles.mobileNavLink} ${styles.disabledMobileNavLink}`}
-                      >
-                        {t(currentLanguage, item.nameKey)}
-                      </div>
-                    );
-                  }
-                  if (item.isComingSoonBadgeOnly) {
+                <div className="flex flex-col gap-8 text-center w-auto">
+                  {navItems.map((item: NavItem) => {
+                    if (item.isComingSoon) {
+                      return (
+                        <div
+                          key={item.path}
+                          className={`${styles.mobileNavLink} ${styles.disabledMobileNavLink}`}
+                        >
+                          {t(currentLanguage, item.nameKey)}
+                        </div>
+                      );
+                    }
+                    if (item.isComingSoonBadgeOnly) {
+                      return (
+                        <SheetClose asChild key={item.path}>
+                          <Link
+                            href={item.path}
+                            className={`${styles.mobileNavLink} ${isActive(item.path) ? styles.activeMobileNavLink : ''} text-3xl font-semibold text-white hover:text-gray-400 border-none`}
+                          >
+                            {t(currentLanguage, item.nameKey)}
+                          </Link>
+                        </SheetClose>
+                      );
+                    }
                     return (
                       <SheetClose asChild key={item.path}>
                         <Link
@@ -199,21 +217,11 @@ export default function Header({
                         </Link>
                       </SheetClose>
                     );
-                  }
-                  return (
-                    <SheetClose asChild key={item.path}>
-                      <Link
-                        href={item.path}
-                        className={`${styles.mobileNavLink} ${isActive(item.path) ? styles.activeMobileNavLink : ''} text-3xl font-semibold text-white hover:text-gray-400 border-none`}
-                      >
-                        {t(currentLanguage, item.nameKey)}
-                      </Link>
-                    </SheetClose>
-                  );
-                })}
-              </div>
-            </SheetContent>
-          </Sheet>
+                  })}
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
         </div>
       </div>
     </header>

@@ -5,7 +5,8 @@ ADD COLUMN IF NOT EXISTS email_dispatch_status TEXT DEFAULT 'NOT_INITIATED' NOT 
 ADD COLUMN IF NOT EXISTS email_dispatch_attempts INTEGER DEFAULT 0 NOT NULL,
 ADD COLUMN IF NOT EXISTS email_last_dispatch_attempt_at TIMESTAMPTZ,
 ADD COLUMN IF NOT EXISTS email_dispatch_error TEXT, -- To store any error message from the last dispatch attempt
-ADD COLUMN IF NOT EXISTS unique_ticket_identifier TEXT; -- Will be populated by the function that generates the ticket/QR
+ADD COLUMN IF NOT EXISTS unique_ticket_identifier TEXT, -- Will be populated by the function that generates the ticket/QR
+ADD COLUMN IF NOT EXISTS webhook_processing_log JSONB DEFAULT '{}'::jsonb;
 
 -- Add an index for querying purchases pending dispatch
 CREATE INDEX IF NOT EXISTS idx_purchases_email_dispatch_status ON public.purchases(email_dispatch_status);
@@ -16,7 +17,7 @@ COMMENT ON COLUMN public.purchases.email_dispatch_attempts IS 'Number of times a
 COMMENT ON COLUMN public.purchases.email_last_dispatch_attempt_at IS 'Timestamp of the last email dispatch attempt.';
 COMMENT ON COLUMN public.purchases.email_dispatch_error IS 'Stores any error message from the last failed dispatch attempt.';
 COMMENT ON COLUMN public.purchases.unique_ticket_identifier IS 'A unique identifier for the ticket, potentially used in QR codes or for reference. Populated during ticket generation.';
-
+COMMENT ON COLUMN public.purchases.webhook_processing_log IS 'JSONB storing processed webhook event IDs for idempotency.';
 
 -- PostgreSQL function to mark a purchase as ready for ticket email dispatch.
 -- This function will be called by an Edge Function (e.g., Lomi webhook handler)

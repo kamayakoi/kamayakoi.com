@@ -6,9 +6,10 @@ import { motion } from 'framer-motion';
 import LoadingComponent from '@/components/ui/loader';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
 import { t } from '@/lib/i18n/translations';
+import { ZoomImage } from './zoom-image';
 
 // Local type for archive images fetched from Sanity via the API route
-interface ArchiveImage {
+export interface ArchiveImage {
   id: number;
   height: string;
   width: string;
@@ -16,14 +17,12 @@ interface ArchiveImage {
   tags?: string[]; // First tag is treated as the category for grouping
 }
 
-// Renamed component to ArchivesClientComponent
 export default function ArchivesClientComponent() {
   const { currentLanguage } = useTranslation();
   const [images, setImages] = useState<ArchiveImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [zoomedImageId, setZoomedImageId] = useState<number | null>(null); // State for zoomed image ID
-  const [isFurtherZoomed, setIsFurtherZoomed] = useState(false); // State for secondary zoom
 
   // Memoize filtered and grouped image lists
   const taggedImages = useMemo(
@@ -107,18 +106,10 @@ export default function ArchivesClientComponent() {
     fetchImages();
   }, []); // Fetch only once on component mount
 
-  // Find the image object based on zoomedImageId
-  const zoomedImage =
-    zoomedImageId !== null
-      ? images.find(img => img.id === zoomedImageId)
-      : null;
-
-  // Reset further zoom when modal closes or image changes
-  useEffect(() => {
-    if (!zoomedImage) {
-      setIsFurtherZoomed(false);
-    }
-  }, [zoomedImage]);
+  const zoomedIndex =
+    zoomedImageId === null
+      ? -1
+      : images.findIndex(img => img.id === zoomedImageId);
 
   // --- Render Logic ---
   if (isLoading) {
@@ -135,16 +126,8 @@ export default function ArchivesClientComponent() {
     );
   }
 
-  // Function to handle closing the modal
   const handleCloseModal = () => {
     setZoomedImageId(null);
-    // No need to reset isFurtherZoomed here, useEffect handles it
-  };
-
-  // Function to toggle further zoom on image click
-  const handleImageClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent modal close
-    setIsFurtherZoomed(prev => !prev); // Toggle further zoom state
   };
 
   // Return the main archives content and modal
@@ -276,75 +259,13 @@ export default function ArchivesClientComponent() {
         </div>
       </div>
 
-      {/* Zoomed Image Modal / Backdrop */}
-      {zoomedImage && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 transition-opacity duration-300"
-          onClick={handleCloseModal} // Use handler to close
-        >
-          {(() => {
-            // Use IIFE to calculate classes based on zoomedImage
-            const numericWidth = parseInt(zoomedImage.width, 10);
-            const numericHeight = parseInt(zoomedImage.height, 10);
-            const isValidDimensions =
-              !isNaN(numericWidth) && !isNaN(numericHeight);
-            const isLandscape =
-              isValidDimensions && numericWidth > numericHeight;
-
-            // Determine container size based on orientation
-            const containerMaxWidth = isLandscape
-              ? 'md:max-w-4xl'
-              : 'md:max-w-xl'; // Larger for landscape
-            const containerMaxHeight = 'md:max-h-[70vh]'; // Increased height slightly
-
-            const containerClasses = `
-                            relative w-auto flex items-center justify-center 
-                            max-w-[95vw] max-h-[85vh] // Allow more space on mobile too
-                            ${containerMaxWidth} 
-                            ${containerMaxHeight}
-                        `;
-
-            // Determine image source width based on orientation for better quality/speed balance
-            const imageSrc = zoomedImage.url;
-
-            // Calculate base width/height for the Image component (guides aspect ratio)
-            const baseWidth = numericWidth || (isLandscape ? 1080 : 720);
-            const baseHeight = numericHeight || (isLandscape ? 720 : 1080); // Approximate inverse aspect
-
-            // Determine sizes prop based on container logic
-            const imageSizes = `(max-width: 767px) 95vw, ${
-              isLandscape ? '80vw' : '50vw'
-            }`;
-
-            return (
-              <div // This is containerClasses (outermost modal content box)
-                className={containerClasses}
-                onClick={e => e.stopPropagation()} // Stop backdrop click from closing if click is on padding of containerClasses
-              >
-                {/* New scaling and clickable wrapper */}
-                <div
-                  className={`
-                    relative cursor-zoom-in 
-                    transition-transform duration-300 ease-in-out
-                    ${isFurtherZoomed ? 'scale-125' : 'scale-100'}
-                  `}
-                  style={{ transformOrigin: 'center center' }} // Ensure scaling is from the center
-                  onClick={handleImageClick} // Click this whole area to further zoom/unzoom
-                >
-                  <Image
-                    alt={`Zoomed archives photo ${zoomedImage.id}`}
-                    className="object-contain w-full h-full rounded-sm" // Transform class removed
-                    style={{ transform: 'translate3d(0, 0, 0)' }} // Keep for potential GPU layer promotion
-                    src={imageSrc}
-                    width={baseWidth}
-                    height={baseHeight}
-                    sizes={imageSizes}
-                  />
-                </div>
-              </div>
-            );
-          })()}
-        </div>
+      {/* Zoomed Image Modal / Backdrop with vertical scroll carousel and download */}
+      {zoomedIndex >= 0 && (
+        <ZoomImage
+          images={images}
+          initialIndex={zoomedIndex}
+          onClose={handleCloseModal}
+        />
       )}
     </div>
   );

@@ -98,13 +98,81 @@ BEGIN
 END;
 $$;
 
+-- Function to check if a webhook has already been processed for deduplication
+-- When p_purchase_id is provided, checks that specific purchase (reliable idempotency).
+CREATE OR REPLACE FUNCTION public.check_webhook_already_processed(
+    p_webhook_event_id TEXT,
+    p_purchase_id UUID DEFAULT NULL
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+    v_already_processed BOOLEAN := FALSE;
+BEGIN
+    IF p_purchase_id IS NOT NULL THEN
+        SELECT EXISTS(
+            SELECT 1
+            FROM public.purchases
+            WHERE id = p_purchase_id
+              AND COALESCE(webhook_processing_log->'processed_webhooks'->>p_webhook_event_id, '') = 'true'
+        ) INTO v_already_processed;
+    ELSE
+        SELECT EXISTS(
+            SELECT 1
+            FROM public.purchases
+            WHERE COALESCE(webhook_processing_log->'processed_webhooks'->>p_webhook_event_id, '') = 'true'
+            LIMIT 1
+        ) INTO v_already_processed;
+    END IF;
+    RETURN v_already_processed;
+END;
+$$;
+
+COMMENT ON FUNCTION public.check_webhook_already_processed(TEXT, UUID)
+IS 'Checks if a webhook event has already been processed for a purchase. Pass purchase_id for reliable per-purchase idempotency.';
+
+-- Function to update purchase webhook metadata for deduplication
+CREATE OR REPLACE FUNCTION public.update_purchase_webhook_metadata(
+    p_purchase_id UUID,
+    p_webhook_event_id TEXT
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+    UPDATE public.purchases
+    SET
+        webhook_processing_log = jsonb_set(
+            COALESCE(webhook_processing_log, '{}'::jsonb),
+            ARRAY['processed_webhooks', p_webhook_event_id],
+            '"true"'::jsonb
+        ),
+        updated_at = NOW()
+    WHERE id = p_purchase_id;
+
+    IF NOT FOUND THEN
+        RAISE WARNING 'Purchase ID % not found during update_purchase_webhook_metadata', p_purchase_id;
+    END IF;
+END;
+$$;
+
 -- Grant execute permissions to service_role
 GRANT EXECUTE ON FUNCTION public.get_purchase_for_email_dispatch(UUID) TO service_role;
 GRANT EXECUTE ON FUNCTION public.update_email_dispatch_status(UUID, TEXT, TEXT, INTEGER, BOOLEAN, TIMESTAMPTZ, TEXT) TO service_role;
+GRANT EXECUTE ON FUNCTION public.update_purchase_webhook_metadata(UUID, TEXT) TO service_role;
+GRANT EXECUTE ON FUNCTION public.check_webhook_already_processed(TEXT, UUID) TO service_role;
 
 -- Comments
 COMMENT ON FUNCTION public.get_purchase_for_email_dispatch(UUID)
 IS 'Retrieves purchase details with customer information for email dispatch processing, including bundle information';
 
 COMMENT ON FUNCTION public.update_email_dispatch_status(UUID, TEXT, TEXT, INTEGER, BOOLEAN, TIMESTAMPTZ, TEXT)
-IS 'Updates the email dispatch status and related fields for a purchase record'; 
+IS 'Updates the email dispatch status and related fields for a purchase record';
+
+COMMENT ON FUNCTION public.update_purchase_webhook_metadata(UUID, TEXT)
+IS 'Updates webhook processing metadata for a purchase to prevent duplicate webhook processing'; 

@@ -12,22 +12,42 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = ''
 AS $$
+DECLARE
+    v_current_status TEXT;
+    v_webhook_event_id TEXT;
 BEGIN
+    -- Generate webhook event ID for idempotency check
+    v_webhook_event_id := p_payment_status || ':' || COALESCE(p_lomi_payment_id, p_lomi_checkout_session_id, 'unknown');
+
+    -- Check if this webhook event has already been processed
+    SELECT status INTO v_current_status
+    FROM public.purchases
+    WHERE id = p_purchase_id;
+
+    IF NOT FOUND THEN
+        RAISE WARNING 'Purchase ID % not found during record_event_lomi_payment. Lomi Event: %', p_purchase_id, p_lomi_event_payload;
+        RETURN;
+    END IF;
+
+    -- Idempotency check: Don't reprocess if status is already 'paid' and we're trying to set it to 'paid'
+    -- Allow status changes (e.g., from 'pending' to 'paid', or 'paid' to 'failed' for refunds)
+    IF v_current_status = 'paid' AND p_payment_status = 'paid' THEN
+        RAISE NOTICE 'Purchase % already marked as paid, skipping duplicate payment recording', p_purchase_id;
+        RETURN;
+    END IF;
+
+    -- Only update if this is a new status or more significant status change
     UPDATE public.purchases
-    SET 
+    SET
         status = p_payment_status, -- Update status based on webhook (e.g., 'paid', 'payment_failed')
         lomi_session_id = COALESCE(p_lomi_checkout_session_id, lomi_session_id), -- Store or update Lomi checkout session ID
-        -- Add a new column for lomi_transaction_id if you need to store it separately from the checkout session ID
-        -- For now, assuming p_lomi_payment_id might be stored in payment_processor_details or a dedicated column if added
         total_amount = p_amount_paid, -- Update with amount confirmed by Lomi
         currency_code = p_currency_paid, -- Update with currency confirmed by Lomi
         payment_processor_details = p_lomi_event_payload, -- Store the full Lomi webhook payload for auditing/reference
         updated_at = NOW()
     WHERE id = p_purchase_id;
 
-    IF NOT FOUND THEN
-        RAISE WARNING 'Purchase ID % not found during record_event_lomi_payment. Lomi Event: %', p_purchase_id, p_lomi_event_payload;
-    END IF;
+    RAISE NOTICE 'Purchase % status updated to % via Lomi webhook', p_purchase_id, p_payment_status;
 END;
 $$;
 
@@ -36,3 +56,25 @@ IS 'Records the outcome of a Lomi payment for an event purchase, updating status
 
 -- Grant execute permission to the service_role (used by Supabase functions/backend calls)
 GRANT EXECUTE ON FUNCTION public.record_event_lomi_payment(UUID, TEXT, TEXT, TEXT, JSONB, NUMERIC, TEXT) TO service_role;
+
+-- RPC to get purchase status (for webhook idempotency, no direct table access from API)
+CREATE OR REPLACE FUNCTION public.get_purchase_status(p_purchase_id UUID)
+RETURNS TEXT
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+    v_status TEXT;
+BEGIN
+    SELECT status INTO v_status
+    FROM public.purchases
+    WHERE id = p_purchase_id;
+    RETURN v_status;
+END;
+$$;
+
+COMMENT ON FUNCTION public.get_purchase_status(UUID)
+IS 'Returns the status of a purchase by id. Used by webhook handler for idempotency.';
+
+GRANT EXECUTE ON FUNCTION public.get_purchase_status(UUID) TO service_role;

@@ -15,6 +15,11 @@ export interface ArchiveImage {
   width: string;
   url: string;
   tags?: string[]; // First tag is treated as the category for grouping
+  // Optional fields to align with shared gallery image shape
+  public_id?: string;
+  format?: string;
+  blurDataUrl?: string;
+  title?: string;
 }
 
 export default function ArchivesClientComponent() {

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Ticket, Plus, Minus, X } from 'lucide-react';
+import { Loader2, Ticket, Plus, Minus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import { t } from '@/lib/i18n/translations';
@@ -12,6 +12,7 @@ import { useTranslation } from '@/lib/contexts/TranslationContext';
 import { useTheme } from '@/lib/contexts/ThemeContext';
 import { SupabaseClient } from '@supabase/supabase-js';
 import PhoneNumberInput from '@/components/ui/phone-number-input';
+import { useIsMobile } from '@/lib/utils/use-is-mobile';
 
 // Helper function for formatting price (matching event page)
 const formatPrice = (price: number): string => {
@@ -79,6 +80,7 @@ export default function PurchaseFormModal({
 }: PurchaseFormModalProps) {
   const { currentLanguage } = useTranslation();
   const { button } = useTheme();
+  const isMobile = useIsMobile();
   const [quantity, setQuantity] = useState(1);
   const [quantityDisplay, setQuantityDisplay] = useState('1');
   const [userName, setUserName] = useState('');
@@ -341,8 +343,9 @@ export default function PurchaseFormModal({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop - stable key for reliable exit animation on desktop */}
           <motion.div
+            key="purchase-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -363,42 +366,49 @@ export default function PurchaseFormModal({
             }}
           />
 
-          {/* Panel */}
+          {/* Panel - slides from bottom on mobile, from right on desktop */}
           <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
+            key="purchase-panel"
+            {...(isMobile
+              ? {
+                  initial: { y: '100%' },
+                  animate: { y: 0 },
+                  exit: { y: '100%' },
+                }
+              : {
+                  initial: { x: '100%' },
+                  animate: { x: 0 },
+                  exit: { x: '100%' },
+                })}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="fixed top-0 bottom-0 right-0 flex w-full md:w-[500px] p-4 z-[70] will-change-transform pointer-events-auto"
-            style={{ position: 'fixed', top: 0, right: 0, bottom: 0 }}
+            className={`fixed z-[70] will-change-transform pointer-events-auto ${
+              isMobile
+                ? 'inset-x-0 bottom-0 flex w-full'
+                : 'top-0 bottom-0 right-0 flex w-full md:w-[500px]'
+            }`}
+            style={
+              isMobile
+                ? { position: 'fixed', left: 0, right: 0, bottom: 0 }
+                : { position: 'fixed', top: 0, right: 0, bottom: 0 }
+            }
             onClick={e => e.stopPropagation()} // Prevent event bubbling to backdrop
           >
-            <div className="flex flex-col w-full bg-[#1a1a1a] backdrop-blur-xl rounded-sm shadow-2xl">
+            <div className="flex flex-col w-full h-[70vh] md:h-full min-h-0 bg-[#1a1a1a] backdrop-blur-xl rounded-t-xl md:rounded-none shadow-2xl p-4">
               {/* Header */}
-              <div className="flex justify-between items-center px-3 md:px-4 py-6 mb-0">
+              <div className="flex items-start py-4 md:py-6 flex-shrink-0">
                 <div>
-                  <h2 className="text-3xl font-bold text-foreground">
+                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                     {t(currentLanguage, 'purchaseModal.title')}
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">
                     {t(currentLanguage, 'purchaseModal.description')}
                   </p>
                 </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="hover:bg-muted/50"
-                  aria-label="Close modal"
-                  onClick={onClose}
-                  type="button"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
               </div>
 
               {/* Form Content */}
-              <div className="flex-1 overflow-y-auto px-3 md:px-4">
-                <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="flex-1 overflow-y-auto min-h-0">
+                <form onSubmit={handleSubmit} className="space-y-6 py-2">
                   {/* Item Details */}
                   <div className="bg-muted/30 p-3 rounded-sm">
                     <div className="flex justify-between items-center">
@@ -568,7 +578,7 @@ export default function PurchaseFormModal({
               </div>
 
               {/* Footer with Submit Button */}
-              <div className="px-3 md:px-4 py-4 border-t border-border">
+              <div className="px-3 md:px-4 py-4 border-t border-border flex-shrink-0">
                 <Button
                   type="submit"
                   disabled={isLoading || !isFormValid()}

@@ -10,6 +10,8 @@ import Link from 'next/link';
 import { useWishlist } from './wishlist-context';
 import { useCart } from '../cart/cart-context';
 import { useTheme } from '@/lib/contexts/ThemeContext';
+import { useTranslation } from '@/lib/contexts/TranslationContext';
+import { t } from '@/lib/i18n/translations';
 import { createPortal } from 'react-dom';
 import { SanityProduct } from '../types';
 
@@ -17,6 +19,7 @@ export default function WishlistModal() {
   const { wishlist, removeFromWishlist, wishlistCount } = useWishlist();
   const { addItem } = useCart();
   const { button } = useTheme();
+  const { currentLanguage } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -201,7 +204,7 @@ export default function WishlistModal() {
                                         }
                                       >
                                         <ShoppingCart className="h-3 w-3 mr-1" />
-                                        Add to Cart
+                                        {t(currentLanguage, 'merchPage.productDetail.addToCart')}
                                       </Button>
                                     </div>
                                   </div>

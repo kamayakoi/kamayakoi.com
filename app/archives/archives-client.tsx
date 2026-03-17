@@ -27,7 +27,18 @@ export default function ArchivesClientComponent() {
   const [images, setImages] = useState<ArchiveImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [zoomedImageId, setZoomedImageId] = useState<number | null>(null); // State for zoomed image ID
+  const [zoomedState, setZoomedState] = useState<{
+    sectionTitle: string;
+    sectionImages: ArchiveImage[];
+    sectionIndex: number;
+  } | null>(null);
+
+  // Slug for section anchor (safe for URLs)
+  const toSectionId = (title: string) =>
+    title
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
 
   // Memoize filtered and grouped image lists
   const taggedImages = useMemo(
@@ -53,6 +64,21 @@ export default function ArchivesClientComponent() {
     });
     return groups;
   }, [taggedImages]);
+
+  // Sections for navigation and zoom (tagged + untagged)
+  const sections = useMemo(() => {
+    const result: { title: string; images: ArchiveImage[] }[] = [];
+    Object.entries(imagesByTag).forEach(([tag, imgs]) =>
+      result.push({ title: tag, images: imgs })
+    );
+    if (untaggedImages.length > 0) {
+      result.push({
+        title: t(currentLanguage, 'archivesPage.untagged'),
+        images: untaggedImages,
+      });
+    }
+    return result;
+  }, [imagesByTag, untaggedImages, currentLanguage]);
 
   // Fetch images from the API route
   useEffect(() => {
@@ -111,11 +137,6 @@ export default function ArchivesClientComponent() {
     fetchImages();
   }, []); // Fetch only once on component mount
 
-  const zoomedIndex =
-    zoomedImageId === null
-      ? -1
-      : images.findIndex(img => img.id === zoomedImageId);
-
   // --- Render Logic ---
   if (isLoading) {
     // Render only the spinner, Header/Footer are in the parent page
@@ -132,7 +153,7 @@ export default function ArchivesClientComponent() {
   }
 
   const handleCloseModal = () => {
-    setZoomedImageId(null);
+    setZoomedState(null);
   };
 
   // Return the main archives content and modal
@@ -149,6 +170,27 @@ export default function ArchivesClientComponent() {
               {t(currentLanguage, 'archivesPage.description')}
             </div>
           </div>
+
+          {/* Section navigation by title */}
+          {sections.length > 1 && (
+            <nav
+              className="flex flex-wrap justify-center gap-2 mt-6"
+              aria-label="Archives sections"
+            >
+              {sections.map(({ title: sectionTitle }) => {
+                const sectionId = toSectionId(sectionTitle);
+                return (
+                  <a
+                    key={sectionId}
+                    href={`#${sectionId}`}
+                    className="px-4 py-2 rounded-md text-sm font-medium bg-zinc-200/80 dark:bg-zinc-800/80 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors"
+                  >
+                    {sectionTitle}
+                  </a>
+                );
+              })}
+            </nav>
+          )}
         </div>
 
         {/* Archives Images Section */}
@@ -175,23 +217,33 @@ export default function ArchivesClientComponent() {
             </motion.div>
           )}
 
-          {/* Tagged Images Sections by Category */}
-          {Object.entries(imagesByTag).map(([tag, tagImages]) => (
-            <section key={tag} className="mb-16">
+          {/* Sections grouped by tag (or untagged) */}
+          {sections.map(({ title: sectionTitle, images: sectionImages }) => (
+            <section
+              key={toSectionId(sectionTitle)}
+              id={toSectionId(sectionTitle)}
+              className="mb-16 scroll-mt-24"
+            >
               {/* Section Title */}
               <h2 className="text-2xl sm:text-3xl md:text-4xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-8 text-left capitalize">
-                {tag}
+                {sectionTitle}
               </h2>
 
               {/* Images Grid */}
               <div className="columns-1 gap-4 sm:columns-2 xl:columns-3 2xl:columns-4">
-                {tagImages.map(({ id, url, width, height }, index) => {
+                {sectionImages.map(({ id, url, width, height }, index) => {
                   const numericWidth = parseInt(width, 10);
                   const numericHeight = parseInt(height, 10);
                   return (
                     <div
-                      key={`tagged-${id}`}
-                      onClick={() => setZoomedImageId(id)}
+                      key={`${sectionTitle}-${id}`}
+                      onClick={() =>
+                        setZoomedState({
+                          sectionTitle,
+                          sectionImages,
+                          sectionIndex: index,
+                        })
+                      }
                       className={`
                                         relative
                                         mb-5 block w-full cursor-zoom-in
@@ -199,7 +251,7 @@ export default function ArchivesClientComponent() {
                                     `}
                     >
                       <Image
-                        alt={`Archives photo - ${tag}`}
+                        alt={`Archives photo - ${sectionTitle}`}
                         className="transform rounded-sm brightness-90 transition will-change-auto group-hover:brightness-110"
                         style={{ transform: 'translate3d(0, 0, 0)' }}
                         src={url}
@@ -209,7 +261,7 @@ export default function ArchivesClientComponent() {
                                           (max-width: 1280px) 50vw,
                                           (max-width: 1536px) 33vw,
                                           25vw"
-                        priority={index < 3} // Priority for first few images in each section
+                        priority={index < 3}
                       />
                     </div>
                   );
@@ -217,58 +269,15 @@ export default function ArchivesClientComponent() {
               </div>
             </section>
           ))}
-
-          {/* Untagged Images Section */}
-          {untaggedImages.length > 0 && (
-            <section className="mb-16">
-              {/* Section Title */}
-              <h2 className="text-2xl sm:text-3xl md:text-4xl tracking-tighter font-regular text-zinc-800 dark:text-white -mt-16 mb-8 text-left">
-                {t(currentLanguage, 'archivesPage.untagged')}
-              </h2>
-
-              <div className="columns-1 gap-4 sm:columns-2 xl:columns-3 2xl:columns-4">
-                {untaggedImages.map(({ id, url, width, height }, index) => {
-                  const numericWidth = parseInt(width, 10);
-                  const numericHeight = parseInt(height, 10);
-                  // console.log(`Untagged Image ${public_id} tags:`, tags);
-                  return (
-                    <div
-                      key={`untagged-${id}`}
-                      onClick={() => setZoomedImageId(id)}
-                      className={`
-                                        relative 
-                                        mb-5 block w-full cursor-zoom-in
-                                        after:content after:pointer-events-none after:absolute after:inset-0 after:rounded-sm after:shadow-highlight
-                                    `}
-                    >
-                      <Image
-                        alt="Archives photo"
-                        className="transform rounded-sm brightness-90 transition will-change-auto group-hover:brightness-110"
-                        style={{ transform: 'translate3d(0, 0, 0)' }}
-                        src={url}
-                        width={!isNaN(numericWidth) ? numericWidth : 720}
-                        height={!isNaN(numericHeight) ? numericHeight : 480}
-                        sizes="(max-width: 640px) 100vw,
-                                          (max-width: 1280px) 50vw,
-                                          (max-width: 1536px) 33vw,
-                                          25vw"
-                        priority={index < 3 && taggedImages.length === 0} // Priority only if no tagged images were prioritized
-                      />
-                      {/* No tag display for untagged images, or could be an empty placeholder if design requires */}
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
         </div>
       </div>
 
-      {/* Zoomed Image Modal / Backdrop with vertical scroll carousel and download */}
-      {zoomedIndex >= 0 && (
+      {/* Zoomed Image Modal – carousel shows only images from the clicked section */}
+      {zoomedState && (
         <ZoomImage
-          images={images}
-          initialIndex={zoomedIndex}
+          images={zoomedState.sectionImages}
+          initialIndex={zoomedState.sectionIndex}
+          sectionTitle={zoomedState.sectionTitle}
           onClose={handleCloseModal}
         />
       )}

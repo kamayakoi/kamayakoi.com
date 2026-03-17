@@ -280,7 +280,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
     }
   };
 
-  const removeFromOfflineQueue = (ticketId: string) => {
+  const removeFromOfflineQueue = useCallback((ticketId: string) => {
     try {
       const queue = getOfflineQueue();
       const newQueue = queue.filter((id) => id !== ticketId);
@@ -289,25 +289,40 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
     } catch {
       // ignore
     }
-  };
+  }, []);
 
   const processOfflineQueue = useCallback(async () => {
     const queue = getOfflineQueue();
     if (queue.length === 0) return;
 
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token =
+      sessionData?.session?.access_token ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const projectUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!token || !projectUrl) return;
+
+    const functionUrl = `${projectUrl.replace(/\/$/, '')}/functions/v1/verify-ticket`;
+
     for (const id of queue) {
       try {
-        const { data: response, error: edgeError } =
-          await supabase.functions.invoke('verify-ticket', {
-            body: {
-              ticket_identifier: id,
-              verified_by: 'staff_portal_offline_sync',
-              auto_admit: true,
-            },
-          });
+        const response = await fetch(functionUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            ticket_identifier: id,
+            verified_by: 'staff_portal_offline_sync',
+            auto_admit: true,
+          }),
+          keepalive: true,
+        });
 
-        if (!edgeError && response) {
-          if (response.success || response.error_code === 'ALREADY_USED') {
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success || result.error_code === 'ALREADY_USED') {
             removeFromOfflineQueue(id);
           }
         }
@@ -316,8 +331,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
         console.error('Offline sync failed for', id, err);
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [removeFromOfflineQueue]);
 
   // Sync offline queue periodically and on mount
   useEffect(() => {
@@ -457,25 +471,48 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
 
       try {
         const result = await retryWithBackoff(async () => {
-          // Call the edge function for atomic verification and admission
-          const { data: response, error: edgeError } =
-            await supabase.functions.invoke('verify-ticket', {
-              body: {
-                ticket_identifier: trimmedId,
-                verified_by: 'staff_portal',
-                auto_admit: true, // Always auto-admit valid tickets
-              },
-            });
+          const { data: sessionData } = await supabase.auth.getSession();
+          const token =
+            sessionData?.session?.access_token ||
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+          const projectUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-          if (edgeError) {
-            throw new Error(`Edge function error: ${edgeError.message}`);
+          if (!projectUrl) {
+            throw new Error('Missing Supabase URL');
+          }
+          if (!token) {
+            throw new Error('Missing Supabase credentials');
           }
 
-          if (!response || typeof response !== 'object') {
+          const functionUrl = `${projectUrl.replace(/\/$/, '')}/functions/v1/verify-ticket`;
+
+          const response = await fetch(functionUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              ticket_identifier: trimmedId,
+              verified_by: 'staff_portal',
+              auto_admit: true,
+            }),
+            keepalive: true,
+          });
+
+          if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(
+              err.error_message || `HTTP error! status: ${response.status}`
+            );
+          }
+
+          const responseData = await response.json();
+          if (!responseData || typeof responseData !== 'object') {
             throw new Error('Invalid response from verification service');
           }
 
-          return response;
+          return responseData;
         });
 
         // Type the result from retryWithBackoff

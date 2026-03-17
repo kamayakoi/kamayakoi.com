@@ -14,7 +14,6 @@ import {
   Ticket,
   AlertCircle,
   QrCode,
-  Tag,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import Link from 'next/link';
@@ -49,7 +48,7 @@ interface TicketData {
 const PIN_CACHE_KEY = 'staff_verification_pin';
 const PIN_CACHE_DURATION = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
 
-const DUPLICATE_SCAN_WINDOW = 5000; // 5 seconds - matches server-side duplicate window
+const DUPLICATE_SCAN_WINDOW = 2000; // 2 seconds in milliseconds
 const MAX_RETRY_ATTEMPTS = 3;
 const RETRY_DELAY_MS = 1000; // 1 second
 
@@ -60,6 +59,10 @@ let lastScannedTickets: Map<string, number> = new Map();
 // Track tickets currently being processed to prevent duplicate API calls
 const inFlightTickets: Set<string> = new Set();
 
+// Track tickets we just admitted (to avoid showing "already used" from duplicate requests)
+const RECENTLY_ADMITTED_WINDOW = 5000; // 5 seconds
+const recentlyAdmittedTickets: Map<string, number> = new Map();
+
 // Clean up old scan records to prevent memory leaks
 const cleanupOldScanRecords = () => {
   const now = Date.now();
@@ -68,6 +71,13 @@ const cleanupOldScanRecords = () => {
   for (const [ticketId, timestamp] of lastScannedTickets.entries()) {
     if (timestamp < cutoffTime) {
       lastScannedTickets.delete(ticketId);
+    }
+  }
+
+  // Clean up old recently-admitted records
+  for (const [ticketId, timestamp] of recentlyAdmittedTickets.entries()) {
+    if (now - timestamp > RECENTLY_ADMITTED_WINDOW) {
+      recentlyAdmittedTickets.delete(ticketId);
     }
   }
 };
@@ -253,7 +263,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
   const [isVerified, setIsVerified] = useState(false);
   const [wasJustAdmitted, setWasJustAdmitted] = useState(false);
   const [flashColor, setFlashColor] = useState<'green' | 'red' | null>(null);
-  const [offlineQueueLength, setOfflineQueueLength] = useState(0);
+  const [, setOfflineQueueLength] = useState(0);
 
   // --- Offline Queue Logic ---
   const OFFLINE_QUEUE_KEY = 'verify_offline_queue';
@@ -305,6 +315,9 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
     const functionUrl = `${projectUrl.replace(/\/$/, '')}/functions/v1/verify-ticket`;
 
     for (const id of queue) {
+      // Skip tickets currently being verified in real-time (prevents double verification)
+      if (inFlightTickets.has(id)) continue;
+
       try {
         const response = await fetch(functionUrl, {
           method: 'POST',
@@ -416,7 +429,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
         ORPHANED_TICKET: 'Ticket data is incomplete. Please contact support.',
         ALREADY_USED: t(
           currentLanguage,
-          'ticketVerification.warnings.alreadyUsed'
+          'ticketVerification.warnings.fullyUsed'
         ),
         DUPLICATE_SCAN: 'Please wait a moment before scanning again.',
         ADMISSION_FAILED:
@@ -450,7 +463,6 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
           setError(
             'This ticket was just scanned. Please wait before scanning again.'
           );
-          setErrorCode('DUPLICATE_SCAN');
           setIsLoading(false);
           return;
         }
@@ -458,15 +470,11 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
         // Prevent duplicate in-flight requests for the same ticket
         if (inFlightTickets.has(trimmedId)) {
           setError('This ticket is currently being processed. Please wait.');
-          setErrorCode('DUPLICATE_SCAN');
           setIsLoading(false);
           return;
         }
 
         inFlightTickets.add(trimmedId);
-
-        // Save to queue immediately so it's not lost if browser closes
-        addToOfflineQueue(trimmedId);
       }
 
       try {
@@ -484,6 +492,9 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
             throw new Error('Missing Supabase credentials');
           }
 
+          // We use fetch with keepalive:true because mobile browsers
+          // abort network requests on page navigation (when using native photo app scanner).
+          // Edge Function URL format: https://[PROJECT_REF].supabase.co/functions/v1/verify-ticket
           const functionUrl = `${projectUrl.replace(/\/$/, '')}/functions/v1/verify-ticket`;
 
           const response = await fetch(functionUrl, {
@@ -507,12 +518,8 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
             );
           }
 
-          const responseData = await response.json();
-          if (!responseData || typeof responseData !== 'object') {
-            throw new Error('Invalid response from verification service');
-          }
-
-          return responseData;
+          const resultData = await response.json();
+          return resultData;
         });
 
         // Type the result from retryWithBackoff
@@ -570,14 +577,29 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
           typedResult.error_code
         ) {
           const errorCode = typedResult.error_code;
-          const errorMessage = typedResult.error_message || 'Admission failed';
 
+          // If we just admitted this ticket (duplicate request from Strict Mode / double nav),
+          // don't show "already used" - we already showed success
+          if (errorCode === 'ALREADY_USED') {
+            const admittedAt = recentlyAdmittedTickets.get(trimmedId);
+            if (
+              admittedAt &&
+              Date.now() - admittedAt < RECENTLY_ADMITTED_WINDOW
+            ) {
+              // Duplicate request - we already showed success, keep success state
+              setWasJustAdmitted(true);
+              setError(null);
+              setErrorCode(null);
+              return;
+            }
+          }
+
+          const errorMessage = typedResult.error_message || 'Admission failed';
           const friendlyMessage = getUserFriendlyError(errorCode, errorMessage);
           setError(friendlyMessage);
           setErrorCode(errorCode);
 
-          if (errorCode === 'ALREADY_USED' || errorCode === 'DUPLICATE_SCAN') {
-            // For already used / duplicate scan, show as orange/warning
+          if (errorCode === 'ALREADY_USED') {
             setFlashColor('red');
           } else {
             playErrorSound();
@@ -594,25 +616,26 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
           setErrorCode(null);
 
           if (!isRefreshCall) {
+            recentlyAdmittedTickets.set(trimmedId, Date.now());
             playSuccessSound();
             setFlashColor('green');
             setTimeout(() => setFlashColor(null), 300);
           }
         }
       } catch (err) {
-        // Skip logging timeout/abort errors to avoid noisy DOMException output
-        const isTimeoutOrAbort =
-          (err instanceof Error &&
-            (err.name === 'TimeoutError' ||
-              err.name === 'AbortError' ||
-              err.message.includes('timeout') ||
-              err.message.includes('aborted'))) ||
-          (typeof err === 'object' &&
-            err !== null &&
-            'code' in err &&
-            (err as { code: number }).code === 23);
-        if (!isTimeoutOrAbort) {
-          console.error('Verification error:', err);
+        console.error('Verification error:', err);
+        // Only add to offline queue when we're actually offline (network error) - not for real-time scans
+        if (!isRefreshCall) {
+          const errorMessage =
+            err instanceof Error ? err.message : 'Verification failed';
+          const isNetworkError =
+            errorMessage.includes('network') ||
+            errorMessage.includes('timeout') ||
+            errorMessage.includes('fetch') ||
+            errorMessage.includes('connection');
+          if (isNetworkError) {
+            addToOfflineQueue(trimmedId);
+          }
         }
         // Only set error if this is not a refresh call or if wasJustAdmitted is not true
         if (!isRefreshCall || !wasJustAdmitted) {
@@ -629,8 +652,9 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
         }
       } finally {
         setIsLoading(false);
-        // Remove from in-flight set
-        inFlightTickets.delete(trimmedId);
+        if (!isRefreshCall) {
+          inFlightTickets.delete(trimmedId);
+        }
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -697,40 +721,28 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
 
   // Get status colors and icons based on ticket state
   const getTicketStatus = () => {
-    // ALREADY_USED: Show as GREEN/VERIFIED (customer paid, let them in)
-    // Backend still logs everything for audit trail
+    // Show slate/neutral styling for ALREADY_USED (ticket is valid, just previously scanned)
     if (error && errorCode === 'ALREADY_USED') {
       return {
-        bgColor: 'bg-emerald-500/10 backdrop-blur-sm',
-        borderColor: 'border-emerald-500/50',
-        textColor: 'text-emerald-200',
-        icon: <CheckCircle className="h-8 w-8 text-emerald-400" />,
-        badgeVariant: 'default' as const,
-        badgeText: t(currentLanguage, 'ticketVerification.badges.welcome'),
-        statusText: t(currentLanguage, 'ticketVerification.status.welcome'),
-      };
-    }
-
-    // DUPLICATE_SCAN: Keep as orange warning (timing issue, wait a moment)
-    if (error && errorCode === 'DUPLICATE_SCAN') {
-      return {
-        bgColor: 'bg-orange-500/10 backdrop-blur-sm',
-        borderColor: 'border-orange-500/50',
-        textColor: 'text-orange-200',
-        icon: <AlertCircle className="h-8 w-8 text-orange-400" />,
+        bgColor: 'bg-slate-50/50 dark:bg-slate-800/30',
+        borderColor: 'border-slate-300 dark:border-slate-600',
+        textColor: 'text-slate-700 dark:text-slate-300',
+        icon: (
+          <AlertCircle className="h-8 w-8 text-slate-600 dark:text-slate-400" />
+        ),
         badgeVariant: 'secondary' as const,
-        badgeText: t(currentLanguage, 'ticketVerification.badges.alreadyUsed'),
-        statusText: error,
+        badgeText: t(currentLanguage, 'ticketVerification.badges.fullyUsed'),
+        statusText: t(currentLanguage, 'ticketVerification.status.fullyUsed'),
       };
     }
 
     // Show red styling for actual errors (ticket not found, invalid, unpaid, etc.)
     if (error) {
       return {
-        bgColor: 'bg-red-500/10 backdrop-blur-sm',
-        borderColor: 'border-red-500/50',
-        textColor: 'text-red-200',
-        icon: <XCircle className="h-8 w-8 text-red-400" />,
+        bgColor: 'bg-red-50/30 dark:bg-red-900/20',
+        borderColor: 'border-red-300 dark:border-red-700',
+        textColor: 'text-red-800 dark:text-red-200',
+        icon: <XCircle className="h-8 w-8 text-red-600 dark:text-red-400" />,
         badgeVariant: 'destructive' as const,
         badgeText: t(currentLanguage, 'ticketVerification.badges.invalid'),
         statusText: t(currentLanguage, 'ticketVerification.status.invalid'),
@@ -739,10 +751,12 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
 
     if (ticketData?.remaining_tickets === 0) {
       return {
-        bgColor: 'bg-orange-500/10 backdrop-blur-sm',
-        borderColor: 'border-orange-500/50',
-        textColor: 'text-orange-200',
-        icon: <AlertCircle className="h-8 w-8 text-orange-400" />,
+        bgColor: 'bg-slate-50/50 dark:bg-slate-800/30',
+        borderColor: 'border-slate-300 dark:border-slate-600',
+        textColor: 'text-slate-700 dark:text-slate-300',
+        icon: (
+          <AlertCircle className="h-8 w-8 text-slate-600 dark:text-slate-400" />
+        ),
         badgeVariant: 'secondary' as const,
         badgeText: t(currentLanguage, 'ticketVerification.badges.fullyUsed'),
         statusText: t(currentLanguage, 'ticketVerification.status.fullyUsed'),
@@ -754,10 +768,12 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
       if (remaining <= 0) {
         // Fallback for logic consistency
         return {
-          bgColor: 'bg-orange-500/10 backdrop-blur-sm',
-          borderColor: 'border-orange-500/50',
-          textColor: 'text-orange-200',
-          icon: <AlertCircle className="h-8 w-8 text-orange-400" />,
+          bgColor: 'bg-slate-50/50 dark:bg-slate-800/30',
+          borderColor: 'border-slate-300 dark:border-slate-600',
+          textColor: 'text-slate-700 dark:text-slate-300',
+          icon: (
+            <AlertCircle className="h-8 w-8 text-slate-600 dark:text-slate-400" />
+          ),
           badgeVariant: 'secondary' as const,
           badgeText: t(currentLanguage, 'ticketVerification.badges.fullyUsed'),
           statusText: t(currentLanguage, 'ticketVerification.status.fullyUsed'),
@@ -766,22 +782,26 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
     } else if (ticketData?.is_used) {
       // Fallback for legacy / simple tickets
       return {
-        bgColor: 'bg-orange-500/10 backdrop-blur-sm',
-        borderColor: 'border-orange-500/50',
-        textColor: 'text-orange-200',
-        icon: <AlertCircle className="h-8 w-8 text-orange-400" />,
+        bgColor: 'bg-slate-50/50 dark:bg-slate-800/30',
+        borderColor: 'border-slate-300 dark:border-slate-600',
+        textColor: 'text-slate-700 dark:text-slate-300',
+        icon: (
+          <AlertCircle className="h-8 w-8 text-slate-600 dark:text-slate-400" />
+        ),
         badgeVariant: 'secondary' as const,
-        badgeText: t(currentLanguage, 'ticketVerification.badges.alreadyUsed'),
-        statusText: t(currentLanguage, 'ticketVerification.status.alreadyUsed'),
+        badgeText: t(currentLanguage, 'ticketVerification.badges.fullyUsed'),
+        statusText: t(currentLanguage, 'ticketVerification.status.fullyUsed'),
       };
     }
 
     if (ticketData) {
       return {
-        bgColor: 'bg-emerald-500/10 backdrop-blur-sm',
-        borderColor: 'border-emerald-500/50',
-        textColor: 'text-emerald-200',
-        icon: <CheckCircle className="h-8 w-8 text-emerald-400" />,
+        bgColor: 'bg-green-50/30 dark:bg-green-900/20',
+        borderColor: 'border-green-300 dark:border-green-700',
+        textColor: 'text-green-800 dark:text-green-200',
+        icon: (
+          <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+        ),
         badgeVariant: 'default' as const,
         badgeText: t(currentLanguage, 'ticketVerification.badges.valid'),
         statusText: t(currentLanguage, 'ticketVerification.status.valid'),
@@ -797,12 +817,12 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
       <>
         <div className="min-h-screen bg-background flex flex-col justify-center py-12 px-4">
           <div className="max-w-md mx-auto">
-            <Card className="rounded-sm border-slate-700 bg-card/30 backdrop-blur-sm shadow-xl">
+            <Card className="border border-blue-300 dark:border-blue-700 bg-blue-50/30 dark:bg-blue-900/20 rounded-sm">
               <CardHeader className="text-center pb-4">
-                <div className="mx-auto w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mb-4 border border-slate-700">
-                  <QrCode className="w-8 h-8 text-slate-200" />
+                <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-sm flex items-center justify-center mb-4">
+                  <QrCode className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-white">
+                <CardTitle className="text-2xl font-bold text-blue-800 dark:text-blue-200">
                   {t(currentLanguage, 'ticketVerification.pageTitle')}
                 </CardTitle>
               </CardHeader>
@@ -816,17 +836,17 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                   </p>
                 </div>
 
-                <div className="bg-slate-900/50 border border-slate-800 rounded-sm p-4">
+                <div className="bg-blue-50/30 dark:bg-blue-900/20 border border-blue-300 dark:border-blue-700 rounded-sm p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <Ticket className="w-5 h-5 text-purple-400" />
-                    <h3 className="font-semibold text-slate-200">
+                    <Ticket className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <h3 className="font-semibold text-blue-800 dark:text-blue-200">
                       {t(
                         currentLanguage,
                         'ticketVerification.noTicketId.howToVerify.title'
                       )}
                     </h3>
                   </div>
-                  <ul className="text-sm text-slate-400 space-y-1">
+                  <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
                     <li>
                       •{' '}
                       {t(
@@ -852,10 +872,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <Button
-                    asChild
-                    className="w-full bg-slate-100 text-slate-900 hover:bg-slate-200 rounded-sm"
-                  >
+                  <Button asChild className="w-full">
                     <Link href="/">
                       <Calendar className="w-4 h-4 mr-2" />
                       {t(
@@ -866,7 +883,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                   </Button>
                 </div>
 
-                <div className="text-center text-xs text-slate-500">
+                <div className="text-center text-xs text-gray-500 dark:text-gray-400">
                   {t(currentLanguage, 'ticketVerification.noTicketId.needHelp')}
                 </div>
               </CardContent>
@@ -883,12 +900,12 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
       <>
         <div className="min-h-screen bg-background flex flex-col justify-center py-12 px-4">
           <div className="max-w-md mx-auto">
-            <Card className="rounded-sm border-slate-700 bg-card/30 backdrop-blur-sm shadow-xl">
+            <Card className="border border-amber-300 dark:border-amber-700 bg-amber-50/30 dark:bg-amber-900/20 rounded-sm">
               <CardHeader className="text-center pb-4">
-                <div className="mx-auto w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mb-4 border border-slate-700">
-                  <Shield className="w-8 h-8 text-slate-200" />
+                <div className="mx-auto w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-sm flex items-center justify-center mb-4">
+                  <Shield className="w-8 h-8 text-amber-600 dark:text-amber-400" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-white">
+                <CardTitle className="text-2xl font-bold text-amber-800 dark:text-amber-200">
                   {t(currentLanguage, 'ticketVerification.staffVerification')}
                 </CardTitle>
               </CardHeader>
@@ -900,13 +917,6 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                       'ticketVerification.pinEntry.description'
                     )}
                   </p>
-                  <p className="text-sm font-mono bg-gray-800 p-2 rounded-sm">
-                    {t(
-                      currentLanguage,
-                      'ticketVerification.pinEntry.ticketIdLabel'
-                    )}{' '}
-                    {ticketId.substring(0, 8)}...
-                  </p>
                 </div>
 
                 <form onSubmit={handlePinSubmit} className="space-y-4">
@@ -917,15 +927,16 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                       'ticketVerification.pinEntry.pinPlaceholder'
                     )}
                     value={pin}
-                    onChange={e => setPin(e.target.value)}
+                    onChange={(e) => setPin(e.target.value)}
                     maxLength={4}
-                    className="text-center text-2xl tracking-widest h-12 rounded-sm bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-slate-500 focus:ring-slate-500/20"
+                    className="text-center text-2xl tracking-widest h-12 rounded-sm bg-background border border-border"
                     disabled={isLoading}
                   />
                   <Button
                     type="submit"
-                    className="w-full h-11 text-base bg-slate-100 text-slate-900 hover:bg-slate-200 rounded-sm"
-                    disabled={isLoading || pin.length < 4}
+                    className="w-full"
+                    disabled={pin.length !== 4 || isLoading}
+                    size="lg"
                   >
                     {isLoading ? (
                       <>
@@ -936,10 +947,13 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                         )}
                       </>
                     ) : (
-                      t(
-                        currentLanguage,
-                        'ticketVerification.pinEntry.verifyButton'
-                      )
+                      <>
+                        <Shield className="mr-2 h-4 w-4" />
+                        {t(
+                          currentLanguage,
+                          'ticketVerification.pinEntry.verifyButton'
+                        )}
+                      </>
                     )}
                   </Button>
                 </form>
@@ -952,7 +966,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                   </div>
                 )}
 
-                <div className="text-center text-xs text-slate-500">
+                <div className="text-center text-xs text-gray-500 dark:text-gray-400">
                   {t(currentLanguage, 'ticketVerification.pinEntry.staffOnly')}
                 </div>
               </CardContent>
@@ -978,21 +992,14 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
         />
       )}
 
-      <div className="min-h-screen bg-background py-8 px-4">
-        <div className="max-w-md mx-auto space-y-6">
-          {/* Offline Queue Indicator */}
-          {offlineQueueLength > 0 && (
-            <div className="rounded-sm border border-amber-700 bg-amber-900/20 p-3 text-amber-300 text-sm flex items-center gap-2">
-              <span className="font-bold">{offlineQueueLength}</span> scan{offlineQueueLength > 1 ? 's' : ''} pending sync — will retry automatically
-            </div>
-          )}
-
+      <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-sm space-y-8">
           {/* Loading State */}
           {isLoading && !ticketData && (
-            <Card className="rounded-sm border-slate-700 bg-card/30 backdrop-blur-sm">
-              <CardContent className="pt-6 text-center text-white">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2 text-slate-400" />
-                <p>
+            <Card className="rounded-lg border-0 shadow-sm">
+              <CardContent className="py-12 text-center">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
                   {t(
                     currentLanguage,
                     'ticketVerification.loading.ticketDetails'
@@ -1002,80 +1009,65 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
             </Card>
           )}
 
-          {/* Status Header with Customer Name and Ticket Type */}
+          {/* Status Card */}
           {status && (
             <Card
-              className={`border-2 ${status.borderColor} ${status.bgColor} rounded-sm`}
+              className={`rounded-lg border ${status.borderColor} ${status.bgColor} shadow-sm`}
             >
-              <CardContent className="pt-6 text-center">
-                <div className="flex flex-col items-center space-y-4">
+              <CardContent className="px-8 py-12">
+                <div className="flex flex-col items-center text-center space-y-8">
                   {status.icon}
-                  <h2 className={`text-xl font-bold ${status.textColor}`}>
+                  <h2 className={`text-lg font-medium tracking-tight ${status.textColor}`}>
                     {status.statusText}
                   </h2>
                   {ticketData && (
-                    <div className="text-center space-y-3">
-                      {/* Prominent Ticket Type Badge */}
-                      <div className="flex justify-center">
-                        <div className="bg-slate-900/60 border border-slate-700 rounded-sm px-4 py-2 flex items-center gap-2 backdrop-blur-sm">
-                          <Tag className="h-4 w-4 text-slate-400" />
-                          <span className="text-lg font-bold text-white">
-                            {ticketData.ticket_name}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Customer Name */}
-                      <div>
-                        <p className="text-2xl font-bold text-white">
+                    <div className="w-full space-y-6">
+                      <p className="text-sm text-muted-foreground uppercase tracking-wider leading-relaxed">
+                        {ticketData.ticket_name} — {ticketData.event_title}
+                      </p>
+                      <div className="space-y-1">
+                        <p className="text-2xl font-semibold text-foreground tracking-tight">
                           {ticketData.customer_name}
                         </p>
-                        <p className="text-sm text-slate-300">
-                          {ticketData.remaining_tickets !== undefined ? (
-                            <span>
-                              {ticketData.remaining_tickets}{' '}
-                              {t(
+                        <p className="text-sm text-muted-foreground">
+                          {ticketData.remaining_tickets !== undefined
+                            ? t(
                                 currentLanguage,
-                                'ticketVerification.quantity.remaining'
-                              )}
-                              <span className="mx-2">/</span>
-                              {ticketData.total_quantity || 1}{' '}
-                              {t(
-                                currentLanguage,
-                                'ticketVerification.quantity.people'
-                              )}
-                            </span>
-                          ) : /* Fallback older logic */
-                          ticketData.use_count !== undefined &&
-                            ticketData.total_quantity ? (
-                            <span>
-                              {ticketData.use_count} /{' '}
-                              {ticketData.total_quantity}{' '}
-                              {t(
-                                currentLanguage,
-                                'ticketVerification.quantity.scanned'
-                              )}
-                            </span>
-                          ) : (
-                            <span>
-                              {ticketData.quantity}{' '}
-                              {ticketData.quantity > 1
-                                ? t(
-                                    currentLanguage,
-                                    'ticketVerification.quantity.people'
-                                  )
-                                : t(
-                                    currentLanguage,
-                                    'ticketVerification.quantity.person'
-                                  )}
-                            </span>
-                          )}
+                                'ticketVerification.quantity.remainingOfTotal',
+                                {
+                                  remaining: ticketData.remaining_tickets,
+                                  total: ticketData.total_quantity || 1,
+                                }
+                              )
+                            : ticketData.use_count !== undefined &&
+                                ticketData.total_quantity
+                              ? `${ticketData.use_count} / ${ticketData.total_quantity} ${t(
+                                  currentLanguage,
+                                  'ticketVerification.quantity.scanned'
+                                )}`
+                              : `${ticketData.quantity} ${
+                                  ticketData.quantity > 1
+                                    ? t(
+                                        currentLanguage,
+                                        'ticketVerification.quantity.people'
+                                      )
+                                    : t(
+                                        currentLanguage,
+                                        'ticketVerification.quantity.person'
+                                      )
+                                }`}
                         </p>
                       </div>
                     </div>
                   )}
                   {error && (
-                    <p className="text-red-700 dark:text-red-300 mt-2">
+                    <p
+                      className={`text-sm ${
+                        errorCode === 'ALREADY_USED'
+                          ? 'text-muted-foreground'
+                          : 'text-destructive'
+                      }`}
+                    >
                       {error}
                     </p>
                   )}
@@ -1083,72 +1075,6 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
               </CardContent>
             </Card>
           )}
-
-          {/* Event Details Card */}
-          {ticketData && (
-            <Card className="rounded-sm border-slate-700 bg-card/30 backdrop-blur-sm">
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2 text-slate-200">
-                  <Ticket className="h-5 w-5" />
-                  <CardTitle className="text-lg font-semibold">
-                    {t(currentLanguage, 'ticketVerification.eventDetails')}
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Simplified event details for quick scanning */}
-                <div>
-                  <div className="flex items-center gap-2 text-slate-400 text-sm mb-1">
-                    <Tag className="h-3 w-3" />
-                    <span>Ticket Type & Purchase Details</span>
-                  </div>
-                  <p className="font-bold text-xl uppercase tracking-wide text-white">
-                    {ticketData.ticket_name} - {ticketData.event_title}
-                  </p>
-                  <div className="flex justify-between mt-2 pt-2 border-t border-slate-700 text-sm text-slate-300">
-                    <span className="text-slate-400">
-                      Quantity: {ticketData.total_quantity || 1} ticket
-                      {(ticketData.total_quantity || 1) > 1 ? 's' : ''}
-                    </span>
-                    <span className="font-mono">
-                      {new Intl.NumberFormat('fr-FR').format(
-                        ticketData.price_per_ticket
-                      )}{' '}
-                      {ticketData.currency_code} each
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm text-slate-300">
-                    <span className="text-slate-400">
-                      ID: {ticketId.substring(0, 12)}
-                    </span>
-                    <span className="font-bold">
-                      Total{' '}
-                      {new Intl.NumberFormat('fr-FR').format(
-                        ticketData.total_amount
-                      )}{' '}
-                      {ticketData.currency_code}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          <div className="text-center pt-4">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setError(null);
-                setErrorCode(null);
-                setTicketData(null);
-                setWasJustAdmitted(false);
-              }}
-              className="w-full h-12 text-base bg-slate-900/50 backdrop-blur-sm border-slate-700 hover:bg-slate-800 text-slate-200"
-            >
-              <QrCode className="mr-2 h-4 w-4" />
-              Scan New Ticket
-            </Button>
-          </div>
         </div>
       </div>
     </>

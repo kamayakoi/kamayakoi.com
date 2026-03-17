@@ -230,7 +230,7 @@ export default function ArchivesClientComponent() {
               </h2>
 
               {/* Images Grid */}
-              <div className="columns-1 gap-4 sm:columns-2 xl:columns-3 2xl:columns-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 {sectionImages.map(({ id, url, width, height }, index) => {
                   const numericWidth = parseInt(width, 10);
                   const numericHeight = parseInt(height, 10);

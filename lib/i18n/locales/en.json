@@ -397,18 +397,16 @@
       "pinPlaceholder": "Enter 4-digit PIN",
       "verifyButton": "Verify PIN",
       "verifying": "Verifying...",
-      "staffOnly": "Staff access only. Unauthorized access is prohibited."
+      "staffOnly": "Staff access only."
     },
     "status": {
       "invalid": "Invalid ticket",
-      "alreadyUsed": "Already checked in",
       "welcome": "Ticket Verified - Welcome!",
       "fullyUsed": "All admissions used",
       "valid": "Ready for entry"
     },
     "badges": {
       "invalid": "❌ INVALID",
-      "alreadyUsed": "⚠️ ALREADY USED",
       "welcome": "✅ VERIFIED",
       "fullyUsed": "⚠️ FULLY USED",
       "valid": "✅ VALID"
@@ -422,8 +420,8 @@
       "invalidPin": "❌ Invalid PIN. Access denied."
     },
     "warnings": {
-      "alreadyUsed": "⚠️ This ticket has already been used",
-      "entryNotPermitted": "Entry not permitted unless customer shows proof of previous entrance"
+      "entryNotPermitted": "Entry not permitted unless customer shows proof of previous entrance",
+      "fullyUsed": "This ticket has already been used."
     },
     "success": {
       "admitted": "✅ Successfully admitted!",
@@ -433,7 +431,8 @@
       "people": "people",
       "person": "person",
       "remaining": "remaining",
-      "scanned": "scanned"
+      "scanned": "scanned",
+      "remainingOfTotal": "{remaining} of {total} remaining"
     },
     "checkedInLabel": "Checked in:"
   },

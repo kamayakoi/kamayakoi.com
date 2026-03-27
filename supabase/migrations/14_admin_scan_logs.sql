@@ -1,5 +1,3 @@
--- Migration: Admin Scan Logs Function
--- Adds RPC to fetch all verification logs for the admin dashboard
 
 -- Function to get verification logs (both success and failure)
 -- Drop the existing function first
@@ -27,6 +25,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = ''
 AS $$
+#variable_conflict use_column
 BEGIN
     RETURN QUERY
     SELECT
@@ -62,4 +61,4 @@ $$;
 GRANT EXECUTE ON FUNCTION public.get_admin_verification_logs(TEXT, INTEGER, INTEGER) TO service_role;
 GRANT EXECUTE ON FUNCTION public.get_admin_verification_logs(TEXT, INTEGER, INTEGER) TO authenticated;
 
-COMMENT ON FUNCTION public.get_admin_verification_logs(TEXT, INTEGER, INTEGER) IS 'Returns paginated verification logs for admin review with proper customer data for both individual and legacy tickets, including scanner email';
+COMMENT ON FUNCTION public.get_admin_verification_logs(TEXT, INTEGER, INTEGER) IS 'Returns paginated verification logs for admin review with proper customer data for both individual and legacy tickets';

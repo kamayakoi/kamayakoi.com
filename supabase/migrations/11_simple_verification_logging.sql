@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS public.verification_attempts (
     success BOOLEAN NOT NULL,
     error_code TEXT,
     error_message TEXT,
-    scanner_email TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    scanner_email TEXT
 );
 
 -- Add indexes for common queries
@@ -32,13 +32,7 @@ TO service_role
 USING (true)
 WITH CHECK (true);
 
--- Allow authenticated users to insert and read (for staff verification app)
-CREATE POLICY "Allow authenticated insert on verification_attempts"
-ON public.verification_attempts
-FOR INSERT
-TO authenticated
-WITH CHECK (true);
-
+-- Allow authenticated users to read (for staff verification app)
 CREATE POLICY "Allow authenticated read on verification_attempts"
 ON public.verification_attempts
 FOR SELECT
@@ -47,7 +41,7 @@ USING (true);
 
 -- Grant permissions
 GRANT SELECT, INSERT ON public.verification_attempts TO service_role;
-GRANT SELECT, INSERT ON public.verification_attempts TO authenticated;
+GRANT SELECT ON public.verification_attempts TO authenticated;
 
 -- RPC Function to log verification attempts
 CREATE OR REPLACE FUNCTION public.log_verification_attempt(
@@ -111,6 +105,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = ''
 AS $$
+#variable_conflict use_column
 BEGIN
     RETURN QUERY
     SELECT 
@@ -157,6 +152,6 @@ GRANT EXECUTE ON FUNCTION public.cleanup_old_verification_logs() TO service_role
 
 -- Comments
 COMMENT ON TABLE public.verification_attempts IS 'Logs all ticket verification attempts for troubleshooting. Retains last 30 days.';
-COMMENT ON FUNCTION public.log_verification_attempt(TEXT, TEXT, TEXT, BOOLEAN, TEXT, TEXT, TEXT) IS 'Logs a verification attempt with success status, optional error details, and scanner email';
+COMMENT ON FUNCTION public.log_verification_attempt(TEXT, TEXT, TEXT, BOOLEAN, TEXT, TEXT, TEXT) IS 'Logs a verification attempt with success status and optional error details';
 COMMENT ON FUNCTION public.get_recent_verification_errors(INTEGER, TEXT) IS 'Returns recent failed verification attempts, optionally filtered by event';
 COMMENT ON FUNCTION public.cleanup_old_verification_logs() IS 'Deletes verification logs older than 30 days';

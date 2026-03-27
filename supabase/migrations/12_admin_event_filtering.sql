@@ -47,13 +47,17 @@ BEGIN
         FROM public.purchases p
         LEFT JOIN public.individual_tickets it ON it.purchase_id = p.id
         WHERE
-            CASE
-                WHEN p_status_filter = 'paid' THEN p.status = 'paid'
-                WHEN p_status_filter = 'pending' THEN p.status = 'pending_payment'
-                WHEN p_status_filter = 'failed' THEN p.status = 'payment_failed'
-                WHEN p_status_filter = 'all' THEN TRUE
-                ELSE p.status = 'paid' -- Default to paid
-            END
+            p.event_id IS NOT NULL
+            AND TRIM(p.event_id) != ''
+            AND (
+                CASE
+                    WHEN p_status_filter = 'paid' THEN p.status = 'paid'
+                    WHEN p_status_filter = 'pending' THEN p.status = 'pending_payment'
+                    WHEN p_status_filter = 'failed' THEN p.status = 'payment_failed'
+                    WHEN p_status_filter = 'all' THEN TRUE
+                    ELSE p.status = 'paid' -- Default to paid
+                END
+            )
         GROUP BY p.event_id
     ) event_stats
     ORDER BY event_stats.last_purchase_date DESC;
@@ -91,7 +95,10 @@ RETURNS TABLE(
     used_at TIMESTAMPTZ,
     is_used BOOLEAN,
     verified_by TEXT,
-    scanned_count BIGINT
+    scanned_count BIGINT,
+    is_bundle BOOLEAN,
+    tickets_per_bundle INTEGER,
+    admission_total INTEGER
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -99,12 +106,12 @@ SET search_path = ''
 AS $$
 BEGIN
     RETURN QUERY
-    SELECT 
-        p.id as purchase_id,
+    SELECT
+        p.id AS purchase_id,
         p.customer_id,
-        c.name as customer_name,
-        c.email as customer_email,
-        c.phone as customer_phone,
+        c.name AS customer_name,
+        c.email AS customer_email,
+        c.phone AS customer_phone,
         p.event_id,
         p.event_title,
         p.event_date_text,
@@ -127,18 +134,29 @@ BEGIN
         p.is_used,
         p.verified_by,
         (
-            CASE 
-                WHEN p.individual_tickets_generated THEN 
+            CASE
+                WHEN EXISTS (
+                    SELECT 1 FROM public.individual_tickets it0 WHERE it0.purchase_id = p.id
+                ) THEN
                     (
-                        SELECT COUNT(*)
+                        SELECT COUNT(*)::BIGINT
                         FROM public.individual_tickets it
-                        WHERE it.purchase_id = p.id
-                          AND it.is_used = TRUE
+                        WHERE it.purchase_id = p.id AND it.is_used = TRUE
                     )
-                ELSE 
+                ELSE
                     p.use_count::BIGINT
             END
-        ) as scanned_count
+        ) AS scanned_count,
+        COALESCE(p.is_bundle, FALSE) AS is_bundle,
+        COALESCE(NULLIF(p.tickets_per_bundle, 0), 1) AS tickets_per_bundle,
+        (
+            CASE
+                WHEN COALESCE(p.is_bundle, FALSE) THEN
+                    p.quantity * GREATEST(COALESCE(NULLIF(p.tickets_per_bundle, 0), 1), 1)
+                ELSE
+                    GREATEST(p.quantity, 1)
+            END
+        )::INTEGER AS admission_total
     FROM public.purchases p
     INNER JOIN public.customers c ON p.customer_id = c.id
     WHERE p.event_id = p_event_id
@@ -159,4 +177,4 @@ COMMENT ON FUNCTION public.get_admin_events_list(TEXT)
 IS 'Returns list of all events with purchase statistics for admin filtering based on status filter (paid/pending/failed/all), counting scanned tickets from both individual ticket system and legacy purchase-level scanning';
 
 COMMENT ON FUNCTION public.get_admin_purchases_by_event(TEXT)
-IS 'Returns purchases filtered by specific event ID';
+IS 'Returns purchases for one event; admission_total expands bundles for admin display.';

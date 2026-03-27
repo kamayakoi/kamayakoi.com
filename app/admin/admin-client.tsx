@@ -1,11 +1,18 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import supabase from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Card,
   CardContent,
@@ -41,7 +48,9 @@ import {
   Download,
   Filter,
   QrCode,
+  ScanLine,
   UserPlus,
+  MailWarning,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import LoadingComponent from '@/components/ui/loader';
@@ -52,8 +61,8 @@ interface Purchase {
   customer_name: string;
   customer_email: string;
   customer_phone: string;
-  event_id: string;
-  event_title: string;
+  event_id: string | null;
+  event_title: string | null;
   event_date_text: string;
   event_time_text: string;
   event_venue_name: string;
@@ -72,6 +81,54 @@ interface Purchase {
   is_used: boolean;
   verified_by: string | null;
   scanned_count?: number;
+  is_bundle?: boolean;
+  tickets_per_bundle?: number;
+  admission_total?: number;
+}
+
+function getAdmissionTotal(p: Purchase): number {
+  if (typeof p.admission_total === 'number' && p.admission_total > 0) {
+    return p.admission_total;
+  }
+  if (p.is_bundle) {
+    return Math.max(1, p.quantity * (p.tickets_per_bundle ?? 1));
+  }
+  return Math.max(1, p.quantity);
+}
+
+function getScannedCount(p: Purchase): number {
+  if (p.scanned_count !== undefined && p.scanned_count !== null) {
+    return Number(p.scanned_count);
+  }
+  return p.is_used ? getAdmissionTotal(p) : 0;
+}
+
+type AdmissionScanState = 'none' | 'partial' | 'full';
+
+function getAdmissionScanState(p: Purchase): AdmissionScanState {
+  const total = getAdmissionTotal(p);
+  const scanned = getScannedCount(p);
+  if (scanned <= 0) return 'none';
+  if (scanned >= total) return 'full';
+  return 'partial';
+}
+
+/** Event ticket / pack rows only (excludes merch and other non-event sales). */
+function isEventTicketPurchase(p: Purchase): boolean {
+  return p.event_id != null && String(p.event_id).trim() !== '';
+}
+
+/** Stable id for filter dropdown: distinguishes bundle vs ticket with same title. */
+function offeringLineKey(p: Purchase): string {
+  const raw = (p.ticket_name ?? '').trim();
+  const name = raw || '—';
+  return p.is_bundle ? `bundle:${name}` : `ticket:${name}`;
+}
+
+function offeringLineLabel(p: Purchase): string {
+  const raw = (p.ticket_name ?? '').trim();
+  const name = raw || 'Untitled';
+  return p.is_bundle ? `${name} (pack)` : name;
 }
 
 interface EventInfo {
@@ -118,9 +175,10 @@ export default function AdminClient() {
   const [events, setEvents] = useState<EventInfo[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 
-  // New: Status filter (defaults to 'paid' only)
   const [statusFilter, setStatusFilter] = useState<string>('paid');
-  const [admissionFilter, setAdmissionFilter] = useState<string>('all'); // 'all', 'scanned', 'unscanned'
+  const [admissionFilter, setAdmissionFilter] = useState<string>('all'); // 'all', 'scanned' (fully admitted), 'unscanned' (no scans yet)
+  /** 'all' or offeringLineKey — options rebuilt from loaded purchases */
+  const [offeringFilter, setOfferingFilter] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
 
   // Guest invitation state
@@ -134,6 +192,31 @@ export default function AdminClient() {
   // Scanner Tab State
   const [activeTab, setActiveTab] = useState('purchases');
   const [scanLogs, setScanLogs] = useState<ScanLog[]>([]);
+
+  const paidEmailEventKeys = useMemo(() => {
+    const s = new Set<string>();
+    for (const p of purchases) {
+      if (p.status === 'paid') {
+        s.add(
+          `${String(p.customer_email ?? '')
+            .trim()
+            .toLowerCase()}::${String(p.event_id ?? '')}`
+        );
+      }
+    }
+    return s;
+  }, [purchases]);
+
+  const isTrueAbandonment = useCallback(
+    (purchase: Purchase) => {
+      if (purchase.status !== 'payment_failed') return false;
+      const key = `${String(purchase.customer_email ?? '')
+        .trim()
+        .toLowerCase()}::${String(purchase.event_id ?? '')}`;
+      return !paidEmailEventKeys.has(key);
+    },
+    [paidEmailEventKeys]
+  );
 
   // Helper function to format relative time
   const formatRelativeTime = (timestamp: string | null) => {
@@ -223,6 +306,7 @@ export default function AdminClient() {
     if (isAuthenticated) {
       loadEvents();
       loadPurchases();
+      loadScanLogs();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEvent, statusFilter, isAuthenticated]);
@@ -323,13 +407,22 @@ export default function AdminClient() {
 
   const loadEvents = async () => {
     try {
+      // Always use "all" for event list so the dropdown stays stable when switching
+      // status filters (paid/pending/failed). Otherwise, clicking "Failed" would
+      // replace the list with only events that have failed purchases, causing the
+      // selected event to disappear and the dropdown to show "All Events" or blank.
       const { data, error } = await supabase.rpc('get_admin_events_list', {
-        p_status_filter: 'all', // Always show all events regardless of payment status filter
+        p_status_filter: 'all',
       });
       if (error) {
         console.error('Error loading events:', error);
       } else {
-        setEvents(data || []);
+        // Filter out events with null/empty event_id to prevent "event without title"
+        // (can occur when purchases have null event_id - they group into one row)
+        const validEvents = (data || []).filter(
+          (e: EventInfo) => e.event_id && String(e.event_id).trim() !== ''
+        );
+        setEvents(validEvents);
       }
     } catch (error) {
       console.error('Error loading events:', error);
@@ -453,8 +546,24 @@ export default function AdminClient() {
         );
 
         if (updateError) {
-          toast.error('Failed to update customer information');
           console.error('Error updating customer:', updateError);
+          // Show more specific error message
+          let errorMessage = 'Failed to update customer information';
+          if (updateError.message?.includes('duplicate key')) {
+            errorMessage = 'Email already exists for another customer';
+          } else if (updateError.message?.includes('customer_email_valid')) {
+            errorMessage = 'Invalid email format';
+          } else if (updateError.message?.includes('Manual review required')) {
+            errorMessage =
+              'Email already exists for a different customer. Manual review required.';
+          } else if (
+            updateError.message?.includes(
+              'already exists for a different customer'
+            )
+          ) {
+            errorMessage = updateError.message; // Use the full message from the function
+          }
+          toast.error(errorMessage);
           return;
         }
       }
@@ -473,16 +582,21 @@ export default function AdminClient() {
         return;
       }
 
-      // Trigger email send
+      const isRecoverySend = isTrueAbandonment(selectedPurchase);
+
       const { error: emailError } = await supabase.functions.invoke(
-        'send-ticket-email',
+        isRecoverySend ? 'send-recovery-email' : 'send-ticket-email',
         {
           body: { purchase_id: selectedPurchase.purchase_id },
         }
       );
 
       if (emailError) {
-        toast.error('Failed to send email');
+        toast.error(
+          isRecoverySend
+            ? 'Failed to send recovery email'
+            : 'Failed to send email'
+        );
         console.error('Error sending email:', emailError);
         return;
       }
@@ -490,9 +604,15 @@ export default function AdminClient() {
       const isFirstTime =
         selectedPurchase.email_dispatch_status === 'NOT_INITIATED' ||
         selectedPurchase.email_dispatch_attempts === 0;
-      toast.success(
-        isFirstTime ? 'Email sent successfully!' : 'Email resent successfully!'
-      );
+      if (isRecoverySend) {
+        toast.success('Recovery email sent successfully!');
+      } else {
+        toast.success(
+          isFirstTime
+            ? 'Email sent successfully!'
+            : 'Email resent successfully!'
+        );
+      }
       setIsEmailDialogOpen(false);
       setSelectedPurchase(null);
       setNewEmail('');
@@ -590,18 +710,36 @@ export default function AdminClient() {
   };
 
   const canSendEmail = (purchase: Purchase) => {
-    // Allow sending if payment is paid, or if it's pending but customer wants to receive the email anyway
-    return purchase.status === 'paid' || purchase.status === 'pending_payment';
+    return (
+      purchase.status === 'paid' ||
+      purchase.status === 'pending_payment' ||
+      isTrueAbandonment(purchase)
+    );
+  };
+
+  /** Recovery emails are one-shot from admin: show Sent badge but no action after success. */
+  const canShowEmailActionButton = (purchase: Purchase) => {
+    if (!canSendEmail(purchase)) return false;
+    if (
+      isTrueAbandonment(purchase) &&
+      purchase.email_dispatch_status === 'SENT_SUCCESSFULLY'
+    )
+      return false;
+    return true;
   };
 
   const getEmailButtonText = (purchase: Purchase) => {
     const isFirstTime =
       purchase.email_dispatch_status === 'NOT_INITIATED' ||
       purchase.email_dispatch_attempts === 0;
+    if (isTrueAbandonment(purchase)) {
+      return isFirstTime ? 'Recovery Email' : 'Retry Recovery';
+    }
     return isFirstTime ? 'Send Email' : 'Resend Email';
   };
 
   const getEmailButtonIcon = (purchase: Purchase) => {
+    if (isTrueAbandonment(purchase)) return MailWarning;
     const isFirstTime =
       purchase.email_dispatch_status === 'NOT_INITIATED' ||
       purchase.email_dispatch_attempts === 0;
@@ -619,13 +757,64 @@ export default function AdminClient() {
     return true;
   });
 
+  // Item names from data (ticket_name from Sanity / checkout) — scoped by status + event
+  const offeringOptions = useMemo(() => {
+    const statusFiltered = purchases.filter(purchase => {
+      if (statusFilter === 'paid' && purchase.status !== 'paid') return false;
+      if (statusFilter === 'all') return true;
+      if (statusFilter === 'pending' && purchase.status !== 'pending_payment')
+        return false;
+      if (statusFilter === 'failed' && purchase.status !== 'payment_failed')
+        return false;
+      return true;
+    });
+    const scoped = statusFiltered
+      .filter(isEventTicketPurchase)
+      .filter(
+        p =>
+          !selectedEvent ||
+          (p.event_id != null && String(p.event_id) === selectedEvent)
+      );
+    const map = new Map<string, string>();
+    for (const p of scoped) {
+      const key = offeringLineKey(p);
+      if (!map.has(key)) map.set(key, offeringLineLabel(p));
+    }
+    return Array.from(map.entries())
+      .map(([value, label]) => ({ value, label }))
+      .sort((a, b) =>
+        a.label.localeCompare(b.label, undefined, { sensitivity: 'base' })
+      );
+  }, [purchases, statusFilter, selectedEvent]);
+
+  useEffect(() => {
+    if (offeringFilter === 'all') return;
+    if (!offeringOptions.some(o => o.value === offeringFilter)) {
+      setOfferingFilter('all');
+    }
+  }, [offeringFilter, offeringOptions]);
+
   // Filter purchases by status AND search (for table display)
   const filteredPurchases = statusFilteredPurchases.filter(purchase => {
-    // Admission filter
-    if (admissionFilter === 'scanned' && !purchase.is_used) return false;
-    if (admissionFilter === 'unscanned' && purchase.is_used) return false;
+    if (!isEventTicketPurchase(purchase)) return false;
 
-    // Search query
+    // Event filter: when an event is selected, only show its purchases
+    // (defense-in-depth: backend should filter, but search/race conditions can mix data)
+    if (selectedEvent && purchase.event_id !== selectedEvent) return false;
+
+    // Admission filter (aligned with scanned_count / multi-ticket rows)
+    const admissionScan = getAdmissionScanState(purchase);
+    if (admissionFilter === 'scanned' && admissionScan !== 'full') return false;
+    if (admissionFilter === 'unscanned' && admissionScan !== 'none')
+      return false;
+
+    if (
+      offeringFilter !== 'all' &&
+      offeringLineKey(purchase) !== offeringFilter
+    ) {
+      return false;
+    }
+
     if (!searchQuery.trim()) return true;
 
     const query = searchQuery.toLowerCase();
@@ -633,6 +822,7 @@ export default function AdminClient() {
       purchase.customer_name?.toLowerCase().includes(query) ||
       purchase.customer_email?.toLowerCase().includes(query) ||
       purchase.event_title?.toLowerCase().includes(query) ||
+      purchase.ticket_name?.toLowerCase().includes(query) ||
       purchase.purchase_id.toLowerCase().includes(query)
     );
   });
@@ -640,26 +830,26 @@ export default function AdminClient() {
   // Calculate current event stats from PAID purchases only (always show real business metrics)
   const currentEventStats = selectedEvent
     ? (() => {
-        const paidPurchases = purchases.filter(
-          p => p.event_id === selectedEvent && p.status === 'paid'
-        );
-        const totalPurchases = paidPurchases.length;
-        const totalTickets = paidPurchases.reduce(
-          (sum, p) => sum + p.quantity,
-          0
-        );
-        const scannedTickets = paidPurchases.reduce(
-          (sum, p) => sum + (p.is_used ? 1 : 0),
-          0
-        );
+      const paidPurchases = purchases.filter(
+        p => p.event_id === selectedEvent && p.status === 'paid'
+      );
+      const totalPurchases = paidPurchases.length;
+      const totalTickets = paidPurchases.reduce(
+        (sum, p) => sum + getAdmissionTotal(p),
+        0
+      );
+      const scannedTickets = paidPurchases.reduce(
+        (sum, p) => sum + getScannedCount(p),
+        0
+      );
 
-        return {
-          total_purchases: totalPurchases,
-          total_tickets: totalTickets,
-          scanned_tickets: scannedTickets,
-          event_id: selectedEvent,
-        };
-      })()
+      return {
+        total_purchases: totalPurchases,
+        total_tickets: totalTickets,
+        scanned_tickets: scannedTickets,
+        event_id: selectedEvent,
+      };
+    })()
     : null;
 
   if (!isAuthenticated) {
@@ -827,11 +1017,10 @@ export default function AdminClient() {
               variant="ghost"
               size="sm"
               onClick={() => setActiveTab('purchases')}
-              className={`rounded-sm text-xs sm:text-sm ${
-                activeTab === 'purchases'
+              className={`rounded-sm text-xs sm:text-sm ${activeTab === 'purchases'
                   ? 'bg-slate-700 text-white hover:bg-slate-600'
                   : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
-              }`}
+                }`}
             >
               Purchases
             </Button>
@@ -839,11 +1028,10 @@ export default function AdminClient() {
               variant="ghost"
               size="sm"
               onClick={() => setActiveTab('scans')}
-              className={`rounded-sm text-xs sm:text-sm ${
-                activeTab === 'scans'
+              className={`rounded-sm text-xs sm:text-sm ${activeTab === 'scans'
                   ? 'bg-slate-700 text-white hover:bg-slate-600'
                   : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
-              }`}
+                }`}
             >
               Logs
             </Button>
@@ -880,11 +1068,10 @@ export default function AdminClient() {
                         variant="ghost"
                         size="sm"
                         onClick={() => setStatusFilter('paid')}
-                        className={`rounded-sm text-xs sm:text-sm ${
-                          statusFilter === 'paid'
+                        className={`rounded-sm text-xs sm:text-sm ${statusFilter === 'paid'
                             ? 'bg-slate-700 text-white hover:bg-slate-600'
                             : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
-                        }`}
+                          }`}
                       >
                         <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         Paid Only
@@ -893,11 +1080,10 @@ export default function AdminClient() {
                         variant="ghost"
                         size="sm"
                         onClick={() => setStatusFilter('all')}
-                        className={`rounded-sm text-xs sm:text-sm ${
-                          statusFilter === 'all'
+                        className={`rounded-sm text-xs sm:text-sm ${statusFilter === 'all'
                             ? 'bg-slate-700 text-white hover:bg-slate-600'
                             : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
-                        }`}
+                          }`}
                       >
                         All Status
                       </Button>
@@ -905,11 +1091,10 @@ export default function AdminClient() {
                         variant="ghost"
                         size="sm"
                         onClick={() => setStatusFilter('pending')}
-                        className={`rounded-sm text-xs sm:text-sm ${
-                          statusFilter === 'pending'
+                        className={`rounded-sm text-xs sm:text-sm ${statusFilter === 'pending'
                             ? 'bg-slate-700 text-white hover:bg-slate-600'
                             : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
-                        }`}
+                          }`}
                       >
                         <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         Pending
@@ -918,11 +1103,10 @@ export default function AdminClient() {
                         variant="ghost"
                         size="sm"
                         onClick={() => setStatusFilter('failed')}
-                        className={`rounded-sm text-xs sm:text-sm ${
-                          statusFilter === 'failed'
+                        className={`rounded-sm text-xs sm:text-sm ${statusFilter === 'failed'
                             ? 'bg-slate-700 text-white hover:bg-slate-600'
                             : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
-                        }`}
+                          }`}
                       >
                         <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         Failed
@@ -931,15 +1115,14 @@ export default function AdminClient() {
 
                     {/* Admission Filter */}
                     <div className="grid grid-cols-3 gap-2 mt-2">
-                       <Button
+                      <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setAdmissionFilter('all')}
-                        className={`rounded-sm text-xs sm:text-sm ${
-                          admissionFilter === 'all'
+                        className={`rounded-sm text-xs sm:text-sm ${admissionFilter === 'all'
                             ? 'bg-slate-700 text-white hover:bg-slate-600'
                             : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
-                        }`}
+                          }`}
                       >
                         All Admission
                       </Button>
@@ -947,11 +1130,10 @@ export default function AdminClient() {
                         variant="ghost"
                         size="sm"
                         onClick={() => setAdmissionFilter('scanned')}
-                        className={`rounded-sm text-xs sm:text-sm ${
-                          admissionFilter === 'scanned'
+                        className={`rounded-sm text-xs sm:text-sm ${admissionFilter === 'scanned'
                             ? 'bg-slate-700 text-white hover:bg-slate-600'
                             : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
-                        }`}
+                          }`}
                       >
                         <QrCode className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         Scanned
@@ -960,44 +1142,74 @@ export default function AdminClient() {
                         variant="ghost"
                         size="sm"
                         onClick={() => setAdmissionFilter('unscanned')}
-                        className={`rounded-sm text-xs sm:text-sm ${
-                          admissionFilter === 'unscanned'
+                        className={`rounded-sm text-xs sm:text-sm ${admissionFilter === 'unscanned'
                             ? 'bg-slate-700 text-white hover:bg-slate-600'
                             : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
-                        }`}
+                          }`}
                       >
                         <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         Not Scanned
                       </Button>
                     </div>
 
-                    {/* Search and Actions */}
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-2">
-                      <div className="flex-1 flex gap-2">
-                        <Input
-                          id="search"
-                          placeholder="Search..."
-                          value={searchQuery}
-                          onChange={e => setSearchQuery(e.target.value)}
-                          className="rounded-sm bg-card/30 backdrop-blur-sm border-slate-700 text-gray-100 placeholder:text-gray-400 h-9 sm:h-12 flex-1 text-sm sm:text-base"
-                        />
-                        <Button
-                          onClick={searchPurchases}
-                          variant="outline"
-                          size="sm"
-                          className="rounded-sm border-slate-700 text-gray-100 hover:bg-card/70 h-9 sm:h-12 px-2 sm:px-3 shrink-0"
-                          disabled={loading}
-                        >
-                          <Search className="h-4 w-4" />
-                        </Button>
+                    {/* Search, product type, and actions */}
+                    <div className="mt-2 flex flex-col gap-2 lg:flex-row lg:items-stretch lg:gap-3">
+                      <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-stretch">
+                        <div className="flex min-w-0 flex-1 gap-2">
+                          <Input
+                            id="search"
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            className="h-8 flex-1 rounded-sm border-slate-700 bg-card/30 text-sm text-gray-100 placeholder:text-gray-400 backdrop-blur-sm sm:h-10 sm:text-base"
+                          />
+                          <Button
+                            onClick={searchPurchases}
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 shrink-0 touch-manipulation rounded-sm border-slate-700 p-0 text-gray-100 hover:bg-card/70 sm:h-10 sm:w-10"
+                            disabled={loading}
+                            aria-label="Search purchases"
+                          >
+                            <Search className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div className="w-full shrink-0 sm:w-[min(100%,20rem)]">
+                          <Label htmlFor="offering-filter" className="sr-only">
+                            Ticket or pack
+                          </Label>
+                          <Select
+                            value={offeringFilter}
+                            onValueChange={setOfferingFilter}
+                          >
+                            <SelectTrigger
+                              id="offering-filter"
+                              className="h-8 w-full max-w-full touch-manipulation rounded-sm border-slate-700 bg-card/30 text-gray-100 backdrop-blur-sm focus:ring-slate-600 sm:h-10 [&>svg]:text-slate-400"
+                              aria-label="Filter by item"
+                            >
+                              <SelectValue placeholder="Item" />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-[min(24rem,70vh)] border-slate-700 bg-slate-950 text-gray-100">
+                              <SelectItem value="all">All items</SelectItem>
+                              {offeringOptions.map(({ value, label }) => (
+                                <SelectItem key={value} value={value}>
+                                  <span className="line-clamp-2 text-left">
+                                    {label}
+                                  </span>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 lg:shrink-0">
                         <Button
                           onClick={loadPurchases}
                           variant="outline"
                           size="sm"
-                          className="rounded-sm border-slate-700 text-gray-100 hover:bg-card/70 h-9 sm:h-12 px-2 sm:px-3 flex-1 sm:flex-none"
+                          className="h-8 w-8 touch-manipulation rounded-sm border-slate-700 p-0 text-gray-100 hover:bg-card/70 sm:h-10 sm:w-10"
                           disabled={loading}
+                          aria-label="Refresh purchases"
                         >
                           <RefreshCw
                             className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
@@ -1008,8 +1220,9 @@ export default function AdminClient() {
                           onClick={downloadCSV}
                           variant="outline"
                           size="sm"
-                          className="rounded-sm border-slate-700 text-gray-100 hover:bg-card/70 h-9 sm:h-12 px-2 sm:px-3 flex-1 sm:flex-none"
+                          className="h-8 w-8 touch-manipulation rounded-sm border-slate-700 p-0 text-gray-100 hover:bg-card/70 sm:h-10 sm:w-10"
                           disabled={loading}
+                          aria-label="Export purchases"
                         >
                           <Download className="h-4 w-4" />
                           <span className="ml-2 sm:hidden">Export</span>
@@ -1043,11 +1256,19 @@ export default function AdminClient() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="text-left w-[20%]">
+                          <TableHead className="text-left w-[18%]">
                             Customer
                           </TableHead>
-                          <TableHead className="text-left hidden sm:table-cell w-[25%]">
-                            Event
+                          {!selectedEvent && (
+                            <TableHead className="text-left hidden sm:table-cell w-[11%]">
+                              Event
+                            </TableHead>
+                          )}
+                          <TableHead
+                            className={`text-left hidden sm:table-cell ${selectedEvent ? 'w-[22%]' : 'w-[11%]'
+                              }`}
+                          >
+                            Item
                           </TableHead>
                           <TableHead className="text-center w-[10%]">
                             Tickets
@@ -1069,10 +1290,12 @@ export default function AdminClient() {
                       <TableBody>
                         {filteredPurchases.map(purchase => {
                           const EmailIcon = getEmailButtonIcon(purchase);
+                          const recoveryRow = isTrueAbandonment(purchase);
+                          const admissionScan = getAdmissionScanState(purchase);
                           return (
                             <TableRow key={purchase.purchase_id}>
                               {/* Customer Info */}
-                              <TableCell className="w-[20%]">
+                              <TableCell className="w-[18%]">
                                 <div className="min-w-0">
                                   <div className="font-medium text-gray-100 truncate max-w-[120px] sm:max-w-none">
                                     {purchase.customer_name}
@@ -1080,27 +1303,93 @@ export default function AdminClient() {
                                   <div className="text-xs text-gray-400 truncate max-w-[120px] sm:max-w-none">
                                     {purchase.customer_email}
                                   </div>
+                                  <div className="mt-1.5 space-y-0.5 sm:hidden text-xs text-gray-500">
+                                    <div
+                                      className="truncate"
+                                      title={purchase.event_title ?? undefined}
+                                    >
+                                      {purchase.event_title || '—'}
+                                    </div>
+                                    <div className="truncate text-gray-400">
+                                      {purchase.is_bundle ? (
+                                        <>
+                                          <span className="text-gray-300">
+                                            {purchase.ticket_name || '—'}
+                                          </span>
+                                          <span>
+                                            {' '}
+                                            × {purchase.quantity} pack ·{' '}
+                                            {getAdmissionTotal(purchase)}{' '}
+                                            tickets
+                                          </span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          {purchase.ticket_name || '—'} ×{' '}
+                                          {purchase.quantity}
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
                                 </div>
                               </TableCell>
 
-                              {/* Event Info - Hidden on mobile */}
-                              <TableCell className="hidden sm:table-cell w-[25%]">
-                                <div className="text-sm text-gray-100 truncate max-w-[150px]">
-                                  {purchase.event_title}
-                                </div>
-                                <div className="text-xs text-gray-400 truncate max-w-[150px]">
-                                  {purchase.ticket_name} × {purchase.quantity}
+                              {!selectedEvent && (
+                                <TableCell className="hidden sm:table-cell w-[11%]">
+                                  <div
+                                    className="text-sm text-gray-100 truncate max-w-[140px]"
+                                    title={purchase.event_title ?? undefined}
+                                  >
+                                    {purchase.event_title || '—'}
+                                  </div>
+                                </TableCell>
+                              )}
+
+                              <TableCell
+                                className={`hidden sm:table-cell ${selectedEvent ? 'w-[22%]' : 'w-[11%]'
+                                  }`}
+                              >
+                                <div
+                                  className={`text-xs text-gray-400 truncate ${selectedEvent
+                                      ? 'max-w-[240px]'
+                                      : 'max-w-[140px]'
+                                    }`}
+                                >
+                                  {purchase.is_bundle ? (
+                                    <>
+                                      <div
+                                        className="text-sm text-gray-100 truncate"
+                                        title={purchase.ticket_name}
+                                      >
+                                        {purchase.ticket_name || '—'}
+                                      </div>
+                                      <span>
+                                        × {purchase.quantity} pack ·{' '}
+                                        {getAdmissionTotal(purchase)} tickets
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span
+                                        className="text-sm text-gray-100"
+                                        title={purchase.ticket_name}
+                                      >
+                                        {purchase.ticket_name || '—'}
+                                      </span>{' '}
+                                      × {purchase.quantity}
+                                    </>
+                                  )}
                                 </div>
                               </TableCell>
 
                               {/* Tickets & Amount */}
                               <TableCell className="text-center w-[10%]">
                                 <div className="text-sm font-medium text-gray-100">
-                                  {purchase.scanned_count !== undefined
-                                    ? <span className="text-green-400">{purchase.scanned_count}</span>
-                                    : purchase.is_used ? purchase.quantity : 0}
+                                  <span className="text-green-400">
+                                    {getScannedCount(purchase)}
+                                  </span>
                                   <span className="text-gray-500 mx-1">/</span>
-                                  {purchase.quantity}
+                                  {getAdmissionTotal(purchase)}
                                 </div>
                                 <div className="text-xs text-gray-400">
                                   {purchase.total_amount}{' '}
@@ -1110,10 +1399,15 @@ export default function AdminClient() {
 
                               {/* Admission Status */}
                               <TableCell className="text-center w-[12%]">
-                                {purchase.is_used ? (
+                                {admissionScan === 'full' ? (
                                   <Badge className="bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700 rounded-sm text-xs">
                                     <QrCode className="h-3 w-3 mr-1" />
                                     Scanned
+                                  </Badge>
+                                ) : admissionScan === 'partial' ? (
+                                  <Badge className="bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 border-amber-300 dark:border-amber-700 rounded-sm text-xs">
+                                    <ScanLine className="h-3 w-3 mr-1" />
+                                    Partially scanned
                                   </Badge>
                                 ) : (
                                   <Badge className="bg-slate-800/50 text-slate-300 border-slate-700 rounded-sm text-xs">
@@ -1124,14 +1418,28 @@ export default function AdminClient() {
 
                               {/* Payment Status */}
                               <TableCell className="text-center w-[12%]">
-                                {getPaymentStatusBadge(purchase.status)}
+                                <div className="flex flex-col items-center gap-1">
+                                  {isTrueAbandonment(purchase) ? (
+                                    <Badge className="bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 border-amber-300 dark:border-amber-700 rounded-sm text-xs max-w-[100px] sm:max-w-none whitespace-normal sm:whitespace-nowrap">
+                                      Abandoned Cart
+                                    </Badge>
+                                  ) : (
+                                    getPaymentStatusBadge(purchase.status)
+                                  )}
+                                </div>
                               </TableCell>
 
                               {/* Email Status */}
-                              <TableCell className="text-center w-[15%]">
+                              <TableCell className="text-center w-[14%]">
                                 <div className="flex flex-col items-center gap-1">
-                                  {getStatusBadge(
-                                    purchase.email_dispatch_status
+                                  {canSendEmail(purchase) ? (
+                                    getStatusBadge(
+                                      purchase.email_dispatch_status
+                                    )
+                                  ) : (
+                                    <span className="text-xs text-gray-500">
+                                      —
+                                    </span>
                                   )}
                                   {purchase.pdf_ticket_sent_at && (
                                     <span className="text-xs text-gray-500">
@@ -1144,19 +1452,29 @@ export default function AdminClient() {
                               </TableCell>
 
                               {/* Actions */}
-                              <TableCell className="text-center w-[18%]">
-                                <Button
-                                  size="sm"
-                                  onClick={() => openEmailDialog(purchase)}
-                                  className="rounded-sm bg-blue-600 hover:bg-blue-700 text-white text-xs"
-                                  disabled={!canSendEmail(purchase)}
-                                >
-                                  <EmailIcon className="h-3 w-3 mr-1" />
-                                  <span className="hidden sm:inline ml-1">
-                                    {getEmailButtonText(purchase)}
+                              <TableCell className="text-center w-[14%]">
+                                {canShowEmailActionButton(purchase) ? (
+                                  <Button
+                                    size="sm"
+                                    onClick={() => openEmailDialog(purchase)}
+                                    className={`rounded-sm text-white text-xs ${recoveryRow
+                                        ? 'bg-amber-600 hover:bg-amber-700'
+                                        : 'bg-blue-600 hover:bg-blue-700'
+                                      }`}
+                                  >
+                                    <EmailIcon className="h-3 w-3 mr-1" />
+                                    <span className="hidden sm:inline ml-1">
+                                      {getEmailButtonText(purchase)}
+                                    </span>
+                                    <span className="sm:hidden">
+                                      {recoveryRow ? 'Recovery' : 'Email'}
+                                    </span>
+                                  </Button>
+                                ) : (
+                                  <span className="text-xs text-gray-500">
+                                    —
                                   </span>
-                                  <span className="sm:hidden">Email</span>
-                                </Button>
+                                )}
                               </TableCell>
                             </TableRow>
                           );
@@ -1260,10 +1578,8 @@ export default function AdminClient() {
                                     {log.error_message}
                                   </div>
                                 ) : (
-                                  <div className="text-green-400 text-xs">
-                                    {log.success
-                                      ? '✓ Verified successfully'
-                                      : 'No details'}
+                                  <div className="text-slate-500 text-xs">
+                                    Verified successfully
                                   </div>
                                 )}
                               </td>
@@ -1285,13 +1601,22 @@ export default function AdminClient() {
             <DialogHeader>
               <DialogTitle className="text-gray-100 text-base sm:text-lg">
                 {selectedPurchase &&
-                (selectedPurchase.email_dispatch_status === 'NOT_INITIATED' ||
-                  selectedPurchase.email_dispatch_attempts === 0)
-                  ? 'Send Ticket Email'
-                  : 'Resend Ticket Email'}
+                  (() => {
+                    const recovery = isTrueAbandonment(selectedPurchase);
+                    const first =
+                      selectedPurchase.email_dispatch_status ===
+                      'NOT_INITIATED' ||
+                      selectedPurchase.email_dispatch_attempts === 0;
+                    if (recovery) {
+                      return 'Send Recovery Email';
+                    }
+                    return first ? 'Send Ticket Email' : 'Resend Ticket Email';
+                  })()}
               </DialogTitle>
               <DialogDescription className="text-gray-300 text-xs sm:text-sm">
-                Update customer information and send the ticket email
+                {selectedPurchase && isTrueAbandonment(selectedPurchase)
+                  ? 'Update contact details if needed, then send the abandoned checkout recovery message.'
+                  : 'Update customer information and send the ticket email'}
               </DialogDescription>
             </DialogHeader>
             {selectedPurchase && (
@@ -1353,8 +1678,16 @@ export default function AdminClient() {
                       Event: {selectedPurchase.event_title}
                     </div>
                     <div>
-                      Ticket: {selectedPurchase.ticket_name} ×{' '}
-                      {selectedPurchase.quantity}
+                      Ticket: {selectedPurchase.ticket_name}
+                      {selectedPurchase.is_bundle ? (
+                        <span>
+                          {' '}
+                          — {selectedPurchase.quantity} pack (
+                          {getAdmissionTotal(selectedPurchase)} tickets)
+                        </span>
+                      ) : (
+                        <span> × {selectedPurchase.quantity}</span>
+                      )}
                     </div>
                     <div>
                       Amount: {selectedPurchase.total_amount}{' '}
@@ -1380,11 +1713,16 @@ export default function AdminClient() {
                         <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                         Sending...
                       </>
+                    ) : isTrueAbandonment(selectedPurchase) ? (
+                      <>
+                        <MailWarning className="h-4 w-4 mr-2" />
+                        Send Recovery Email
+                      </>
                     ) : (
                       <>
                         {selectedPurchase.email_dispatch_status ===
                           'NOT_INITIATED' ||
-                        selectedPurchase.email_dispatch_attempts === 0 ? (
+                          selectedPurchase.email_dispatch_attempts === 0 ? (
                           <>
                             <Send className="h-4 w-4 mr-2" />
                             Send Email

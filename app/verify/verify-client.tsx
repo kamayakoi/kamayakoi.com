@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
 import {
   Loader2,
   CheckCircle,
@@ -17,6 +16,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
 import { t } from '@/lib/i18n/translations';
 
@@ -40,47 +40,49 @@ interface TicketData {
   is_used: boolean;
   used_at?: string;
   verified_by?: string;
-  use_count?: number; // How many times a legacy ticket has been used
-  total_quantity?: number; // The total number of admissions on a legacy ticket
+  use_count?: number; // Admissions already used (legacy or purchase-level for individual QRs)
+  total_quantity?: number; // Total admissions on this purchase (legacy quantity or individual row count)
   remaining_tickets?: number; // Calculated remaining admissions
 }
 
 const PIN_CACHE_KEY = 'staff_verification_pin';
 const PIN_CACHE_DURATION = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
 
-const DUPLICATE_SCAN_WINDOW = 2000; // 2 seconds in milliseconds
-const MAX_RETRY_ATTEMPTS = 3;
-const RETRY_DELAY_MS = 1000; // 1 second
-
-// Track last scanned tickets to prevent rapid duplicates (ticket-specific)
-// eslint-disable-next-line prefer-const
-let lastScannedTickets: Map<string, number> = new Map();
-
-// Track tickets currently being processed to prevent duplicate API calls
-const inFlightTickets: Set<string> = new Set();
-
-// Track tickets we just admitted (to avoid showing "already used" from duplicate requests)
-const RECENTLY_ADMITTED_WINDOW = 5000; // 5 seconds
-const recentlyAdmittedTickets: Map<string, number> = new Map();
-
-// Clean up old scan records to prevent memory leaks
-const cleanupOldScanRecords = () => {
-  const now = Date.now();
-  const cutoffTime = now - DUPLICATE_SCAN_WINDOW * 2; // Keep records for 2x the window
-
-  for (const [ticketId, timestamp] of lastScannedTickets.entries()) {
-    if (timestamp < cutoffTime) {
-      lastScannedTickets.delete(ticketId);
+/** QR sometimes contains a full verify URL, wrapped quotes, or only the id query segment. */
+function normalizeTicketIdentifier(raw: string): string {
+  let s = raw.trim();
+  if (!s) return s;
+  if (
+    (s.startsWith('"') && s.endsWith('"')) ||
+    (s.startsWith("'") && s.endsWith("'"))
+  ) {
+    s = s.slice(1, -1).trim();
+  }
+  try {
+    if (/^https?:\/\//i.test(s) && /verify/i.test(s)) {
+      const u = new URL(s);
+      const id = u.searchParams.get('id');
+      if (id) {
+        try {
+          return decodeURIComponent(id).trim();
+        } catch {
+          return id.trim();
+        }
+      }
+    }
+  } catch {
+    // not a usable URL
+  }
+  const idFromQuery = s.match(/[?&]id=([^&]+)/i);
+  if (idFromQuery?.[1]) {
+    try {
+      return decodeURIComponent(idFromQuery[1]).trim();
+    } catch {
+      return idFromQuery[1].trim();
     }
   }
-
-  // Clean up old recently-admitted records
-  for (const [ticketId, timestamp] of recentlyAdmittedTickets.entries()) {
-    if (now - timestamp > RECENTLY_ADMITTED_WINDOW) {
-      recentlyAdmittedTickets.delete(ticketId);
-    }
-  }
-};
+  return s;
+}
 
 // Audio feedback for scanning
 const playSuccessSound = () => {
@@ -158,6 +160,13 @@ const storage = {
     try {
       // Try localStorage first (persists across browser sessions)
       localStorage.setItem(key, data);
+
+      // Also set document cookie for cross-app/tab persistence
+      if (typeof document !== 'undefined') {
+        const expires = new Date();
+        expires.setTime(expires.getTime() + 8 * 60 * 60 * 1000); // 8 hours
+        document.cookie = `${key}=${encodeURIComponent(data)};expires=${expires.toUTCString()};path=/;max-age=${8 * 60 * 60};SameSite=Lax`;
+      }
       return true;
     } catch {
       try {
@@ -173,8 +182,22 @@ const storage = {
     }
   },
   get: (key: string): unknown => {
+    // Try cookie first as it's more reliable across sub-environments (like native camera to Safari transitions)
     try {
-      // Try localStorage first
+      if (typeof document !== 'undefined') {
+        const match = document.cookie.match(
+          new RegExp('(^| )' + key + '=([^;]+)')
+        );
+        if (match && match[2]) {
+          return JSON.parse(decodeURIComponent(match[2]));
+        }
+      }
+    } catch {
+      // Ignore parse errors from cookies
+    }
+
+    try {
+      // Try localStorage
       const data = localStorage.getItem(key);
       if (data) return JSON.parse(data);
     } catch {
@@ -200,6 +223,13 @@ const storage = {
   },
   remove: (key: string): void => {
     try {
+      if (typeof document !== 'undefined') {
+        document.cookie = `${key}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+      }
+    } catch {
+      // Ignore errors
+    }
+    try {
       localStorage.removeItem(key);
     } catch {
       // Ignore errors
@@ -223,155 +253,60 @@ interface VerifyClientProps {
   ticketId?: string;
 }
 
-// Retry helper with exponential backoff
-const retryWithBackoff = async <T,>(
-  fn: () => Promise<T>,
-  retries: number = MAX_RETRY_ATTEMPTS,
-  delay: number = RETRY_DELAY_MS
-): Promise<T> => {
-  try {
-    return await fn();
-  } catch (error) {
-    if (retries <= 0) throw error;
+export function VerifyClient({ ticketId: ticketIdProp }: VerifyClientProps) {
+  const searchParams = useSearchParams();
+  const ticketId =
+    searchParams.get('id')?.trim() || ticketIdProp?.trim() || undefined;
 
-    // Check if it's a network error (worth retrying)
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    const isNetworkError =
-      errorMessage.includes('network') ||
-      errorMessage.includes('timeout') ||
-      errorMessage.includes('fetch') ||
-      errorMessage.includes('connection');
-
-    if (!isNetworkError) {
-      // Don't retry validation errors like TICKET_NOT_FOUND
-      throw error;
-    }
-
-    // Wait before retrying
-    await new Promise(resolve => setTimeout(resolve, delay));
-    return retryWithBackoff(fn, retries - 1, delay * 1.5); // Exponential backoff
-  }
-};
-
-export function VerifyClient({ ticketId }: VerifyClientProps) {
   const { currentLanguage } = useTranslation();
   const [pin, setPin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [ticketData, setTicketData] = useState<TicketData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [errorCode, setErrorCode] = useState<string | null>(null); // Track error type for UI differentiation
+  const [errorCode, setErrorCode] = useState<string | null>(null);
   const [isVerified, setIsVerified] = useState(false);
   const [wasJustAdmitted, setWasJustAdmitted] = useState(false);
   const [flashColor, setFlashColor] = useState<'green' | 'red' | null>(null);
-  const [, setOfflineQueueLength] = useState(0);
 
-  // --- Offline Queue Logic ---
-  const OFFLINE_QUEUE_KEY = 'verify_offline_queue';
-
-  const getOfflineQueue = (): string[] => {
-    try {
-      const q = localStorage.getItem(OFFLINE_QUEUE_KEY);
-      return q ? JSON.parse(q) : [];
-    } catch {
-      return [];
-    }
-  };
-
-  const addToOfflineQueue = (ticketId: string) => {
-    try {
-      const queue = getOfflineQueue();
-      if (!queue.includes(ticketId)) {
-        queue.push(ticketId);
-        localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
-        setOfflineQueueLength(queue.length);
-      }
-    } catch {
-      // ignore
-    }
-  };
-
-  const removeFromOfflineQueue = useCallback((ticketId: string) => {
-    try {
-      const queue = getOfflineQueue();
-      const newQueue = queue.filter((id) => id !== ticketId);
-      localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(newQueue));
-      setOfflineQueueLength(newQueue.length);
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  const processOfflineQueue = useCallback(async () => {
-    const queue = getOfflineQueue();
-    if (queue.length === 0) return;
-
-    const { data: sessionData } = await supabase.auth.getSession();
-    const token =
-      sessionData?.session?.access_token ||
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    const projectUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (!token || !projectUrl) return;
-
-    const functionUrl = `${projectUrl.replace(/\/$/, '')}/functions/v1/verify-ticket`;
-
-    for (const id of queue) {
-      // Skip tickets currently being verified in real-time (prevents double verification)
-      if (inFlightTickets.has(id)) continue;
-
-      try {
-        const response = await fetch(functionUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            ticket_identifier: id,
-            verified_by: 'staff_portal_offline_sync',
-            auto_admit: true,
-          }),
-          keepalive: true,
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success || result.error_code === 'ALREADY_USED') {
-            removeFromOfflineQueue(id);
-          }
-        }
-      } catch (err) {
-        // Network error, leave in queue for later
-        console.error('Offline sync failed for', id, err);
-      }
-    }
-  }, [removeFromOfflineQueue]);
-
-  // Sync offline queue periodically and on mount
-  useEffect(() => {
-    setOfflineQueueLength(getOfflineQueue().length);
-    processOfflineQueue();
-    const interval = setInterval(processOfflineQueue, 10000); // Check every 10s
-    return () => clearInterval(interval);
-  }, [processOfflineQueue]);
-  // ---------------------------
+  // Guard: only fire one verification request per unique ticketId
+  const verifiedTicketRef = useRef<string | null>(null);
+  const isVerifiedRef = useRef(false);
+  const verifyTicketFnRef = useRef<(id: string) => Promise<void>>(
+    async () => {}
+  );
+  /** Bumps when `ticketId` changes so slow responses cannot overwrite UI (mobile / rapid scans). */
+  const verifyGenerationRef = useRef(0);
 
   // Check for cached PIN on component mount
   useEffect(() => {
     const checkCachedPin = () => {
       try {
-        const cached = storage.get(PIN_CACHE_KEY) as {
-          timestamp: number;
-        } | null;
-        if (cached && cached.timestamp) {
-          const now = Date.now();
+        const cached = storage.get(PIN_CACHE_KEY);
+        if (cached) {
+          // Check if it's the newer object format with timestamp
+          if (
+            typeof cached === 'object' &&
+            cached !== null &&
+            'timestamp' in cached
+          ) {
+            const cacheObj = cached as { timestamp: number };
+            const now = Date.now();
 
-          // Check if cached PIN is still valid (within duration)
-          if (now - cached.timestamp < PIN_CACHE_DURATION) {
+            // Check if cached PIN is still valid (within duration)
+            if (now - cacheObj.timestamp < PIN_CACHE_DURATION) {
+              setIsVerified(true);
+              return;
+            } else {
+              // Clear expired cache
+              storage.remove(PIN_CACHE_KEY);
+            }
+          }
+          // Handle legacy format (raw PIN string/number saved before update)
+          else if (typeof cached === 'string' || typeof cached === 'number') {
+            // Upgrade to new format
+            storage.set(PIN_CACHE_KEY, { timestamp: Date.now() });
             setIsVerified(true);
             return;
-          } else {
-            // Clear expired cache
-            storage.remove(PIN_CACHE_KEY);
           }
         }
       } catch {
@@ -383,23 +318,32 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
     checkCachedPin();
   }, []);
 
+  useEffect(() => {
+    isVerifiedRef.current = isVerified;
+  }, [isVerified]);
+
   // Reset state when ticketId changes (for continuous scanning workflow)
   useEffect(() => {
     if (ticketId) {
+      verifyGenerationRef.current += 1;
       setError(null);
       setErrorCode(null);
       setTicketData(null);
       setWasJustAdmitted(false);
+      verifiedTicketRef.current = null; // allow re-verification on new ticket
     }
   }, [ticketId]);
 
   // Auto-verify ticket when page loads with ID and user is verified
+  // useRef guard ensures exactly ONE request fires per unique ticketId
   useEffect(() => {
-    if (ticketId && isVerified && !ticketData) {
-      verifyTicket(ticketId);
-    }
+    if (!ticketId || !isVerified) return;
+    const normalized = normalizeTicketIdentifier(ticketId);
+    if (verifiedTicketRef.current === normalized) return;
+    verifiedTicketRef.current = normalized;
+    verifyTicket(normalized);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ticketId, isVerified, ticketData]);
+  }, [ticketId, isVerified]);
 
   // Helper to parse error codes from database exceptions
   const parseErrorMessage = (
@@ -442,88 +386,39 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
   );
 
   const verifyTicket = useCallback(
-    async (ticketIdentifier: string, isRefreshCall: boolean = false) => {
+    async (ticketIdentifier: string) => {
+      const generation = ++verifyGenerationRef.current;
       setIsLoading(true);
+      setError(null);
+      setErrorCode(null);
+      setTicketData(null);
 
-      // Don't clear error/success state if this is a refresh call after successful admission
-      if (!isRefreshCall) {
-        setError(null);
-        setErrorCode(null);
-        setTicketData(null);
-      }
+      const trimmedId = normalizeTicketIdentifier(ticketIdentifier);
 
-      const trimmedId = ticketIdentifier.trim();
-
-      // Check for duplicate scan (only for initial scans, not refresh calls)
-      if (!isRefreshCall) {
-        const now = Date.now();
-        const lastScanTime = lastScannedTickets.get(trimmedId);
-
-        if (lastScanTime && now - lastScanTime < DUPLICATE_SCAN_WINDOW) {
-          setError(
-            'This ticket was just scanned. Please wait before scanning again.'
-          );
-          setIsLoading(false);
-          return;
-        }
-
-        // Prevent duplicate in-flight requests for the same ticket
-        if (inFlightTickets.has(trimmedId)) {
-          setError('This ticket is currently being processed. Please wait.');
-          setIsLoading(false);
-          return;
-        }
-
-        inFlightTickets.add(trimmedId);
-      }
+      const isStale = () => generation !== verifyGenerationRef.current;
 
       try {
-        const result = await retryWithBackoff(async () => {
-          const { data: sessionData } = await supabase.auth.getSession();
-          const token =
-            sessionData?.session?.access_token ||
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-          const projectUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-
-          if (!projectUrl) {
-            throw new Error('Missing Supabase URL');
-          }
-          if (!token) {
-            throw new Error('Missing Supabase credentials');
-          }
-
-          // We use fetch with keepalive:true because mobile browsers
-          // abort network requests on page navigation (when using native photo app scanner).
-          // Edge Function URL format: https://[PROJECT_REF].supabase.co/functions/v1/verify-ticket
-          const functionUrl = `${projectUrl.replace(/\/$/, '')}/functions/v1/verify-ticket`;
-
-          const response = await fetch(functionUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
+        // Single direct call - edge function handles deduplication server-side
+        const { data: response, error: edgeError } =
+          await supabase.functions.invoke('verify-ticket', {
+            body: {
               ticket_identifier: trimmedId,
-              verified_by: 'staff_portal',
+              verified_by: 'staff',
               auto_admit: true,
-            }),
-            keepalive: true,
+            },
           });
 
-          if (!response.ok) {
-            const err = await response.json().catch(() => ({}));
-            throw new Error(
-              err.error_message || `HTTP error! status: ${response.status}`
-            );
-          }
+        if (isStale()) return;
 
-          const resultData = await response.json();
-          return resultData;
-        });
+        if (edgeError) {
+          throw new Error(`Edge function error: ${edgeError.message}`);
+        }
 
-        // Type the result from retryWithBackoff
-        const typedResult = result as {
+        if (!response || typeof response !== 'object') {
+          throw new Error('Invalid response from verification service');
+        }
+
+        const result = response as {
           success: boolean;
           ticket_data?: TicketData;
           error_code?: string;
@@ -531,142 +426,86 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
           admitted?: boolean;
         };
 
-        if (typedResult.ticket_data) {
-          setTicketData(typedResult.ticket_data);
-
-          // Update last scanned ticket (only for initial scans)
-          if (!isRefreshCall) {
-            lastScannedTickets.set(trimmedId, Date.now());
-            // Clean up old records periodically
-            if (lastScannedTickets.size > 100) {
-              cleanupOldScanRecords();
-            }
-          }
+        if (result.ticket_data) {
+          setTicketData(result.ticket_data);
         }
 
-        // If we got a valid response from server, we can remove from offline queue
-        if (!isRefreshCall) {
-          removeFromOfflineQueue(trimmedId);
-        }
-
-        if (!typedResult.success) {
-          // Handle verification failure
-          const errorCode = typedResult.error_code || 'UNKNOWN_ERROR';
-          const errorMessage =
-            typedResult.error_message || 'Verification failed';
-
-          const friendlyMessage = getUserFriendlyError(errorCode, errorMessage);
-          setError(friendlyMessage);
-          setErrorCode(errorCode);
-
-          // Error feedback - use orange flash for ALREADY_USED, red for other errors
-          if (errorCode === 'ALREADY_USED') {
-            setFlashColor('red'); // Still flash to get attention
-          } else {
-            playErrorSound();
-            setFlashColor('red');
-          }
-          setTimeout(() => setFlashColor(null), 500);
-          return;
-        }
-
-        // Check if admission failed even if verification was successful (e.g., already used)
-        if (
-          typedResult.success &&
-          !typedResult.admitted &&
-          typedResult.error_code
-        ) {
-          const errorCode = typedResult.error_code;
-
-          // If we just admitted this ticket (duplicate request from Strict Mode / double nav),
-          // don't show "already used" - we already showed success
-          if (errorCode === 'ALREADY_USED') {
-            const admittedAt = recentlyAdmittedTickets.get(trimmedId);
-            if (
-              admittedAt &&
-              Date.now() - admittedAt < RECENTLY_ADMITTED_WINDOW
-            ) {
-              // Duplicate request - we already showed success, keep success state
-              setWasJustAdmitted(true);
-              setError(null);
-              setErrorCode(null);
-              return;
-            }
-          }
-
-          const errorMessage = typedResult.error_message || 'Admission failed';
-          const friendlyMessage = getUserFriendlyError(errorCode, errorMessage);
-          setError(friendlyMessage);
-          setErrorCode(errorCode);
-
-          if (errorCode === 'ALREADY_USED') {
-            setFlashColor('red');
-          } else {
-            playErrorSound();
-            setFlashColor('red');
-          }
-          setTimeout(() => setFlashColor(null), 500);
-          return;
-        }
-
-        // Verification successful and admission successful (or not needed)
-        if (typedResult.success && typedResult.admitted) {
-          setWasJustAdmitted(true);
-          setError(null);
-          setErrorCode(null);
-
-          if (!isRefreshCall) {
-            recentlyAdmittedTickets.set(trimmedId, Date.now());
-            playSuccessSound();
-            setFlashColor('green');
-            setTimeout(() => setFlashColor(null), 300);
-          }
-        }
-      } catch (err) {
-        console.error('Verification error:', err);
-        // Only add to offline queue when we're actually offline (network error) - not for real-time scans
-        if (!isRefreshCall) {
-          const errorMessage =
-            err instanceof Error ? err.message : 'Verification failed';
-          const isNetworkError =
-            errorMessage.includes('network') ||
-            errorMessage.includes('timeout') ||
-            errorMessage.includes('fetch') ||
-            errorMessage.includes('connection');
-          if (isNetworkError) {
-            addToOfflineQueue(trimmedId);
-          }
-        }
-        // Only set error if this is not a refresh call or if wasJustAdmitted is not true
-        if (!isRefreshCall || !wasJustAdmitted) {
-          const errorMessage =
-            err instanceof Error ? err.message : 'Verification failed';
-          const { code, message } = parseErrorMessage(errorMessage);
-          const friendlyMessage = getUserFriendlyError(code, message);
+        if (!result.success) {
+          const code = result.error_code || 'UNKNOWN_ERROR';
+          const msg = result.error_message || 'Verification failed';
+          const friendlyMessage = getUserFriendlyError(code, msg);
           setError(friendlyMessage);
           setErrorCode(code);
-
           playErrorSound();
           setFlashColor('red');
           setTimeout(() => setFlashColor(null), 500);
+          return;
         }
+
+        if (result.success && !result.admitted && result.error_code) {
+          const code = result.error_code;
+          const msg = result.error_message || 'Admission failed';
+          const friendlyMessage = getUserFriendlyError(code, msg);
+          setError(friendlyMessage);
+          setErrorCode(code);
+          setFlashColor('red');
+          setTimeout(() => setFlashColor(null), 500);
+          return;
+        }
+
+        if (result.success && result.admitted) {
+          setWasJustAdmitted(true);
+          setError(null);
+          setErrorCode(null);
+          playSuccessSound();
+          setFlashColor('green');
+          setTimeout(() => setFlashColor(null), 300);
+        }
+      } catch (err) {
+        if (isStale()) return;
+        console.error('Verification error:', err);
+        const errorMessage =
+          err instanceof Error ? err.message : 'Verification failed';
+        const { code, message } = parseErrorMessage(errorMessage);
+        const friendlyMessage = getUserFriendlyError(code, message);
+        setError(friendlyMessage);
+        setErrorCode(code);
+        playErrorSound();
+        setFlashColor('red');
+        setTimeout(() => setFlashColor(null), 500);
       } finally {
-        setIsLoading(false);
-        if (!isRefreshCall) {
-          inFlightTickets.delete(trimmedId);
+        if (!isStale()) {
+          setIsLoading(false);
         }
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      currentLanguage,
-      setIsLoading,
-      setError,
-      setTicketData,
-      getUserFriendlyError,
-      wasJustAdmitted,
-    ]
+    [getUserFriendlyError]
   );
+
+  useEffect(() => {
+    verifyTicketFnRef.current = verifyTicket;
+  }, [verifyTicket]);
+
+  // iOS/Safari: camera handoff can restore this tab from bfcache with old React state
+  // while the URL already points at a new ?id= — clear UI and re-verify from window.location.
+  useEffect(() => {
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (!e.persisted) return;
+      verifyGenerationRef.current += 1;
+      verifiedTicketRef.current = null;
+      setTicketData(null);
+      setError(null);
+      setErrorCode(null);
+      setWasJustAdmitted(false);
+      const raw = new URLSearchParams(window.location.search).get('id');
+      const normalized = raw ? normalizeTicketIdentifier(raw) : '';
+      if (!normalized || !isVerifiedRef.current) return;
+      verifiedTicketRef.current = normalized;
+      void verifyTicketFnRef.current(normalized);
+    };
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, []);
 
   const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -746,6 +585,21 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
         badgeVariant: 'destructive' as const,
         badgeText: t(currentLanguage, 'ticketVerification.badges.invalid'),
         statusText: t(currentLanguage, 'ticketVerification.status.invalid'),
+      };
+    }
+
+    // NEW: If we just successfully admitted this ticket, it is ALWAYS a valid scan (green)!
+    if (wasJustAdmitted) {
+      return {
+        bgColor: 'bg-green-50/30 dark:bg-green-900/20',
+        borderColor: 'border-green-300 dark:border-green-700',
+        textColor: 'text-green-800 dark:text-green-200',
+        icon: (
+          <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+        ),
+        badgeVariant: 'default' as const,
+        badgeText: t(currentLanguage, 'ticketVerification.badges.valid'),
+        statusText: t(currentLanguage, 'ticketVerification.status.valid'),
       };
     }
 
@@ -927,7 +781,7 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                       'ticketVerification.pinEntry.pinPlaceholder'
                     )}
                     value={pin}
-                    onChange={(e) => setPin(e.target.value)}
+                    onChange={e => setPin(e.target.value)}
                     maxLength={4}
                     className="text-center text-2xl tracking-widest h-12 rounded-sm bg-background border border-border"
                     disabled={isLoading}
@@ -1017,7 +871,9 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
               <CardContent className="px-8 py-12">
                 <div className="flex flex-col items-center text-center space-y-8">
                   {status.icon}
-                  <h2 className={`text-lg font-medium tracking-tight ${status.textColor}`}>
+                  <h2
+                    className={`text-lg font-medium tracking-tight ${status.textColor}`}
+                  >
                     {status.statusText}
                   </h2>
                   {ticketData && (
@@ -1030,32 +886,21 @@ export function VerifyClient({ ticketId }: VerifyClientProps) {
                           {ticketData.customer_name}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {ticketData.remaining_tickets !== undefined
-                            ? t(
-                                currentLanguage,
-                                'ticketVerification.quantity.remainingOfTotal',
-                                {
-                                  remaining: ticketData.remaining_tickets,
-                                  total: ticketData.total_quantity || 1,
-                                }
-                              )
-                            : ticketData.use_count !== undefined &&
-                                ticketData.total_quantity
-                              ? `${ticketData.use_count} / ${ticketData.total_quantity} ${t(
-                                  currentLanguage,
-                                  'ticketVerification.quantity.scanned'
-                                )}`
-                              : `${ticketData.quantity} ${
-                                  ticketData.quantity > 1
-                                    ? t(
-                                        currentLanguage,
-                                        'ticketVerification.quantity.people'
-                                      )
-                                    : t(
-                                        currentLanguage,
-                                        'ticketVerification.quantity.person'
-                                      )
-                                }`}
+                          {t(
+                            currentLanguage,
+                            'ticketVerification.quantity.scannedRemaining',
+                            {
+                              scannedCount:
+                                ticketData.use_count != null
+                                  ? ticketData.use_count
+                                  : 1 - (ticketData.remaining_tickets || 0),
+                              remainingCount:
+                                ticketData.remaining_tickets != null
+                                  ? ticketData.remaining_tickets
+                                  : (ticketData.total_quantity || 1) -
+                                    (ticketData.use_count || 0),
+                            }
+                          )}
                         </p>
                       </div>
                     </div>

@@ -884,28 +884,8 @@ Deno.serve(async (req: Request) => {
     }
 
     // --- 5. Send Email with Resend (with PDF attachment) ---
-    // Fetch and embed the logo image as Base64 to prevent email clients from blocking it.
-    // This is wrapped in its own try-catch to NEVER fail the entire function
-    let logoSrc = defaultLogoUrl; // Always have a fallback URL
-
-    try {
-      console.log('Fetching logo from website...');
-
-      // Fetch logo from the website URL
-      const logoResponse = await fetch(defaultLogoUrl);
-      if (logoResponse.ok) {
-        const logoBytes = new Uint8Array(await logoResponse.arrayBuffer());
-        const logoBase64 = uint8ArrayToBase64(logoBytes);
-        logoSrc = `data:image/png;base64,${logoBase64}`;
-        console.log('Successfully fetched and encoded logo from website.');
-      } else {
-        console.warn(
-          `Failed to fetch logo (status: ${logoResponse.status}), using URL as fallback.`
-        );
-      }
-    } catch (logoError) {
-      console.warn('Failed to fetch logo, using URL as fallback:', logoError);
-    }
+    // Use logo URL directly for reliable rendering in email clients.
+    const logoSrc = defaultLogoUrl;
 
     const emailHtmlBody = `
       <!DOCTYPE html>

@@ -37,7 +37,7 @@ export function ZoomImage({
   const handleImageClick = (index: number) => {
     if (!isMobile) return;
 
-    setZoomedIndex((current) => (current === index ? null : index));
+    setZoomedIndex(current => (current === index ? null : index));
   };
 
   return (
@@ -121,7 +121,7 @@ export function ZoomImage({
                     width={baseWidth}
                     height={baseHeight}
                     sizes={imageSizes}
-                    loading={index === initialIndex ? "eager" : "lazy"}
+                    loading={index === initialIndex ? 'eager' : 'lazy'}
                   />
 
                   {/* Download button – inside image, bottom-right */}

@@ -204,7 +204,10 @@ export default function WishlistModal() {
                                         }
                                       >
                                         <ShoppingCart className="h-3 w-3 mr-1" />
-                                        {t(currentLanguage, 'merchPage.productDetail.addToCart')}
+                                        {t(
+                                          currentLanguage,
+                                          'merchPage.productDetail.addToCart'
+                                        )}
                                       </Button>
                                     </div>
                                   </div>

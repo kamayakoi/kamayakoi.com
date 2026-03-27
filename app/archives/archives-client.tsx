@@ -52,10 +52,7 @@ function SectionArchives({
   }, [sectionImages, columnCount]);
 
   return (
-    <section
-      id={toSectionId(sectionTitle)}
-      className="mb-16 scroll-mt-24"
-    >
+    <section id={toSectionId(sectionTitle)} className="mb-16 scroll-mt-24">
       <h2 className="text-2xl sm:text-3xl md:text-4xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-8 text-left capitalize">
         {sectionTitle}
       </h2>
@@ -115,7 +112,7 @@ function ArchiveItem({
       role="button"
       tabIndex={0}
       onClick={onClick}
-      onKeyDown={(e) => {
+      onKeyDown={e => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           onClick();

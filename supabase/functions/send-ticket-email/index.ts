@@ -13,21 +13,6 @@ function uint8ArrayToBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
-// Treat TBA / placeholders as empty so we don't show them in email or PDF
-const PLACEHOLDER_VALUES = [
-  'tba',
-  'to be announced',
-  'soon',
-  'secret location',
-];
-function normalizeEventDetail(val: string | null | undefined): string {
-  const s = (val || '').trim();
-  if (!s) return '';
-  const lower = s.toLowerCase();
-  if (PLACEHOLDER_VALUES.includes(lower)) return '';
-  return s;
-}
-
 interface IndividualTicket {
   ticket_identifier: string;
 }
@@ -36,38 +21,13 @@ interface IndividualTicket {
 // was removed from here to resolve TypeScript parsing errors.
 
 // --- Environment Variables ---
-const supabaseUrl = Deno.env.get('SUPABASE_URL');
-const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-const resendApiKey = Deno.env.get('RESEND_API_KEY');
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const resendApiKey = Deno.env.get('RESEND_API_KEY')!;
 const fromEmail = Deno.env.get('FROM_EMAIL') || 'tickets@updates.kamayakoi.com';
 const APP_BASE_URL =
   Deno.env.get('APP_BASE_URL') || 'https://www.kamayakoi.com';
 const defaultLogoUrl = 'https://www.kamayakoi.com/icon.png';
-
-// --- Environment Validation ---
-if (!supabaseUrl || supabaseUrl.trim() === '') {
-  console.error('SUPABASE_URL environment variable is missing or empty');
-  throw new Error('SUPABASE_URL environment variable is required');
-}
-
-if (!supabaseServiceRoleKey || supabaseServiceRoleKey.trim() === '') {
-  console.error(
-    'SUPABASE_SERVICE_ROLE_KEY environment variable is missing or empty'
-  );
-  throw new Error('SUPABASE_SERVICE_ROLE_KEY environment variable is required');
-}
-
-if (!resendApiKey || resendApiKey.trim() === '') {
-  console.error('RESEND_API_KEY environment variable is missing or empty');
-  throw new Error('RESEND_API_KEY environment variable is required');
-}
-
-// Validate API key format (Resend API keys typically start with "re_")
-if (!resendApiKey.startsWith('re_')) {
-  console.warn(
-    'RESEND_API_KEY does not appear to be in the correct format (should start with "re_"). This may cause authentication errors.'
-  );
-}
 
 // --- Main Serve Function ---
 Deno.serve(async (req: Request) => {
@@ -212,12 +172,26 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Event data for ticket (empty string when not set or placeholder like TBA)
+    // Event data for ticket — only set date/time/venue when we have real values (omit row if TBA/missing)
+    const rawDate = (purchaseData.event_date_text || '').trim();
+    const rawTime = (purchaseData.event_time_text || '').trim();
+    const rawVenue = (purchaseData.event_venue_name || '').trim();
+    const tbaOrEmpty = (v: string) =>
+      !v ||
+      v === 'TBA' ||
+      v === 'Time TBA' ||
+      v === 'Venue TBA' ||
+      v === 'À confirmer' ||
+      v === 'Lieu à confirmer' ||
+      v === 'To Be Announced';
+    const hasDate = !tbaOrEmpty(rawDate);
+    const hasTime = !tbaOrEmpty(rawTime);
+    const hasVenue = !tbaOrEmpty(rawVenue);
     const eventDataForTicket = {
       eventName: purchaseData.event_title || 'Amazing Event',
-      eventDate: normalizeEventDetail(purchaseData.event_date_text),
-      eventTime: normalizeEventDetail(purchaseData.event_time_text),
-      eventVenue: normalizeEventDetail(purchaseData.event_venue_name),
+      eventDate: hasDate ? rawDate : (null as string | null),
+      eventTime: hasTime ? rawTime : (null as string | null),
+      eventVenue: hasVenue ? rawVenue : (null as string | null),
     };
 
     // Calculate actual ticket quantity for bundles
@@ -231,12 +205,23 @@ Deno.serve(async (req: Request) => {
       `Bundle calculation: isBundle=${isBundle}, quantity=${purchaseData.quantity}, ticketsPerBundle=${ticketsPerBundle}, actualTicketQuantity=${actualTicketQuantity}`
     );
 
-    // --- NEW LOGIC: Decide between individual tickets or legacy single QR ---
-    const INDIVIDUAL_TICKETS_CUTOFF_DATE = new Date('2025-07-01'); // Use new system for all purchases from July 1, 2025
+    // Per-ticket QRs whenever individual rows exist (e.g. guest list ×1) or multi-admission cutoff applies
+    const INDIVIDUAL_TICKETS_CUTOFF_DATE = new Date('2025-07-01');
     const purchaseDate = new Date(purchaseData.created_at || Date.now());
-    const useIndividualTickets =
-      purchaseDate >= INDIVIDUAL_TICKETS_CUTOFF_DATE &&
-      actualTicketQuantity > 1;
+    let useIndividualTickets =
+      purchaseData.individual_tickets_generated === true ||
+      (purchaseDate >= INDIVIDUAL_TICKETS_CUTOFF_DATE &&
+        actualTicketQuantity > 1);
+
+    if (!useIndividualTickets) {
+      const { data: hasIndividuals, error: hasIndividualsErr } =
+        await supabase.rpc('purchase_has_individual_tickets', {
+          p_purchase_id: purchaseIdFromRequest,
+        });
+      if (!hasIndividualsErr && hasIndividuals === true) {
+        useIndividualTickets = true;
+      }
+    }
 
     let ticketIdentifiers: string[] = [];
     const qrCodeData: Array<{ identifier: string; qrCodeBytes: Uint8Array }> =
@@ -309,9 +294,8 @@ Deno.serve(async (req: Request) => {
         }
       }
     } else {
-      // Legacy single QR code system
       console.log(
-        `Using legacy single QR system for purchase ${purchaseIdFromRequest}`
+        `Using single purchase-level QR for ${purchaseIdFromRequest} (no individual ticket rows)`
       );
       ticketIdentifiers = [uniqueTicketId];
 
@@ -357,13 +341,13 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    // // Helper functions for quantity-based text (inspired by ticket.tsx)
-    // const getAdmissionText = (quantity: number) => {
-    //   if (quantity === 1) return "MAXIMUM UN";
-    //   if (quantity === 2) return "MAXIMUM DEUX";
-    //   if (quantity === 3) return "MAXIMUM TROIS";
-    //   return `MAXIMUM ${quantity}`;
-    // };
+    // Helper functions for quantity-based text (inspired by ticket.tsx)
+    const getAdmissionText = (quantity: number) => {
+      if (quantity === 1) return 'ADMIT ONE';
+      if (quantity === 2) return 'ADMIT TWO';
+      if (quantity === 3) return 'ADMIT THREE';
+      return `ADMIT ${quantity}`;
+    };
 
     const getNameText = (
       firstName: string,
@@ -384,6 +368,9 @@ Deno.serve(async (req: Request) => {
       eventDate: eventDataForTicket.eventDate,
       eventTime: eventDataForTicket.eventTime,
       eventVenue: eventDataForTicket.eventVenue,
+      hasDate: hasDate,
+      hasTime: hasTime,
+      hasVenue: hasVenue,
       quantity: actualTicketQuantity, // Use actual ticket quantity for display
       ticketIdentifier: ticketIdentifiers[0], // Primary identifier for compatibility
       isBundle: isBundle,
@@ -396,27 +383,24 @@ Deno.serve(async (req: Request) => {
     const pdfsToAttach: Array<{ filename: string; content: string }> = [];
 
     if (useIndividualTickets) {
-      // Generate individual PDFs for each ticket
+      // Generate individual PDFs for each ticket (receipt-style layout like kamayakoi)
+      const receiptWidth = 250;
+      const receiptHeight = 400;
+      const rightAlignX = receiptWidth - 10;
+
       for (let i = 0; i < qrCodeData.length; i++) {
         const qr = qrCodeData[i];
         const pdfDoc = await PDFDocument.create();
-
-        // Create smaller receipt-like page (thermal printer size)
-        const receiptWidth = 250; // Narrower like a receipt
-        const receiptHeight = 400; // Compact height
         const page = pdfDoc.addPage([receiptWidth, receiptHeight]);
-
         const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
         const helveticaBold = await pdfDoc.embedFont(
           StandardFonts.HelveticaBold
         );
 
-        // Receipt color scheme - white background, black text
         const blackColor = rgb(0, 0, 0);
         const whiteColor = rgb(1, 1, 1);
         const greyColor = rgb(0.5, 0.5, 0.5);
 
-        // White background (default, but explicit)
         page.drawRectangle({
           x: 0,
           y: 0,
@@ -424,8 +408,6 @@ Deno.serve(async (req: Request) => {
           height: receiptHeight,
           color: whiteColor,
         });
-
-        // Add subtle border
         page.drawRectangle({
           x: 2,
           y: 2,
@@ -435,10 +417,8 @@ Deno.serve(async (req: Request) => {
           borderWidth: 1,
         });
 
-        // Start from top with company header
         let y = receiptHeight - 20;
 
-        // Company header - left aligned
         page.drawText('KAMAYAKOI', {
           x: 10,
           y: y,
@@ -447,7 +427,6 @@ Deno.serve(async (req: Request) => {
           color: blackColor,
         });
         y -= 15;
-
         page.drawText('VOTRE BILLET', {
           x: 10,
           y: y,
@@ -457,7 +436,6 @@ Deno.serve(async (req: Request) => {
         });
         y -= 25;
 
-        // Divider line
         page.drawLine({
           start: { x: 10, y: y },
           end: { x: receiptWidth - 10, y: y },
@@ -466,9 +444,6 @@ Deno.serve(async (req: Request) => {
         });
         y -= 15;
 
-        // Event details in receipt style - labels left, values right aligned
-        const rightAlignX = receiptWidth - 10; // Right edge minus padding
-
         page.drawText('ÉVÉNEMENT', {
           x: 10,
           y: y,
@@ -476,12 +451,12 @@ Deno.serve(async (req: Request) => {
           font: helveticaBold,
           color: blackColor,
         });
-        const eventNameWidth = helvetica.widthOfTextAtSize(
+        const eventNameW = helvetica.widthOfTextAtSize(
           ticketProps.eventName,
           7
         );
         page.drawText(ticketProps.eventName, {
-          x: rightAlignX - eventNameWidth,
+          x: rightAlignX - eventNameW,
           y: y,
           size: 7,
           font: helvetica,
@@ -497,12 +472,9 @@ Deno.serve(async (req: Request) => {
             font: helveticaBold,
             color: blackColor,
           });
-          const dateWidth = helvetica.widthOfTextAtSize(
-            ticketProps.eventDate,
-            7
-          );
-          page.drawText(`${ticketProps.eventDate}`, {
-            x: rightAlignX - dateWidth,
+          const dateW = helvetica.widthOfTextAtSize(ticketProps.eventDate, 7);
+          page.drawText(ticketProps.eventDate, {
+            x: rightAlignX - dateW,
             y: y,
             size: 7,
             font: helvetica,
@@ -510,7 +482,6 @@ Deno.serve(async (req: Request) => {
           });
           y -= 12;
         }
-
         if (ticketProps.eventTime) {
           page.drawText('HEURE', {
             x: 10,
@@ -519,12 +490,9 @@ Deno.serve(async (req: Request) => {
             font: helveticaBold,
             color: blackColor,
           });
-          const timeWidth = helvetica.widthOfTextAtSize(
-            ticketProps.eventTime,
-            7
-          );
-          page.drawText(`${ticketProps.eventTime}`, {
-            x: rightAlignX - timeWidth,
+          const timeW = helvetica.widthOfTextAtSize(ticketProps.eventTime, 7);
+          page.drawText(ticketProps.eventTime, {
+            x: rightAlignX - timeW,
             y: y,
             size: 7,
             font: helvetica,
@@ -532,7 +500,6 @@ Deno.serve(async (req: Request) => {
           });
           y -= 12;
         }
-
         if (ticketProps.eventVenue) {
           page.drawText('LIEU', {
             x: 10,
@@ -541,12 +508,9 @@ Deno.serve(async (req: Request) => {
             font: helveticaBold,
             color: blackColor,
           });
-          const venueWidth = helvetica.widthOfTextAtSize(
-            ticketProps.eventVenue,
-            7
-          );
+          const venueW = helvetica.widthOfTextAtSize(ticketProps.eventVenue, 7);
           page.drawText(ticketProps.eventVenue, {
-            x: rightAlignX - venueWidth,
+            x: rightAlignX - venueW,
             y: y,
             size: 7,
             font: helvetica,
@@ -563,9 +527,9 @@ Deno.serve(async (req: Request) => {
           color: blackColor,
         });
         const holderName = `${ticketProps.firstName} ${ticketProps.lastName}`;
-        const holderWidth = helvetica.widthOfTextAtSize(holderName, 7);
+        const holderW = helvetica.widthOfTextAtSize(holderName, 7);
         page.drawText(holderName, {
-          x: rightAlignX - holderWidth,
+          x: rightAlignX - holderW,
           y: y,
           size: 7,
           font: helvetica,
@@ -573,7 +537,6 @@ Deno.serve(async (req: Request) => {
         });
         y -= 20;
 
-        // Another divider
         page.drawLine({
           start: { x: 10, y: y },
           end: { x: receiptWidth - 10, y: y },
@@ -582,15 +545,13 @@ Deno.serve(async (req: Request) => {
         });
         y -= 15;
 
-        // QR Code (bigger with proper spacing)
         try {
           const qrImage = await pdfDoc.embedPng(qr.qrCodeBytes);
-          const qrSize = 100; // Bigger QR code
+          const qrSize = 100;
           const qrX = (receiptWidth - qrSize) / 2;
           const qrY = y - qrSize;
-          const qrPadding = 8; // Space between border and QR code
+          const qrPadding = 8;
 
-          // Draw QR border with padding
           page.drawRectangle({
             x: qrX - qrPadding,
             y: qrY - qrPadding,
@@ -599,14 +560,12 @@ Deno.serve(async (req: Request) => {
             borderColor: rgb(0, 0, 0),
             borderWidth: 1,
           });
-
           page.drawImage(qrImage, {
             x: qrX,
             y: qrY,
             width: qrSize,
             height: qrSize,
           });
-
           y = qrY - 10;
         } catch (imgError) {
           const embedErrorMsg =
@@ -617,7 +576,6 @@ Deno.serve(async (req: Request) => {
             `Error embedding QR for ticket ${i + 1}:`,
             embedErrorMsg
           );
-
           const errorText = '[QR CODE INDISPONIBLE]';
           page.drawText(errorText, {
             x: (receiptWidth - 90) / 2,
@@ -629,24 +587,31 @@ Deno.serve(async (req: Request) => {
           y -= 25;
         }
 
-        // Footer messages at bottom right
-        const bottomY = 25; // Very bottom of page
-
+        const bottomY = 25;
         const footerMsg1 = "Présentez ce QR code à l'entrée";
-        const footerMsg1Width = helvetica.widthOfTextAtSize(footerMsg1, 5);
+        const footerMsg1W = helvetica.widthOfTextAtSize(footerMsg1, 5);
         page.drawText(footerMsg1, {
-          x: rightAlignX - footerMsg1Width,
+          x: rightAlignX - footerMsg1W,
           y: bottomY,
           size: 5,
           font: helvetica,
           color: greyColor,
         });
-
-        const footerMsg2 = 'Thank you for choosing Kamayakoi!';
-        const footerMsg2Width = helvetica.widthOfTextAtSize(footerMsg2, 5);
-        page.drawText(footerMsg2, {
-          x: rightAlignX - footerMsg2Width,
+        const ticketNumText = `Ticket ${i + 1} / ${actualTicketQuantity}`;
+        const ticketNumW = helvetica.widthOfTextAtSize(ticketNumText, 5);
+        page.drawText(ticketNumText, {
+          x: rightAlignX - ticketNumW,
           y: bottomY - 8,
+          size: 5,
+          font: helvetica,
+          color: greyColor,
+        });
+
+        const footerThankYou = 'Thank you for choosing Kamayakoi!';
+        const footerThankYouW = helvetica.widthOfTextAtSize(footerThankYou, 5);
+        page.drawText(footerThankYou, {
+          x: rightAlignX - footerThankYouW,
+          y: bottomY - 16,
           size: 5,
           font: helvetica,
           color: greyColor,
@@ -659,23 +624,20 @@ Deno.serve(async (req: Request) => {
         });
       }
     } else {
-      // Legacy single PDF generation (receipt style)
-      const pdfDoc = await PDFDocument.create();
-
-      // Create receipt-like page
+      // Legacy single PDF generation (receipt-style layout like kamayakoi)
       const receiptWidth = 250;
-      const receiptHeight = 450; // Slightly taller for legacy with potentially more content
-      const page = pdfDoc.addPage([receiptWidth, receiptHeight]);
+      const receiptHeight = 450;
+      const legacyRightAlignX = receiptWidth - 10;
 
+      const pdfDoc = await PDFDocument.create();
+      const page = pdfDoc.addPage([receiptWidth, receiptHeight]);
       const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
       const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-      // Receipt color scheme - white background, black text
       const blackColor = rgb(0, 0, 0);
       const whiteColor = rgb(1, 1, 1);
       const greyColor = rgb(0.5, 0.5, 0.5);
 
-      // White background
       page.drawRectangle({
         x: 0,
         y: 0,
@@ -683,8 +645,6 @@ Deno.serve(async (req: Request) => {
         height: receiptHeight,
         color: whiteColor,
       });
-
-      // Add subtle border
       page.drawRectangle({
         x: 2,
         y: 2,
@@ -694,10 +654,8 @@ Deno.serve(async (req: Request) => {
         borderWidth: 1,
       });
 
-      // Start from top with company header
       let y = receiptHeight - 20;
 
-      // Company header - left aligned
       page.drawText('KAMAYAKOI', {
         x: 10,
         y: y,
@@ -706,7 +664,6 @@ Deno.serve(async (req: Request) => {
         color: blackColor,
       });
       y -= 15;
-
       page.drawText('VOTRE BILLET', {
         x: 10,
         y: y,
@@ -716,7 +673,6 @@ Deno.serve(async (req: Request) => {
       });
       y -= 25;
 
-      // Divider line
       page.drawLine({
         start: { x: 10, y: y },
         end: { x: receiptWidth - 10, y: y },
@@ -725,9 +681,6 @@ Deno.serve(async (req: Request) => {
       });
       y -= 15;
 
-      // Event details in receipt style - labels left, values right aligned
-      const legacyRightAlignX = receiptWidth - 10; // Right edge minus padding
-
       page.drawText('ÉVÉNEMENT', {
         x: 10,
         y: y,
@@ -735,12 +688,12 @@ Deno.serve(async (req: Request) => {
         font: helveticaBold,
         color: blackColor,
       });
-      const legacyEventNameWidth = helvetica.widthOfTextAtSize(
+      const legacyEventNameW = helvetica.widthOfTextAtSize(
         ticketProps.eventName,
         7
       );
       page.drawText(ticketProps.eventName, {
-        x: legacyRightAlignX - legacyEventNameWidth,
+        x: legacyRightAlignX - legacyEventNameW,
         y: y,
         size: 7,
         font: helvetica,
@@ -756,12 +709,12 @@ Deno.serve(async (req: Request) => {
           font: helveticaBold,
           color: blackColor,
         });
-        const legacyDateWidth = helvetica.widthOfTextAtSize(
+        const legacyDateW = helvetica.widthOfTextAtSize(
           ticketProps.eventDate,
           7
         );
-        page.drawText(`${ticketProps.eventDate}`, {
-          x: legacyRightAlignX - legacyDateWidth,
+        page.drawText(ticketProps.eventDate, {
+          x: legacyRightAlignX - legacyDateW,
           y: y,
           size: 7,
           font: helvetica,
@@ -769,7 +722,6 @@ Deno.serve(async (req: Request) => {
         });
         y -= 12;
       }
-
       if (ticketProps.eventTime) {
         page.drawText('HEURE', {
           x: 10,
@@ -778,12 +730,12 @@ Deno.serve(async (req: Request) => {
           font: helveticaBold,
           color: blackColor,
         });
-        const legacyTimeWidth = helvetica.widthOfTextAtSize(
+        const legacyTimeW = helvetica.widthOfTextAtSize(
           ticketProps.eventTime,
           7
         );
-        page.drawText(`${ticketProps.eventTime}`, {
-          x: legacyRightAlignX - legacyTimeWidth,
+        page.drawText(ticketProps.eventTime, {
+          x: legacyRightAlignX - legacyTimeW,
           y: y,
           size: 7,
           font: helvetica,
@@ -791,7 +743,6 @@ Deno.serve(async (req: Request) => {
         });
         y -= 12;
       }
-
       if (ticketProps.eventVenue) {
         page.drawText('LIEU', {
           x: 10,
@@ -800,12 +751,12 @@ Deno.serve(async (req: Request) => {
           font: helveticaBold,
           color: blackColor,
         });
-        const legacyVenueWidth = helvetica.widthOfTextAtSize(
+        const legacyVenueW = helvetica.widthOfTextAtSize(
           ticketProps.eventVenue,
           7
         );
         page.drawText(ticketProps.eventVenue, {
-          x: legacyRightAlignX - legacyVenueWidth,
+          x: legacyRightAlignX - legacyVenueW,
           y: y,
           size: 7,
           font: helvetica,
@@ -826,22 +777,16 @@ Deno.serve(async (req: Request) => {
         ticketProps.lastName,
         ticketProps.quantity
       );
-      const legacyHolderWidth = helvetica.widthOfTextAtSize(
-        legacyDisplayName,
-        7
-      );
+      const legacyHolderW = helvetica.widthOfTextAtSize(legacyDisplayName, 7);
       page.drawText(legacyDisplayName, {
-        x: legacyRightAlignX - legacyHolderWidth,
+        x: legacyRightAlignX - legacyHolderW,
         y: y,
         size: 7,
         font: helvetica,
         color: blackColor,
       });
-      y -= 12;
-
       y -= 20;
 
-      // Another divider
       page.drawLine({
         start: { x: 10, y: y },
         end: { x: receiptWidth - 10, y: y },
@@ -850,17 +795,15 @@ Deno.serve(async (req: Request) => {
       });
       y -= 15;
 
-      // QR Code (bigger with proper spacing)
       if (qrCodeData.length > 0) {
-        const qr = qrCodeData[0]; // Use first (and only) QR code for legacy
+        const qr = qrCodeData[0];
         try {
           const qrImage = await pdfDoc.embedPng(qr.qrCodeBytes);
-          const qrSize = 100; // Bigger QR code
+          const qrSize = 100;
           const qrX = (receiptWidth - qrSize) / 2;
           const qrY = y - qrSize;
-          const qrPadding = 8; // Space between border and QR code
+          const qrPadding = 8;
 
-          // Draw QR border with padding
           page.drawRectangle({
             x: qrX - qrPadding,
             y: qrY - qrPadding,
@@ -869,14 +812,12 @@ Deno.serve(async (req: Request) => {
             borderColor: rgb(0, 0, 0),
             borderWidth: 1,
           });
-
           page.drawImage(qrImage, {
             x: qrX,
             y: qrY,
             width: qrSize,
             height: qrSize,
           });
-
           y = qrY - 10;
         } catch (imgError) {
           const embedErrorMsg =
@@ -886,7 +827,6 @@ Deno.serve(async (req: Request) => {
           console.error(
             `Error embedding QR for ${purchaseIdFromRequest}: ${embedErrorMsg}`
           );
-
           const errorText = '[QR CODE INDISPONIBLE]';
           page.drawText(errorText, {
             x: (receiptWidth - 90) / 2,
@@ -909,16 +849,14 @@ Deno.serve(async (req: Request) => {
         y -= 25;
       }
 
-      // Footer messages at bottom right
-      const legacyBottomY = 25; // Very bottom of page
-
+      const legacyBottomY = 25;
       const legacyFooterMsg1 = "Présentez ce code QR à l'entrée";
-      const legacyFooterMsg1Width = helvetica.widthOfTextAtSize(
+      const legacyFooterMsg1W = helvetica.widthOfTextAtSize(
         legacyFooterMsg1,
         5
       );
       page.drawText(legacyFooterMsg1, {
-        x: legacyRightAlignX - legacyFooterMsg1Width,
+        x: legacyRightAlignX - legacyFooterMsg1W,
         y: legacyBottomY,
         size: 5,
         font: helvetica,
@@ -926,12 +864,12 @@ Deno.serve(async (req: Request) => {
       });
 
       const legacyFooterMsg2 = 'Merci de soutenir le mouvement!';
-      const legacyFooterMsg2Width = helvetica.widthOfTextAtSize(
+      const legacyFooterMsg2W = helvetica.widthOfTextAtSize(
         legacyFooterMsg2,
         5
       );
       page.drawText(legacyFooterMsg2, {
-        x: legacyRightAlignX - legacyFooterMsg2Width,
+        x: legacyRightAlignX - legacyFooterMsg2W,
         y: legacyBottomY - 8,
         size: 5,
         font: helvetica,
@@ -1062,50 +1000,19 @@ ${
         emailError instanceof Error
           ? emailError.message
           : JSON.stringify(emailError);
-
-      // Parse error details for better error messages
-      let errorDetails = resendErrorMsg;
-      let errorHint = '';
-
-      try {
-        const errorObj =
-          typeof emailError === 'object'
-            ? emailError
-            : JSON.parse(resendErrorMsg);
-        if (
-          errorObj.statusCode === 401 ||
-          errorObj.message?.includes('API key is invalid')
-        ) {
-          errorHint =
-            ' The Resend API key appears to be invalid or expired. Please check your RESEND_API_KEY environment variable in Supabase dashboard.';
-        } else if (errorObj.statusCode === 403) {
-          errorHint =
-            ' The Resend API key does not have the required permissions.';
-        } else if (errorObj.statusCode === 429) {
-          errorHint = ' Rate limit exceeded. Please try again later.';
-        }
-      } catch {
-        // If parsing fails, use the original error message
-      }
-
       console.error(
         `Resend error for purchase ${purchaseIdFromRequest}:`,
         resendErrorMsg
       );
-      if (errorHint) {
-        console.error(`Error hint:${errorHint}`);
-      }
-
       await supabase.rpc('update_email_dispatch_status', {
         p_purchase_id: purchaseIdFromRequest,
         p_email_dispatch_status: 'DISPATCH_FAILED',
-        p_email_dispatch_error: `Resend API error: ${resendErrorMsg}${errorHint}`,
+        p_email_dispatch_error: `Resend API error: ${resendErrorMsg}`,
       });
       return new Response(
         JSON.stringify({
           error: 'Failed to send email',
           details: resendErrorMsg,
-          hint: errorHint || undefined,
         }),
         {
           status: 500,

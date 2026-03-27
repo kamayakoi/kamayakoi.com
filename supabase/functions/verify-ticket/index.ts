@@ -32,6 +32,42 @@ if (!supabaseServiceRoleKey || supabaseServiceRoleKey.trim() === '') {
   throw new Error('SUPABASE_SERVICE_ROLE_KEY environment variable is required');
 }
 
+/** QR payloads may be a full /verify?id= URL, quoted id, or legacy formats from scanners. */
+function normalizeTicketIdentifier(raw: string): string {
+  let s = raw.trim();
+  if (!s) return s;
+  if (
+    (s.startsWith('"') && s.endsWith('"')) ||
+    (s.startsWith("'") && s.endsWith("'"))
+  ) {
+    s = s.slice(1, -1).trim();
+  }
+  try {
+    if (/^https?:\/\//i.test(s) && /verify/i.test(s)) {
+      const u = new URL(s);
+      const id = u.searchParams.get('id');
+      if (id) {
+        try {
+          return decodeURIComponent(id).trim();
+        } catch {
+          return id.trim();
+        }
+      }
+    }
+  } catch {
+    // ignore
+  }
+  const idFromQuery = s.match(/[?&]id=([^&]+)/i);
+  if (idFromQuery?.[1]) {
+    try {
+      return decodeURIComponent(idFromQuery[1]).trim();
+    } catch {
+      return idFromQuery[1].trim();
+    }
+  }
+  return s;
+}
+
 // The edge function's single-threaded nature prevents race conditions
 // No additional locking mechanism needed
 
@@ -67,16 +103,16 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const trimmedId = ticket_identifier.trim();
+    const trimmedId = normalizeTicketIdentifier(ticket_identifier);
 
     // Step 1: Verify the ticket (atomic operation)
     console.log(`Verifying ticket: ${trimmedId}`);
 
     const { data: ticketData, error: verifyError } = await supabase.rpc(
       'verify_ticket',
-      { 
+      {
         p_ticket_identifier: trimmedId,
-        p_scanner_email: verified_by || "edge_function_unknown"
+        p_scanner_email: verified_by || 'edge_function_unknown',
       }
     );
 
@@ -114,32 +150,51 @@ Deno.serve(async (req: Request) => {
       `Ticket verified: ${ticket.customer_name} - ${ticket.event_title}`
     );
 
-    // Step 2: Check if ticket can be admitted
-    // Fix: Ensure strict checking for use_count vs total_quantity for legacy tickets
-    const isLegacyTicket =
-      ticket.use_count !== undefined &&
-      ticket.use_count !== null &&
-      ticket.total_quantity !== undefined;
+    // Purchase-level counts from DB; per-QR scans still require !ticket.is_used when applicable.
+    const totalQty = Math.max(1, Number(ticket.total_quantity) || 1);
+    const useCount = Math.max(0, Number(ticket.use_count) || 0);
+    const canBeAdmitted = !ticket.is_used && useCount < totalQty;
+    const remainingTickets = Math.max(0, totalQty - useCount);
 
-    const canBeAdmitted = isLegacyTicket
-      ? ticket.use_count < ticket.total_quantity
-      : !ticket.is_used;
-
-    // Calculate remaining tickets
-    let remainingTickets = 0;
-    if (isLegacyTicket) {
-      remainingTickets = Math.max(0, ticket.total_quantity - ticket.use_count);
-    } else {
-      remainingTickets = ticket.is_used ? 0 : 1;
-    }
-
-    // Add remaining tickets to ticket data for response
     const ticketWithRemaining = {
       ...ticket,
+      total_quantity: totalQty,
+      use_count: useCount,
       remaining_tickets: remainingTickets,
     };
 
     if (!canBeAdmitted) {
+      // Check if it was admitted VERY recently (e.g., last 15 seconds)
+      // This absorbs iOS Safari pre-fetches and network retries gracefully.
+      if (ticket.used_at) {
+        const usedAtTime = new Date(ticket.used_at).getTime();
+        const nowTime = Date.now();
+        const isRecentlyUsed = nowTime - usedAtTime < 15000; // 15 seconds
+
+        if (isRecentlyUsed) {
+          console.log(
+            `Ticket was used very recently (${nowTime - usedAtTime}ms ago), likely a prefetch or retry. Treated as success.`
+          );
+
+          const fakedTicket = {
+            ...ticketWithRemaining,
+            remaining_tickets: Math.max(0, totalQty - useCount),
+          };
+
+          return new Response(
+            JSON.stringify({
+              success: true,
+              ticket_data: fakedTicket,
+              admitted: true,
+              warning: 'RECENT_DUPLICATE_TREATED_AS_SUCCESS',
+            }),
+            {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+      }
+
       console.log(`Ticket cannot be admitted: already used`);
       return new Response(
         JSON.stringify({
@@ -149,7 +204,7 @@ Deno.serve(async (req: Request) => {
           error_code: 'ALREADY_USED',
           error_message: ticket.is_used
             ? 'Ticket has already been used for entry'
-            : 'Legacy ticket fully used (all admissions consumed)',
+            : 'All admissions for this ticket have been used',
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -188,10 +243,10 @@ Deno.serve(async (req: Request) => {
 
       if (admitResult === 'SUCCESS') {
         admitted = true;
-        // Decrement remaining tickets for the response since we just used one
+        ticketWithRemaining.use_count = useCount + 1;
         ticketWithRemaining.remaining_tickets = Math.max(
           0,
-          ticketWithRemaining.remaining_tickets - 1
+          totalQty - ticketWithRemaining.use_count
         );
         console.log(`Ticket successfully admitted: ${trimmedId}`);
       } else {

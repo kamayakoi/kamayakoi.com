@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -89,6 +89,10 @@ export default function PurchaseFormModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  /** Caps sheet height to visible viewport so content stays above the mobile keyboard */
+  const [mobileVisibleHeight, setMobileVisibleHeight] = useState<number | null>(
+    null
+  );
 
   // Ensure component is mounted before rendering portal
   useEffect(() => {
@@ -111,6 +115,55 @@ export default function PurchaseFormModal({
       document.removeEventListener('keydown', handleEscapeKey);
     };
   }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !isMobile || typeof window === 'undefined') {
+      setMobileVisibleHeight(null);
+      return;
+    }
+    const vv = window.visualViewport;
+    const apply = () => {
+      setMobileVisibleHeight(
+        vv ? Math.round(vv.height) : Math.round(window.innerHeight)
+      );
+    };
+    apply();
+    if (vv) {
+      vv.addEventListener('resize', apply);
+      vv.addEventListener('scroll', apply);
+      return () => {
+        vv.removeEventListener('resize', apply);
+        vv.removeEventListener('scroll', apply);
+      };
+    }
+    window.addEventListener('resize', apply);
+    return () => window.removeEventListener('resize', apply);
+  }, [isOpen, isMobile]);
+
+  const scrollActiveFieldIntoView = useCallback(() => {
+    if (!isMobile) return;
+    requestAnimationFrame(() => {
+      window.setTimeout(() => {
+        const el = document.activeElement;
+        if (el instanceof HTMLElement && el.tagName !== 'BODY') {
+          el.scrollIntoView({
+            block: 'center',
+            behavior: 'instant',
+            inline: 'nearest',
+          });
+        }
+      }, 120);
+    });
+  }, [isMobile]);
 
   useEffect(() => {
     if (item) {
@@ -380,10 +433,16 @@ export default function PurchaseFormModal({
                   animate: { x: 0 },
                   exit: { x: '100%' },
                 })}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className={`fixed z-[70] will-change-transform pointer-events-auto ${
+            transition={{
+              duration: isMobile ? 0.22 : 0.3,
+              ease: isMobile ? [0.32, 0.72, 0, 1] : 'easeInOut',
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="purchase-modal-title"
+            className={`fixed z-[70] will-change-transform pointer-events-auto overscroll-contain ${
               isMobile
-                ? 'inset-x-0 bottom-0 flex w-full'
+                ? 'inset-x-0 bottom-0 flex w-full max-h-[100dvh]'
                 : 'top-0 bottom-0 right-0 flex w-full md:w-[500px]'
             }`}
             style={
@@ -393,11 +452,21 @@ export default function PurchaseFormModal({
             }
             onClick={e => e.stopPropagation()} // Prevent event bubbling to backdrop
           >
-            <div className="flex flex-col w-full h-[70vh] md:h-full min-h-0 bg-[#1a1a1a] backdrop-blur-xl rounded-t-xl md:rounded-none shadow-2xl p-4">
+            <div
+              className="flex flex-col w-full min-h-0 bg-[#1a1a1a] backdrop-blur-xl rounded-t-xl md:rounded-none shadow-2xl p-4 md:h-full h-[min(96dvh,100%)]"
+              style={
+                isMobile && mobileVisibleHeight != null
+                  ? { maxHeight: mobileVisibleHeight }
+                  : undefined
+              }
+            >
               {/* Header */}
-              <div className="flex items-start py-4 md:py-6 flex-shrink-0">
+              <div className="flex items-start py-3 md:py-6 flex-shrink-0">
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                  <h2
+                    id="purchase-modal-title"
+                    className="text-2xl md:text-3xl font-bold text-foreground"
+                  >
                     {t(currentLanguage, 'purchaseModal.title')}
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">
@@ -407,8 +476,12 @@ export default function PurchaseFormModal({
               </div>
 
               {/* Form Content */}
-              <div className="flex-1 overflow-y-auto min-h-0">
-                <form onSubmit={handleSubmit} className="space-y-6 py-2">
+              <div className="flex-1 overflow-y-auto min-h-0 overscroll-y-contain [-webkit-overflow-scrolling:touch]">
+                <form
+                  id="purchase-checkout-form"
+                  onSubmit={handleSubmit}
+                  className="space-y-5 md:space-y-6 py-1 md:py-2"
+                >
                   {/* Item Details */}
                   <div className="bg-muted/30 p-3 rounded-sm">
                     <div className="flex justify-between items-center">
@@ -457,9 +530,14 @@ export default function PurchaseFormModal({
                     </Label>
                     <Input
                       id="name"
+                      name="name"
                       value={userName}
                       onChange={e => setUserName(e.target.value)}
-                      className="rounded-sm h-9 text-sm mt-2"
+                      onFocus={scrollActiveFieldIntoView}
+                      autoComplete="name"
+                      enterKeyHint="next"
+                      autoCapitalize="words"
+                      className="rounded-sm min-h-11 text-base md:h-9 md:min-h-0 md:text-sm mt-2"
                       placeholder={t(
                         currentLanguage,
                         'purchaseModal.placeholders.name'
@@ -475,10 +553,15 @@ export default function PurchaseFormModal({
                     </Label>
                     <Input
                       id="email"
+                      name="email"
                       type="email"
                       value={userEmail}
                       onChange={e => setUserEmail(e.target.value)}
-                      className="rounded-sm h-9 text-sm mt-2"
+                      onFocus={scrollActiveFieldIntoView}
+                      autoComplete="email"
+                      enterKeyHint="next"
+                      inputMode="email"
+                      className="rounded-sm min-h-11 text-base md:h-9 md:min-h-0 md:text-sm mt-2"
                       placeholder={t(
                         currentLanguage,
                         'purchaseModal.placeholders.email'
@@ -488,7 +571,10 @@ export default function PurchaseFormModal({
                   </div>
 
                   {/* Phone Field */}
-                  <div className="space-y-2">
+                  <div
+                    className="space-y-2"
+                    onFocusCapture={scrollActiveFieldIntoView}
+                  >
                     <Label className="text-sm">
                       {t(currentLanguage, 'purchaseModal.labels.phone')}
                     </Label>
@@ -515,18 +601,21 @@ export default function PurchaseFormModal({
                         size="sm"
                         onClick={handleQuantityDecrement}
                         disabled={quantity <= 1}
-                        className="rounded-sm h-9 w-9 p-0 mt-2"
+                        className="rounded-sm min-h-11 min-w-11 h-11 w-11 shrink-0 p-0 mt-2 md:h-9 md:min-h-0 md:min-w-0 md:w-9"
                       >
                         <Minus className="h-3 w-3" />
                       </Button>
                       <Input
                         id="quantity"
+                        name="quantity"
                         type="text"
                         inputMode="numeric"
                         value={quantityDisplay}
                         onChange={handleQuantityChange}
                         onBlur={handleQuantityBlur}
-                        className="rounded-sm h-9 text-sm text-center flex-1 mt-2"
+                        onFocus={scrollActiveFieldIntoView}
+                        enterKeyHint="done"
+                        className="rounded-sm min-h-11 text-base text-center flex-1 md:h-9 md:min-h-0 md:text-sm mt-2"
                         required
                       />
                       <Button
@@ -535,7 +624,7 @@ export default function PurchaseFormModal({
                         size="sm"
                         onClick={handleQuantityIncrement}
                         disabled={quantity >= maxQuantity}
-                        className="rounded-sm h-9 w-9 p-0 mt-2"
+                        className="rounded-sm min-h-11 min-w-11 h-11 w-11 shrink-0 p-0 mt-2 md:h-9 md:min-h-0 md:min-w-0 md:w-9"
                       >
                         <Plus className="h-3 w-3" />
                       </Button>
@@ -578,12 +667,12 @@ export default function PurchaseFormModal({
               </div>
 
               {/* Footer with Submit Button */}
-              <div className="px-3 md:px-4 py-4 border-t border-border flex-shrink-0">
+              <div className="px-3 md:px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] border-t border-border flex-shrink-0">
                 <Button
                   type="submit"
+                  form="purchase-checkout-form"
                   disabled={isLoading || !isFormValid()}
-                  onClick={handleSubmit}
-                  className={`${button.secondary} rounded-sm text-sm w-full font-medium h-10`}
+                  className={`${button.secondary} rounded-sm text-sm w-full font-medium min-h-11 h-11 md:h-10 md:min-h-0`}
                 >
                   {isLoading ? (
                     <>

@@ -1,4 +1,8 @@
 @import 'tailwindcss';
+
+/* App is always dark (`html.dark`); Tailwind v4 defaults `dark:` to prefers-color-scheme, which breaks on phones set to Light appearance. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @import 'tw-animate-css';
 
 /* Custom fonts like Oroko */
@@ -173,6 +177,7 @@
 
   /* Hide scrollbar for horizon */
   html {
+    color-scheme: dark;
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* Internet Explorer 10+ */
   }

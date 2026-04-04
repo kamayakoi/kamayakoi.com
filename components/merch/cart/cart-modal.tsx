@@ -383,7 +383,7 @@ export default function CartModal() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  className="fixed inset-0 z-60 bg-foreground/30 will-change-auto"
+                  className="fixed inset-0 z-[60] bg-foreground/30 will-change-auto"
                   onClick={closeCart}
                   aria-hidden="true"
                   style={{
@@ -411,10 +411,10 @@ export default function CartModal() {
                       })}
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
                   className={cn(
-                    'fixed z-70 will-change-transform flex w-full',
+                    'fixed z-[70] will-change-transform flex flex-col w-full',
                     isMobile
                       ? 'inset-x-0 bottom-0'
-                      : 'top-0 bottom-0 right-0 md:w-[500px]'
+                      : 'top-0 bottom-0 right-0 md:w-[500px] md:p-4'
                   )}
                   style={
                     isMobile
@@ -423,7 +423,7 @@ export default function CartModal() {
                   }
                   onClick={e => e.stopPropagation()} // Prevent event bubbling to cart button
                 >
-                  <div className="flex flex-col py-4 px-2 md:px-4 w-full bg-[#1a1a1a] backdrop-blur-xl rounded-t-xl md:rounded-sm shadow-2xl max-h-[70vh] md:max-h-none">
+                  <div className="flex flex-col py-4 px-2 md:px-4 w-full min-h-0 bg-[#1a1a1a] backdrop-blur-xl rounded-t-xl md:rounded-sm shadow-2xl max-h-[70vh] md:max-h-none md:h-full">
                     <CartContainer className="flex justify-between items-center mb-8">
                       <div>
                         <h2 className="text-3xl font-bold text-foreground">

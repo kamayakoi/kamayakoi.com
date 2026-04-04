@@ -440,10 +440,10 @@ export default function PurchaseFormModal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="purchase-modal-title"
-            className={`fixed z-[70] will-change-transform pointer-events-auto overscroll-contain ${
+            className={`fixed z-[70] will-change-transform pointer-events-auto overscroll-contain flex flex-col ${
               isMobile
-                ? 'inset-x-0 bottom-0 flex w-full max-h-[100dvh]'
-                : 'top-0 bottom-0 right-0 flex w-full md:w-[500px]'
+                ? 'inset-x-0 bottom-0 w-full max-h-[100dvh]'
+                : 'top-0 bottom-0 right-0 w-full md:w-[500px] md:p-4'
             }`}
             style={
               isMobile
@@ -453,7 +453,7 @@ export default function PurchaseFormModal({
             onClick={e => e.stopPropagation()} // Prevent event bubbling to backdrop
           >
             <div
-              className="flex flex-col w-full min-h-0 bg-[#1a1a1a] backdrop-blur-xl rounded-t-xl md:rounded-none shadow-2xl p-4 md:h-full h-[min(96dvh,100%)]"
+              className="flex flex-col w-full min-h-0 bg-[#1a1a1a] backdrop-blur-xl rounded-t-xl md:rounded-sm shadow-2xl p-4 md:h-full md:min-h-0 h-[min(96dvh,100%)]"
               style={
                 isMobile && mobileVisibleHeight != null
                   ? { maxHeight: mobileVisibleHeight }
@@ -667,7 +667,7 @@ export default function PurchaseFormModal({
               </div>
 
               {/* Footer with Submit Button */}
-              <div className="px-3 md:px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] border-t border-border flex-shrink-0">
+              <div className="px-3 md:px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:pb-4 border-t border-border flex-shrink-0">
                 <Button
                   type="submit"
                   form="purchase-checkout-form"

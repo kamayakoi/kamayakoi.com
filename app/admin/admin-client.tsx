@@ -858,7 +858,7 @@ export default function AdminClient() {
 
     // Admission filter (aligned with scanned_count / multi-ticket rows)
     const admissionScan = getAdmissionScanState(purchase);
-    if (admissionFilter === 'scanned' && admissionScan !== 'full') return false;
+    if (admissionFilter === 'scanned' && admissionScan === 'none') return false;
     if (admissionFilter === 'unscanned' && admissionScan !== 'none')
       return false;
 

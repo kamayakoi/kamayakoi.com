@@ -108,7 +108,11 @@ export async function resolveCheckoutInvokeError(
 
   if (message.trim() && !message.includes('Edge Function')) {
     return {
-      message: translateCode(language, CHECKOUT_ERROR_CODES.UNEXPECTED, namespace),
+      message: translateCode(
+        language,
+        CHECKOUT_ERROR_CODES.UNEXPECTED,
+        namespace
+      ),
       code: CHECKOUT_ERROR_CODES.UNEXPECTED,
       debug: message,
     };
@@ -126,8 +130,5 @@ export async function resolveCheckoutInvokeError(
 }
 
 export function reportCheckoutError(error: CheckoutDisplayError): void {
-  console.error(
-    `[checkout] ${error.code}`,
-    error.debug ?? '(no debug detail)'
-  );
+  console.error(`[checkout] ${error.code}`, error.debug ?? '(no debug detail)');
 }

@@ -54,5 +54,8 @@ export function checkoutSuccess(
     checkout_url,
     purchase_id,
   };
-  return new Response(JSON.stringify(body), { status: 200, headers: jsonHeaders });
+  return new Response(JSON.stringify(body), {
+    status: 200,
+    headers: jsonHeaders,
+  });
 }

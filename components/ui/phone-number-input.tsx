@@ -73,8 +73,7 @@ export default function PhoneNumberInput({
       });
   }, []);
 
-  const wrapperHeight =
-    fieldSize === 'responsive' ? 'min-h-11 md:h-9' : 'h-11';
+  const wrapperHeight = fieldSize === 'responsive' ? 'min-h-11 md:h-9' : 'h-11';
 
   return (
     <FieldSizeContext.Provider value={fieldSize}>
@@ -159,7 +158,9 @@ const CountrySelect = ({
       className={cn(
         'PhoneInputCountry relative inline-flex items-center self-stretch bg-transparent text-foreground outline-none',
         'flex h-full min-w-0 px-3 py-0 border-0 shadow-none rounded-l-sm rounded-r-sm',
-        fieldSize === 'responsive' ? 'text-base md:text-sm' : 'text-base md:text-sm',
+        fieldSize === 'responsive'
+          ? 'text-base md:text-sm'
+          : 'text-base md:text-sm',
         'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30',
         disabled && 'pointer-events-none cursor-not-allowed opacity-50'
       )}

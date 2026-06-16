@@ -94,7 +94,9 @@ export default function PurchaseFormModal({
   const [userEmail, setUserEmail] = useState('');
   const [userPhone, setUserPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | CheckoutDisplayError | null>(null);
+  const [error, setError] = useState<string | CheckoutDisplayError | null>(
+    null
+  );
   const [isMounted, setIsMounted] = useState(false);
   /** Caps sheet height to visible viewport so content stays above the mobile keyboard */
   const [mobileVisibleHeight, setMobileVisibleHeight] = useState<number | null>(
@@ -534,200 +536,208 @@ export default function PurchaseFormModal({
                     onSubmit={handleSubmit}
                     className="space-y-5 md:space-y-6 py-1 md:py-2 px-2"
                   >
-                  {/* Item Details */}
-                  <div className="bg-muted/30 p-3 rounded-sm">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-medium text-sm">{item.name}</h4>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {formatPrice(item.price)}
+                    {/* Item Details */}
+                    <div className="bg-muted/30 p-3 rounded-sm">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h4 className="font-medium text-sm">{item.name}</h4>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {formatPrice(item.price)}
+                            {t(
+                              currentLanguage,
+                              'eventSlugPage.tickets.currencySuffix'
+                            )}
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          {item.isBundle && (
+                            <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-sm">
+                              {item.ticketsIncluded || 1}{' '}
+                              {item.ticketsIncluded === 1
+                                ? 'billet'
+                                : 'billets'}
+                            </span>
+                          )}
+                          {!item.isBundle &&
+                            item.stock !== null &&
+                            item.stock !== undefined &&
+                            item.stock > 0 && (
+                              <span
+                                className={`text-xs px-2 py-0.5 rounded-sm ${button.tag}`}
+                              >
+                                {t(currentLanguage, 'purchaseModal.only')}{' '}
+                                {item.stock}{' '}
+                                {item.stock === 1
+                                  ? t(
+                                      currentLanguage,
+                                      'purchaseModal.available'
+                                    )
+                                  : t(
+                                      currentLanguage,
+                                      'purchaseModal.availablePlural'
+                                    )}
+                              </span>
+                            )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Name Field */}
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-sm">
+                        {t(currentLanguage, 'purchaseModal.labels.name')}
+                      </Label>
+                      <Input
+                        id="name"
+                        name="name"
+                        value={userName}
+                        onChange={e => setUserName(e.target.value)}
+                        onFocus={scrollActiveFieldIntoView}
+                        autoComplete="name"
+                        enterKeyHint="next"
+                        autoCapitalize="words"
+                        className="rounded-sm min-h-11 text-base md:h-9 md:min-h-0 md:text-sm mt-2 focus-visible:ring-inset"
+                        placeholder={t(
+                          currentLanguage,
+                          'purchaseModal.placeholders.name'
+                        )}
+                        required
+                      />
+                    </div>
+
+                    {/* Email Field */}
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-sm">
+                        {t(currentLanguage, 'purchaseModal.labels.email')}
+                      </Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={userEmail}
+                        onChange={e => setUserEmail(e.target.value)}
+                        onFocus={scrollActiveFieldIntoView}
+                        autoComplete="email"
+                        enterKeyHint="next"
+                        inputMode="email"
+                        className="rounded-sm min-h-11 text-base md:h-9 md:min-h-0 md:text-sm mt-2 focus-visible:ring-inset"
+                        placeholder={t(
+                          currentLanguage,
+                          'purchaseModal.placeholders.email'
+                        )}
+                        required
+                      />
+                    </div>
+
+                    {/* Phone Field */}
+                    <div
+                      className="space-y-2"
+                      onFocusCapture={scrollActiveFieldIntoView}
+                    >
+                      <Label className="text-sm">
+                        {t(currentLanguage, 'purchaseModal.labels.phone')}
+                      </Label>
+                      <PhoneNumberInput
+                        value={userPhone}
+                        onChange={value => setUserPhone(value || '')}
+                        fieldSize="responsive"
+                        className="mt-2"
+                        placeholder={t(
+                          currentLanguage,
+                          'purchaseModal.placeholders.phone'
+                        )}
+                      />
+                    </div>
+
+                    {/* Quantity Field */}
+                    <div className="space-y-2">
+                      <Label htmlFor="quantity" className="text-sm">
+                        {t(currentLanguage, 'purchaseModal.labels.quantity')}
+                      </Label>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleQuantityDecrement}
+                          disabled={quantity <= 1}
+                          className="rounded-sm min-h-11 min-w-11 h-11 w-11 shrink-0 p-0 mt-2 md:h-9 md:min-h-0 md:min-w-0 md:w-9"
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <Input
+                          id="quantity"
+                          name="quantity"
+                          type="text"
+                          inputMode="numeric"
+                          value={quantityDisplay}
+                          onChange={handleQuantityChange}
+                          onBlur={handleQuantityBlur}
+                          onFocus={scrollActiveFieldIntoView}
+                          enterKeyHint="done"
+                          className="rounded-sm min-h-11 text-base text-center flex-1 md:h-9 md:min-h-0 md:text-sm mt-2 focus-visible:ring-inset"
+                          required
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleQuantityIncrement}
+                          disabled={quantity >= maxQuantity}
+                          className="rounded-sm min-h-11 min-w-11 h-11 w-11 shrink-0 p-0 mt-2 md:h-9 md:min-h-0 md:min-w-0 md:w-9"
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Error Display */}
+                    {error && (
+                      <div
+                        role="alert"
+                        className="text-xs text-red-400 text-center px-3 py-2 bg-red-900/20 rounded-sm border border-red-700/50 mt-2 space-y-1"
+                      >
+                        <p>
+                          {typeof error === 'string' ? error : error.message}
+                        </p>
+                        {typeof error !== 'string' && error.code && (
+                          <p className="text-[10px] text-red-400/70 font-mono tracking-wide">
+                            {t(currentLanguage, 'purchaseModal.errorRef', {
+                              code: error.code,
+                            })}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Total Price */}
+                    <div className="pt-3 border-t border-border">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-muted-foreground">
+                          {t(currentLanguage, 'purchaseModal.totalPrice')}
+                        </span>
+                        <span className="text-primary font-semibold">
+                          {formatPrice(totalPrice)}
                           {t(
                             currentLanguage,
                             'eventSlugPage.tickets.currencySuffix'
                           )}
-                        </p>
+                        </span>
                       </div>
-                      <div className="flex flex-col items-end gap-1">
-                        {item.isBundle && (
-                          <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-sm">
-                            {item.ticketsIncluded || 1}{' '}
-                            {item.ticketsIncluded === 1 ? 'billet' : 'billets'}
+                      {item.isBundle && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">
+                            {t(
+                              currentLanguage,
+                              'purchaseModal.ticketsGenerated'
+                            )}
                           </span>
-                        )}
-                        {!item.isBundle &&
-                          item.stock !== null &&
-                          item.stock !== undefined &&
-                          item.stock > 0 && (
-                            <span
-                              className={`text-xs px-2 py-0.5 rounded-sm ${button.tag}`}
-                            >
-                              {t(currentLanguage, 'purchaseModal.only')}{' '}
-                              {item.stock}{' '}
-                              {item.stock === 1
-                                ? t(currentLanguage, 'purchaseModal.available')
-                                : t(
-                                    currentLanguage,
-                                    'purchaseModal.availablePlural'
-                                  )}
-                            </span>
-                          )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Name Field */}
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm">
-                      {t(currentLanguage, 'purchaseModal.labels.name')}
-                    </Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      value={userName}
-                      onChange={e => setUserName(e.target.value)}
-                      onFocus={scrollActiveFieldIntoView}
-                      autoComplete="name"
-                      enterKeyHint="next"
-                      autoCapitalize="words"
-                      className="rounded-sm min-h-11 text-base md:h-9 md:min-h-0 md:text-sm mt-2 focus-visible:ring-inset"
-                      placeholder={t(
-                        currentLanguage,
-                        'purchaseModal.placeholders.name'
-                      )}
-                      required
-                    />
-                  </div>
-
-                  {/* Email Field */}
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm">
-                      {t(currentLanguage, 'purchaseModal.labels.email')}
-                    </Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={userEmail}
-                      onChange={e => setUserEmail(e.target.value)}
-                      onFocus={scrollActiveFieldIntoView}
-                      autoComplete="email"
-                      enterKeyHint="next"
-                      inputMode="email"
-                      className="rounded-sm min-h-11 text-base md:h-9 md:min-h-0 md:text-sm mt-2 focus-visible:ring-inset"
-                      placeholder={t(
-                        currentLanguage,
-                        'purchaseModal.placeholders.email'
-                      )}
-                      required
-                    />
-                  </div>
-
-                  {/* Phone Field */}
-                  <div
-                    className="space-y-2"
-                    onFocusCapture={scrollActiveFieldIntoView}
-                  >
-                    <Label className="text-sm">
-                      {t(currentLanguage, 'purchaseModal.labels.phone')}
-                    </Label>
-                    <PhoneNumberInput
-                      value={userPhone}
-                      onChange={value => setUserPhone(value || '')}
-                      fieldSize="responsive"
-                      className="mt-2"
-                      placeholder={t(
-                        currentLanguage,
-                        'purchaseModal.placeholders.phone'
-                      )}
-                    />
-                  </div>
-
-                  {/* Quantity Field */}
-                  <div className="space-y-2">
-                    <Label htmlFor="quantity" className="text-sm">
-                      {t(currentLanguage, 'purchaseModal.labels.quantity')}
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleQuantityDecrement}
-                        disabled={quantity <= 1}
-                        className="rounded-sm min-h-11 min-w-11 h-11 w-11 shrink-0 p-0 mt-2 md:h-9 md:min-h-0 md:min-w-0 md:w-9"
-                      >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                      <Input
-                        id="quantity"
-                        name="quantity"
-                        type="text"
-                        inputMode="numeric"
-                        value={quantityDisplay}
-                        onChange={handleQuantityChange}
-                        onBlur={handleQuantityBlur}
-                        onFocus={scrollActiveFieldIntoView}
-                        enterKeyHint="done"
-                        className="rounded-sm min-h-11 text-base text-center flex-1 md:h-9 md:min-h-0 md:text-sm mt-2 focus-visible:ring-inset"
-                        required
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleQuantityIncrement}
-                        disabled={quantity >= maxQuantity}
-                        className="rounded-sm min-h-11 min-w-11 h-11 w-11 shrink-0 p-0 mt-2 md:h-9 md:min-h-0 md:min-w-0 md:w-9"
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Error Display */}
-                  {error && (
-                    <div
-                      role="alert"
-                      className="text-xs text-red-400 text-center px-3 py-2 bg-red-900/20 rounded-sm border border-red-700/50 mt-2 space-y-1"
-                    >
-                      <p>
-                        {typeof error === 'string' ? error : error.message}
-                      </p>
-                      {typeof error !== 'string' && error.code && (
-                        <p className="text-[10px] text-red-400/70 font-mono tracking-wide">
-                          {t(currentLanguage, 'purchaseModal.errorRef', {
-                            code: error.code,
-                          })}
-                        </p>
+                          <span className="text-xs font-medium">
+                            {actualTicketCount}
+                          </span>
+                        </div>
                       )}
                     </div>
-                  )}
-
-                  {/* Total Price */}
-                  <div className="pt-3 border-t border-border">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">
-                        {t(currentLanguage, 'purchaseModal.totalPrice')}
-                      </span>
-                      <span className="text-primary font-semibold">
-                        {formatPrice(totalPrice)}
-                        {t(
-                          currentLanguage,
-                          'eventSlugPage.tickets.currencySuffix'
-                        )}
-                      </span>
-                    </div>
-                    {item.isBundle && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">
-                          {t(currentLanguage, 'purchaseModal.ticketsGenerated')}
-                        </span>
-                        <span className="text-xs font-medium">
-                          {actualTicketCount}
-                        </span>
-                      </div>
-                    )}
-                  </div>
                   </form>
                 </div>
 

@@ -223,10 +223,7 @@ serve(async (req: Request) => {
           description: `Payment for ${payload.quantity} ticket(s) for the event: ${payload.eventTitle}. Ticket type: ${payload.ticketName}.`,
         };
 
-    console.log(
-      'Calling lomi. API:',
-      `${LOMI_API_URL}/checkout-sessions`
-    );
+    console.log('Calling lomi. API:', `${LOMI_API_URL}/checkout-sessions`);
 
     const lomiResponse = await fetch(`${LOMI_API_URL}/checkout-sessions`, {
       method: 'POST',
@@ -323,8 +320,7 @@ serve(async (req: Request) => {
 
     return checkoutSuccess(checkoutUrl, purchaseId);
   } catch (error) {
-    const debug =
-      error instanceof Error ? error.message : String(error);
+    const debug = error instanceof Error ? error.message : String(error);
     return checkoutError(CHECKOUT_ERROR_CODES.UNEXPECTED, debug, 500);
   }
 });

@@ -283,6 +283,7 @@
       "phone": "+2250771234567"
     },
     "totalPrice": "Total",
+    "errorRef": "Réf. : {code}",
     "buttons": {
       "cancel": "Annuler",
       "pay": "Acheter",
@@ -292,10 +293,31 @@
       "nameRequired": "Le nom est requis.",
       "emailRequired": "L'email est requis.",
       "emailInvalid": "Veuillez entrer une adresse e-mail valide.",
+      "phoneRequired": "Le numéro de téléphone est requis.",
+      "phoneInvalid": "Veuillez entrer un numéro de téléphone valide.",
+      "phoneInvalidCiLength": "Les numéros ivoiriens doivent comporter 10 chiffres (ex. 07 77 36 78 73).",
       "quantityInvalid": "La quantité doit être d'au moins 1.",
+      "quantityExceedsMax": "Maximum {max} billets par commande.",
+      "quantityExceedsStock": "Il ne reste que {stock} billets en stock.",
       "functionError": "Impossible d'initier le paiement. Veuillez réessayer.",
+      "networkError": "Connexion impossible. Vérifiez votre réseau et réessayez.",
+      "networkInAppBrowser": "Le paiement ne peut pas démarrer depuis ce navigateur intégré (Instagram, Facebook, etc.). Ouvrez cette page dans Safari ou Chrome, puis réessayez.",
       "lomiUrlMissing": "URL de paiement non reçue. Veuillez réessayer.",
       "submitError": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "errorCodes": {
+      "CONFIG_SUPABASE": "Le paiement est temporairement indisponible. Réessayez dans quelques minutes.",
+      "CONFIG_LOMI": "Le paiement est temporairement indisponible. Réessayez dans quelques minutes.",
+      "VALIDATION_FAILED": "Des informations sont manquantes. Vérifiez le formulaire et réessayez.",
+      "VALIDATION_QUANTITY": "La quantité doit être d'au moins 1.",
+      "CUSTOMER_UPSERT_FAILED": "Impossible d'enregistrer vos coordonnées. Veuillez réessayer.",
+      "PURCHASE_CREATE_FAILED": "Impossible de créer la commande. Les billets sont peut-être épuisés — essayez une quantité plus faible.",
+      "LOMI_INVALID_RESPONSE": "Le service de paiement a renvoyé une réponse inattendue. Réessayez dans un instant.",
+      "LOMI_SESSION_FAILED": "Le paiement n'a pas pu démarrer. Réessayez ou utilisez Safari/Chrome.",
+      "CHECKOUT_URL_MISSING": "Le lien de paiement n'a pas été reçu. Veuillez réessayer.",
+      "UNEXPECTED": "Une erreur est survenue. Réessayez ou contactez le support.",
+      "NETWORK": "Connexion impossible. Vérifiez votre réseau et réessayez.",
+      "NETWORK_IN_APP": "Le paiement ne peut pas démarrer depuis ce navigateur intégré (Instagram, Facebook, etc.). Ouvrez cette page dans Safari ou Chrome, puis réessayez."
     }
   },
   "cartModal": {

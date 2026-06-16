@@ -6,11 +6,17 @@ import * as RPNInput from 'react-phone-number-input';
 import flags from 'react-phone-number-input/flags';
 import { cn } from '@/lib/actions/utils';
 
+const FieldSizeContext = React.createContext<'default' | 'responsive'>(
+  'default'
+);
+
 interface PhoneNumberInputProps {
   value: string;
   onChange: (value: string | undefined) => void;
   placeholder?: string;
   className?: string;
+  /** Match modal inputs: taller on mobile, compact on desktop */
+  fieldSize?: 'default' | 'responsive';
 }
 
 export default function PhoneNumberInput({
@@ -18,6 +24,7 @@ export default function PhoneNumberInput({
   onChange,
   placeholder = 'Phone number',
   className,
+  fieldSize = 'default',
 }: PhoneNumberInputProps) {
   const [defaultCountry, setDefaultCountry] = useState<RPNInput.Country>();
   const [isFocused, setIsFocused] = useState(false);
@@ -66,31 +73,37 @@ export default function PhoneNumberInput({
       });
   }, []);
 
+  const wrapperHeight =
+    fieldSize === 'responsive' ? 'min-h-11 md:h-9' : 'h-11';
+
   return (
-    <div className={cn('w-full relative', className)}>
-      <div
-        className={cn(
-          'flex w-full rounded-sm border border-input bg-transparent shadow-xs transition-[color,box-shadow]',
-          isFocused && 'border-ring ring-ring/50 ring-[3px]'
-        )}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-      >
-        <RPNInput.default
-          className="flex PhoneInput w-full"
-          international
-          defaultCountry={defaultCountry}
-          flagComponent={FlagComponent}
-          countrySelectComponent={CountrySelect}
-          inputComponent={PhoneInput}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          smartCaret={true}
-          countryCallingCodeEditable={true}
-        />
+    <FieldSizeContext.Provider value={fieldSize}>
+      <div className={cn('w-full relative', className)}>
+        <div
+          className={cn(
+            'flex w-full rounded-sm border border-input bg-transparent shadow-xs transition-[color,box-shadow]',
+            wrapperHeight,
+            isFocused && 'border-ring ring-ring/50 ring-[3px] ring-inset'
+          )}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+        >
+          <RPNInput.default
+            className="flex PhoneInput w-full h-full items-stretch"
+            international
+            defaultCountry={defaultCountry}
+            flagComponent={FlagComponent}
+            countrySelectComponent={CountrySelect}
+            inputComponent={PhoneInput}
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+            smartCaret={true}
+            countryCallingCodeEditable={true}
+          />
+        </div>
       </div>
-    </div>
+    </FieldSizeContext.Provider>
   );
 }
 
@@ -98,14 +111,18 @@ export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 const PhoneInput = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, ...props }, ref) => {
+    const fieldSize = React.useContext(FieldSizeContext);
     return (
       <input
         ref={ref}
         className={cn(
           'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30',
-          'flex h-11 w-full min-w-0 bg-transparent px-3 py-1 text-base outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium',
+          'flex h-full w-full min-w-0 bg-transparent px-3 py-1 outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium',
           'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
           'border-0 shadow-none rounded-l-sm rounded-r-sm',
+          fieldSize === 'responsive'
+            ? 'text-base md:text-sm'
+            : 'text-base md:text-sm',
           className
         )}
         {...props}
@@ -132,6 +149,7 @@ const CountrySelect = ({
   onChange,
   options,
 }: CountrySelectProps) => {
+  const fieldSize = React.useContext(FieldSizeContext);
   const handleSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
     onChange(event.target.value as RPNInput.Country);
   };
@@ -140,7 +158,8 @@ const CountrySelect = ({
     <div
       className={cn(
         'PhoneInputCountry relative inline-flex items-center self-stretch bg-transparent text-foreground outline-none',
-        'flex h-11 min-w-0 px-3 py-1 border-0 shadow-none rounded-l-sm rounded-r-sm',
+        'flex h-full min-w-0 px-3 py-0 border-0 shadow-none rounded-l-sm rounded-r-sm',
+        fieldSize === 'responsive' ? 'text-base md:text-sm' : 'text-base md:text-sm',
         'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30',
         disabled && 'pointer-events-none cursor-not-allowed opacity-50'
       )}

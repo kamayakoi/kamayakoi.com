@@ -280,9 +280,10 @@
     "placeholders": {
       "name": "Noe Richer-Willi",
       "email": "noe@gmail.com",
-      "phone": "+221771234567"
+      "phone": "+2250771234567"
     },
     "totalPrice": "Total",
+    "errorRef": "Ref: {code}",
     "buttons": {
       "cancel": "Cancel",
       "pay": "Purchase",
@@ -292,10 +293,31 @@
       "nameRequired": "Name is required.",
       "emailRequired": "Email is required.",
       "emailInvalid": "Please enter a valid email address.",
+      "phoneRequired": "Phone number is required.",
+      "phoneInvalid": "Please enter a valid phone number.",
+      "phoneInvalidCiLength": "Ivorian numbers must have 10 digits (e.g. 07 77 36 78 73).",
       "quantityInvalid": "Quantity must be at least 1.",
+      "quantityExceedsMax": "Maximum {max} tickets per order.",
+      "quantityExceedsStock": "Only {stock} tickets left in stock.",
       "functionError": "Could not initiate payment. Please try again.",
+      "networkError": "Connection failed. Check your internet and try again.",
+      "networkInAppBrowser": "Payment could not start from this in-app browser (Instagram, Facebook, etc.). Open this page in Safari or Chrome, then try again.",
       "lomiUrlMissing": "Payment URL not received. Please try again.",
       "submitError": "An error occurred. Please try again."
+    },
+    "errorCodes": {
+      "CONFIG_SUPABASE": "Payment is temporarily unavailable. Please try again in a few minutes.",
+      "CONFIG_LOMI": "Payment is temporarily unavailable. Please try again in a few minutes.",
+      "VALIDATION_FAILED": "Some order details are missing. Please check the form and try again.",
+      "VALIDATION_QUANTITY": "Quantity must be at least 1.",
+      "CUSTOMER_UPSERT_FAILED": "We could not save your contact details. Please try again.",
+      "PURCHASE_CREATE_FAILED": "We could not create your order. The tickets may be sold out — try a lower quantity.",
+      "LOMI_INVALID_RESPONSE": "The payment service returned an unexpected response. Please try again shortly.",
+      "LOMI_SESSION_FAILED": "Payment could not be started. Please try again or use Safari/Chrome.",
+      "CHECKOUT_URL_MISSING": "Payment link was not received. Please try again.",
+      "UNEXPECTED": "Something went wrong. Please try again or contact support.",
+      "NETWORK": "Connection failed. Check your internet and try again.",
+      "NETWORK_IN_APP": "Payment cannot start from this in-app browser (Instagram, Facebook, etc.). Open this page in Safari or Chrome, then try again."
     }
   },
   "cartModal": {

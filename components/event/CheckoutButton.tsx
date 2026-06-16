@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase/client';
 import PurchaseFormModal from '@/components/event/PurchaseFormModal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -48,24 +48,10 @@ interface CheckoutButtonProps {
   currentLanguage: string;
 }
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-let supabase: SupabaseClient | null = null;
-
-if (supabaseUrl && supabaseAnonKey) {
-  try {
-    supabase = createClient(supabaseUrl, supabaseAnonKey);
-  } catch (error) {
-    console.error(
-      'Failed to initialize Supabase client in CheckoutButton:',
-      error
-    );
-  }
-} else {
-  console.warn(
-    'Supabase URL or Anon Key is missing from .env. API checkout (modal) will be disabled if these are not set.'
-  );
-}
+const isSupabaseConfigured = Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 const getItemAvailabilityStatus = (
   item: {
@@ -132,7 +118,7 @@ export default function CheckoutButton({
   );
 
   const handleOpenPurchaseModal = () => {
-    if (!supabase) {
+    if (!isSupabaseConfigured) {
       alert(t(currentLanguage, 'eventSlugPage.errors.supabaseNotInitialized'));
       console.error(
         'Supabase client not initialized. Cannot open purchase modal.'
@@ -154,7 +140,7 @@ export default function CheckoutButton({
   };
 
   if (globallyTicketsOnSale && availabilityStatus.available) {
-    if (supabase) {
+    if (isSupabaseConfigured) {
       const isBundle = item.isBundle;
       const buttonText = isBundle
         ? t(currentLanguage, 'eventSlugPage.tickets.buyNow')

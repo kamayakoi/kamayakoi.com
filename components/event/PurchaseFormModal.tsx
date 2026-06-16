@@ -13,6 +13,13 @@ import { useTheme } from '@/lib/contexts/ThemeContext';
 import { SupabaseClient } from '@supabase/supabase-js';
 import PhoneNumberInput from '@/components/ui/phone-number-input';
 import { useIsMobile } from '@/lib/utils/use-is-mobile';
+import { validatePhoneNumber } from '@/lib/utils/phone';
+import {
+  type CheckoutDisplayError,
+  resolveCheckoutApiBody,
+  resolveCheckoutInvokeError,
+  reportCheckoutError,
+} from '@/lib/utils/checkout-api';
 
 // Helper function for formatting price (matching event page)
 const formatPrice = (price: number): string => {
@@ -87,7 +94,7 @@ export default function PurchaseFormModal({
   const [userEmail, setUserEmail] = useState('');
   const [userPhone, setUserPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | CheckoutDisplayError | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   /** Caps sheet height to visible viewport so content stays above the mobile keyboard */
   const [mobileVisibleHeight, setMobileVisibleHeight] = useState<number | null>(
@@ -173,6 +180,19 @@ export default function PurchaseFormModal({
     }
   }, [item]);
 
+  // Reset loading when modal reopens or user navigates back from checkout
+  useEffect(() => {
+    if (isOpen) {
+      setIsLoading(false);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const onPageShow = () => setIsLoading(false);
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, []);
+
   if (!item) return null;
 
   // Refined maxQuantity calculation
@@ -252,6 +272,8 @@ export default function PurchaseFormModal({
     return emailRegex.test(email);
   };
 
+  const phoneValidation = validatePhoneNumber(userPhone, 'CI');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -266,6 +288,18 @@ export default function PurchaseFormModal({
     }
     if (!validateEmail(userEmail)) {
       setError(t(currentLanguage, 'purchaseModal.errors.emailInvalid'));
+      return;
+    }
+
+    const phone = validatePhoneNumber(userPhone, 'CI');
+    if (!phone.valid) {
+      const phoneErrorKey =
+        phone.reason === 'empty'
+          ? 'purchaseModal.errors.phoneRequired'
+          : phone.reason === 'ci_length'
+            ? 'purchaseModal.errors.phoneInvalidCiLength'
+            : 'purchaseModal.errors.phoneInvalid';
+      setError(t(currentLanguage, phoneErrorKey));
       return;
     }
     if (quantity <= 0) {
@@ -312,7 +346,7 @@ export default function PurchaseFormModal({
       quantity: quantity,
       userName: userName.trim(),
       userEmail: userEmail.trim(),
-      userPhone: userPhone || undefined, // Send phone number properly formatted
+      userPhone: phone.e164,
       currencyCode: 'XOF', // Assuming XOF, make dynamic if needed
       successUrlPath: '/payment/success', // Or from config
       cancelUrlPath: '/payment/error', // Or from config
@@ -337,34 +371,51 @@ export default function PurchaseFormModal({
         });
 
       if (functionError) {
-        console.error('Supabase function error:', functionError);
-        setError(
-          functionError.message ||
-            t(currentLanguage, 'purchaseModal.errors.functionError')
+        const checkoutError = await resolveCheckoutInvokeError(
+          functionError,
+          currentLanguage,
+          'purchaseModal'
         );
+        reportCheckoutError(checkoutError);
+        setError(checkoutError);
         setIsLoading(false);
         return;
       }
 
-      if (data && data.checkout_url) {
+      if (data?.checkout_url) {
         window.location.href = data.checkout_url;
         successfullyInitiatedRedirect = true;
+      } else if (data && (data.ok === false || data.code)) {
+        const checkoutError = resolveCheckoutApiBody(
+          data,
+          currentLanguage,
+          'purchaseModal'
+        );
+        reportCheckoutError(checkoutError);
+        setError(checkoutError);
       } else {
         console.error('Lomi checkout URL not found in response:', data);
-        setError(
-          data.error ||
-            t(currentLanguage, 'purchaseModal.errors.lomiUrlMissing')
+        const checkoutError = resolveCheckoutApiBody(
+          { code: 'CHECKOUT_URL_MISSING', debug: JSON.stringify(data) },
+          currentLanguage,
+          'purchaseModal'
         );
+        reportCheckoutError(checkoutError);
+        setError(checkoutError);
       }
     } catch (e: unknown) {
       console.error('Error invoking Supabase function:', e);
-      let message = t(currentLanguage, 'purchaseModal.errors.submitError');
-      if (e instanceof Error) {
-        message = e.message;
-      } else if (typeof e === 'string') {
-        message = e;
+      if (e && typeof e === 'object' && 'message' in e) {
+        const checkoutError = await resolveCheckoutInvokeError(
+          e as { message?: string },
+          currentLanguage,
+          'purchaseModal'
+        );
+        reportCheckoutError(checkoutError);
+        setError(checkoutError);
+      } else {
+        setError(t(currentLanguage, 'purchaseModal.errors.submitError'));
       }
-      setError(message);
     } finally {
       // Only set isLoading to false if there was an error and we are not redirecting
       if (!successfullyInitiatedRedirect) {
@@ -379,7 +430,7 @@ export default function PurchaseFormModal({
       userName.trim().length > 0 &&
       userEmail.trim().length > 0 &&
       validateEmail(userEmail) &&
-      userPhone.trim().length > 4 && // Phone is now required
+      phoneValidation.valid &&
       quantity > 0
     );
   };
@@ -453,35 +504,36 @@ export default function PurchaseFormModal({
             onClick={e => e.stopPropagation()} // Prevent event bubbling to backdrop
           >
             <div
-              className="flex flex-col w-full min-h-0 bg-[#1a1a1a] backdrop-blur-xl rounded-t-xl md:rounded-sm shadow-2xl p-4 md:h-full md:min-h-0 h-[min(96dvh,100%)]"
+              className="flex flex-col w-full min-h-0 bg-[#1a1a1a] backdrop-blur-xl rounded-t-xl md:rounded-sm shadow-2xl py-4 px-2 md:px-4 md:h-full md:min-h-0 h-[min(96dvh,100%)]"
               style={
                 isMobile && mobileVisibleHeight != null
                   ? { maxHeight: mobileVisibleHeight }
                   : undefined
               }
             >
-              {/* Header */}
-              <div className="flex items-start py-3 md:py-6 flex-shrink-0">
-                <div>
-                  <h2
-                    id="purchase-modal-title"
-                    className="text-2xl md:text-3xl font-bold text-foreground"
-                  >
-                    {t(currentLanguage, 'purchaseModal.title')}
-                  </h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {t(currentLanguage, 'purchaseModal.description')}
-                  </p>
+              <div className="flex flex-col flex-1 min-h-0">
+                {/* Header */}
+                <div className="flex items-start py-3 md:py-6 flex-shrink-0 px-2">
+                  <div>
+                    <h2
+                      id="purchase-modal-title"
+                      className="text-2xl md:text-3xl font-bold text-foreground"
+                    >
+                      {t(currentLanguage, 'purchaseModal.title')}
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {t(currentLanguage, 'purchaseModal.description')}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              {/* Form Content */}
-              <div className="flex-1 overflow-y-auto min-h-0 overscroll-y-contain [-webkit-overflow-scrolling:touch]">
-                <form
-                  id="purchase-checkout-form"
-                  onSubmit={handleSubmit}
-                  className="space-y-5 md:space-y-6 py-1 md:py-2"
-                >
+                {/* Form Content — horizontal padding inside scroll so focus rings are not clipped */}
+                <div className="flex-1 overflow-y-auto min-h-0 overscroll-y-contain [-webkit-overflow-scrolling:touch]">
+                  <form
+                    id="purchase-checkout-form"
+                    onSubmit={handleSubmit}
+                    className="space-y-5 md:space-y-6 py-1 md:py-2 px-2"
+                  >
                   {/* Item Details */}
                   <div className="bg-muted/30 p-3 rounded-sm">
                     <div className="flex justify-between items-center">
@@ -537,7 +589,7 @@ export default function PurchaseFormModal({
                       autoComplete="name"
                       enterKeyHint="next"
                       autoCapitalize="words"
-                      className="rounded-sm min-h-11 text-base md:h-9 md:min-h-0 md:text-sm mt-2"
+                      className="rounded-sm min-h-11 text-base md:h-9 md:min-h-0 md:text-sm mt-2 focus-visible:ring-inset"
                       placeholder={t(
                         currentLanguage,
                         'purchaseModal.placeholders.name'
@@ -561,7 +613,7 @@ export default function PurchaseFormModal({
                       autoComplete="email"
                       enterKeyHint="next"
                       inputMode="email"
-                      className="rounded-sm min-h-11 text-base md:h-9 md:min-h-0 md:text-sm mt-2"
+                      className="rounded-sm min-h-11 text-base md:h-9 md:min-h-0 md:text-sm mt-2 focus-visible:ring-inset"
                       placeholder={t(
                         currentLanguage,
                         'purchaseModal.placeholders.email'
@@ -581,7 +633,8 @@ export default function PurchaseFormModal({
                     <PhoneNumberInput
                       value={userPhone}
                       onChange={value => setUserPhone(value || '')}
-                      className="rounded-sm h-9 text-sm mt-2"
+                      fieldSize="responsive"
+                      className="mt-2"
                       placeholder={t(
                         currentLanguage,
                         'purchaseModal.placeholders.phone'
@@ -615,7 +668,7 @@ export default function PurchaseFormModal({
                         onBlur={handleQuantityBlur}
                         onFocus={scrollActiveFieldIntoView}
                         enterKeyHint="done"
-                        className="rounded-sm min-h-11 text-base text-center flex-1 md:h-9 md:min-h-0 md:text-sm mt-2"
+                        className="rounded-sm min-h-11 text-base text-center flex-1 md:h-9 md:min-h-0 md:text-sm mt-2 focus-visible:ring-inset"
                         required
                       />
                       <Button
@@ -633,8 +686,20 @@ export default function PurchaseFormModal({
 
                   {/* Error Display */}
                   {error && (
-                    <div className="text-xs text-red-400 text-center px-3 py-2 bg-red-900/20 rounded-sm border border-red-700/50 mt-2">
-                      {error}
+                    <div
+                      role="alert"
+                      className="text-xs text-red-400 text-center px-3 py-2 bg-red-900/20 rounded-sm border border-red-700/50 mt-2 space-y-1"
+                    >
+                      <p>
+                        {typeof error === 'string' ? error : error.message}
+                      </p>
+                      {typeof error !== 'string' && error.code && (
+                        <p className="text-[10px] text-red-400/70 font-mono tracking-wide">
+                          {t(currentLanguage, 'purchaseModal.errorRef', {
+                            code: error.code,
+                          })}
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -663,29 +728,30 @@ export default function PurchaseFormModal({
                       </div>
                     )}
                   </div>
-                </form>
-              </div>
+                  </form>
+                </div>
 
-              {/* Footer with Submit Button */}
-              <div className="px-3 md:px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:pb-4 border-t border-border flex-shrink-0">
-                <Button
-                  type="submit"
-                  form="purchase-checkout-form"
-                  disabled={isLoading || !isFormValid()}
-                  className={`${button.secondary} rounded-sm text-sm w-full font-medium min-h-11 h-11 md:h-10 md:min-h-0`}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {t(currentLanguage, 'purchaseModal.buttons.processing')}
-                    </>
-                  ) : (
-                    <>
-                      <Ticket className="mr-2 h-4 w-4" />
-                      {t(currentLanguage, 'purchaseModal.buttons.pay')}
-                    </>
-                  )}
-                </Button>
+                {/* Footer with Submit Button */}
+                <div className="px-2 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:pb-4 border-t border-border flex-shrink-0">
+                  <Button
+                    type="submit"
+                    form="purchase-checkout-form"
+                    disabled={isLoading || !isFormValid()}
+                    className={`${button.secondary} rounded-sm text-sm w-full font-medium min-h-11 h-11 md:h-10 md:min-h-0`}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {t(currentLanguage, 'purchaseModal.buttons.processing')}
+                      </>
+                    ) : (
+                      <>
+                        <Ticket className="mr-2 h-4 w-4" />
+                        {t(currentLanguage, 'purchaseModal.buttons.pay')}
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
           </motion.div>

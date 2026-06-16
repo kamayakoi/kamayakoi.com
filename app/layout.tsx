@@ -1,6 +1,7 @@
 import type React from 'react';
 import type { Metadata } from 'next';
 import { Geist_Mono } from 'next/font/google';
+import { cookies } from 'next/headers';
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
 import { Analytics } from '@vercel/analytics/react';
@@ -9,11 +10,13 @@ import { MediaProvider } from '@/lib/contexts/MediaContext';
 import MusicWrapper from '@/components/landing/music-wrapper';
 import { CartProvider } from '@/components/merch/cart/cart-context';
 import { WishlistProvider } from '@/components/merch/wishlist/wishlist-context';
-import {
-  getHomepageMusicTracks,
-  getHomepageThemeSettings,
-} from '@/lib/sanity/queries';
+import { getHomepageLayoutData } from '@/lib/sanity/queries';
 import { ThemeProvider } from '@/lib/contexts/ThemeContext';
+import {
+  parseLanguageCookie,
+  LANGUAGE_COOKIE_KEY,
+} from '@/lib/i18n/language-cookie';
+import type { Language } from '@/lib/i18n/config';
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
@@ -63,7 +66,6 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    nocache: true,
     googleBot: {
       index: true,
       follow: true,
@@ -109,20 +111,26 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Fetch music tracks and theme (button color) for global use
-  const [musicTracks, themeSettings] = await Promise.all([
-    getHomepageMusicTracks(),
-    getHomepageThemeSettings(),
-  ]);
+  const layoutData = await getHomepageLayoutData();
+  const cookieStore = await cookies();
+  const initialLanguage = parseLanguageCookie(
+    cookieStore.get(LANGUAGE_COOKIE_KEY)?.value
+  ) as Language;
 
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang={initialLanguage} className="dark" suppressHydrationWarning>
       <body
         className={`${geistMono.variable} font-sans flex flex-col min-h-screen`}
       >
-        <ThemeProvider primaryButtonColor={themeSettings.primaryButtonColor}>
-          <MusicWrapper audioSettings={musicTracks}>
-            <TranslationProvider>
+        <ThemeProvider primaryButtonColor={layoutData.primaryButtonColor}>
+          <MusicWrapper
+            audioSettings={{
+              audioPlayerEnabled: layoutData.audioPlayerEnabled,
+              autoPlayMusic: layoutData.autoPlayMusic,
+              musicTracks: layoutData.musicTracks,
+            }}
+          >
+            <TranslationProvider initialLanguage={initialLanguage}>
               <MediaProvider>
                 <CartProvider>
                   <WishlistProvider>

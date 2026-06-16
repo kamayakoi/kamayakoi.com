@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { client } from './client';
 
 // Helper function to get cache configuration based on environment
@@ -114,6 +115,152 @@ export async function getEventBySlug(slug: string, locale: string) {
     }
   `,
     { slug, locale },
+    getCacheConfig([`event-${slug}`, 'events'])
+  );
+
+  return event;
+}
+
+export interface LocalizedText {
+  en?: string;
+  fr?: string;
+}
+
+export interface EventPageData {
+  _id: string;
+  title: string;
+  subtitle?: string;
+  slug: { current: string };
+  date: string;
+  dateFormatted?: string;
+  time?: string;
+  location?: {
+    venueName?: string;
+    address?: string;
+    googleMapsUrl?: string;
+    yangoUrl?: string;
+  };
+  flyer?: { url: string };
+  promoVideoUrl?: string;
+  description?: LocalizedText;
+  venueDetails?: LocalizedText;
+  hostedBy?: string;
+  ticketsAvailable?: boolean;
+  paymentProductId?: string;
+  ticketTypes?: Array<{
+    _key: string;
+    name: string;
+    price: number;
+    description?: string;
+    details?: string;
+    stock?: number | null;
+    maxPerOrder?: number;
+    salesStart?: string | null;
+    salesEnd?: string | null;
+    active: boolean;
+    productId?: string;
+  }>;
+  bundles?: Array<{
+    _key: string;
+    name: string;
+    bundleId: { current: string };
+    price: number;
+    description?: string;
+    details?: string;
+    stock?: number | null;
+    active: boolean;
+    salesStart?: string | null;
+    salesEnd?: string | null;
+    maxPerOrder?: number;
+    productId?: string;
+    ticketsIncluded?: number;
+  }>;
+  lineup?: Array<{
+    _id: string;
+    name: string;
+    description?: string;
+    image?: string;
+    videoUrl?: string;
+    videoCaption?: string;
+    socialLink?: string;
+    socialHandle?: string;
+    isResident?: boolean;
+    role?: string;
+  }>;
+  gallery?: Array<{ _key: string; url: string; caption?: string }>;
+}
+
+export async function getEventPageData(
+  slug: string
+): Promise<EventPageData | null> {
+  const event = await client.fetch(
+    `
+    *[_type == "event" && slug.current == $slug][0] {
+      _id,
+      title,
+      subtitle,
+      slug,
+      date,
+      "dateFormatted": dateTime(date),
+      "time": coalesce(time, "TBD"),
+      "location": location,
+      "flyer": {
+        "url": flyer.asset->url
+      },
+      "promoVideoUrl": promoVideo.asset->url,
+      "description": description,
+      "venueDetails": venueDetails,
+      hostedBy,
+      ticketsAvailable,
+      paymentProductId,
+      ticketTypes[]{
+        _key,
+        name,
+        price,
+        description,
+        details,
+        stock,
+        maxPerOrder,
+        salesStart,
+        salesEnd,
+        active,
+        productId
+      },
+      lineup[]->{
+        _id,
+        name,
+        description,
+        "image": image.asset->url,
+        "videoUrl": video.asset->url,
+        "videoCaption": video.caption,
+        socialLink,
+        socialHandle,
+        isResident,
+        role
+      },
+      gallery[]{
+        _key,
+        "url": asset->url,
+        "caption": caption
+      },
+      bundles[]{
+        _key,
+        name,
+        bundleId,
+        price,
+        description,
+        details,
+        stock,
+        active,
+        salesStart,
+        salesEnd,
+        maxPerOrder,
+        productId,
+        ticketsIncluded
+      }
+    }
+  `,
+    { slug },
     getCacheConfig([`event-${slug}`, 'events'])
   );
 
@@ -467,7 +614,7 @@ export interface HomepageThemeSettings {
   primaryButtonColor: string;
 }
 
-export const getHomepageThemeSettings =
+export const getHomepageThemeSettings = cache(
   async (): Promise<HomepageThemeSettings> => {
     const query = `*[_type == "homepage"][0] {
       primaryButtonColor,
@@ -480,7 +627,8 @@ export const getHomepageThemeSettings =
     return {
       primaryButtonColor: result?.primaryButtonColor ?? 'teal',
     };
-  };
+  }
+);
 
 // Define interface for the data returned by getEventsForScroller
 interface EventScrollerData {
@@ -558,32 +706,38 @@ export interface HomepageAudioSettings {
   musicTracks: MusicTrack[];
 }
 
-// Fetch music tracks and audio settings from the singleton homepage document
-export const getHomepageMusicTracks =
-  async (): Promise<HomepageAudioSettings> => {
+export interface HomepageLayoutData {
+  primaryButtonColor: string;
+  audioPlayerEnabled: boolean;
+  autoPlayMusic: boolean;
+  musicTracks: MusicTrack[];
+}
+
+export const getHomepageLayoutData = cache(
+  async (): Promise<HomepageLayoutData> => {
     try {
-      // Query the single document of type 'homepage'
-      // Select the music tracks with their audio files and cover images, plus audio settings
       const query = `*[_type == "homepage"][0] {
-      audioPlayerEnabled,
-      autoPlayMusic,
-      "musicTracks": musicTracks[]{
-        title,
-        artist,
-        "audioUrl": audioFile.asset->url,
-        "coverImageUrl": coverImage.asset->url
-      }
-    }`;
+        primaryButtonColor,
+        audioPlayerEnabled,
+        autoPlayMusic,
+        "musicTracks": musicTracks[]{
+          title,
+          artist,
+          "audioUrl": audioFile.asset->url,
+          "coverImageUrl": coverImage.asset->url
+        }
+      }`;
 
       const result = await client.fetch<{
+        primaryButtonColor?: string;
         audioPlayerEnabled?: boolean;
         autoPlayMusic?: boolean;
         musicTracks?: MusicTrack[];
-      }>(query, {}, getCacheConfig(['homepage', 'music']));
+      }>(query, {}, getCacheConfig(['homepage', 'music', 'settings']));
 
-      // Handle case when no homepage document exists
       if (!result) {
         return {
+          primaryButtonColor: 'teal',
           audioPlayerEnabled: true,
           autoPlayMusic: false,
           musicTracks: [],
@@ -591,20 +745,34 @@ export const getHomepageMusicTracks =
       }
 
       return {
+        primaryButtonColor: result.primaryButtonColor ?? 'teal',
         audioPlayerEnabled: result.audioPlayerEnabled ?? true,
         autoPlayMusic: result.autoPlayMusic ?? false,
         musicTracks: result.musicTracks?.filter(track => track.audioUrl) ?? [],
       };
     } catch (error) {
-      console.error('Error fetching homepage music tracks:', error);
-      // Return default values instead of throwing error to prevent app crash
+      console.error('Error fetching homepage layout data:', error);
       return {
+        primaryButtonColor: 'teal',
         audioPlayerEnabled: true,
         autoPlayMusic: false,
         musicTracks: [],
       };
     }
-  };
+  }
+);
+
+// Fetch music tracks and audio settings from the singleton homepage document
+export const getHomepageMusicTracks = cache(
+  async (): Promise<HomepageAudioSettings> => {
+    const layoutData = await getHomepageLayoutData();
+    return {
+      audioPlayerEnabled: layoutData.audioPlayerEnabled,
+      autoPlayMusic: layoutData.autoPlayMusic,
+      musicTracks: layoutData.musicTracks,
+    };
+  }
+);
 
 // ================================= Artists ================================
 
@@ -762,8 +930,9 @@ export interface HomepageData {
 }
 
 // Fetch homepage content
-export const getHomepageContent = async (): Promise<HomepageData | null> => {
-  const query = `*[_type == "homepage"][0] {
+export const getHomepageContent = cache(
+  async (): Promise<HomepageData | null> => {
+    const query = `*[_type == "homepage"][0] {
     ticketsButtonLocation,
     showBlogInNavigation,
     showArchivesInNavigation,
@@ -798,14 +967,15 @@ export const getHomepageContent = async (): Promise<HomepageData | null> => {
     }
   }`;
 
-  const result = await client.fetch<HomepageData | null>(
-    query,
-    {},
-    getCacheConfig(['homepage'])
-  );
+    const result = await client.fetch<HomepageData | null>(
+      query,
+      {},
+      getCacheConfig(['homepage'])
+    );
 
-  return result;
-};
+    return result;
+  }
+);
 
 // ================================= Archives / Gallery ================================
 

@@ -22,7 +22,7 @@ export default async function Home() {
   // Fetch all homepage content server-side
   const [homepageData, events, articles, media] = await Promise.all([
     getHomepageContent(),
-    getLatestEvents(36),
+    getLatestEvents(12),
     getLatestBlogPosts(6),
     getMedia(10),
   ]);

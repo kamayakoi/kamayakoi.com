@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { CheckCircle, Calendar, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +10,7 @@ import { useTranslation } from '@/lib/contexts/TranslationContext';
 import { useTheme } from '@/lib/contexts/ThemeContext';
 import { t } from '@/lib/i18n/translations';
 import { motion } from 'framer-motion';
+import { clearCheckoutForm } from '@/lib/utils/checkout-form-storage';
 
 interface PaymentSuccessClientProps {
   purchaseId?: string;
@@ -25,6 +27,10 @@ export function PaymentSuccessClient({
 }: PaymentSuccessClientProps) {
   const { currentLanguage } = useTranslation();
   const { button } = useTheme();
+
+  useEffect(() => {
+    clearCheckoutForm();
+  }, []);
 
   return (
     <>
@@ -55,11 +61,17 @@ export function PaymentSuccessClient({
                     <div className="text-center text-muted-foreground">
                       <p>{t(currentLanguage, 'paymentSuccess.description')}</p>
                       {purchaseId && (
-                        <p className="text-sm mt-2 font-mono bg-muted/50 p-2 rounded-sm">
-                          {t(currentLanguage, 'paymentSuccess.orderId', {
-                            orderId: purchaseId,
-                          })}
-                        </p>
+                        <div className="mt-4 p-3 rounded-sm bg-green-900/20 border border-green-800/50">
+                          <p className="text-xs uppercase tracking-wide text-green-400 mb-1">
+                            {t(
+                              currentLanguage,
+                              'paymentSuccess.orderReference'
+                            )}
+                          </p>
+                          <p className="text-sm font-mono text-green-200 break-all">
+                            {purchaseId}
+                          </p>
+                        </div>
                       )}
                     </div>
                   </CardContent>
@@ -109,7 +121,7 @@ export function PaymentSuccessClient({
                     asChild
                     className={`w-full ${button.secondaryBorder}`}
                   >
-                    <Link href="/">
+                    <Link href="/events">
                       <Calendar className="w-4 h-4 mr-2" />
                       {t(
                         currentLanguage,

@@ -1,7 +1,12 @@
 import { Suspense } from 'react';
+import { notFound } from 'next/navigation';
 import EventPageContent from '@/components/event/EventPageContent';
-import LoadingComponent from '@/components/ui/loader';
-import { getHomepageContent } from '@/lib/sanity/queries';
+import EventPageSkeleton from '@/components/event/event-page-skeleton';
+import {
+  getEventPageData,
+  getEventsForParallax,
+  getHomepageContent,
+} from '@/lib/sanity/queries';
 
 // Helper to get locale (consistent with other page)
 const getPageLocale = (params?: { slug?: string; locale?: string }): string => {
@@ -36,18 +41,36 @@ export default async function EventPage({
 }: {
   params: Promise<{ slug: string; locale?: string }>;
 }) {
-  const params = await paramsPromise;
-  const { slug } = params;
-  const homepageData = await getHomepageContent();
+  return (
+    <Suspense fallback={<EventPageSkeleton />}>
+      <EventContent params={paramsPromise} />
+    </Suspense>
+  );
+}
+
+async function EventContent({
+  params: paramsPromise,
+}: {
+  params: Promise<{ slug: string; locale?: string }>;
+}) {
+  const { slug } = await paramsPromise;
+  const [event, allEvents, homepageData] = await Promise.all([
+    getEventPageData(slug),
+    getEventsForParallax(10),
+    getHomepageContent(),
+  ]);
+
+  if (!event) {
+    notFound();
+  }
 
   return (
-    <Suspense fallback={<LoadingComponent />}>
-      <EventPageContent
-        slug={slug}
-        ticketsButtonLocation={homepageData?.ticketsButtonLocation}
-        showBlogInNavigation={homepageData?.showBlogInNavigation}
-        showArchivesInNavigation={homepageData?.showArchivesInNavigation}
-      />
-    </Suspense>
+    <EventPageContent
+      event={event}
+      allEvents={allEvents}
+      ticketsButtonLocation={homepageData?.ticketsButtonLocation}
+      showBlogInNavigation={homepageData?.showBlogInNavigation}
+      showArchivesInNavigation={homepageData?.showArchivesInNavigation}
+    />
   );
 }

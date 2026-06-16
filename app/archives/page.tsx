@@ -1,11 +1,9 @@
-// Removed "use client"
-
-// Keep only necessary imports for the page structure and metadata
 import Header from '@/components/landing/header';
 import { Footer } from '@/components/landing/footer';
 import { Metadata } from 'next';
-import ArchivesClientComponent from './archives-client'; // Import the new client component
-import { getHomepageContent } from '@/lib/sanity/queries';
+import ArchivesClientComponent from './archives-client';
+import { getArchiveImages, getHomepageContent } from '@/lib/sanity/queries';
+import { mapArchiveImagesForClient } from '@/lib/utils/archive-images';
 
 // Metadata export remains here (this is now a Server Component)
 export const metadata: Metadata = {
@@ -14,12 +12,13 @@ export const metadata: Metadata = {
     'Explore our archives of events, performances, and behind-the-scenes moments.',
 };
 
-// This is now a simple Server Component
 export default async function ArchivesPage() {
-  // Removed state, effects, handlers, and complex rendering logic
-  const homepageData = await getHomepageContent();
+  const [homepageData, archiveImages] = await Promise.all([
+    getHomepageContent(),
+    getArchiveImages(),
+  ]);
+  const images = mapArchiveImagesForClient(archiveImages);
 
-  // Render the page structure with the client component inside
   return (
     <>
       <Header
@@ -27,11 +26,8 @@ export default async function ArchivesPage() {
         showBlogInNavigation={homepageData?.showBlogInNavigation}
         showArchivesInNavigation={homepageData?.showArchivesInNavigation}
       />
-      {/* Render the client component which handles fetching and display */}
-      <ArchivesClientComponent />
+      <ArchivesClientComponent initialImages={images} />
       <Footer />
     </>
   );
 }
-
-// Removed original async function Archives and export default Archives

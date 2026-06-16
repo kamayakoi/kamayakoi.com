@@ -367,6 +367,7 @@
     "title": "Paiement réussi !",
     "description": "Votre achat a été complété avec succès.",
     "orderId": "ID commande : {orderId}",
+    "orderReference": "Référence de commande",
     "whatsNext": {
       "title": "Et maintenant ?",
       "checkEmail": "Vérifiez votre email pour les détails de votre commande",

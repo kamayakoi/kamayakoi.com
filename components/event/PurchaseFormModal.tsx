@@ -15,6 +15,10 @@ import PhoneNumberInput from '@/components/ui/phone-number-input';
 import { useIsMobile } from '@/lib/utils/use-is-mobile';
 import { validatePhoneNumber } from '@/lib/utils/phone';
 import {
+  loadCheckoutForm,
+  saveCheckoutForm,
+} from '@/lib/utils/checkout-form-storage';
+import {
   type CheckoutDisplayError,
   resolveCheckoutApiBody,
   resolveCheckoutInvokeError,
@@ -108,6 +112,22 @@ export default function PurchaseFormModal({
     setIsMounted(true);
     return () => setIsMounted(false);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const saved = loadCheckoutForm();
+    if (saved.name) setUserName(saved.name);
+    if (saved.email) setUserEmail(saved.email);
+    if (saved.phone) setUserPhone(saved.phone);
+  }, [isOpen]);
+
+  const persistCheckoutFields = useCallback(() => {
+    saveCheckoutForm({
+      name: userName,
+      email: userEmail,
+      phone: userPhone,
+    });
+  }, [userName, userEmail, userPhone]);
 
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
@@ -330,6 +350,7 @@ export default function PurchaseFormModal({
     }
 
     setIsLoading(true);
+    persistCheckoutFields();
 
     console.log('PurchaseFormModal - item.productId:', item.productId);
 
@@ -385,6 +406,7 @@ export default function PurchaseFormModal({
       }
 
       if (data?.checkout_url) {
+        persistCheckoutFields();
         window.location.href = data.checkout_url;
         successfullyInitiatedRedirect = true;
       } else if (data && (data.ok === false || data.code)) {
@@ -592,6 +614,7 @@ export default function PurchaseFormModal({
                         name="name"
                         value={userName}
                         onChange={e => setUserName(e.target.value)}
+                        onBlur={persistCheckoutFields}
                         onFocus={scrollActiveFieldIntoView}
                         autoComplete="name"
                         enterKeyHint="next"
@@ -616,6 +639,7 @@ export default function PurchaseFormModal({
                         type="email"
                         value={userEmail}
                         onChange={e => setUserEmail(e.target.value)}
+                        onBlur={persistCheckoutFields}
                         onFocus={scrollActiveFieldIntoView}
                         autoComplete="email"
                         enterKeyHint="next"

@@ -1,19 +1,13 @@
 'use client';
 
-import { notFound } from 'next/navigation';
 import { CalendarDays, Clock, MapPin, Users, Check } from 'lucide-react';
 import Header from '@/components/landing/header';
 import { Separator } from '@/components/ui/separator';
-import {
-  getEventBySlug,
-  getEventsForParallax,
-  EventParallaxData,
-} from '@/lib/sanity/queries';
+import { EventPageData, EventParallaxData } from '@/lib/sanity/queries';
 import { EventShareButton } from '@/components/event/event-share-button';
 import { Card, CardContent } from '@/components/ui/card';
 import Image from 'next/image';
 import CheckoutButtonWrapper from '@/components/event/CheckoutButtonWrapper';
-import LoadingComponent from '@/components/ui/loader';
 import { EventMediaDisplay } from '@/components/event/event-media-display';
 import { Footer } from '@/components/landing/footer';
 import ArtistCard from '@/components/event/ArtistCard';
@@ -22,77 +16,11 @@ import SwipeNavigation from '@/components/event/SwipeNavigation';
 import { TranslatedLabel } from '@/components/event/TranslatedLabel';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
 import { t } from '@/lib/i18n/translations';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
-// Define specific type for TicketType
-interface TicketTypeData {
-  _key: string;
-  name: string;
-  price: number;
-  description?: string;
-  details?: string;
-  stock?: number | null; // Allow null
-  maxPerOrder?: number;
-  salesStart?: string | null; // Allow null
-  salesEnd?: string | null; // Allow null
-  active: boolean; // <-- ADDED active field
-  productId?: string;
-}
-
-// Define specific type for Bundle
-interface BundleData {
-  _key: string;
-  name: string;
-  bundleId: { current: string }; // Slug type
-  price: number;
-  description?: string;
-  details?: string;
-  stock?: number | null; // Allow null
-  active: boolean; // Kept for bundles
-  salesStart?: string | null; // Added salesStart for bundles
-  salesEnd?: string | null; // Added salesEnd for bundles
-  maxPerOrder?: number; // <-- ADDED maxPerOrder field
-  productId?: string;
-  ticketsIncluded?: number; // Number of tickets included per bundle
-}
-
-// Updated EventData type
-type EventData = {
-  _id: string;
-  title: string;
-  subtitle?: string;
-  slug: { current: string };
-  date: string; // ISO datetime string
-  location?: {
-    venueName?: string;
-    address?: string;
-    googleMapsUrl?: string;
-    yangoUrl?: string; // Added Yango URL
-  };
-  flyer?: { url: string };
-  promoVideoUrl?: string;
-  description?: string;
-  venueDetails?: string;
-  hostedBy?: string;
-  ticketsAvailable?: boolean; // Master switch
-  ticketTypes?: TicketTypeData[];
-  bundles?: BundleData[];
-  lineup?: {
-    _id: string;
-    name: string;
-    bio?: string;
-    description?: string;
-    image?: string;
-    videoUrl?: string;
-    videoCaption?: string;
-    socialLink?: string;
-    socialHandle?: string;
-    isResident?: boolean;
-    role?: string;
-  }[];
-
-  gallery?: { _key: string; url: string; caption?: string }[];
-};
+// Ticket and bundle types align with EventPageData from Sanity queries
+type TicketTypeData = NonNullable<EventPageData['ticketTypes']>[number];
+type BundleData = NonNullable<EventPageData['bundles']>[number];
 
 // Helper function for formatting price
 const formatPrice = (price: number): string => {
@@ -191,44 +119,40 @@ const renderFormattedText = (text: string) => {
 };
 
 interface EventPageContentProps {
-  slug: string;
+  event: EventPageData;
+  allEvents: EventParallaxData[];
   ticketsButtonLocation?: 'header' | 'hero';
   showBlogInNavigation?: boolean;
   showArchivesInNavigation?: boolean;
 }
 
+function pickLocalizedText(
+  field: EventPageData['description'],
+  language: string
+): string {
+  if (!field) return '';
+  if (language === 'fr' && field.fr?.trim()) return field.fr;
+  return field.en?.trim() || field.fr?.trim() || '';
+}
+
 export default function EventPageContent({
-  slug,
+  event,
+  allEvents,
   ticketsButtonLocation = 'header',
   showBlogInNavigation = true,
   showArchivesInNavigation = true,
 }: EventPageContentProps) {
   const { currentLanguage } = useTranslation();
-  const [event, setEvent] = useState<EventData | null>(null);
-  const [allEvents, setAllEvents] = useState<EventParallaxData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const slug = event.slug.current;
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [eventData, eventsData] = await Promise.all([
-          getEventBySlug(slug, currentLanguage),
-          getEventsForParallax(10),
-        ]);
-
-        setEvent(eventData);
-        setAllEvents(eventsData);
-      } catch (error) {
-        console.error('Error fetching event data:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (currentLanguage) {
-      fetchData();
-    }
-  }, [slug, currentLanguage]);
+  const description = useMemo(
+    () => pickLocalizedText(event.description, currentLanguage),
+    [event.description, currentLanguage]
+  );
+  const venueDetails = useMemo(
+    () => pickLocalizedText(event.venueDetails, currentLanguage),
+    [event.venueDetails, currentLanguage]
+  );
 
   // Get all events for navigation
   const currentIndex = allEvents.findIndex(e => e.slug === slug);
@@ -238,14 +162,6 @@ export default function EventPageContent({
     currentIndex > 0 ? allEvents[currentIndex - 1] : null;
   const chronologicallyOlderEvent =
     currentIndex < allEvents.length - 1 ? allEvents[currentIndex + 1] : null;
-
-  if (loading) {
-    return <LoadingComponent />;
-  }
-
-  if (!event) {
-    notFound();
-  }
 
   let mapEmbedSrc = null;
   if (event.location && (event.location.venueName || event.location.address)) {
@@ -727,7 +643,7 @@ export default function EventPageContent({
 
           {/* Additional Content Sections - Improved with better spacing */}
           <div className="mt-16 space-y-12">
-            {event.description && (
+            {description && (
               <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-bold text-foreground mb-4">
@@ -736,7 +652,7 @@ export default function EventPageContent({
                 </div>
                 <div className="bg-card/30 backdrop-blur-sm rounded-sm p-8 border border-border/20">
                   <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
-                    {renderFormattedText(event.description)}
+                    {renderFormattedText(description)}
                   </div>
                 </div>
               </div>
@@ -745,7 +661,7 @@ export default function EventPageContent({
             {/* Venue Section - Restored */}
             {(event.location?.venueName ||
               event.location?.address ||
-              event.venueDetails) && (
+              venueDetails) && (
               <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-bold text-foreground mb-4">
@@ -783,9 +699,9 @@ export default function EventPageContent({
                     </div>
                   )}
 
-                  {event.venueDetails && (
+                  {venueDetails && (
                     <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
-                      {renderFormattedText(event.venueDetails)}
+                      {renderFormattedText(venueDetails)}
                     </div>
                   )}
                 </div>
@@ -808,7 +724,7 @@ export default function EventPageContent({
                           artist={{
                             _id: artist._id,
                             name: artist.name,
-                            bio: artist.bio || artist.description,
+                            bio: artist.description,
                             image: artist.image,
                             socialLink: artist.socialLink,
                             isResident: artist.isResident,

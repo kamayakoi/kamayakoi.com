@@ -367,6 +367,7 @@
     "title": "Payment successful!",
     "description": "Your purchase has been completed successfully.",
     "orderId": "Order ID: {orderId}",
+    "orderReference": "Order reference",
     "whatsNext": {
       "title": "What's next?",
       "checkEmail": "Check your email for your order details",

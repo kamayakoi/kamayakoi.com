@@ -3,10 +3,12 @@
 import Image from 'next/image';
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import LoadingComponent from '@/components/ui/loader';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
 import { t } from '@/lib/i18n/translations';
 import { ZoomImage } from './zoom-image';
+import type { ArchiveImage } from '@/lib/utils/archive-images';
+
+export type { ArchiveImage };
 
 function useColumnCount() {
   const [cols, setCols] = useState(2);
@@ -143,26 +145,16 @@ function ArchiveItem({
   );
 }
 
-// Local type for archive images fetched from Sanity via the API route
-export interface ArchiveImage {
-  id: number;
-  height: string;
-  width: string;
-  url: string;
-  tags?: string[]; // First tag is treated as the category for grouping
-  // Optional fields to align with shared gallery image shape
-  public_id?: string;
-  format?: string;
-  blurDataUrl?: string;
-  title?: string;
+interface ArchivesClientComponentProps {
+  initialImages: ArchiveImage[];
 }
 
-export default function ArchivesClientComponent() {
+export default function ArchivesClientComponent({
+  initialImages,
+}: ArchivesClientComponentProps) {
   const { currentLanguage } = useTranslation();
   const columnCount = useColumnCount();
-  const [images, setImages] = useState<ArchiveImage[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const images = initialImages;
   const [zoomedState, setZoomedState] = useState<{
     sectionTitle: string;
     sectionImages: ArchiveImage[];
@@ -216,78 +208,6 @@ export default function ArchivesClientComponent() {
     return result;
   }, [imagesByTag, untaggedImages, currentLanguage]);
 
-  // Fetch images from the API route
-  useEffect(() => {
-    const fetchImages = async () => {
-      setIsLoading(true);
-      setError(null);
-      console.log('[Archives Client] Fetching images from API route...');
-      try {
-        const response = await fetch('/api/gallery-images'); // Call the API route
-
-        if (!response.ok) {
-          // Try to parse error message from API response body
-          let errorMsg = `API Error: ${response.status} ${response.statusText}`;
-          try {
-            const errorData = await response.json();
-            if (errorData.error) {
-              errorMsg = errorData.error;
-            }
-          } catch (parseError) {
-            // Ignore if response body is not JSON or empty
-            console.error(
-              '[Archives Client] Failed to parse error response:',
-              parseError
-            );
-          }
-          throw new Error(errorMsg);
-        }
-
-        const fetchedImages: ArchiveImage[] = await response.json();
-
-        // Validate fetched data structure (optional but recommended)
-        if (!Array.isArray(fetchedImages)) {
-          console.error(
-            '[Archives Client] API response is not an array:',
-            fetchedImages
-          );
-          throw new Error('Invalid data format received from server.');
-        }
-
-        console.log(
-          `[Archives Client] Successfully fetched ${fetchedImages.length} images.`
-        );
-        setImages(fetchedImages); // Update state with fetched images
-      } catch (err) {
-        console.error('[Archives Client] Error fetching images from API:', err);
-        setError(
-          err instanceof Error ? err.message : 'An unknown fetch error occurred'
-        );
-        setImages([]); // Ensure images array is empty on error
-      } finally {
-        setIsLoading(false);
-        console.log('[Archives Client] Image fetch attempt complete.');
-      }
-    };
-
-    fetchImages();
-  }, []); // Fetch only once on component mount
-
-  // --- Render Logic ---
-  if (isLoading) {
-    // Render only the spinner, Header/Footer are in the parent page
-    return <LoadingComponent />;
-  }
-
-  if (error) {
-    // Render error message, Header/Footer are in the parent page
-    return (
-      <div className="flex justify-center items-center h-screen text-red-500 pt-20">
-        Error loading archives: {error}
-      </div>
-    );
-  }
-
   const handleCloseModal = () => {
     setZoomedState(null);
   };
@@ -331,13 +251,7 @@ export default function ArchivesClientComponent() {
 
         {/* Archives Images Section */}
         <div className="pb-24">
-          {/* Display error inline if needed, without blocking archives */}
-          {error && (
-            <p className="text-center text-red-500 mb-4">
-              Error loading images: {error}
-            </p>
-          )}
-          {images.length === 0 && !isLoading && !error && (
+          {images.length === 0 && (
             <motion.div
               className="text-center py-20 bg-muted/30 rounded-sm p-8 mb-20"
               initial={{ opacity: 0 }}

@@ -7,6 +7,12 @@ import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '@/lib/utils/localStorage';
+import {
+  LANGUAGE_STORAGE_KEY,
+  LEGACY_LANGUAGE_STORAGE_KEY,
+  setLanguageCookie,
+  isSupportedLanguage,
+} from '@/lib/i18n/language-cookie';
 
 interface TranslationContextType {
   currentLanguage: Language;
@@ -18,35 +24,48 @@ const TranslationContext = createContext<TranslationContextType>({
   setLanguage: () => {},
 });
 
-// Main provider component
+function readStoredLanguage(): Language | null {
+  const current = getLocalStorageItem(LANGUAGE_STORAGE_KEY);
+  if (isSupportedLanguage(current ?? undefined)) {
+    return current;
+  }
+
+  const legacy = getLocalStorageItem(LEGACY_LANGUAGE_STORAGE_KEY);
+  if (isSupportedLanguage(legacy ?? undefined)) {
+    setLocalStorageItem(LANGUAGE_STORAGE_KEY, legacy as string);
+    return legacy;
+  }
+
+  return null;
+}
+
 export function TranslationProvider({
   children,
+  initialLanguage = 'en',
 }: {
   children: React.ReactNode;
+  initialLanguage?: Language;
 }) {
-  const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
+  const [currentLanguage, setCurrentLanguage] =
+    useState<Language>(initialLanguage);
 
   useEffect(() => {
-    // Try to get language from localStorage
-    const savedLanguage = getLocalStorageItem('jumbo.language');
+    const savedLanguage = readStoredLanguage();
 
     if (savedLanguage && languages.some(lang => lang.code === savedLanguage)) {
-      setCurrentLanguage(savedLanguage as Language);
-    } else {
-      // Try to detect browser language
-      if (typeof navigator !== 'undefined') {
-        const browserLang = navigator.language.split('-')[0];
-
-        if (languages.some(lang => lang.code === browserLang)) {
-          setCurrentLanguage(browserLang as Language);
-        }
-      }
+      setCurrentLanguage(savedLanguage);
+      setLanguageCookie(savedLanguage);
+      return;
     }
-  }, []);
+
+    setLocalStorageItem(LANGUAGE_STORAGE_KEY, initialLanguage);
+    setLanguageCookie(initialLanguage);
+  }, [initialLanguage]);
 
   const setLanguage = (lang: Language) => {
     setCurrentLanguage(lang);
-    setLocalStorageItem('jumbo.language', lang);
+    setLocalStorageItem(LANGUAGE_STORAGE_KEY, lang);
+    setLanguageCookie(lang);
   };
 
   return (
@@ -56,7 +75,6 @@ export function TranslationProvider({
   );
 }
 
-// Hook component
 export function useTranslation() {
   const context = useContext(TranslationContext);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +12,10 @@ import { cn } from '@/lib/actions/utils';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
 import { useTheme } from '@/lib/contexts/ThemeContext';
 import { t } from '@/lib/i18n/translations';
+import {
+  loadCheckoutForm,
+  saveCheckoutForm,
+} from '@/lib/utils/checkout-form-storage';
 
 const CartContainer = ({
   children,
@@ -32,6 +36,21 @@ export default function CartPurchaseForm() {
   const [userPhone, setUserPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const saved = loadCheckoutForm();
+    if (saved.name) setUserName(saved.name);
+    if (saved.email) setUserEmail(saved.email);
+    if (saved.phone) setUserPhone(saved.phone);
+  }, []);
+
+  const persistCheckoutFields = useCallback(() => {
+    saveCheckoutForm({
+      name: userName,
+      email: userEmail,
+      phone: userPhone,
+    });
+  }, [userName, userEmail, userPhone]);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -65,6 +84,7 @@ export default function CartPurchaseForm() {
     }
 
     setIsLoading(true);
+    persistCheckoutFields();
 
     try {
       // Prepare cart items for the API
@@ -156,6 +176,7 @@ export default function CartPurchaseForm() {
                 id="name"
                 value={userName}
                 onChange={e => setUserName(e.target.value)}
+                onBlur={persistCheckoutFields}
                 className="rounded-sm mt-2"
                 placeholder={t(
                   currentLanguage,
@@ -174,6 +195,7 @@ export default function CartPurchaseForm() {
                 type="email"
                 value={userEmail}
                 onChange={e => setUserEmail(e.target.value)}
+                onBlur={persistCheckoutFields}
                 className="rounded-sm mt-2"
                 placeholder={t(
                   currentLanguage,

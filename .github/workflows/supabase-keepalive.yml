@@ -1,0 +1,64 @@
+name: Supabase keepalive
+
+on:
+  schedule:
+    # Every 6 hours — Free tier pauses on insufficient weekly activity.
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: false
+
+jobs:
+  keepalive:
+    name: Ping Supabase (REST + optional DB)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Keepalive
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ]; then
+            echo "SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY secrets are required."
+            exit 1
+          fi
+
+          # Real DB read via PostgREST — what free-tier activity tracking expects.
+          status="$(curl -sS -o /tmp/keepalive.json -w '%{http_code}' --max-time 30 \
+            "${SUPABASE_URL}/rest/v1/purchases?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+            -H "Accept: application/json")"
+
+          echo "REST HTTP status: ${status}"
+          head -c 400 /tmp/keepalive.json; echo
+
+          if [ "$status" != "200" ]; then
+            echo "REST keepalive failed."
+            exit 1
+          fi
+          echo "REST keepalive OK."
+
+          if [ -n "${SUPABASE_DB_URL:-}" ]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client > /dev/null
+
+            psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 \
+              -c "CREATE TABLE IF NOT EXISTS public._kamayakoi_keepalive (id int PRIMARY KEY DEFAULT 1 CHECK (id = 1), last_ping timestamptz NOT NULL DEFAULT now(), ping_count bigint NOT NULL DEFAULT 0);" \
+              -c "INSERT INTO public._kamayakoi_keepalive (id, last_ping, ping_count) VALUES (1, now(), 1) ON CONFLICT (id) DO UPDATE SET last_ping = excluded.last_ping, ping_count = public._kamayakoi_keepalive.ping_count + 1;" \
+              -c "SELECT last_ping, ping_count FROM public._kamayakoi_keepalive WHERE id = 1;"
+
+            echo "Direct DB keepalive OK."
+          else
+            echo "SUPABASE_DB_URL not set — skipped direct DB write (REST ping is enough)."
+          fi

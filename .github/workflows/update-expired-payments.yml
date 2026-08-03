@@ -2,18 +2,8 @@ name: Update Expired Payments
 
 on:
   schedule:
-    # Every 2 hours — also generates DB activity for free-tier keepalive.
     - cron: '15 */2 * * *'
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: 'Ensure SQL objects only; skip cleanup writes'
-        required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
 
 permissions:
   contents: read
@@ -24,85 +14,36 @@ concurrency:
 
 jobs:
   update-expired-payments:
-    name: Ensure SQL + expire pending payments
+    name: Call expire-payments RPC
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
+    timeout-minutes: 5
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Ensure function + expire payments
+      - name: RPC update_expired_pending_payments
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
         run: |
           set -euo pipefail
 
-          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ]; then
-            echo "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY."
-            exit 1
-          fi
-
-          if [ -n "${SUPABASE_DB_URL:-}" ]; then
-            echo "Mode: direct SQL (preferred)"
-            sudo apt-get update -qq
-            sudo apt-get install -y -qq postgresql-client > /dev/null
-
-            if [ "$DRY_RUN" = "true" ]; then
-              echo "Dry-run: ensuring function/view/keepalive only"
-              awk '
-                /^SELECT \* FROM public\.update_expired_pending_payments\(\);/ { next }
-                { print }
-              ' scripts/prod/update-expired-payments.sql \
-                | psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1
-            else
-              psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f scripts/prod/update-expired-payments.sql
-            fi
-
-            echo "SQL cron completed."
-          else
-            echo "Mode: REST fallback (set SUPABASE_DB_URL to ensure+run via SQL)"
-
-            if [ "$DRY_RUN" = "true" ]; then
-              echo "Dry-run: skipping RPC write"
-            else
-              status="$(curl -sS -o /tmp/rpc.json -w '%{http_code}' --max-time 60 \
-                -X POST "${SUPABASE_URL}/rest/v1/rpc/update_expired_pending_payments" \
-                -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
-                -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
-                -H "Content-Type: application/json" \
-                -d '{}')"
-
-              echo "RPC HTTP status: ${status}"
-              cat /tmp/rpc.json; echo
-
-              if [ "$status" != "200" ]; then
-                echo "RPC failed — trying Edge Function fallback..."
-                status="$(curl -sS -o /tmp/fn.json -w '%{http_code}' --max-time 60 \
-                  -X POST "${SUPABASE_URL}/functions/v1/update-expired-payments" \
-                  -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
-                  -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
-                  -H "Content-Type: application/json")"
-                echo "Edge Function HTTP status: ${status}"
-                cat /tmp/fn.json; echo
-                if [ "$status" != "200" ] || ! grep -q '"success":true' /tmp/fn.json; then
-                  echo "Expired payments update failed."
-                  exit 1
-                fi
-              fi
-
-              echo "REST cleanup completed."
-            fi
-          fi
-
-          # Always ping PostgREST so free-tier activity is recorded.
-          ping_status="$(curl -sS -o /tmp/ping.json -w '%{http_code}' --max-time 30 \
-            "${SUPABASE_URL}/rest/v1/purchases?select=id&limit=1" \
+          status="$(curl -sS -o /tmp/rpc.json -w '%{http_code}' --max-time 60 \
+            -X POST "${SUPABASE_URL}/rest/v1/rpc/update_expired_pending_payments" \
+            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
             -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
-            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}")"
-          echo "Keepalive HTTP: ${ping_status}"
-          head -c 200 /tmp/ping.json; echo
-          test "$ping_status" = "200"
+            -H "Content-Type: application/json" \
+            -d '{}')"
+
+          echo "RPC HTTP ${status}"
+          cat /tmp/rpc.json; echo
+
+          if [ "$status" != "200" ]; then
+            echo "RPC failed — Edge Function fallback..."
+            status="$(curl -sS -o /tmp/fn.json -w '%{http_code}' --max-time 60 \
+              -X POST "${SUPABASE_URL}/functions/v1/update-expired-payments" \
+              -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+              -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+              -H "Content-Type: application/json")"
+            echo "Edge HTTP ${status}"
+            cat /tmp/fn.json; echo
+            test "$status" = "200"
+            grep -q '"success":true' /tmp/fn.json
+          fi

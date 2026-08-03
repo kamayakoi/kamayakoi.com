@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { PaymentSuccessClient } from './payment-success-client';
+import { PaymentSuccessClient } from '@/components/payment/payment-success-client';
 import LoadingComponent from '@/components/ui/loader';
 import { getHomepageContent } from '@/lib/sanity/queries';
 

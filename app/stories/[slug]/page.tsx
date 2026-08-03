@@ -2,8 +2,8 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getBlogPostBySlug, getHomepageContent } from '@/lib/sanity/queries';
-import StoryPageSkeleton from './story-page-skeleton';
-import StorySlugContentClient from './story-slug-content-client';
+import StoryPageSkeleton from '@/components/stories/story-page-skeleton';
+import StorySlugContentClient from '@/components/stories/story-slug-content-client';
 
 interface PageProps {
   params: Promise<{ slug: string; locale?: string }>;

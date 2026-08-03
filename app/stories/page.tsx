@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import LoadingComponent from '@/components/ui/loader';
 
 import { getAllBlogPosts, getHomepageContent } from '@/lib/sanity/queries';
-import StoriesContentClient from './stories-content-client';
+import StoriesContentClient from '@/components/stories/stories-content-client';
 
 export const metadata: Metadata = {
   title: 'Stories',

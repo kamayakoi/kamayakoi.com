@@ -1,7 +1,7 @@
 import Header from '@/components/landing/header';
 import { Footer } from '@/components/landing/footer';
 import { Metadata } from 'next';
-import ArchivesClientComponent from './archives-client';
+import ArchivesClientComponent from '@/components/archives/archives-client';
 import { getArchiveImages, getHomepageContent } from '@/lib/sanity/queries';
 import { mapArchiveImagesForClient } from '@/lib/utils/archive-images';
 

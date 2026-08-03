@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import EventPageContent from '@/components/event/EventPageContent';
-import EventPageSkeleton from '@/components/event/event-page-skeleton';
+import EventPageContent from '@/components/events/event-page-content';
+import EventPageSkeleton from '@/components/events/event-page-skeleton';
 import {
   getEventPageData,
   getEventsForParallax,

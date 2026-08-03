@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import PrivacyClientPage from './privacy-client';
+import PrivacyClientPage from '@/components/privacy/privacy-client';
 import LoadingComponent from '@/components/ui/loader';
 import { getHomepageContent } from '@/lib/sanity/queries';
 

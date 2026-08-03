@@ -5,7 +5,7 @@ import { Footer } from '@/components/landing/footer';
 import Image from 'next/image';
 import { PortableText } from '@portabletext/react';
 import { portableTextRenderers } from '@/components/blog/portable-text-renderers';
-import { BackButton } from './back-button.tsx';
+import { BackButton } from './back-button';
 import { t } from '@/lib/i18n/translations';
 import { useTranslation } from '@/lib/contexts/TranslationContext';
 

@@ -3,7 +3,7 @@
 import { useTranslation } from '@/lib/contexts/TranslationContext';
 import CheckoutButton, {
   CheckoutItemData,
-} from '@/components/event/CheckoutButton';
+} from '@/components/events/checkout-button';
 
 interface CheckoutButtonWrapperProps {
   item: CheckoutItemData;

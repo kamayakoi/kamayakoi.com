@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { getAllArtists, getHomepageContent } from '@/lib/sanity/queries';
 import LoadingComponent from '@/components/ui/loader';
-import ArtistsContentClient from '@/app/artists/artists-content-client';
+import ArtistsContentClient from '@/components/artists/artists-content-client';
 
 export const metadata: Metadata = {
   title: 'Artists',

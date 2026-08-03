@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import TermsClientPage from './terms-client';
+import TermsClientPage from '@/components/terms/terms-client';
 import LoadingComponent from '@/components/ui/loader';
 import { getHomepageContent } from '@/lib/sanity/queries';
 

@@ -18,10 +18,6 @@ import { useTranslation } from '@/lib/contexts/TranslationContext';
 import { t } from '@/lib/i18n/translations';
 import { useMemo } from 'react';
 
-// Ticket and bundle types align with EventPageData from Sanity queries
-type TicketTypeData = NonNullable<EventPageData['ticketTypes']>[number];
-type BundleData = NonNullable<EventPageData['bundles']>[number];
-
 // Helper function for formatting price
 const formatPrice = (price: number): string => {
   // Use non-breaking space (\u00A0) for thousands separator

@@ -196,9 +196,10 @@ serve(async (req: Request) => {
       ...(payload.userPhone && { customer_phone: payload.userPhone }),
       allow_coupon_code:
         payload.allowCouponCode !== undefined ? payload.allowCouponCode : true,
-      // Quantity is fixed on our purchase row before redirect. Letting Lomi
-      // change it on the hosted page desyncs paid amount from tickets issued.
-      allow_quantity: false,
+      // Qty can change on Lomi; record_event_lomi_payment reconciles
+      // purchases.quantity from the amount actually paid.
+      allow_quantity:
+        payload.allowQuantity !== undefined ? payload.allowQuantity : true,
       metadata: {
         internal_purchase_id: purchaseId,
         event_id: payload.eventId,

@@ -354,12 +354,6 @@ export default function PurchaseFormModal({
 
     console.log('PurchaseFormModal - item.productId:', item.productId);
 
-    const shouldAllowQuantity =
-      (item.maxPerOrder && item.maxPerOrder > 1) ||
-      item.stock === null ||
-      item.stock === undefined ||
-      item.stock > 1;
-
     const payload: CreateCheckoutSessionPayload = {
       eventId: eventDetails.id,
       eventTitle: eventDetails.title,
@@ -375,7 +369,7 @@ export default function PurchaseFormModal({
       cancelUrlPath: '/payment/error', // Or from config
       productId: item.productId,
       allowCouponCode: true, // Enable coupon codes by default
-      allowQuantity: shouldAllowQuantity,
+      allowQuantity: false,
       eventDateText: eventDetails.dateText,
       eventTimeText: eventDetails.timeText,
       eventVenueName: eventDetails.venueName,

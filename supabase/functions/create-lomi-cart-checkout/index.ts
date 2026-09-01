@@ -323,6 +323,7 @@ serve(async (req: Request) => {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': LOMI_SECRET_KEY,
+        'Idempotency-Key': purchaseIds[0],
       },
       body: JSON.stringify(lomiPayload),
     });

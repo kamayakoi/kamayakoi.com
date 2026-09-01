@@ -7,6 +7,7 @@ import {
   CHECKOUT_ERROR_CODES,
   checkoutError,
   checkoutSuccess,
+  lomiCheckoutHeaders,
 } from '../_shared/checkout-api.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
@@ -229,10 +230,7 @@ serve(async (req: Request) => {
 
     const lomiResponse = await fetch(`${LOMI_API_URL}/checkout-sessions`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': LOMI_SECRET_KEY,
-      },
+      headers: lomiCheckoutHeaders(LOMI_SECRET_KEY, purchaseId),
       body: JSON.stringify(lomiPayload),
     });
 

@@ -35,6 +35,18 @@ const jsonHeaders = {
   'Content-Type': 'application/json',
 };
 
+/** Headers for POST /checkout-sessions. Lomi returns 400 idempotency_key_required without the key. */
+export function lomiCheckoutHeaders(
+  secretKey: string,
+  idempotencyKey: string
+): Record<string, string> {
+  return {
+    'Content-Type': 'application/json',
+    'x-api-key': secretKey,
+    'Idempotency-Key': idempotencyKey,
+  };
+}
+
 export function checkoutError(
   code: CheckoutErrorCode,
   debug: string,

@@ -206,7 +206,7 @@
       "misconfigured": "Erreur du système de billetterie."
     },
     "tickets": {
-      "salesClosedGlobal": "La billetterie pour cet événement est actuellement fermée.",
+      "salesClosedGlobal": "Préventes en ligne SOLD OUT. Billets disponibles directement sur place à 10 000 XOF.",
       "noItemsListed": "Aucun ticket ou pack n'est actuellement listé pour cet événement.",
       "title": "Tickets",
       "buyNow": "Acheter",

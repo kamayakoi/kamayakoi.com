@@ -332,7 +332,7 @@ export default function EventPageContent({
               <div className="space-y-6">
                 {!globallyTicketsOnSale ? (
                   <div className="bg-destructive/10 border border-destructive/20 text-destructive p-6 rounded-sm backdrop-blur-sm">
-                    <p className="font-semibold text-center">
+                    <p className="font-semibold text-center text-pretty leading-relaxed">
                       <TranslatedLabel translationKey="eventSlugPage.tickets.salesClosedGlobal" />
                     </p>
                   </div>

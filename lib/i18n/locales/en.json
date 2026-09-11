@@ -206,7 +206,7 @@
       "misconfigured": "Ticketing system error."
     },
     "tickets": {
-      "salesClosedGlobal": "Ticket sales are currently closed for this event.",
+      "salesClosedGlobal": "Online presales SOLD OUT. Tickets available at the door for 10,000 XOF.",
       "noItemsListed": "No tickets or bundles are currently listed for this event.",
       "title": "Tickets",
       "buyNow": "Buy now",

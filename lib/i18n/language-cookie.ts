@@ -8,8 +8,9 @@ export const LEGACY_LANGUAGE_STORAGE_KEY = 'jumbo.language';
 export const SUPPORTED_LANGUAGES = ['en', 'fr'] as const;
 
 export function parseLanguageCookie(value: string | undefined): 'en' | 'fr' {
+  if (value === 'en') return 'en';
   if (value === 'fr') return 'fr';
-  return 'en';
+  return 'fr';
 }
 
 export function setLanguageCookie(lang: string): void {

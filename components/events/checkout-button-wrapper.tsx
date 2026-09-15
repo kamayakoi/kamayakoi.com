@@ -10,17 +10,20 @@ interface CheckoutButtonWrapperProps {
   eventDetails: {
     id: string;
     title: string;
+    slug?: string;
     dateText?: string;
     timeText?: string;
     venueName?: string;
   };
   globallyTicketsOnSale: boolean;
+  compact?: boolean;
 }
 
 export default function CheckoutButtonWrapper({
   item,
   eventDetails,
   globallyTicketsOnSale,
+  compact = false,
 }: CheckoutButtonWrapperProps) {
   const { currentLanguage } = useTranslation();
 
@@ -30,6 +33,7 @@ export default function CheckoutButtonWrapper({
       eventDetails={eventDetails}
       globallyTicketsOnSale={globallyTicketsOnSale}
       currentLanguage={currentLanguage}
+      compact={compact}
     />
   );
 }

@@ -235,6 +235,14 @@ serve(async (req: Request) => {
     // --- Prepare lomi. Payload ---
     const successRedirectPath = payload.successUrlPath || '/payment/success';
     const cancelRedirectPath = payload.cancelUrlPath || '/payment/error';
+    const successUrl = new URL(successRedirectPath, `${APP_BASE_URL}/`);
+    const cancelUrl = new URL(cancelRedirectPath, `${APP_BASE_URL}/`);
+    successUrl.searchParams.set('purchase_ids', purchaseIds.join(','));
+    successUrl.searchParams.set('status', 'success');
+    successUrl.searchParams.set('flow', 'merch');
+    cancelUrl.searchParams.set('purchase_ids', purchaseIds.join(','));
+    cancelUrl.searchParams.set('status', 'cancelled');
+    cancelUrl.searchParams.set('flow', 'merch');
 
     // Determine checkout approach based on productIds (similar to regular checkout)
     const productIds = payload.cartItems
@@ -269,8 +277,8 @@ serve(async (req: Request) => {
     console.log('Product ID (if applicable):', singleProductId);
 
     const baseLomiPayload = {
-      success_url: `${APP_BASE_URL}${successRedirectPath}?purchase_ids=${encodeURIComponent(purchaseIds.join(','))}&status=success`,
-      cancel_url: `${APP_BASE_URL}${cancelRedirectPath}?purchase_ids=${encodeURIComponent(purchaseIds.join(','))}&status=cancelled`,
+      success_url: successUrl.toString(),
+      cancel_url: cancelUrl.toString(),
       currency_code: currencyCode,
       customer_email: payload.userEmail,
       customer_name: payload.userName,

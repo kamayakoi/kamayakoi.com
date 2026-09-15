@@ -43,11 +43,14 @@ interface RequestPayload {
   allowedProviders?: string[];
   productId?: string;
   priceId?: string;
+  lomiProductId?: string;
+  lomiPriceId?: string;
   allowCouponCode?: boolean;
   allowQuantity?: boolean;
   eventDateText?: string;
   eventTimeText?: string;
   eventVenueName?: string;
+  eventSlug?: string;
   couponCode?: string;
   couponCodes?: string[];
   isBundle?: boolean;
@@ -184,12 +187,25 @@ serve(async (req: Request) => {
 
     const successRedirectPath = payload.successUrlPath || '/payment/success';
     const cancelRedirectPath = payload.cancelUrlPath || '/payment/error';
-    const priceId = payload.priceId || payload.productId || null;
-    const isPriceBased = !!priceId;
+    const successUrl = new URL(successRedirectPath, `${APP_BASE_URL}/`);
+    const cancelUrl = new URL(cancelRedirectPath, `${APP_BASE_URL}/`);
+    successUrl.searchParams.set('purchase_id', purchaseId);
+    successUrl.searchParams.set('status', 'success');
+    successUrl.searchParams.set('flow', 'ticket');
+    cancelUrl.searchParams.set('purchase_id', purchaseId);
+    cancelUrl.searchParams.set('status', 'cancelled');
+    cancelUrl.searchParams.set('flow', 'ticket');
+    if (payload.eventSlug) {
+      successUrl.searchParams.set('event_slug', payload.eventSlug);
+      cancelUrl.searchParams.set('event_slug', payload.eventSlug);
+    }
+    const catalogPriceId = payload.lomiPriceId || payload.priceId || null;
+    const catalogProductId = payload.lomiProductId || null;
+    const isPriceBased = !!catalogPriceId;
 
     const baseLomiPayload = {
-      success_url: `${APP_BASE_URL}${successRedirectPath}?purchase_id=${purchaseId}&status=success`,
-      cancel_url: `${APP_BASE_URL}${cancelRedirectPath}?purchase_id=${purchaseId}&status=cancelled`,
+      success_url: successUrl.toString(),
+      cancel_url: cancelUrl.toString(),
       currency_code: currencyCode,
       quantity: payload.quantity,
       customer_email: payload.userEmail,
@@ -208,6 +224,8 @@ serve(async (req: Request) => {
         customer_id: customerId,
         app_source: 'kamayakoi_events_app',
         is_price_based: isPriceBased,
+        ...(catalogProductId && { lomi_product_id: catalogProductId }),
+        ...(catalogPriceId && { lomi_price_id: catalogPriceId }),
       },
       require_billing_address: false,
     };
@@ -215,7 +233,8 @@ serve(async (req: Request) => {
     const lomiPayload = isPriceBased
       ? {
           ...baseLomiPayload,
-          price_id: priceId,
+          price_id: catalogPriceId,
+          ...(catalogProductId && { product_id: catalogProductId }),
           title: `${payload.eventTitle} Tickets (x${payload.quantity})`,
           description: `Tickets for: ${payload.eventTitle}`,
         }

@@ -1,6 +1,6 @@
 'use client';
 
-import { PlusCircleIcon, ShoppingCart } from 'lucide-react';
+import { PlusCircleIcon, ShoppingCart, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useCart } from './cart-context';
@@ -152,6 +152,9 @@ export default function CartModal() {
   const [isMounted, setIsMounted] = useState(false);
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
   const [shouldRenderPortal, setShouldRenderPortal] = useState(false);
+  const [mobileVisibleHeight, setMobileVisibleHeight] = useState<number | null>(
+    null
+  );
   const serializedCart = useRef(cart ? serializeCart(cart) : undefined);
   const instanceIdRef = useRef<string>(
     `cart-${Math.random().toString(36).substring(7)}`
@@ -275,6 +278,30 @@ export default function CartModal() {
       document.removeEventListener('keydown', handleEscapeKey);
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !isMobile || typeof window === 'undefined') {
+      setMobileVisibleHeight(null);
+      return;
+    }
+    const vv = window.visualViewport;
+    const apply = () => {
+      setMobileVisibleHeight(
+        vv ? Math.round(vv.height) : Math.round(window.innerHeight)
+      );
+    };
+    apply();
+    if (vv) {
+      vv.addEventListener('resize', apply);
+      vv.addEventListener('scroll', apply);
+      return () => {
+        vv.removeEventListener('resize', apply);
+        vv.removeEventListener('scroll', apply);
+      };
+    }
+    window.addEventListener('resize', apply);
+    return () => window.removeEventListener('resize', apply);
+  }, [isOpen, isMobile]);
 
   const openCart = () => {
     // For manual opens (button click), always allow opening
@@ -423,13 +450,33 @@ export default function CartModal() {
                   }
                   onClick={e => e.stopPropagation()} // Prevent event bubbling to cart button
                 >
-                  <div className="flex flex-col py-4 px-2 md:px-4 w-full min-h-0 bg-[#1a1a1a] backdrop-blur-xl rounded-t-xl md:rounded-sm shadow-2xl max-h-[70vh] md:max-h-none md:h-full">
-                    <CartContainer className="flex justify-between items-center mb-8">
+                  <div
+                    className="flex flex-col py-4 px-2 md:px-4 w-full min-h-0 bg-[#1a1a1a] backdrop-blur-xl rounded-t-xl md:rounded-sm shadow-2xl max-h-[70vh] md:max-h-none md:h-full"
+                    style={
+                      isMobile && mobileVisibleHeight != null
+                        ? { maxHeight: mobileVisibleHeight }
+                        : undefined
+                    }
+                  >
+                    <CartContainer className="flex justify-between items-start mb-8">
                       <div>
+                        {isMobile && (
+                          <div className="flex justify-center pb-3 md:hidden">
+                            <span className="h-1 w-10 rounded-full bg-muted-foreground/40" />
+                          </div>
+                        )}
                         <h2 className="text-3xl font-bold text-foreground">
                           {t(currentLanguage, 'cartModal.cart')}
                         </h2>
                       </div>
+                      <button
+                        type="button"
+                        onClick={closeCart}
+                        className="shrink-0 rounded-sm p-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 min-h-11 min-w-11 inline-flex items-center justify-center"
+                        aria-label={t(currentLanguage, 'purchaseModal.close')}
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
                     </CartContainer>
 
                     {renderCartContent()}

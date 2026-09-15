@@ -265,6 +265,7 @@
   "purchaseModal": {
     "title": "Purchase tickets",
     "description": "Complete your order details",
+    "close": "Close",
     "only": "Only",
     "available": "available",
     "availablePlural": "available",
@@ -366,19 +367,28 @@
   "paymentSuccess": {
     "title": "Payment successful!",
     "description": "Your purchase has been completed successfully.",
+    "descriptionTicket": "Your ticket purchase has been completed successfully.",
+    "descriptionMerch": "Your merch order has been completed successfully.",
     "orderId": "Order ID: {orderId}",
     "orderReference": "Order reference",
+    "emailDelay": "The email can take a few minutes to arrive.",
+    "shareWhatsApp": "Share on WhatsApp",
+    "whatsAppText": "Order {orderId}",
     "whatsNext": {
       "title": "What's next?",
-      "checkEmail": "Check your email for your order details",
-      "presentTicket": "Present your e-ticket QR code at the event (if applicable)",
+      "checkEmail": "Check your email for your e-ticket",
+      "presentTicket": "Present your e-ticket QR code at the event",
       "arriveEarly": "Arrive early to avoid queues",
-      "trackOrder": "Track your order in your account"
+      "trackOrder": "Track your order in your account",
+      "merchCheckEmail": "Check your email for the order confirmation",
+      "merchWait": "We will follow up by email about delivery",
+      "merchKeepId": "Keep this order ID as proof of payment"
     },
     "buttons": {
       "backToEvents": "Back to events",
       "browseGallery": "Browse archives",
-      "backToMerch": "Merch"
+      "backToMerch": "Merch",
+      "backToEvent": "Back to the event"
     },
     "support": "Need help? Contact our support team"
   },
@@ -388,14 +398,16 @@
     "orderId": "Order ID: {orderId}",
     "whatsNext": {
       "title": "What's next?",
-      "tryAgain": "You can try again",
+      "tryAgain": "You can try again. Your details are still filled in.",
       "differentMethod": "Choose a different payment method",
       "contactSupport": "Contact support if you need help"
     },
     "buttons": {
       "backToEvents": "Back to events",
       "browseGallery": "Browse archives",
-      "backToMerch": "Merch"
+      "backToMerch": "Merch",
+      "tryAgain": "Try again",
+      "backToEvent": "Back to the event"
     },
     "support": "Need help? Contact our support team"
   },

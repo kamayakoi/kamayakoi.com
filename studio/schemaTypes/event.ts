@@ -1,4 +1,5 @@
 import {Rule} from 'sanity'
+import {lomiCatalogFields, lomiCatalogFieldset} from './lomiCatalogFields'
 
 export default {
   name: 'event',
@@ -239,6 +240,7 @@ export default {
           name: 'ticketType',
           title: 'Ticket / Offering',
           type: 'object',
+          fieldsets: [lomiCatalogFieldset],
           fields: [
             {
               name: 'name',
@@ -254,12 +256,13 @@ export default {
             },
             {
               name: 'productId',
-              title: 'lomi. Product ID',
+              title: 'lomi. Product ID (legacy)',
               type: 'string',
+              hidden: true,
               description:
-                'lomi.africa product ID for this ticket type (UUID format). Required for event ticket types.',
-              validation: (Rule: Rule) => Rule.required(),
+                'Deprecated. New publishes fill Product ID / Price ID under lomi. automatically.',
             },
+            ...lomiCatalogFields({fieldset: 'lomi'}),
             {
               name: 'description',
               title: 'Short description',
@@ -356,6 +359,7 @@ export default {
           name: 'bundle',
           title: 'Bundle / Package',
           type: 'object',
+          fieldsets: [lomiCatalogFieldset],
           fields: [
             {
               name: 'name',
@@ -380,12 +384,13 @@ export default {
             },
             {
               name: 'productId',
-              title: 'lomi. Product ID',
+              title: 'lomi. Product ID (legacy)',
               type: 'string',
+              hidden: true,
               description:
-                'lomi. product ID for this bundle (UUID format). Required for event bundles.',
-              validation: (Rule: Rule) => Rule.required(),
+                'Deprecated. New publishes fill Product ID / Price ID under lomi. automatically.',
             },
+            ...lomiCatalogFields({fieldset: 'lomi'}),
             {
               name: 'ticketsIncluded',
               title: 'Tickets included per bundle',

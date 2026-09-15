@@ -168,7 +168,7 @@ export default function CartPurchaseForm() {
       <div className="relative flex-1 min-h-0 py-4 overflow-y-auto">
         <CartContainer>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-6">
+            <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium">
                 {t(currentLanguage, 'cartPurchaseForm.labels.name')} *
               </Label>
@@ -177,7 +177,7 @@ export default function CartPurchaseForm() {
                 value={userName}
                 onChange={e => setUserName(e.target.value)}
                 onBlur={persistCheckoutFields}
-                className="rounded-sm mt-2"
+                className="rounded-sm min-h-11 text-base md:h-9 md:min-h-0 md:text-sm mt-2 focus-visible:ring-inset"
                 placeholder={t(
                   currentLanguage,
                   'cartPurchaseForm.placeholders.name'
@@ -186,7 +186,7 @@ export default function CartPurchaseForm() {
               />
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">
                 {t(currentLanguage, 'cartPurchaseForm.labels.email')} *
               </Label>
@@ -196,7 +196,7 @@ export default function CartPurchaseForm() {
                 value={userEmail}
                 onChange={e => setUserEmail(e.target.value)}
                 onBlur={persistCheckoutFields}
-                className="rounded-sm mt-2"
+                className="rounded-sm min-h-11 text-base md:h-9 md:min-h-0 md:text-sm mt-2 focus-visible:ring-inset"
                 placeholder={t(
                   currentLanguage,
                   'cartPurchaseForm.placeholders.email'
@@ -205,13 +205,22 @@ export default function CartPurchaseForm() {
               />
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-2">
               <Label className="text-sm font-medium">
                 {t(currentLanguage, 'cartPurchaseForm.labels.phone')} *
               </Label>
               <PhoneNumberInput
                 value={userPhone}
-                onChange={value => setUserPhone(value || '')}
+                onChange={value => {
+                  const next = value || '';
+                  setUserPhone(next);
+                  saveCheckoutForm({
+                    name: userName,
+                    email: userEmail,
+                    phone: next,
+                  });
+                }}
+                fieldSize="responsive"
                 className="mt-2"
                 placeholder={t(
                   currentLanguage,

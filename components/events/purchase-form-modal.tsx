@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Ticket, Plus, Minus } from 'lucide-react';
+import { Loader2, Ticket, Plus, Minus, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import { t } from '@/lib/i18n/translations';
@@ -40,6 +40,8 @@ interface PurchaseItem {
   maxPerOrder?: number;
   stock?: number | null;
   productId?: string;
+  lomiProductId?: string;
+  lomiPriceId?: string;
   ticketsIncluded?: number; // Number of tickets included per bundle
 }
 
@@ -58,11 +60,14 @@ interface CreateCheckoutSessionPayload {
   successUrlPath?: string;
   cancelUrlPath?: string;
   productId?: string;
+  lomiProductId?: string;
+  lomiPriceId?: string;
   allowCouponCode?: boolean;
   allowQuantity?: boolean;
   eventDateText?: string;
   eventTimeText?: string;
   eventVenueName?: string;
+  eventSlug?: string;
   // Bundle-specific fields
   isBundle?: boolean;
   ticketsPerBundle?: number;
@@ -75,6 +80,7 @@ interface PurchaseFormModalProps {
   eventDetails: {
     id: string; // Event Sanity _id
     title: string;
+    slug?: string;
     dateText?: string;
     timeText?: string;
     venueName?: string;
@@ -374,11 +380,14 @@ export default function PurchaseFormModal({
       successUrlPath: '/payment/success', // Or from config
       cancelUrlPath: '/payment/error', // Or from config
       productId: item.productId,
+      lomiProductId: item.lomiProductId,
+      lomiPriceId: item.lomiPriceId,
       allowCouponCode: true, // Enable coupon codes by default
       allowQuantity: shouldAllowQuantity,
       eventDateText: eventDetails.dateText,
       eventTimeText: eventDetails.timeText,
       eventVenueName: eventDetails.venueName,
+      eventSlug: eventDetails.slug,
       // Bundle-specific fields
       isBundle: item.isBundle,
       ticketsPerBundle: item.ticketsIncluded || 1,
@@ -535,9 +544,13 @@ export default function PurchaseFormModal({
                   : undefined
               }
             >
+              {isMobile && (
+                <div className="flex justify-center pt-1 pb-2 md:hidden">
+                  <span className="h-1 w-10 rounded-full bg-muted-foreground/40" />
+                </div>
+              )}
               <div className="flex flex-col flex-1 min-h-0">
-                {/* Header */}
-                <div className="flex items-start py-3 md:py-6 flex-shrink-0 px-2">
+                <div className="flex items-start justify-between gap-3 py-3 md:py-6 flex-shrink-0 px-2">
                   <div>
                     <h2
                       id="purchase-modal-title"
@@ -549,6 +562,14 @@ export default function PurchaseFormModal({
                       {t(currentLanguage, 'purchaseModal.description')}
                     </p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="shrink-0 rounded-sm p-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 min-h-11 min-w-11 inline-flex items-center justify-center"
+                    aria-label={t(currentLanguage, 'purchaseModal.close')}
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
                 </div>
 
                 {/* Form Content — horizontal padding inside scroll so focus rings are not clipped */}
@@ -663,7 +684,15 @@ export default function PurchaseFormModal({
                       </Label>
                       <PhoneNumberInput
                         value={userPhone}
-                        onChange={value => setUserPhone(value || '')}
+                        onChange={value => {
+                          const next = value || '';
+                          setUserPhone(next);
+                          saveCheckoutForm({
+                            name: userName,
+                            email: userEmail,
+                            phone: next,
+                          });
+                        }}
                         fieldSize="responsive"
                         className="mt-2"
                         placeholder={t(
@@ -689,6 +718,12 @@ export default function PurchaseFormModal({
                         >
                           <Minus className="h-3 w-3" />
                         </Button>
+                        <span
+                          className="flex-1 text-center text-base font-medium mt-2 md:hidden tabular-nums"
+                          aria-live="polite"
+                        >
+                          {quantity}
+                        </span>
                         <Input
                           id="quantity"
                           name="quantity"
@@ -699,7 +734,7 @@ export default function PurchaseFormModal({
                           onBlur={handleQuantityBlur}
                           onFocus={scrollActiveFieldIntoView}
                           enterKeyHint="done"
-                          className="rounded-sm min-h-11 text-base text-center flex-1 md:h-9 md:min-h-0 md:text-sm mt-2 focus-visible:ring-inset"
+                          className="hidden md:block rounded-sm min-h-11 text-base text-center flex-1 md:h-9 md:min-h-0 md:text-sm mt-2 focus-visible:ring-inset"
                           required
                         />
                         <Button

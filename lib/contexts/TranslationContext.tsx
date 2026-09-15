@@ -20,7 +20,7 @@ interface TranslationContextType {
 }
 
 const TranslationContext = createContext<TranslationContextType>({
-  currentLanguage: 'en',
+  currentLanguage: 'fr',
   setLanguage: () => {},
 });
 
@@ -41,7 +41,7 @@ function readStoredLanguage(): Language | null {
 
 export function TranslationProvider({
   children,
-  initialLanguage = 'en',
+  initialLanguage = 'fr',
 }: {
   children: React.ReactNode;
   initialLanguage?: Language;

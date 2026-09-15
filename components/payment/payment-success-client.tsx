@@ -14,6 +14,8 @@ import { clearCheckoutForm } from '@/lib/utils/checkout-form-storage';
 
 interface PaymentSuccessClientProps {
   purchaseId?: string;
+  flow?: string;
+  eventSlug?: string;
   ticketsButtonLocation?: 'header' | 'hero';
   showBlogInNavigation?: boolean;
   showArchivesInNavigation?: boolean;
@@ -21,12 +23,27 @@ interface PaymentSuccessClientProps {
 
 export function PaymentSuccessClient({
   purchaseId,
+  flow,
+  eventSlug,
   ticketsButtonLocation = 'header',
   showBlogInNavigation = true,
   showArchivesInNavigation = true,
 }: PaymentSuccessClientProps) {
   const { currentLanguage } = useTranslation();
   const { button } = useTheme();
+  const isMerch = flow === 'merch';
+  const returnHref = isMerch
+    ? '/merch'
+    : eventSlug
+      ? `/events/${eventSlug}`
+      : '/events';
+  const whatsappHref = purchaseId
+    ? `https://wa.me/?text=${encodeURIComponent(
+        t(currentLanguage, 'paymentSuccess.whatsAppText', {
+          orderId: purchaseId,
+        })
+      )}`
+    : null;
 
   useEffect(() => {
     clearCheckoutForm();
@@ -59,7 +76,17 @@ export function PaymentSuccessClient({
                 <Card className="bg-card/50 backdrop-blur-sm border-border">
                   <CardContent className="p-4">
                     <div className="text-center text-muted-foreground">
-                      <p>{t(currentLanguage, 'paymentSuccess.description')}</p>
+                      <p>
+                        {t(
+                          currentLanguage,
+                          isMerch
+                            ? 'paymentSuccess.descriptionMerch'
+                            : 'paymentSuccess.descriptionTicket'
+                        )}
+                      </p>
+                      <p className="text-sm mt-2">
+                        {t(currentLanguage, 'paymentSuccess.emailDelay')}
+                      </p>
                       {purchaseId && (
                         <div className="mt-4 p-3 rounded-sm bg-green-900/20 border border-green-800/50">
                           <p className="text-xs uppercase tracking-wide text-green-400 mb-1">
@@ -85,34 +112,55 @@ export function PaymentSuccessClient({
                     </h3>
                   </div>
                   <ul className="text-sm text-green-300 space-y-1">
-                    <li>
-                      •{' '}
-                      {t(
-                        currentLanguage,
-                        'paymentSuccess.whatsNext.checkEmail'
-                      )}
-                    </li>
-                    <li>
-                      •{' '}
-                      {t(
-                        currentLanguage,
-                        'paymentSuccess.whatsNext.presentTicket'
-                      )}
-                    </li>
-                    <li>
-                      •{' '}
-                      {t(
-                        currentLanguage,
-                        'paymentSuccess.whatsNext.arriveEarly'
-                      )}
-                    </li>
-                    <li>
-                      •{' '}
-                      {t(
-                        currentLanguage,
-                        'paymentSuccess.whatsNext.trackOrder'
-                      )}
-                    </li>
+                    {isMerch ? (
+                      <>
+                        <li>
+                          •{' '}
+                          {t(
+                            currentLanguage,
+                            'paymentSuccess.whatsNext.merchCheckEmail'
+                          )}
+                        </li>
+                        <li>
+                          •{' '}
+                          {t(
+                            currentLanguage,
+                            'paymentSuccess.whatsNext.merchWait'
+                          )}
+                        </li>
+                        <li>
+                          •{' '}
+                          {t(
+                            currentLanguage,
+                            'paymentSuccess.whatsNext.merchKeepId'
+                          )}
+                        </li>
+                      </>
+                    ) : (
+                      <>
+                        <li>
+                          •{' '}
+                          {t(
+                            currentLanguage,
+                            'paymentSuccess.whatsNext.checkEmail'
+                          )}
+                        </li>
+                        <li>
+                          •{' '}
+                          {t(
+                            currentLanguage,
+                            'paymentSuccess.whatsNext.presentTicket'
+                          )}
+                        </li>
+                        <li>
+                          •{' '}
+                          {t(
+                            currentLanguage,
+                            'paymentSuccess.whatsNext.arriveEarly'
+                          )}
+                        </li>
+                      </>
+                    )}
                   </ul>
                 </div>
 
@@ -121,14 +169,39 @@ export function PaymentSuccessClient({
                     asChild
                     className={`w-full ${button.secondaryBorder}`}
                   >
-                    <Link href="/events">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      {t(
-                        currentLanguage,
-                        'paymentSuccess.buttons.backToEvents'
+                    <Link href={returnHref}>
+                      {isMerch ? (
+                        <Package className="w-4 h-4 mr-2" />
+                      ) : (
+                        <Calendar className="w-4 h-4 mr-2" />
                       )}
+                      {isMerch
+                        ? t(
+                            currentLanguage,
+                            'paymentSuccess.buttons.backToMerch'
+                          )
+                        : eventSlug
+                          ? t(
+                              currentLanguage,
+                              'paymentSuccess.buttons.backToEvent'
+                            )
+                          : t(
+                              currentLanguage,
+                              'paymentSuccess.buttons.backToEvents'
+                            )}
                     </Link>
                   </Button>
+                  {whatsappHref && (
+                    <Button variant="outline" asChild className="w-full">
+                      <a
+                        href={whatsappHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {t(currentLanguage, 'paymentSuccess.shareWhatsApp')}
+                      </a>
+                    </Button>
+                  )}
 
                   <div className="flex gap-3">
                     <Button variant="outline" asChild className="flex-1">

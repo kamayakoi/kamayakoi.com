@@ -78,7 +78,9 @@ export async function getEventBySlug(slug: string, locale: string) {
         salesStart,
         salesEnd,
         active,
-        productId
+        productId,
+        lomiProductId,
+        lomiPriceId
       },
       lineup[]->{
         _id,
@@ -110,6 +112,8 @@ export async function getEventBySlug(slug: string, locale: string) {
         salesEnd,
         maxPerOrder,
         productId,
+        lomiProductId,
+        lomiPriceId,
         ticketsIncluded
       }
     }
@@ -159,6 +163,8 @@ export interface EventPageData {
     salesEnd?: string | null;
     active: boolean;
     productId?: string;
+    lomiProductId?: string;
+    lomiPriceId?: string;
   }>;
   bundles?: Array<{
     _key: string;
@@ -173,6 +179,8 @@ export interface EventPageData {
     salesEnd?: string | null;
     maxPerOrder?: number;
     productId?: string;
+    lomiProductId?: string;
+    lomiPriceId?: string;
     ticketsIncluded?: number;
   }>;
   lineup?: Array<{
@@ -224,7 +232,9 @@ export async function getEventPageData(
         salesStart,
         salesEnd,
         active,
-        productId
+        productId,
+        lomiProductId,
+        lomiPriceId
       },
       lineup[]->{
         _id,
@@ -256,6 +266,8 @@ export async function getEventPageData(
         salesEnd,
         maxPerOrder,
         productId,
+        lomiProductId,
+        lomiPriceId,
         ticketsIncluded
       }
     }

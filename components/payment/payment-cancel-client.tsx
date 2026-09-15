@@ -12,6 +12,8 @@ import { motion } from 'framer-motion';
 
 interface PaymentCancelClientProps {
   purchaseId?: string;
+  flow?: string;
+  eventSlug?: string;
   ticketsButtonLocation?: 'header' | 'hero';
   showBlogInNavigation?: boolean;
   showArchivesInNavigation?: boolean;
@@ -19,12 +21,20 @@ interface PaymentCancelClientProps {
 
 export function PaymentCancelClient({
   purchaseId,
+  flow,
+  eventSlug,
   ticketsButtonLocation = 'header',
   showBlogInNavigation = true,
   showArchivesInNavigation = true,
 }: PaymentCancelClientProps) {
   const { currentLanguage } = useTranslation();
   const { button } = useTheme();
+  const isMerch = flow === 'merch';
+  const returnHref = isMerch
+    ? '/merch'
+    : eventSlug
+      ? `/events/${eventSlug}`
+      : '/events';
 
   return (
     <>
@@ -98,26 +108,36 @@ export function PaymentCancelClient({
                     asChild
                     className={`w-full ${button.secondaryBorder}`}
                   >
-                    <Link href="/">
+                    <Link href={returnHref}>
                       <Calendar className="w-4 h-4 mr-2" />
-                      {t(currentLanguage, 'paymentCancel.buttons.backToEvents')}
+                      {t(currentLanguage, 'paymentCancel.buttons.tryAgain')}
                     </Link>
                   </Button>
 
                   <div className="flex gap-3">
                     <Button variant="outline" asChild className="flex-1">
+                      <Link href={returnHref}>
+                        {isMerch
+                          ? t(
+                              currentLanguage,
+                              'paymentCancel.buttons.backToMerch'
+                            )
+                          : eventSlug
+                            ? t(
+                                currentLanguage,
+                                'paymentCancel.buttons.backToEvent'
+                              )
+                            : t(
+                                currentLanguage,
+                                'paymentCancel.buttons.backToEvents'
+                              )}
+                      </Link>
+                    </Button>
+                    <Button variant="outline" asChild className="flex-1">
                       <Link href="/archives">
                         {t(
                           currentLanguage,
                           'paymentCancel.buttons.browseGallery'
-                        )}
-                      </Link>
-                    </Button>
-                    <Button variant="outline" asChild className="flex-1">
-                      <Link href="/merch">
-                        {t(
-                          currentLanguage,
-                          'paymentCancel.buttons.backToMerch'
                         )}
                       </Link>
                     </Button>

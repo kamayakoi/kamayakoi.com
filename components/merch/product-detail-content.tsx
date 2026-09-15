@@ -31,15 +31,15 @@ function ProductImageCarousel({
   images,
   productName,
 }: ProductImageCarouselProps) {
-  const [, setApi] = useState<CarouselApi>();
+  const [api, setApi] = useState<CarouselApi>();
 
   return (
-    <>
+    <div className="w-full">
       <Carousel setApi={setApi} className="w-full">
         <CarouselContent>
           {images.map((image, index) => (
             <CarouselItem key={index}>
-              <div className="flex-1 min-h-[650px] relative overflow-hidden rounded-sm bg-muted shadow-2xl">
+              <div className="relative overflow-hidden rounded-sm bg-muted shadow-2xl min-h-[55vw] max-h-[420px] md:min-h-[650px] md:max-h-none md:flex-1">
                 <Image
                   src={image.url}
                   alt={
@@ -57,7 +57,28 @@ function ProductImageCarousel({
         <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 rounded-sm" />
         <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 rounded-sm" />
       </Carousel>
-    </>
+
+      {images.length > 1 && (
+        <div className="mt-4 grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2">
+          {images.map((image, index) => (
+            <button
+              key={`thumb-${index}`}
+              type="button"
+              onClick={() => api?.scrollTo(index)}
+              className="relative w-full pb-[100%] overflow-hidden rounded-sm border border-border/40 hover:border-primary transition-colors"
+            >
+              <Image
+                src={image.url}
+                alt={typeof productName === 'string' ? productName : 'Product'}
+                fill
+                className="object-cover"
+                quality={80}
+              />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -207,7 +228,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 productName={product.name}
               />
             ) : mainImage ? (
-              <div className="flex-1 min-h-[650px] relative overflow-hidden rounded-sm bg-muted shadow-2xl">
+              <div className="relative overflow-hidden rounded-sm bg-muted shadow-2xl min-h-[55vw] max-h-[420px] md:min-h-[650px] md:max-h-none md:flex-1">
                 <Image
                   src={mainImage}
                   alt={
@@ -220,7 +241,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent"></div>
               </div>
             ) : (
-              <div className="flex-1 min-h-[650px] relative overflow-hidden rounded-sm bg-muted flex items-center justify-center shadow-2xl">
+              <div className="relative overflow-hidden rounded-sm bg-muted flex items-center justify-center shadow-2xl min-h-[55vw] max-h-[420px] md:min-h-[650px] md:max-h-none md:flex-1">
                 <span className="text-muted-foreground">
                   {t(currentLanguage, 'merchPage.productDetail.noImage')}
                 </span>
@@ -230,7 +251,7 @@ function ProductDetail({ product }: ProductDetailContentProps) {
 
           {/* Product Information */}
           <motion.div
-            className="space-y-8 min-h-[650px] flex flex-col mt-0"
+            className="space-y-8 flex flex-col mt-0 md:min-h-[650px]"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}

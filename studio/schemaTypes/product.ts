@@ -1,4 +1,5 @@
 import {Rule} from 'sanity'
+import {lomiCatalogFields} from './lomiCatalogFields'
 
 export default {
   name: 'product',
@@ -10,6 +11,7 @@ export default {
     {name: 'media', title: 'Media'},
     {name: 'organization', title: 'Organization'},
     {name: 'shipping', title: 'Shipping'},
+    {name: 'lomi', title: 'lomi.'},
   ],
   fields: [
     {
@@ -230,6 +232,7 @@ export default {
       group: 'shipping',
       initialValue: true,
     },
+    ...lomiCatalogFields({group: 'lomi'}),
   ],
   preview: {
     select: {

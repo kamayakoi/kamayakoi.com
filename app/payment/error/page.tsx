@@ -6,6 +6,9 @@ import { getHomepageContent } from '@/lib/sanity/queries';
 interface SearchParamsProps {
   searchParams: Promise<{
     purchase_id?: string;
+    purchase_ids?: string;
+    flow?: string;
+    event_slug?: string;
   }>;
 }
 
@@ -20,7 +23,9 @@ export default async function PaymentCancelPage({
   return (
     <Suspense fallback={<LoadingComponent />}>
       <PaymentCancelClient
-        purchaseId={params.purchase_id}
+        purchaseId={params.purchase_id || params.purchase_ids}
+        flow={params.flow}
+        eventSlug={params.event_slug}
         ticketsButtonLocation={homepageData?.ticketsButtonLocation}
         showBlogInNavigation={homepageData?.showBlogInNavigation}
         showArchivesInNavigation={homepageData?.showArchivesInNavigation}

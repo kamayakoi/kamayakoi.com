@@ -35,7 +35,7 @@ export function middleware(request: NextRequest) {
   const detected =
     acceptLanguage && isSupportedLanguage(acceptLanguage)
       ? acceptLanguage
-      : 'en';
+      : 'fr';
 
   response.cookies.set(LANGUAGE_COOKIE_KEY, detected, {
     path: '/',

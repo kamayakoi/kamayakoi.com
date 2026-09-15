@@ -269,6 +269,7 @@
     "only": "Seulement",
     "available": "disponible",
     "availablePlural": "disponibles",
+    "stockLeft": "{count} restants",
     "includesTickets": "Inclut {count} ticket(s)",
     "ticketsGenerated": "Tickets à générer",
     "labels": {
